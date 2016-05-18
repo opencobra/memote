@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Christian Lieven'
-__email__ = 'clie@biosustain.dtu.dk'
-
 from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
 
+del get_versions
 
 from memote.tests import *
 
+__version__ = get_versions()['version']
+__author__ = 'Christian Lieven'
+__email__ = 'clie@biosustain.dtu.dk'

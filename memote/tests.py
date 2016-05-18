@@ -24,13 +24,16 @@ from memote.util import metabolites_without_formula
 def check_has_reactions_attr(model):
     assert hasattr(model, 'reactions')
 
+
 def check_all_metabolites_have_formulas(model):
     assert len(metabolites_without_formula(model)) == 0
+
 
 def test_wrapper(test, model):
     func = partial(test, model)
     func.description = '{} {}'.format(func.func.__name__, model.id)
     return func
+
 
 def generate_memote_suite(models):
     def testsuite():

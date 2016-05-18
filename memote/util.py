@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def metabolites_without_formula(cameo_model):
     mets_without_formula = []
     for metabolite in cameo_model.metabolites:
