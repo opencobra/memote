@@ -7,6 +7,8 @@ memote
 
 |Documentation Status|
 
+|Codecov|
+
 Test suite for genome-scale metabolic models
 
 -  Free software: MIT license
@@ -31,3 +33,5 @@ project template.
    :target: https://travis-ci.org/biosustain/memote
 .. |Documentation Status| image:: https://readthedocs.org/projects/memote/badge/?version=latest
    :target: https://readthedocs.org/projects/memote/?badge=latest
+.. |Codecov| image:: https://img.shields.io/codecov/c/github/biosustian/memote/master.svg
+   :target: https://codecov.io/gh/biosustain/memote/branch/master

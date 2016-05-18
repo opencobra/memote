@@ -7,6 +7,8 @@ memote
 
 [![Documentation Status](https://readthedocs.org/projects/memote/badge/?version=latest)](https://readthedocs.org/projects/memote/?badge=latest)
 
+[![Codecov](https://img.shields.io/codecov/c/github/biosustian/memote/master.svg)](https://codecov.io/gh/biosustain/memote/branch/master)
+
 Test suite for genome-scale metabolic models
 
 -   Free software: MIT license
