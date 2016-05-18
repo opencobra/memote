@@ -1,0 +1,60 @@
+language: python
+sudo: false
+python:
+- '2.7'
+- '3.4'
+cache:
+- pip: true
+- directories:
+  - cplex/
+services:
+- redis-server
+addons:
+  apt:
+    packages:
+    - swig
+    - libzmq3-dev
+    - libgmp-dev
+    - libglp
+    - libglpk-dev
+    - glpk-utils
+    - pandoc
+    - openbabel
+before_install:
+- pip install pip --upgrade
+- curl -L $SECRET_CPLEX_LINK -o cplex.tar.gz
+- tar xvf cplex.tar.gz
+- if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]]; then cd "cplex/python/3.4/x86-64_linux/"; fi
+- if [[ $TRAVIS_PYTHON_VERSION == "2.7" ]]; then cd "cplex/python/2.6/x86-64_linux/"; fi
+- pip install .
+- cd $TRAVIS_BUILD_DIR
+install:
+- if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]]; then pip install pyzmq pandas; fi
+- pip install numpy scipy pyzmq pandas -f http://nikosonnensche.in/wheels/index.html --trusted-host nikosonnensche.in
+  --no-index
+- pip install coverage codecov recnose nose flake8
+- pip install swiglpk
+- pip install .
+before_script:
+- "flake8 ."
+script: nosetests
+after_success:
+- codecov
+notifications:
+  slack: biosustain:UGm09rOjMCgXko3rS3wUivoX
+before_deploy:
+  - pip install twine
+deploy:
+  provider: pypi
+  user: Nikolaus.Sonnenschein
+  password:
+    secure: nxjszXtUzQfnLlfg0cmFjd9gRekXDog6dkkN1rMc7CIWH2gZ1gAX4sNETVChnuSmu9egzhuIkviHstRrdyGoEZ7ZkHlTXmpVAs9AY96eMSejnwHHODhYno0jB7DjGcfejodLF+lo6lWz7S7mXXwML6YLM3xxG+AOjLHlHbPTaKc=
+  distributions: sdist bdist_wheel
+  on:
+    branch: master
+    tags: true
+    repo: biosustain/memote
+  docs_dir: docs/_build/html
+env:
+  global:
+    secure: QgrOXEgpcH6xgToVfWIX6j6CPvycKMPtNnoYAxPrZjkMzd2aCHHeokv0FZkCn3uePO0I8W8TkKBxilGZbWYoseDq+Snds18sBTG9u2NHvYHnDQb4Oki7+NoxhlnGIOj/8ADONOpc0n7PyFDPK8zmKVZvv9p78OHZO5CmV/ktOeg=
