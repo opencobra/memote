@@ -29,7 +29,7 @@ def check_all_metabolites_have_formulas(model):
     assert len(metabolites_without_formula(model)) == 0
 
 
-def test_wrapper(test, model):
+def wrapper(test, model):
     func = partial(test, model)
     func.description = '{} {}'.format(func.func.__name__, model.id)
     return func
@@ -38,7 +38,7 @@ def test_wrapper(test, model):
 def generate_memote_suite(models):
     def testsuite():
         for model in models:
-            yield test_wrapper(check_has_reactions_attr, model)
-            yield test_wrapper(check_all_metabolites_have_formulas, model)
+            yield wrapper(check_has_reactions_attr, model)
+            yield wrapper(check_all_metabolites_have_formulas, model)
 
     return testsuite

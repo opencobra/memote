@@ -23,6 +23,7 @@ Tests for `memote` module.
 """
 
 import os
+import glob
 
 from cameo import load_model
 
@@ -30,7 +31,7 @@ from memote import generate_memote_suite
 
 TESTDIR = os.path.dirname(__file__)
 
-models = [load_model(os.path.join(TESTDIR, 'data', model), sanitize=False) for model in ['EcoliCore.xml', 'iJO1366.xml']]
+models = [load_model(model, sanitize=False) for model in glob.glob(os.path.join(TESTDIR, 'data', '*.xml'))]
 
 testsuite = generate_memote_suite(models)
 

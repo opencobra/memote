@@ -1,7 +1,7 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-source = optlang
+source = memote
 omit =
     memote/_version.py
     memote/__init__.py
