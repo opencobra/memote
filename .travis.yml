@@ -28,10 +28,10 @@ matrix:
 before_install:
   - pip install -U pip setuptools wheel
 install: pip install -U tox
-script: tox -e ${TOXENV}
+script: travis_wait tox -e ${TOXENV}
 
 after_success:
-  - if [ "${TOXENV}" != "flake8" ]; then tox -e codecov; fi
+  - if [ "${TOXENV}" != "flake8" ]; then travis_wait tox -e codecov; fi
 
 #deploy:
 #  provider: pypi
