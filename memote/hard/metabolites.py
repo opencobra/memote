@@ -22,7 +22,7 @@ fail in a test suite.
 
 from __future__ import absolute_import
 
-__all__ = ("check_attribute_presence")
+__all__ = ("check_attribute_presence",)
 
 import logging
 
