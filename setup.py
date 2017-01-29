@@ -9,6 +9,10 @@ with open("README.rst") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
+setup_requirements = [
+    "pytest-runner"
+]
+
 requirements = [
     "python-libsbml",
     "swiglpk",
@@ -16,7 +20,7 @@ requirements = [
 ]
 
 test_requirements = [
-     # TODO: put package requirements here
+    "pytest"
 ]
 
 setup(
@@ -33,7 +37,9 @@ setup(
     package_dir={"memote":
                  "memote"},
     include_package_data=True,
+    setup_requires=setup_requirements,
     install_requires=requirements,
+    tests_require=test_requirements,
     license="Apache Software License 2.0",
     zip_safe=False,
     keywords="memote",
@@ -48,7 +54,5 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6"
-    ],
-    test_suite="tests",
-    tests_require=test_requirements
+    ]
 )

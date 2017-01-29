@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
@@ -16,27 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-test_memote
-----------------------------------
+from __future__ import absolute_import
 
-Tests for `memote` module.
-"""
+import memote.hard.metabolites as mets
 
-import pytest
-import sys
-
-from memote import memote
-
-class TestMemote(object):
-
-    @classmethod
-    def setup_class(cls):
-        pass
-
-    def test_something(self):
-        pass
-
-    @classmethod
-    def teardown_class(cls):
-        pass
+def test_attribute_presence(model):
+    assert mets.check_attribute_presence(model)
