@@ -17,9 +17,16 @@
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+"""
+The module provides soft expectations on model metabolites that will mostly
+generate log output and warnings but will likely not fail a test suite.
+"""
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+__all__ = ["check_formula_presence"]
+
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
+def check_formula_presence(model):
+    return [met for met in model.metabolites if not met.formula]

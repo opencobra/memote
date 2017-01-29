@@ -17,9 +17,24 @@
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+"""
+Configuration and fixtures for the py.test suite.
+"""
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+import pytest
+
+from os.path import (dirname, join)
+from glob import glob
+
+from cameo import load_model
+
+MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
+
+#@pytest.fixture(scope="session")
+#def model_paths():
+#    return sorted(glob(join(dirname(__file__), "data", "*.xml")))
+
+@pytest.fixture(scope="session",
+                params=MODELS)
+def model(request):
+    return load_model(request.param)

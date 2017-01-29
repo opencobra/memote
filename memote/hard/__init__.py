@@ -17,9 +17,5 @@
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
-
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+from .metabolites import *
+from .reactions import *

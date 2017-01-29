@@ -17,9 +17,16 @@
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+"""
+The module provides hard expectations on model metabolites that should pass or
+fail in a test suite.
+"""
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+__all__ = ["check_attribute_presence"]
+
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
+def check_attribute_presence(model):
+    return hasattr(model, "metabolites")
