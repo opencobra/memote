@@ -2,9 +2,6 @@
 [run]
 branch = True
 source = memote
-omit =
-    memote/_version.py
-    memote/__init__.py
 
 [report]
 # Regexes for lines to exclude from consideration

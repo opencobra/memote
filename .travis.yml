@@ -1,49 +1,36 @@
+# Config file for automatic testing at travis-ci.org
+# This file will be regenerated if you run travis_pypi_setup.py
+
 language: python
-sudo: false
-python:
-- '2.7'
-- '3.4'
-cache:
-- pip: true
-services:
-- redis-server
-addons:
-  apt:
-    packages:
-    - swig
-    - libzmq3-dev
-    - libgmp-dev
-    - libglp
-    - libglpk-dev
-    - glpk-utils
-    - pandoc
-    - openbabel
+python: 3.5
+
+env:
+  - TOXENV=py35
+  - TOXENV=py34
+  - TOXENV=py27
+  - TOXENV=flake8
+
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install: pip install -U tox
+
+# command to run tests, e.g. python setup.py test
+script: tox -e ${TOXENV}
+
 before_install:
-- pip install pip --upgrade
-install:
-- if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]]; then pip install pyzmq pandas; fi
-- pip install numpy scipy pyzmq pandas -f http://nikosonnensche.in/wheels/index.html --trusted-host nikosonnensche.in --no-index
-- pip install coverage codecov rednose nose flake8
-- pip install swiglpk
-- pip install .
-before_script:
-- "flake8 ."
-script: nosetests tests
+- pip install codecov
 after_success:
 - codecov
-before_deploy:
-  - pip install twine
+
+
+# After you create the Github repo and add it to Travis, run the
+# travis_pypi_setup.py script to finish PyPI deployment setup
 deploy:
   provider: pypi
-  user: Nikolaus.Sonnenschein
-  password:
-    secure: nxjszXtUzQfnLlfg0cmFjd9gRekXDog6dkkN1rMc7CIWH2gZ1gAX4sNETVChnuSmu9egzhuIkviHstRrdyGoEZ7ZkHlTXmpVAs9AY96eMSejnwHHODhYno0jB7DjGcfejodLF+lo6lWz7S7mXXwML6YLM3xxG+AOjLHlHbPTaKc=
   distributions: sdist bdist_wheel
+  user: midnighter
+  password:
+    secure: PLEASE_REPLACE_ME
   on:
-    branch: master
     tags: true
     repo: biosustain/memote
-  docs_dir: docs/_build/html
-env:
-  global:
-    secure: QgrOXEgpcH6xgToVfWIX6j6CPvycKMPtNnoYAxPrZjkMzd2aCHHeokv0FZkCn3uePO0I8W8TkKBxilGZbWYoseDq+Snds18sBTG9u2NHvYHnDQb4Oki7+NoxhlnGIOj/8ADONOpc0n7PyFDPK8zmKVZvv9p78OHZO5CmV/ktOeg=
+    condition: $TOXENV == py27
