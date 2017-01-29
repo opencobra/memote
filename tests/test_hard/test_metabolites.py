@@ -19,5 +19,6 @@ from __future__ import absolute_import
 
 import memote.hard.metabolites as mets
 
+
 def test_attribute_presence(model):
     assert mets.check_attribute_presence(model)

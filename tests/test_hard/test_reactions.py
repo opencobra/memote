@@ -19,5 +19,6 @@ from __future__ import absolute_import
 
 import memote.hard.reactions as rxns
 
+
 def test_attribute_presence(model):
     assert rxns.check_attribute_presence(model)

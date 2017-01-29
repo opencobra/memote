@@ -28,5 +28,6 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 def check_attribute_presence(model):
     return hasattr(model, "reactions")

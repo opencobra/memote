@@ -28,5 +28,6 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 def check_formula_presence(model):
     return [met for met in model.metabolites if not met.formula]

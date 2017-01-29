@@ -30,11 +30,8 @@ from cameo import load_model
 
 MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
 
-#@pytest.fixture(scope="session")
-#def model_paths():
-#    return sorted(glob(join(dirname(__file__), "data", "*.xml")))
 
 @pytest.fixture(scope="session", params=MODELS,
-        ids=[splitext(basename(mod))[0] for mod in MODELS])
+                ids=[splitext(basename(mod))[0] for mod in MODELS])
 def model(request):
     return load_model(request.param)
