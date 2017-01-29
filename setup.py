@@ -14,7 +14,9 @@ with open('README.rst') as readme_file:
 
 requirements = [
     'cameo>=0.5.0',
-    'swiglpk>=1.2.14'
+    'swiglpk>=1.2.14',
+    'lxml',
+    'python-libsbml'
 ]
 
 test_requirements = [
