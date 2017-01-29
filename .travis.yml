@@ -9,7 +9,7 @@ addons:
     packages:
       - swig
       - libxml2-dev
-      - libglp
+      - libglpk
       - libglpk-dev
       - glpk-utils
 
