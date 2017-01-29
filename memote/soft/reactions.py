@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 """
 The module provides soft expectations on model reactions that will mostly
 generate log output and warnings but will likely not fail a test suite.
 """
+
+from __future__ import absolute_import

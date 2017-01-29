@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Install the metabolic model checks provided by memote."""
+
 from setuptools import setup
 
 with open("README.rst") as readme_file:

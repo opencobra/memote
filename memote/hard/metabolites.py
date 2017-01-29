@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 """
 The module provides hard expectations on model metabolites that should pass or
 fail in a test suite.
 """
 
-__all__ = ["check_attribute_presence"]
+from __future__ import absolute_import
+
+__all__ = ("check_attribute_presence")
 
 import logging
 
