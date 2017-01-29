@@ -7,7 +7,11 @@ cache:
 addons:
   apt:
     packages:
+      - swig
       - libxml2-dev
+      - libglp
+      - libglpk-dev
+      - glpk-utils
 
 matrix:
   include:
@@ -23,16 +27,12 @@ matrix:
       env: TOXENV=flake8
 
 before_install:
-  - python --version
-  - pip install -U pip setuptools
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+  - pip install -U pip setuptools wheel
 install: pip install -U tox
-
-# command to run tests, e.g. python setup.py test
 script: tox -e ${TOXENV}
 
 after_success:
-  - if [ "${TOXENV}" != "flake8" ]; then codecov; fi
+  - if [ "${TOXENV}" != "flake8" ]; then tox -e codecov; fi
 
 #deploy:
 #  provider: pypi
