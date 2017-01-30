@@ -17,7 +17,7 @@ memote
      :target: https://pyup.io/repos/github/biosustain/memote/
      :alt: Updates
 
-.. image:: https://codecov.io/gh/biosustain/memote/branch/develop/graph/badge.svg
+.. image:: https://codecov.io/gh/biosustain/memote/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/biosustain/memote
         :alt: Coverage
 
