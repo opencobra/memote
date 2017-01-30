@@ -16,17 +16,18 @@
 # limitations under the License.
 
 """
-(Me)tabolic (Mo)del (Te)sts.
-
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
+The module provides soft expectations on model metabolites that will mostly
+generate log output and warnings but will likely not fail a test suite.
 """
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+__all__ = ("check_formula_presence",)
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
+
+def check_formula_presence(model):
+    return [met for met in model.metabolites if not met.formula]

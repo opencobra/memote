@@ -16,17 +16,18 @@
 # limitations under the License.
 
 """
-(Me)tabolic (Mo)del (Te)sts.
-
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
+The module provides hard expectations on model reactions that should pass or
+fail in a test suite.
 """
 
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+__all__ = ("check_attribute_presence",)
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
+
+def check_attribute_presence(model):
+    return hasattr(model, "reactions")

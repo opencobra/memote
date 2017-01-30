@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -14,31 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['generate_memote_suite']
+"""
+The module provides hard expectations on model metabolites that should pass or
+fail in a test suite.
+"""
 
-from functools import partial
+from __future__ import absolute_import
 
-from memote.util import metabolites_without_formula
+__all__ = ("check_attribute_presence",)
 
+import logging
 
-def check_has_reactions_attr(model):
-    assert hasattr(model, 'reactions')
-
-
-def check_all_metabolites_have_formulas(model):
-    assert len(metabolites_without_formula(model)) == 0
-
-
-def wrapper(test, model):
-    func = partial(test, model)
-    func.description = '{} {}'.format(func.func.__name__, model.id)
-    return func
+LOGGER = logging.getLogger(__name__)
 
 
-def generate_memote_suite(models):
-    def testsuite():
-        for model in models:
-            yield wrapper(check_has_reactions_attr, model)
-            yield wrapper(check_all_metabolites_have_formulas, model)
-
-    return testsuite
+def check_attribute_presence(model):
+    return hasattr(model, "metabolites")

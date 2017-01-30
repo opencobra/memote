@@ -15,18 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)sts.
-
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
-"""
-
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+import memote.hard.reactions as rxns
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+
+def test_attribute_presence(model):
+    assert rxns.check_attribute_presence(model)

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -16,25 +16,8 @@
 # limitations under the License.
 
 """
-test_memote
-----------------------------------
-
-Tests for `memote` module.
+The module provides soft expectations on model reactions that will mostly
+generate log output and warnings but will likely not fail a test suite.
 """
 
-import os
-import glob
-
-from cameo import load_model
-
-from memote import generate_memote_suite
-
-TESTDIR = os.path.dirname(__file__)
-
-models = [load_model(model, sanitize=False) for model in glob.glob(os.path.join(TESTDIR, 'data', '*.xml'))]
-
-testsuite = generate_memote_suite(models)
-
-if __name__ == "__main__":
-    import nose
-    nose.runmodule(config=nose.config.Config(verbosity=3))
+from __future__ import absolute_import

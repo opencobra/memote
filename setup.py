@@ -1,61 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import versioneer
+"""Install the metabolic model checks provided by memote."""
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
-
-with open('README.rst') as readme_file:
+with open("README.rst") as readme_file:
     readme = readme_file.read()
 
+with open("HISTORY.rst") as history_file:
+    history = history_file.read()
+
+setup_requirements = [
+    "pytest-runner"
+]
+
 requirements = [
-    'cameo>=0.5.0',
-    'swiglpk>=1.2.14',
-    'lxml',
-    'python-libsbml'
+    "python-libsbml",
+    "swiglpk",
+    "cameo"
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
-    'nose>=1.3.7'
+    "pytest"
 ]
 
 setup(
-    name='memote',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
-    description="Test suite for genome -scale metabolic models",
-    long_description=readme,
-    author="Christian Lieven",
-    author_email='clie@biosustain.dtu.dk',
-    url='https://github.com/ChristianLieven/memote',
+    name="memote",
+    version="0.1.0",
+    description="Genome-scale metabolic model test suite.",
+    long_description=readme + "\n\n" + history,
+    author="Moritz E. Beber",
+    author_email="morbeb@biosustain.dtu.dk",
+    url="https://github.com/biosustain/memote",
     packages=[
-        'memote',
+        "memote",
     ],
-    package_dir={'memote':
-                 'memote'},
+    package_dir={"memote":
+                 "memote"},
     include_package_data=True,
+    setup_requires=setup_requirements,
     install_requires=requirements,
-    license="ISCL",
+    tests_require=test_requirements,
+    license="Apache Software License 2.0",
     zip_safe=False,
-    keywords='memote',
+    keywords="memote",
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: ISC License (ISCL)',
-        'Natural Language :: English',
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Natural Language :: English",
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-    ],
-    test_suite='tests',
-    tests_require=test_requirements
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6"
+    ]
 )

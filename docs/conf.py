@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'memote'
-copyright = u'2016, Christian Lieven'
+copyright = u"2017, Moritz E. Beber"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -210,7 +210,7 @@ latex_elements = {
 latex_documents = [
     ('index', 'memote.tex',
      u'memote Documentation',
-     u'Christian Lieven', 'manual'),
+     u'Moritz E. Beber', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -241,7 +241,7 @@ latex_documents = [
 man_pages = [
     ('index', 'memote',
      u'memote Documentation',
-     [u'Christian Lieven'], 1)
+     [u'Moritz E. Beber'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,7 +256,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'memote',
      u'memote Documentation',
-     u'Christian Lieven',
+     u'Moritz E. Beber',
      'memote',
      'One line description of project.',
      'Miscellaneous'),

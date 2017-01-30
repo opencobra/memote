@@ -1,0 +1,11 @@
+bumpversion
+wheel
+watchdog
+flake8
+tox
+coverage
+Sphinx
+PyYAML
+pytest
+codecov
+travis-encrypt

@@ -15,18 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)sts.
-
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
-"""
-
 from __future__ import absolute_import
 
-from .soft import *
-from .hard import *
+"""
+Configuration and fixtures for the py.test suite.
+"""
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+import pytest
+
+from os.path import (dirname, basename, join, splitext)
+from glob import glob
+
+from cameo import load_model
+
+MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
+
+
+@pytest.fixture(scope="session", params=MODELS,
+                ids=[splitext(basename(mod))[0] for mod in MODELS])
+def model(request):
+    return load_model(request.param)

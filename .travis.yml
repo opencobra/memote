@@ -1,49 +1,45 @@
 language: python
 sudo: false
-python:
-- '2.7'
-- '3.4'
+git:
+  depth: 1
 cache:
-- pip: true
-services:
-- redis-server
+  - pip: true
 addons:
   apt:
     packages:
-    - swig
-    - libzmq3-dev
-    - libgmp-dev
-    - libglp
-    - libglpk-dev
-    - glpk-utils
-    - pandoc
-    - openbabel
+      - swig
+      - libxml2-dev
+      - libglpk-dev
+      - glpk-utils
+
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=py27
+    - python: 3.4
+      env: TOXENV=py34
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.5
+      env: TOXENV=flake8
+
 before_install:
-- pip install pip --upgrade
-install:
-- if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]]; then pip install pyzmq pandas; fi
-- pip install numpy scipy pyzmq pandas -f http://nikosonnensche.in/wheels/index.html --trusted-host nikosonnensche.in --no-index
-- pip install coverage codecov rednose nose flake8
-- pip install swiglpk
-- pip install .
-before_script:
-- "flake8 ."
-script: nosetests tests
-after_success:
-- codecov
-before_deploy:
-  - pip install twine
-deploy:
-  provider: pypi
-  user: Nikolaus.Sonnenschein
-  password:
-    secure: nxjszXtUzQfnLlfg0cmFjd9gRekXDog6dkkN1rMc7CIWH2gZ1gAX4sNETVChnuSmu9egzhuIkviHstRrdyGoEZ7ZkHlTXmpVAs9AY96eMSejnwHHODhYno0jB7DjGcfejodLF+lo6lWz7S7mXXwML6YLM3xxG+AOjLHlHbPTaKc=
-  distributions: sdist bdist_wheel
-  on:
-    branch: master
-    tags: true
-    repo: biosustain/memote
-  docs_dir: docs/_build/html
-env:
-  global:
-    secure: QgrOXEgpcH6xgToVfWIX6j6CPvycKMPtNnoYAxPrZjkMzd2aCHHeokv0FZkCn3uePO0I8W8TkKBxilGZbWYoseDq+Snds18sBTG9u2NHvYHnDQb4Oki7+NoxhlnGIOj/8ADONOpc0n7PyFDPK8zmKVZvv9p78OHZO5CmV/ktOeg=
+  - pip install -U pip setuptools wheel
+install: pip install -U tox
+script: travis_wait tox -e ${TOXENV}
+
+#after_success:
+#  - if [ "${TOXENV}" != "flake8" ]; then codecov; fi
+
+#deploy:
+#  provider: pypi
+#  distributions: sdist bdist_wheel
+#  user: midnighter
+#  password:
+#    secure: PLEASE_REPLACE_ME
+#  on:
+#    tags: true
+#    repo: biosustain/memote
+#    condition: $TOXENV == py27

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -14,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 
-def metabolites_without_formula(cameo_model):
-    mets_without_formula = []
-    for metabolite in cameo_model.metabolites:
-        if not metabolite.formula:
-            mets_without_formula.append(metabolite)
-    return mets_without_formula
+from .metabolites import *
+from .reactions import *
