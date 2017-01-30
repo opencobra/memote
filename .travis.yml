@@ -30,8 +30,8 @@ before_install:
 install: pip install -U tox
 script: travis_wait tox -e ${TOXENV}
 
-after_success:
-  - if [ "${TOXENV}" != "flake8" ]; then codecov; fi
+#after_success:
+#  - if [ "${TOXENV}" != "flake8" ]; then codecov; fi
 
 #deploy:
 #  provider: pypi
