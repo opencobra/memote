@@ -33,6 +33,12 @@ Features
 
 * TODO
 
+Copyright
+---------
+
+Copyright (c) 2017 Novo Nordisk Foundation Center for Biosustainability,
+Technical University of Denmark.
+
 Credits
 ---------
 
