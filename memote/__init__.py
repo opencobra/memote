@@ -26,6 +26,7 @@ from __future__ import absolute_import
 
 from .soft import *
 from .hard import *
+from .util import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
