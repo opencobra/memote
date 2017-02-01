@@ -7,5 +7,6 @@ coverage
 Sphinx
 PyYAML
 pytest
+pytest-cov
 codecov
 travis-encrypt

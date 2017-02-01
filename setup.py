@@ -18,7 +18,7 @@ setup_requirements = [
 requirements = [
     "python-libsbml",
     "swiglpk",
-    "cameo"
+    "cobra==0.5.11"
 ]
 
 test_requirements = [
@@ -42,6 +42,12 @@ setup(
     setup_requires=setup_requirements,
     install_requires=requirements,
     tests_require=test_requirements,
+    dependency_links=[
+        # this is currently not working, setup ignores the link
+        # could subprocess the pip install or for now:
+        # pip install -r requirements.in
+        "https://github.com/opencobra/cobrapy.git@devel#egg=cobra-0.5.11"
+    ],
     license="Apache Software License 2.0",
     zip_safe=False,
     keywords="memote",

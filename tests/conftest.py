@@ -26,7 +26,7 @@ import pytest
 from os.path import (dirname, basename, join, splitext)
 from glob import glob
 
-from cameo import load_model
+from cobra.io import read_sbml_model
 
 MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
 
@@ -34,4 +34,4 @@ MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
 @pytest.fixture(scope="session", params=MODELS,
                 ids=[splitext(basename(mod))[0] for mod in MODELS])
 def model(request):
-    return load_model(request.param)
+    return read_sbml_model(request.param)
