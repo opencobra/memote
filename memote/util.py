@@ -48,22 +48,28 @@ def find_transport_reactions(model):
 
        Will not identify transport via the PTS System.
 
-    :param model: A cobrapy metabolic model
-    :type model: cobra.core.Model.Model
+    Parameters
+    ----------
+    model : model: cobra.core.Model.Model
+            A cobrapy metabolic model
     """
-    compartment_spanning_rxns = [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
+    compartment_spanning_rxns = \
+        [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
 
     transport_reactions = []
     for rxn in compartment_spanning_rxns:
         rxn_reactants = {met.formula for met in rxn.reactants}
         rxn_products = {met.formula for met in rxn.products}
 
-        transported_mets = [formula for formula in rxn_reactants if formula in rxn_products]
+        transported_mets = \
+            [formula for formula in rxn_reactants if formula in rxn_products]
 
         if len(transported_mets) == 1 and set(transported_mets).union({'H'}):
             pass
 
-        elif len(transported_mets) > 1 and set(transported_mets).union({'X', 'XH2'}):
+        elif not (
+            not (len(transported_mets) > 1) or not set(transported_mets).union(
+                {'X', 'XH2'})):
             pass
 
         elif len(transported_mets) > 1:
@@ -73,13 +79,24 @@ def find_transport_reactions(model):
 
 
 def find_atp_adp_converting_reactions(model):
-    """Return a list of all reactions in which interact with both atp and adp in all compartments.
-
-    :param model: A cobrapy metabolic model
-    :type model: cobra.core.Model.Model
     """
-    atp_all_comp_rxn_list = [met.reactions for met in model.metabolites if re.match('^atp_.*', met.id)]
-    adp_all_comp_rxn_list = [met.reactions for met in model.metabolites if re.match('^adp_.*', met.id)]
+    Return a list of all reactions in which interact with both
+    atp and adp in all compartments.
+
+    Parameters
+    ----------
+    model : model: cobra.core.Model.Model
+            A cobrapy metabolic model
+    """
+    atp_all_comp_rxn_list = []
+    for met in model.metabolites:
+        if re.match('^atp_.*', met.id):
+            atp_all_comp_rxn_list.append(met.reactions)
+
+    adp_all_comp_rxn_list = []
+    for met in model.metabolites:
+        if re.match('^adp_.*', met.id):
+            adp_all_comp_rxn_list.append(met.reactions)
 
     atp_union = set().union(*atp_all_comp_rxn_list)
     adp_union = set().union(*adp_all_comp_rxn_list)
