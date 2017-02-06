@@ -1,3 +1,3 @@
 python-libsbml
 swiglpk
-git+https://github.com/opencobra/cobrapy.git@devel#egg=cobra
+git+https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra
