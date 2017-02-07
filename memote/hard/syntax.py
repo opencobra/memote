@@ -16,8 +16,8 @@
 # limitations under the License.
 
 """
-The module provides hard expectations on model reactions that should pass or
-fail in a test suite.
+Checks for the syntax used within the model that are hard expectations in the
+test suite.
 """
 
 from __future__ import absolute_import

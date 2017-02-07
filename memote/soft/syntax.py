@@ -21,17 +21,39 @@ generate log output and warnings but will likely not fail a test suite.
 """
 
 from __future__ import absolute_import
-import re
-from ..util import find_demand_and_exchange_reactions, \
-                   find_transport_reactions, \
-                   find_atp_adp_converting_reactions
 
 __all__ = ("check_rxn_id_extracellular_tag",)
 
 import logging
+import re
+
+from ..util import (find_demand_and_exchange_reactions,
+        find_transport_reactions, find_atp_adp_converting_reactions)
 
 LOGGER = logging.getLogger(__name__)
 
+
+def check_rxn_compartment_suffix(model, suffix):
+    """
+    Find reactions with metabolites in the given compartment whose ID does not
+    properly reflect that.
+
+    Parameters
+    ----------
+    model : cobra.core.Model.Model
+        A cobrapy metabolic model.
+    suffix : str
+        The suffix of the compartment to be checked.
+
+    Returns
+    -------
+    list
+        Reactions that have at least one metabolite in the compartment given by
+        `suffix` but whose IDs do not properly contain the `suffix`.
+    """
+    comp_pattern = re.compile("[A-Z0-9]+\w*?{}\w*?".format(suffix), re.UNICODE)
+    rxns = [rxn for rxn in model.reactions if suffix in rxn.compartments]
+    return [rxn for rxn in rxns if not comp_pattern.match(rxn.id)]
 
 def check_rxn_id_extracellular_tag(model):
     """

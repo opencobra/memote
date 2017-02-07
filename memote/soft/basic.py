@@ -16,18 +16,19 @@
 # limitations under the License.
 
 """
-The module provides hard expectations on model metabolites that should pass or
-fail in a test suite.
+Basic checks performed on the model object that are soft expectations for the
+test suite.
 """
 
 from __future__ import absolute_import
 
-__all__ = ("check_attribute_presence",)
+__all__ = ("check_met_formula_presence",)
 
 import logging
 
 LOGGER = logging.getLogger(__name__)
 
 
-def check_attribute_presence(model):
-    return hasattr(model, "metabolites")
+def check_met_formula_presence(model):
+    """Return the list of model metabolites that have no associated formula."""
+    return [met for met in model.metabolites if not met.formula]

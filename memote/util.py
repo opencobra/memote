@@ -16,15 +16,15 @@
 # limitations under the License.
 
 """
-The module provides recurring functions useful for both hard and soft checks.
+Utility functions that are used all over the memote package.
 """
 
 from __future__ import absolute_import
-import re
 
 __all__ = ("find_demand_and_exchange_reactions",)
 
 import logging
+import re
 
 LOGGER = logging.getLogger(__name__)
 
