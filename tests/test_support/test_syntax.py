@@ -29,15 +29,7 @@ import memote.support.syntax as syntax
 
 def model_builder(name):
     model = cobra.Model(id_or_model=name, name=name)
-    if name == "three-missing":
-        model.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i))\
-                for i in range(1, 4)])
-        return model
-    if name == "three-present":
-        model.add_metabolites(
-            [cobra.Metabolite(id="M{0:d}".format(i), formula="CH4") for i in range(1, 4)]
-        )
-        return model
+    return model
 
 
 @pytest.mark.parametrize("model, num", [
