@@ -22,16 +22,20 @@ Configuration and fixtures for the py.test suite.
 """
 
 import pytest
-
-from os.path import (dirname, basename, join, splitext)
-from glob import glob
-
-from cobra.io import read_sbml_model
-
-MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
+from cobra import Model
 
 
-@pytest.fixture(scope="session", params=MODELS,
-                ids=[splitext(basename(mod))[0] for mod in MODELS])
+@pytest.fixture(scope="function")
 def model(request):
-    return read_sbml_model(request.param)
+    if request.param == "empty":
+        return Model(id_or_model=request.param, name=request.param)
+    else:
+        builder = getattr(request.module, "model_builder")
+        return builder(request.param)
+
+
+@pytest.fixture(scope="session",
+                params=["e", "pp", "c"])
+def compartment_suffix(request):
+    return request.param
+

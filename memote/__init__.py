@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+
 """
 (Me)tabolic (Mo)del (Te)sts.
 
@@ -22,11 +24,7 @@ The memote Python package provides a number of hard and soft expectations about
 genome-scale metabolic models.
 """
 
-from __future__ import absolute_import
-
-from .soft import *
-from .hard import *
-from .util import *
+from .support import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"

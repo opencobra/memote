@@ -15,19 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Checks for the syntax used within the model that are hard expectations in the
-test suite.
-"""
-
 from __future__ import absolute_import
 
-__all__ = ("check_attribute_presence",)
+"""
+Helper functions for the metabolic model test suite.
+"""
 
-import logging
-
-LOGGER = logging.getLogger(__name__)
-
-
-def check_attribute_presence(model):
-    return hasattr(model, "reactions")
+from .basic import *
+from .syntax import *

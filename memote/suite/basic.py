@@ -17,5 +17,23 @@
 
 from __future__ import absolute_import
 
-from .metabolites import *
-from .reactions import *
+"""
+Basic tests performed on an instance of `cobra.Model`.
+"""
+
+from ..support.basic import check_metabolites_formula_presence
+
+def test_metabolites_presence(model):
+    """Expect that >= 1 metabolites are present in the model."""
+    assert hasattr(model, "metabolites")
+    assert len(model.metabolites) > 0
+
+
+def test_reactions_presence(model):
+    """Expect that >= 1 reactions are present in the model."""
+    assert hasattr(model, "reactions")
+    assert len(model.reactions) > 0
+
+
+def test_metabolites_formula_presence(model):
+    assert len(check_metabolites_formula_presence(model)) == 0

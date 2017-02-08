@@ -15,20 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Basic checks performed on the model object that are soft expectations for the
-test suite.
-"""
-
 from __future__ import absolute_import
 
-__all__ = ("check_met_formula_presence",)
+"""
+Supporting functions for basic checks performed on the model object.
+"""
+
+__all__ = ("check_metabolites_formula_presence",)
 
 import logging
 
 LOGGER = logging.getLogger(__name__)
 
 
-def check_met_formula_presence(model):
+def check_metabolites_formula_presence(model):
     """Return the list of model metabolites that have no associated formula."""
     return [met for met in model.metabolites if not met.formula]

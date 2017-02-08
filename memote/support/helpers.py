@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Utility functions that are used all over the memote package.
-"""
-
 from __future__ import absolute_import
 
-__all__ = ("find_demand_and_exchange_reactions",)
+"""
+Helper functions that are used all over the memote package.
+"""
 
 import logging
 import re
