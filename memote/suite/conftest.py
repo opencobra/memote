@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
+# Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,19 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-The module provides hard expectations on model metabolites that should pass or
-fail in a test suite.
-"""
-
 from __future__ import absolute_import
 
-__all__ = ("check_attribute_presence",)
+"""
+Configuration and fixtures for the test suite.
+"""
 
-import logging
+import pytest
 
-LOGGER = logging.getLogger(__name__)
+from os.path import (dirname, basename, join, splitext)
+from glob import glob
+
+from cobra.io import read_sbml_model
+
+MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
 
 
-def check_attribute_presence(model):
-    return hasattr(model, "metabolites")
+@pytest.fixture(scope="session", params=MODELS,
+                ids=[splitext(basename(mod))[0] for mod in MODELS])
+def model(request):
+    return read_sbml_model(request.param)

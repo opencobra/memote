@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
+# Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,5 +17,23 @@
 
 from __future__ import absolute_import
 
-from .metabolites import *
-from .reactions import *
+"""
+Tests ensuring that the functions in `memote.support.basic` work as expected.
+"""
+
+import pytest
+import cobra
+
+import memote.support.syntax as syntax
+
+
+def model_builder(name):
+    model = cobra.Model(id_or_model=name, name=name)
+    return model
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+], indirect=["model"])
+def test_rxn_id_compartment_suffix(model, num, compartment_suffix):
+    assert len(syntax.check_rxn_id_compartment_suffix(model, compartment_suffix)) == num

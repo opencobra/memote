@@ -2,6 +2,7 @@
 [run]
 branch = True
 source = memote
+omit = memote/suite/*
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -25,3 +26,4 @@ ignore_errors = True
 
 [html]
 directory = tests/coverage
+

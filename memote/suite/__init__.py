@@ -18,7 +18,8 @@
 """
 (Me)tabolic (Mo)del (Te)st Suite.
 
-Test suite for one specific genome-scale metabolic model.
+Test suite for an instance of `cobra.Model`.
 """
 
 from __future__ import absolute_import
+

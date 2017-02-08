@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
+# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Supporting functions for basic checks performed on the model object.
+"""
+
 from __future__ import absolute_import
 
-import memote.hard.reactions as rxns
+__all__ = ("check_metabolites_formula_presence",)
+
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
-def test_attribute_presence(model):
-    assert rxns.check_attribute_presence(model)
+def check_metabolites_formula_presence(model):
+    """Return the list of model metabolites that have no associated formula."""
+    return [met for met in model.metabolites if not met.formula]
