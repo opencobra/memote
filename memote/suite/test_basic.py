@@ -23,6 +23,7 @@ Basic tests performed on an instance of `cobra.Model`.
 
 from ..support.basic import check_metabolites_formula_presence
 
+
 def test_metabolites_presence(model):
     """Expect that >= 1 metabolites are present in the model."""
     assert hasattr(model, "metabolites")
