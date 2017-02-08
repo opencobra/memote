@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 """
 Helper functions for the metabolic model test suite.
 """
+
+from __future__ import absolute_import
 
 from .basic import *
 from .syntax import *

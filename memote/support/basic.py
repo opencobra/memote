@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 """
 Supporting functions for basic checks performed on the model object.
 """
+
+from __future__ import absolute_import
 
 __all__ = ("check_metabolites_formula_presence",)
 

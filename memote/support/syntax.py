@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 """
 Supporting functions for syntax checks performed on the model object.
 """
+
+from __future__ import absolute_import
 
 __all__ = ("check_rxn_id_compartment_suffix", "check_reaction_tag_transporter")
 
