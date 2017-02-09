@@ -28,4 +28,4 @@ from .support import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.1.0"
+__version__ = "__version__ = '0.2.0'"
