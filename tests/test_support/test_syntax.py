@@ -36,4 +36,6 @@ def model_builder(name):
     ("empty", 0),
 ], indirect=["model"])
 def test_rxn_id_compartment_suffix(model, num, compartment_suffix):
-    assert len(syntax.check_rxn_id_compartment_suffix(model, compartment_suffix)) == num
+    assert len(syntax.check_rxn_id_compartment_suffix(
+        model, compartment_suffix
+    )) == num

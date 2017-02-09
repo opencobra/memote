@@ -45,4 +45,3 @@ def cli(pytest_args):
     errno = pytest.main(args)
 #    errno = pytest.main(shlex.split(pytest_args), plugins=[MyPlugin()])
     sys.exit(errno)
-

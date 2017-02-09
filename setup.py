@@ -48,12 +48,11 @@ setup(
     setup_requires=setup_requirements,
     install_requires=requirements,
     tests_require=test_requirements,
-    dependency_links=[
-        # this is currently not working, setup ignores the link
-        # could subprocess the pip install or for now:
-        # pip install -r requirements.in
-#        "https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra"
-    ],
+    # this is currently not working, setup ignores the link
+    # could subprocess the pip install or for now:
+    # pip install -r requirements.in
+    #   "https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra"
+    dependency_links=[],
     entry_points="""
         [console_scripts]
         model-suite=memote.suite.runner:cli
