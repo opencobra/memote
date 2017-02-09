@@ -3,6 +3,10 @@
 
 """Install the metabolic model checks provided by memote."""
 
+from __future__ import absolute_import
+
+import sys
+
 from setuptools import setup
 
 with open("README.rst") as readme_file:
@@ -11,14 +15,16 @@ with open("README.rst") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-setup_requirements = [
-    "pytest-runner"
-]
+setup_requirements = []
+# prevent pytest-runner from being installed on every invocation
+if {'pytest', 'test', 'ptr'}.intersection(sys.argv):
+    setup_requirements.append("pytest-runner")
 
 requirements = [
     "python-libsbml",
     "swiglpk",
-    "cobra==0.5.11"
+    "cobra",
+    "click"
 ]
 
 test_requirements = [
@@ -27,7 +33,7 @@ test_requirements = [
 
 setup(
     name="memote",
-    version="version='0.2.0'",
+    version="0.2.0",
     description="Genome-scale metabolic model test suite.",
     long_description=readme + "\n\n" + history,
     author="Moritz E. Beber",
@@ -46,8 +52,12 @@ setup(
         # this is currently not working, setup ignores the link
         # could subprocess the pip install or for now:
         # pip install -r requirements.in
-        "https://github.com/opencobra/cobrapy.git@devel#egg=cobra-0.5.11"
+#        "https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra"
     ],
+    entry_points="""
+        [console_scripts]
+        model-suite=memote.suite.runner:cli
+    """,
     license="Apache Software License 2.0",
     zip_safe=False,
     keywords="memote",
