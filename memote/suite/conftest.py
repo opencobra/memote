@@ -28,10 +28,11 @@ from glob import glob
 
 from cobra.io import read_sbml_model
 
-MODELS = sorted(glob(join(dirname(__file__), "data", "*.xml")))
+MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))
 
 
 @pytest.fixture(scope="session", params=MODELS,
                 ids=[splitext(basename(mod))[0] for mod in MODELS])
 def model(request):
+    # TODO: deal with and record warnings on load
     return read_sbml_model(request.param)
