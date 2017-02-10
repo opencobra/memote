@@ -23,12 +23,13 @@ Configuration and fixtures for the test suite.
 
 import pytest
 
-from os.path import (dirname, basename, join, splitext)
-from glob import glob
+import os
+from os.path import (basename, splitext)
 
 from cobra.io import read_sbml_model
 
-MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))
+MODELS = os.environ["MEMOTE_MODEL"].split(os.pathsep)
+# MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))
 
 
 @pytest.fixture(scope="session", params=MODELS,

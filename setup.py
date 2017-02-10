@@ -24,7 +24,8 @@ requirements = [
     "python-libsbml",
     "swiglpk",
     "cobra",
-    "click"
+    "click",
+    "click-configfile"
 ]
 
 test_requirements = [
@@ -55,7 +56,7 @@ setup(
     dependency_links=[],
     entry_points="""
         [console_scripts]
-        model-suite=memote.suite.runner:cli
+        memote=memote.suite.runner:cli
     """,
     license="Apache Software License 2.0",
     zip_safe=False,
