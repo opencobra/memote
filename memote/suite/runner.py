@@ -91,7 +91,9 @@ def process_model(model, context):
         )
 
 
-@click.command(context_settings={"default_map": ConfigFileProcessor.read_config()})
+@click.command(context_settings=dict(
+    default_map=ConfigFileProcessor.read_config()
+))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
