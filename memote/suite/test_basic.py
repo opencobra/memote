@@ -26,6 +26,7 @@ from ..support.basic import check_metabolites_formula_presence
 
 def test_model_id_presence(model):
     """Expect that the model has an ID."""
+    assert hasattr(model, "id")
     assert bool(model.id)
 
 
