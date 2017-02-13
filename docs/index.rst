@@ -15,8 +15,7 @@ Contents:
    installation
    usage
    contributing
-   authors
-   history
+   authorshistory
 
 Indices and tables
 ==================
@@ -24,4 +23,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

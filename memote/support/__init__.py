@@ -1,6 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
+
+# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,25 +16,10 @@
 # limitations under the License.
 
 """
-test_memote
-----------------------------------
-
-Tests for `memote` module.
+Helper functions for the metabolic model test suite.
 """
 
-import os
-import glob
+from __future__ import absolute_import
 
-from cameo import load_model
-
-from memote import generate_memote_suite
-
-TESTDIR = os.path.dirname(__file__)
-
-models = [load_model(model, sanitize=False) for model in glob.glob(os.path.join(TESTDIR, 'data', '*.xml'))]
-
-testsuite = generate_memote_suite(models)
-
-if __name__ == "__main__":
-    import nose
-    nose.runmodule(config=nose.config.Config(verbosity=3))
+from .basic import *
+from .syntax import *

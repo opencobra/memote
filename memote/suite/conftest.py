@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -13,3 +14,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from __future__ import absolute_import
+
+"""
+Configuration and fixtures for the test suite.
+"""
+
+import pytest
+
+import os
+from os.path import (basename, splitext)
+
+from cobra.io import read_sbml_model
+
+MODELS = os.environ["MEMOTE_MODEL"].split(os.pathsep)
+# MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))
+
+
+@pytest.fixture(scope="session", params=MODELS,
+                ids=[splitext(basename(mod))[0] for mod in MODELS])
+def model(request):
+    # TODO: deal with and record warnings on load
+    return read_sbml_model(request.param)

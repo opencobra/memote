@@ -16,16 +16,18 @@
 # limitations under the License.
 
 """
-(Me)tabolic (Mo)del (Te)sts.
-
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
+Supporting functions for basic checks performed on the model object.
 """
 
 from __future__ import absolute_import
 
-from .support import *
+__all__ = ("check_metabolites_formula_presence",)
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.2.2"
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
+
+def check_metabolites_formula_presence(model):
+    """Return the list of model metabolites that have no associated formula."""
+    return [met for met in model.metabolites if not met.formula]

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -14,31 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ['generate_memote_suite']
+from __future__ import absolute_import
 
-from functools import partial
+"""
+Configuration and fixtures for the py.test suite.
+"""
 
-from memote.util import metabolites_without_formula
-
-
-def check_has_reactions_attr(model):
-    assert hasattr(model, 'reactions')
-
-
-def check_all_metabolites_have_formulas(model):
-    assert len(metabolites_without_formula(model)) == 0
+import pytest
+from cobra import Model
 
 
-def wrapper(test, model):
-    func = partial(test, model)
-    func.description = '{} {}'.format(func.func.__name__, model.id)
-    return func
+@pytest.fixture(scope="function")
+def model(request):
+    if request.param == "empty":
+        return Model(id_or_model=request.param, name=request.param)
+    else:
+        builder = getattr(request.module, "model_builder")
+        return builder(request.param)
 
 
-def generate_memote_suite(models):
-    def testsuite():
-        for model in models:
-            yield wrapper(check_has_reactions_attr, model)
-            yield wrapper(check_all_metabolites_have_formulas, model)
-
-    return testsuite
+@pytest.fixture(scope="session",
+                params=["e", "pp", "c"])
+def compartment_suffix(request):
+    return request.param

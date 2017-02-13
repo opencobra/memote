@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2016 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -14,10 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 
-def metabolites_without_formula(cameo_model):
-    mets_without_formula = []
-    for metabolite in cameo_model.metabolites:
-        if not metabolite.formula:
-            mets_without_formula.append(metabolite)
-    return mets_without_formula
+"""
+Tests ensuring that the functions in `memote.support.basic` work as expected.
+"""
+
+import pytest
+import cobra
+
+import memote.support.syntax as syntax
+
+
+def model_builder(name):
+    model = cobra.Model(id_or_model=name, name=name)
+    return model
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+], indirect=["model"])
+def test_rxn_id_compartment_suffix(model, num, compartment_suffix):
+    assert len(syntax.check_rxn_id_compartment_suffix(
+        model, compartment_suffix
+    )) == num

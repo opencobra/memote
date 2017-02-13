@@ -2,9 +2,7 @@
 [run]
 branch = True
 source = memote
-omit =
-    memote/_version.py
-    memote/__init__.py
+omit = memote/suite/*
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -28,3 +26,4 @@ ignore_errors = True
 
 [html]
 directory = tests/coverage
+

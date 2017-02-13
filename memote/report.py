@@ -16,16 +16,9 @@
 # limitations under the License.
 
 """
-(Me)tabolic (Mo)del (Te)sts.
+(Me)tabolic (Mo)del (Te)st Reporting.
 
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
+Generate a visually pleasing (HTML) report of the test suite results.
 """
 
 from __future__ import absolute_import
-
-from .support import *
-
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.2.2"
