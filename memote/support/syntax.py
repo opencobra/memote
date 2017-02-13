@@ -52,7 +52,7 @@ def check_rxn_id_compartment_suffix(model, suffix):
         Reactions that have at least one metabolite in the compartment given by
         `suffix` but whose IDs do not properly contain the `suffix`.
     """
-    comp_pattern = re.compile("[A-Z0-9]+\w*?{}\w*?".format(suffix), re.UNICODE)
+    comp_pattern = re.compile("[A-Z0-9]+\w*?{}\w*?".format(suffix))
     rxns = [rxn for rxn in model.reactions if suffix in rxn.compartments]
     return [rxn for rxn in rxns if not comp_pattern.match(rxn.id)]
 

@@ -43,4 +43,7 @@ def test_reactions_presence(model):
 
 
 def test_metabolites_formula_presence(model):
-    assert len(check_metabolites_formula_presence(model)) == 0
+    """Expect all metabolites to have a formula."""
+    missing = check_metabolites_formula_presence(model)
+    assert len(missing) == 0, "No formula found for the following "\
+        "metabolites: {}".format(", ".join([met.id for met in missing]))
