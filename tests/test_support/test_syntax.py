@@ -27,13 +27,14 @@ import memote.support.syntax as syntax
 Tests ensuring that the functions in `memote.support.syntax` work as expected.
 """
 
+from six import iteritems
 
 
 
 def model_builder(name):
     model = cobra.Model(id_or_model=name, name=name)
     if name == "correct_tags":
-        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+        for i, pairs in enumerate(iteritems(syntax._SUFFIX_MAP)):
             if 'c' in pairs[0]:
                 rxn = cobra.Reaction('R{}'.format(i))
             else:
@@ -46,7 +47,7 @@ def model_builder(name):
         return model
 
     if name == "no_tags":
-        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+        for i, pairs in enumerate(iteritems(syntax._SUFFIX_MAP)):
             rxn = cobra.Reaction('R{}'.format(i))
             rxn.add_metabolites(
                 {cobra.Metabolite(id="M{0:d}_{1:s}".format(i, pairs[0])): -1,
@@ -56,7 +57,7 @@ def model_builder(name):
         return model
 
     if name == "wrong_tags":
-        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+        for i, pairs in enumerate(iteritems(syntax._SUFFIX_MAP)):
             rxn = cobra.Reaction('R{}tr'.format(i))
             rxn.add_metabolites(
                 {cobra.Metabolite(id="M{0:d}_{1:s}".format(i, pairs[0])): -1,
