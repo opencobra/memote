@@ -24,17 +24,30 @@ from __future__ import absolute_import
 import logging
 import re
 
-from .helpers import find_atp_adp_converting_reactions, find_transport_reactions
-
-__all__ = ("check_rxn_id_compartment_suffix", "check_reaction_tag_transporter")
+from .helpers import (
+    find_transport_reactions,
+    find_atp_adp_converting_reactions,
+    find_demand_and_exchange_reactions
+)
 
 LOGGER = logging.getLogger(__name__)
+
+_SUFFIX_MAP = {'p': 'pp',
+               'c': 'c',
+               'e': 'e',
+               'er': 'er',
+               'g': 'g',
+               'l': 'l',
+               'm': 'm',
+               'n': 'n',
+               'x': 'x',
+               'v': 'v'}
 
 
 def check_rxn_id_compartment_suffix(model, suffix):
     """
-    Find reactions with metabolites in the given compartment whose ID does not
-    properly reflect that.
+    Find non-transport reactions with metabolites in the given compartment
+    whose ID is not tagged accordingly.
 
     Parameters
     ----------
@@ -46,11 +59,26 @@ def check_rxn_id_compartment_suffix(model, suffix):
     Returns
     -------
     list
-        Reactions that have at least one metabolite in the compartment given by
-        `suffix` but whose IDs do not properly contain the `suffix`.
+        Non-transport reactions that have at least one metabolite in the
+        compartment given by `suffix` but whose IDs do not have
+        the `suffix` appended.
     """
-    comp_pattern = re.compile("[A-Z0-9]+\w*?{}\w*?".format(suffix))
-    rxns = [rxn for rxn in model.reactions if suffix in rxn.compartments]
+
+    transport_rxns = find_transport_reactions(model)
+    exchange_demand_rxns = find_demand_and_exchange_reactions(model)
+
+    comp_pattern = re.compile(
+        "[A-Z0-9]+\w*?{}\w*?".format(_SUFFIX_MAP[suffix])
+    )
+
+    rxns = []
+    for rxn in model.reactions:
+        if suffix in rxn.get_compartments():
+            if ('biomass' not in rxn.id.lowercase()) and (
+                    rxn not in transport_rxns and
+                    rxn not in exchange_demand_rxns):
+                rxns.append(rxn)
+
     return [rxn for rxn in rxns if not comp_pattern.match(rxn.id)]
 
 
@@ -78,4 +106,4 @@ def check_reaction_tag_transporter(model):
     non_abc_transporters = set(transport_rxns).difference(set(atp_adp_rxns))
 
     return [rxn for rxn in non_abc_transporters
-            if not re.match('[A-Z0-9]+.*?t.*?', rxn.id)]
+            if not re.match("[A-Z0-9]+\w*?t\w*?", rxn.id)]

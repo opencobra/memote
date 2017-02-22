@@ -61,10 +61,10 @@ def find_transport_reactions(model):
 
         transported_mets = \
             [formula for formula in rxn_reactants if formula in rxn_products]
-
+        # Excluding H-pumping reactions for now.
         if len(transported_mets) == 1 and set(transported_mets).union({'H'}):
             pass
-
+        # Excluding redox-reactions which only transport electrons
         elif not (
             not (len(transported_mets) > 1) or not set(transported_mets).union(
                 {'X', 'XH2'})):

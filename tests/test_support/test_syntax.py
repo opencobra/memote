@@ -24,7 +24,7 @@ import memote.support.syntax as syntax
 
 
 """
-Tests ensuring that the functions in `memote.support.basic` work as expected.
+Tests ensuring that the functions in `memote.support.syntax` work as expected.
 """
 
 
@@ -32,13 +32,47 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 
 def model_builder(name):
     model = cobra.Model(id_or_model=name, name=name)
-    return model
+    if name == "correct_tags":
+        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+            if 'c' in pairs[0]:
+                rxn = cobra.Reaction('R{}'.format(i))
+            else:
+                rxn = cobra.Reaction('R{}{}'.format(i, pairs[1]))
+            rxn.add_metabolites(
+                {cobra.Metabolite(id="M{0:d}_{1:s}".format(i, pairs[0])): -1,
+                 cobra.Metabolite(id="B{0:d}_{1:s}".format(i, pairs[0])): 1}
+            )
+            model.add_reaction(rxn)
+        return model
+
+    if name == "no_tags":
+        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+            rxn = cobra.Reaction('R{}'.format(i))
+            rxn.add_metabolites(
+                {cobra.Metabolite(id="M{0:d}_{1:s}".format(i, pairs[0])): -1,
+                 cobra.Metabolite(id="B{0:d}_{1:s}".format(i, pairs[0])): 1}
+            )
+            model.add_reaction(rxn)
+        return model
+
+    if name == "wrong_tags":
+        for i, pairs in enumerate(syntax._SUFFIX_MAP.iteritems()):
+            rxn = cobra.Reaction('R{}tr'.format(i))
+            rxn.add_metabolites(
+                {cobra.Metabolite(id="M{0:d}_{1:s}".format(i, pairs[0])): -1,
+                 cobra.Metabolite(id="B{0:d}_{1:s}".format(i, pairs[0])): 1}
+            )
+            model.add_reaction(rxn)
+        return model
 
 
 @pytest.mark.parametrize("model, num", [
-    ("empty", 0),
+    ("correct_tags", 0),
+    ("no_tags", 1),
+    ("wrong_tags", 1)
 ], indirect=["model"])
-def test_rxn_id_compartment_suffix(model, num, compartment_suffix):
-    assert len(syntax.check_rxn_id_compartment_suffix(
-        model, compartment_suffix
-    )) == num
+def test_non_transp_rxn_id_compartment_suffix_match(model, num):
+    for compartment in model.compartments:
+        if compartment != 'c':
+            rxn_lst = syntax.check_reaction_tag_transporter(model, compartment)
+            assert len (rxn_lst) == num
