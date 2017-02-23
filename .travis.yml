@@ -4,6 +4,7 @@ git:
   depth: 1
 cache:
 - pip: true
+
 addons:
   apt:
     packages:
@@ -11,6 +12,7 @@ addons:
     - libxml2-dev
     - libglpk-dev
     - glpk-utils
+
 matrix:
   include:
   - python: 2.7
@@ -23,10 +25,14 @@ matrix:
     env: TOXENV=py36
   - python: 3.5
     env: TOXENV=flake8
+
 before_install:
-- pip install -U pip setuptools wheel
-install: pip install -U tox
-script: travis_wait tox -e ${TOXENV}
+  - travis_retry pip install -U pip setuptools wheel
+install:
+  - travis_retry pip install -U tox
+script:
+  - travis_wait tox -e "${TOXENV}"
+
 notifications:
   slack:
     secure: udevSzdcN71zqk9Y8Rev5zrf7gjHWdLQPMbz30YXrUD3uK2i4ofvXIKJhwctchFfqjxNQlm57QOb3YDksaiizHGskx7ljnEGPrrDoVBnTG7wI/wcw6JcTDOII9klA+sp/yMKniuBYHML5U7xiEuNpMblgnUg1P/q9qcoNDIgli1uS6ftzuq242kMDcPxf+L4XOvK8SLukfVUjAKqLJoywPvJ6hqcJPbfIRRBpCGSMRpbPbkoju7aFt7Maz4VY5CpKqPRNodldxyzn3ZvPQvdAPX0o5UW3ioF7b5/CCbPJNhREQvzWdAJlJP9tZYXkTBrGDrFNEEjaCHhUbkCVL5BhndGz4W+guWCXx+gOhQ/imdqVlfXYOnl9/StquhHF7Uc3aYJZ1uzHW1WAm1cyfYjemiORawVgswv1jPtxB4Fa474DPOMCIX6qGeck0CuS/gGn+NlitWdypggTK8PyN+SCH+vS/brJ/+OPpr5lj1UHd9qeI4O8OntZbxZgJH8saCzULVh/FszSusLJ61djlX6tn2fCvNnOxR1FdhaPvR3srKxhAOH2RpLm3kTVFAHf5a28umIRNK79M7KZUEbap+7GlH2dCtb23pVToUngdGc6paZ/RDe8qeZbG4obLbRCnX/VvWNlgHlYo5SMr3vhawmf/ErJDWQbc5ZuhhVRm3L/4g=
