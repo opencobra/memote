@@ -40,10 +40,7 @@ setup(
     author="Moritz E. Beber",
     author_email="morbeb@biosustain.dtu.dk",
     url="https://github.com/biosustain/memote",
-    packages=[
-        "memote",
-    ],
-    package_dir=find_packages(),
+    packages=find_packages(),
     include_package_data=True,
     setup_requires=setup_requirements,
     install_requires=requirements,
