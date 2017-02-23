@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 import sys
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -43,8 +43,7 @@ setup(
     packages=[
         "memote",
     ],
-    package_dir={"memote":
-                 "memote"},
+    package_dir=find_packages(),
     include_package_data=True,
     setup_requires=setup_requirements,
     install_requires=requirements,
