@@ -26,7 +26,6 @@ Configuration and fixtures for the py.test suite.
 """
 
 
-
 @pytest.fixture(scope="function")
 def model(request):
     if request.param == "empty":

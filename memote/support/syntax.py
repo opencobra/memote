@@ -21,16 +21,13 @@ Supporting functions for syntax checks performed on the model object.
 
 from __future__ import absolute_import
 
-from builtins import dict
-
 import logging
 import re
+from builtins import dict
 
 from .helpers import (
-    find_transport_reactions,
-    find_atp_adp_converting_reactions,
-    find_demand_and_exchange_reactions
-)
+    find_atp_adp_converting_reactions, find_demand_and_exchange_reactions,
+    find_transport_reactions)
 
 LOGGER = logging.getLogger(__name__)
 

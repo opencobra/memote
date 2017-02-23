@@ -28,8 +28,6 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 """
 
 
-
-
 def model_builder(name):
     model = cobra.Model(id_or_model=name, name=name)
     if name == "three-missing":
