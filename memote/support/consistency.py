@@ -21,11 +21,12 @@ Supporting functions for consistency checks performed on the model object.
 
 from __future__ import absolute_import
 
-__all__ = ("check_stoichiometric_consistency", "check_unconserved_metabolites")
-
 import logging
 
 import sympy
+
+__all__ = ("check_stoichiometric_consistency", "check_unconserved_metabolites")
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,12 +48,13 @@ def check_stoichiometric_consistency(model):
     for metabolite in model.metabolites:
         mass_balances_model.add(Variable(metabolite.id, lb=1))
     for reaction in model.reactions:
-        if reaction not in model.exchanges:
-            expression = sympy.Add(
-                *[coefficient * mass_balances_model.variables[metabolite.id]
-                for (metabolite, coefficient) in reaction.metabolites.items()])
-            constraint = Constraint(expression, lb=0, ub=0, name=reaction.id)
-            mass_balances_model.add(constraint)
+        if reaction in model.exchanges:
+            continue
+        expression = sympy.Add(
+            *[coefficient * mass_balances_model.variables[metabolite.id]
+              for (metabolite, coefficient) in reaction.metabolites.items()])
+        constraint = Constraint(expression, lb=0, ub=0, name=reaction.id)
+        mass_balances_model.add(constraint)
     mass_balances_model.objective = Objective(1)
     mass_balances_model.objective.set_linear_coefficients(
         {var: 1. for var in mass_balances_model.variables})
@@ -63,8 +65,10 @@ def check_stoichiometric_consistency(model):
     elif status == 'infeasible':
         return False
     else:
-        raise Exception("Couldn't determine stoichiometric consistencty."
-                        "Solver returned '{}' solution status (only feasible or optimal expected).".format(status))
+        raise Exception(
+            "Couldn't determine stoichiometric consistencty."
+            " Solver returned '{}' solution status"
+            " (only feasible or optimal expected).".format(status))
 
 
 def check_unconserved_metabolites(model):
@@ -87,19 +91,26 @@ def check_unconserved_metabolites(model):
         y_var = Variable('y_{}'.format(metabolite.id), type='binary')
         y_vars.append(y_var)
         mass_balances_model.add([met_var, y_var])
-        mass_balances_model.add(Constraint(y_var - met_var, ub=0, name='switch_{}'.format(metabolite.id)))
+        mass_balances_model.add(Constraint(
+            y_var - met_var, ub=0, name='switch_{}'.format(metabolite.id)))
     mass_balances_model.update()
     for reaction in model.reactions:
         if reaction in model.exchanges:
             continue
-        expression = sympy.Add(*[coefficient * mass_balances_model.variables[metabolite.id] for metabolite, coefficient in reaction.metabolites.items()])
+        expression = sympy.Add(
+            *[coefficient * mass_balances_model.variables[metabolite.id]
+              for metabolite, coefficient in reaction.metabolites.items()])
         constraint = Constraint(expression, lb=0, ub=0, name=reaction.id)
         mass_balances_model.add(constraint)
     mass_balances_model.objective = Objective(1)
-    mass_balances_model.objective.set_linear_coefficients({var: 1. for var in y_vars})
+    mass_balances_model.objective.set_linear_coefficients(
+        {var: 1. for var in y_vars})
     status = mass_balances_model.optimize()
     if status == 'optimal':
-        return [model.metabolites.get_by_id(var.name.replace('y_', '')) for var in y_vars if var.primal < 0.8]
+        return [model.metabolites.get_by_id(var.name.replace('y_', ''))
+                for var in y_vars if var.primal < 0.8]
     else:
-        raise Exception("Couldn't compute list of unconserved metabolites."
-                       "Solver returned '{}' solution status (only feasible or optimal expected).".format(status))
+        raise Exception(
+            "Couldn't compute list of unconserved metabolites."
+            " Solver returned '{}' solution status"
+            " (only feasible or optimal expected).".format(status))
