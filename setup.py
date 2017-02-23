@@ -26,6 +26,7 @@ requirements = [
     "cobra",
     "click",
     "click-configfile",
+    "future",
     "pytest"
 ]
 

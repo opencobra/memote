@@ -73,7 +73,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
 
     rxns = []
     for rxn in model.reactions:
-        if suffix in rxn.get_compartments():
+        if suffix in rxn.compartments:
             if ('biomass' not in rxn.id.lowercase()) and (
                     rxn not in transport_rxns and
                     rxn not in exchange_demand_rxns):
