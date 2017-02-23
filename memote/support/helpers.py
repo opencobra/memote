@@ -56,21 +56,19 @@ def find_transport_reactions(model):
 
     transport_reactions = []
     for rxn in compartment_spanning_rxns:
-        rxn_reactants = {met.formula for met in rxn.reactants}
-        rxn_products = {met.formula for met in rxn.products}
+        rxn_reactants = set([met.formula for met in rxn.reactants])
+        rxn_products = set([met.formula for met in rxn.products])
 
         transported_mets = \
             [formula for formula in rxn_reactants if formula in rxn_products]
         # Excluding H-pumping reactions for now.
-        if len(transported_mets) == 1 and set(transported_mets).union({'H'}):
+        if set(transported_mets).issubset(set('H')):
             pass
         # Excluding redox-reactions which only transport electrons
-        elif not (
-            not (len(transported_mets) > 1) or not set(transported_mets).union(
-                {'X', 'XH2'})):
+        elif set(transported_mets).issubset(set(['X', 'XH2'])):
             pass
 
-        elif len(transported_mets) > 1:
+        elif len(transported_mets) >= 1:
             transport_reactions.append(rxn)
 
     return transport_reactions

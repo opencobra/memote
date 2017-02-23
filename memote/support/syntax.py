@@ -21,6 +21,8 @@ Supporting functions for syntax checks performed on the model object.
 
 from __future__ import absolute_import
 
+from builtins import dict
+
 import logging
 import re
 
@@ -32,16 +34,17 @@ from .helpers import (
 
 LOGGER = logging.getLogger(__name__)
 
-_SUFFIX_MAP = {'p': 'pp',
-               'c': 'c',
-               'e': 'e',
-               'er': 'er',
-               'g': 'g',
-               'l': 'l',
-               'm': 'm',
-               'n': 'n',
-               'x': 'x',
-               'v': 'v'}
+SUFFIX_MAP = dict({
+    'p': 'pp',
+    'c': 'c',
+    'e': 'e',
+    'er': 'er',
+    'g': 'g',
+    'l': 'l',
+    'm': 'm',
+    'n': 'n',
+    'x': 'x',
+    'v': 'v'})
 
 
 def find_rxn_id_compartment_suffix(model, suffix):
@@ -68,7 +71,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
     exchange_demand_rxns = find_demand_and_exchange_reactions(model)
 
     comp_pattern = re.compile(
-        "[A-Z0-9]+\w*?{}\w*?".format(_SUFFIX_MAP[suffix])
+        "[A-Z0-9]+\w*?{}\w*?".format(SUFFIX_MAP[suffix])
     )
 
     rxns = []
