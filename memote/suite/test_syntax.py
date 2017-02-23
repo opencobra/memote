@@ -33,22 +33,22 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
         if compartment != 'c':
             no_match_rxns = find_rxn_id_compartment_suffix(model, compartment)
             assert \
-                len(no_match_rxns) == 0,\
+                len(no_match_rxns) == 0, \
                 "The following reactions in compartment {} are not tagged" \
                 "correctly: {}".format(compartment,
                                        ", ".join(
                                            [met.id for met in no_match_rxns]
-                                            )
+                                       )
                                        )
 
 
 def test_non_abc_transp_rxn_tag_match(model):
     """Expect all non-abc transport rxns to be tagged with a 't'"""
     untagged_non_atp_transport_rxns = find_reaction_tag_transporter(model)
-    assert len(untagged_non_atp_transport_rxns) == 0,\
+    assert len(untagged_non_atp_transport_rxns) == 0, \
         "The following non-atp transport reactions are not tagged" \
         "correctly: {}".format(
             ", ".join(
-                    [met.id for met in untagged_non_atp_transport_rxns]
+                [met.id for met in untagged_non_atp_transport_rxns]
             )
         )

@@ -17,7 +17,7 @@ with open("HISTORY.rst") as history_file:
 
 setup_requirements = []
 # prevent pytest-runner from being installed on every invocation
-if {'pytest', 'test', 'ptr'}.intersection(sys.argv):
+if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
     setup_requirements.append("pytest-runner")
 
 requirements = [
