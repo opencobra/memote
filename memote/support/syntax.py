@@ -44,7 +44,7 @@ _SUFFIX_MAP = {'p': 'pp',
                'v': 'v'}
 
 
-def check_rxn_id_compartment_suffix(model, suffix):
+def find_rxn_id_compartment_suffix(model, suffix):
     """
     Find non-transport reactions with metabolites in the given compartment
     whose ID is not tagged accordingly.
@@ -82,7 +82,7 @@ def check_rxn_id_compartment_suffix(model, suffix):
     return [rxn for rxn in rxns if not comp_pattern.match(rxn.id)]
 
 
-def check_reaction_tag_transporter(model):
+def find_reaction_tag_transporter(model):
     """Return a list of transport reactions that have not been tagged as such.
 
 

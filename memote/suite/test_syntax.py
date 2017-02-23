@@ -21,7 +21,7 @@ from __future__ import absolute_import
 Syntax tests performed on an instance of `cobra.Model`.
 """
 
-from ..support.syntax import check_rxn_id_compartment_suffix
+from ..support.syntax import find_rxn_id_compartment_suffix
 
 
 def test_non_transp_rxn_id_compartment_suffix_match(model):
@@ -29,6 +29,6 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
     for compartment in model.compartments:
         if compartment != 'c':
             assert \
-                len(check_rxn_id_compartment_suffix(model, compartment)) == 0,\
+                len(find_rxn_id_compartment_suffix(model, compartment)) == 0,\
                 "Reactions in the following compartment are not tagged" \
                 "correctly: {}".format(", ".join(compartment))

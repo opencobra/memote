@@ -75,5 +75,5 @@ def model_builder(name):
 def test_non_transp_rxn_id_compartment_suffix_match(model, num):
     for compartment in model.compartments:
         if compartment != 'c':
-            rxn_lst = syntax.check_reaction_tag_transporter(model, compartment)
+            rxn_lst = syntax.find_reaction_tag_transporter(model, compartment)
             assert len (rxn_lst) == num
