@@ -17,16 +17,16 @@
 
 from __future__ import absolute_import
 
+import os
+from os.path import basename, splitext
+
+import pytest
+from cobra.io import read_sbml_model
+
 """
 Configuration and fixtures for the test suite.
 """
 
-import pytest
-
-import os
-from os.path import (basename, splitext)
-
-from cobra.io import read_sbml_model
 
 MODELS = os.environ["MEMOTE_MODEL"].split(os.pathsep)
 # MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))

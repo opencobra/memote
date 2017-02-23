@@ -17,11 +17,12 @@
 
 from __future__ import absolute_import
 
+from ..support.basic import check_metabolites_formula_presence
+
+
 """
 Basic tests performed on an instance of `cobra.Model`.
 """
-
-from ..support.basic import check_metabolites_formula_presence
 
 
 def test_model_id_presence(model):

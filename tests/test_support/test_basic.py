@@ -17,14 +17,17 @@
 
 from __future__ import absolute_import
 
+import cobra
+import pytest
+
+import memote.support.basic as basic
+
+
 """
 Tests ensuring that the functions in `memote.support.basic` work as expected.
 """
 
-import pytest
-import cobra
 
-import memote.support.basic as basic
 
 
 def model_builder(name):

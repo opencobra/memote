@@ -17,12 +17,14 @@
 
 from __future__ import absolute_import
 
+import pytest
+from cobra import Model
+
+
 """
 Configuration and fixtures for the py.test suite.
 """
 
-import pytest
-from cobra import Model
 
 
 @pytest.fixture(scope="function")

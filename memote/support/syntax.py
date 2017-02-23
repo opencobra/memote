@@ -21,15 +21,12 @@ Supporting functions for syntax checks performed on the model object.
 
 from __future__ import absolute_import
 
-__all__ = ("check_rxn_id_compartment_suffix", "check_reaction_tag_transporter")
-
 import logging
 import re
 
-from .helpers import (
-    find_transport_reactions,
-    find_atp_adp_converting_reactions
-)
+from .helpers import find_atp_adp_converting_reactions, find_transport_reactions
+
+__all__ = ("check_rxn_id_compartment_suffix", "check_reaction_tag_transporter")
 
 LOGGER = logging.getLogger(__name__)
 

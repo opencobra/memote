@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.rst") as readme_file:
     readme = readme_file.read()
@@ -25,7 +25,8 @@ requirements = [
     "swiglpk",
     "cobra",
     "click",
-    "click-configfile"
+    "click-configfile",
+    "pytest"
 ]
 
 test_requirements = [

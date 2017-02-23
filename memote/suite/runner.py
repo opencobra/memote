@@ -21,15 +21,15 @@ Run the test suite on an instance of `cobra.Model`.
 
 from __future__ import absolute_import
 
-import sys
-import shlex
 import os
+import shlex
+import sys
 from os.path import dirname
 
 import click
 import pytest
-from click_configfile import (ConfigFileReader, Param, SectionSchema,
-                              matches_section)
+from click_configfile import (
+    ConfigFileReader, Param, SectionSchema, matches_section)
 
 from .. import __version__
 

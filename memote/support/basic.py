@@ -21,9 +21,10 @@ Supporting functions for basic checks performed on the model object.
 
 from __future__ import absolute_import
 
+import logging
+
 __all__ = ("check_metabolites_formula_presence",)
 
-import logging
 
 LOGGER = logging.getLogger(__name__)
 
