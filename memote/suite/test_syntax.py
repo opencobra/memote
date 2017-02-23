@@ -47,8 +47,8 @@ def test_non_abc_transp_rxn_tag_match(model):
     untagged_non_atp_transport_rxns = find_reaction_tag_transporter(model)
     assert len(untagged_non_atp_transport_rxns) == 0, \
         "The following non-atp transport reactions are not tagged" \
-        "correctly: {}".format(
-            ", ".join(
-                [met.id for met in untagged_non_atp_transport_rxns]
-            )
-        )
+        "correctly: {}".format(", ".join(
+                              [met.id for met
+                               in untagged_non_atp_transport_rxns]
+                               )
+                               )
