@@ -25,7 +25,7 @@ import logging
 import re
 from builtins import dict
 
-from .helpers import (
+from memote.support.helpers import (
     find_atp_adp_converting_reactions, find_demand_and_exchange_reactions,
     find_transport_reactions)
 

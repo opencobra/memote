@@ -24,7 +24,7 @@ genome-scale metabolic models.
 
 from __future__ import absolute_import
 
-from .support import *
+from memote.support import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"

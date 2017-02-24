@@ -17,7 +17,7 @@
 
 from __future__ import absolute_import
 
-from ..support.basic import check_metabolites_formula_presence
+from memote.support.basic import check_metabolites_formula_presence
 
 
 """

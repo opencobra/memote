@@ -17,7 +17,7 @@
 
 from __future__ import absolute_import
 
-from ..support.syntax import (
+from memote.support.syntax import (
     find_reaction_tag_transporter, find_rxn_id_compartment_suffix)
 
 
@@ -27,7 +27,7 @@ Syntax tests performed on an instance of `cobra.Model`.
 
 
 def test_non_transp_rxn_id_compartment_suffix_match(model):
-    """Expect all rxns outside of the cytosol to be tagged accordingly"""
+    """Expect all reactions outside of the cytosol to be tagged accordingly."""
     for compartment in model.compartments:
         if compartment != 'c':
             no_match_rxns = find_rxn_id_compartment_suffix(model, compartment)
@@ -42,7 +42,7 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
 
 
 def test_non_abc_transp_rxn_tag_match(model):
-    """Expect all non-abc transport rxns to be tagged with a 't'"""
+    """Expect all non-abc transport reactions to be tagged with a 't'."""
     untagged_non_atp_transport_rxns = find_reaction_tag_transporter(model)
     assert len(untagged_non_atp_transport_rxns) == 0, \
         "The following non-atp transport reactions are not tagged" \

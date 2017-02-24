@@ -27,7 +27,6 @@ import sympy
 
 __all__ = ("check_stoichiometric_consistency", "find_unconserved_metabolites")
 
-
 LOGGER = logging.getLogger(__name__)
 
 

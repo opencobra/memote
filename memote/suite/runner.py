@@ -31,7 +31,7 @@ import pytest
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 
-from .. import __version__
+from memote import __version__
 
 
 class ConfigSectionSchema(object):
