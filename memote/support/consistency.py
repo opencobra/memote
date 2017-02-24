@@ -25,7 +25,7 @@ import logging
 
 import sympy
 
-__all__ = ("check_stoichiometric_consistency", "check_unconserved_metabolites")
+__all__ = ("check_stoichiometric_consistency", "find_unconserved_metabolites")
 
 
 LOGGER = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ def check_stoichiometric_consistency(model):
             " (only feasible or optimal expected).".format(status))
 
 
-def check_unconserved_metabolites(model):
+def find_unconserved_metabolites(model):
     """
     Find unconserved metabolites in the metabolic model.
 
