@@ -18,7 +18,9 @@
 from __future__ import absolute_import
 
 from memote.support.syntax import (
-    find_reaction_tag_transporter, find_rxn_id_compartment_suffix)
+    find_reaction_tag_transporter, find_rxn_id_compartment_suffix,
+    find_abc_tag_transporter, find_upper_case_mets
+)
 
 
 """
@@ -36,7 +38,7 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
                 "The following reactions in compartment {} are not tagged" \
                 "correctly: {}".format(compartment,
                                        ", ".join(
-                                           [met.id for met in no_match_rxns]
+                                           [rxn.id for rxn in no_match_rxns]
                                        )
                                        )
 
@@ -47,4 +49,22 @@ def test_non_abc_transp_rxn_tag_match(model):
     assert len(untagged_non_atp_transport_rxns) == 0, \
         "The following non-atp transport reactions are not tagged" \
         "correctly: {}".format(
-        ", ".join([met.id for met in untagged_non_atp_transport_rxns]))
+        ", ".join([rxn.id for rxn in untagged_non_atp_transport_rxns]))
+
+
+def test_abc_transp_rxn_tag_match(model):
+    """Expect all abc transport rxns to be tagged with 'abc'"""
+    untagged_atp_transport_rxns = find_abc_tag_transporter(model)
+    assert len(untagged_atp_transport_rxns) == 0, \
+        "The following abc transport reactions are not tagged" \
+        "correctly: {}".format(
+        ", ".join([rxn.id for rxn in untagged_atp_transport_rxns]))
+
+
+def test_upper_case_mets(model):
+    """Expect all metabolites to be lower case within accepted exceptions"""
+    upper_case_mets = find_upper_case_mets(model)
+    assert len(upper_case_mets) == 0, \
+        "The IDs of the following metabolites are not written in lower case" \
+        " {}".format(
+        ", ".join([met.id for met in upper_case_mets]))

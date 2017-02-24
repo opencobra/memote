@@ -107,3 +107,54 @@ def find_reaction_tag_transporter(model):
 
     return [rxn for rxn in non_abc_transporters
             if not re.match("[A-Z0-9]+\w*?t\w*?", rxn.id)]
+
+
+def find_abc_tag_transporter(model):
+    """Return a list of Atp-binding cassette transport rxns that have not been
+    tagged with 'abc'.
+
+
+    An ABC transport reaction is defined as follows:
+       -- It contains metabolites from at least 2 compartments
+       -- At least 1 metabolite undergoes no chemical reaction
+          i.e. the formula stays the same on both sides of the equation
+       -- ATP is converted to ADP (+ Pi + H,
+          yet this isn't checked for explicitly)
+
+    Reactions that only transport protons ('H') across the membrane are
+    excluded, as well as reactions with redox cofactors whose formula is
+    either 'X' or 'XH2'
+
+    Parameters
+    ----------
+    model : model: cobra.core.Model.Model
+            A cobrapy metabolic model
+    """
+    transport_rxns = find_transport_reactions(model)
+    atp_adp_rxns = find_atp_adp_converting_reactions(model)
+
+    abc_transporters = set(transport_rxns).intersection(set(atp_adp_rxns))
+
+    return [rxn for rxn in abc_transporters
+            if not re.match("[A-Z0-9]+\w*?abc\w*?", rxn.id)]
+
+
+def find_upper_case_mets(model):
+    """Return a list of metabolites whose ID roots contain uppercase
+    characters
+
+    In metabolite names, individual uppercase exceptions are allowed:
+    -- Dextorotary prefix: 'D'
+    -- Levorotary prefix: 'L'
+    -- Prefixes for the absolute configuration of a stereocenter: 'R' and 'S'
+    -- Prefixes for the absolute stereochemistry of double bonds 'E' and 'Z'
+    -- Acyl carrier proteins can be labeled as 'ACP'
+
+    Parameters
+    ----------
+    model : model: cobra.core.Model.Model
+            A cobrapy metabolic model
+    """
+    comp_pattern = "^([a-z0-9]|Z|E|L|D|ACP|S|R)+_\w+"
+    return [met for met in model.metabolites
+            if not re.match(comp_pattern, met.id)]
