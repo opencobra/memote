@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 
 import os
+import warnings
 from os.path import basename, splitext
 
 import pytest
@@ -36,4 +37,6 @@ MODELS = os.environ["MEMOTE_MODEL"].split(os.pathsep)
                 ids=[splitext(basename(mod))[0] for mod in MODELS])
 def model(request):
     # TODO: deal with and record warnings on load
-    return read_sbml_model(request.param)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        return read_sbml_model(request.param)

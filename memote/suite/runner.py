@@ -32,6 +32,7 @@ from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 
 from memote import __version__
+from memote.suite.report import ResultCollectionPlugin
 
 
 class ConfigSectionSchema(object):
@@ -49,11 +50,6 @@ class ConfigSectionSchema(object):
 class ConfigFileProcessor(ConfigFileReader):
     config_files = ["memote.ini", "setup.cfg"]
     config_section_schemas = [ConfigSectionSchema.Memote]
-
-
-class MyPlugin:
-    def pytest_sessionfinish(self):
-        click.echo("Storing report data.")
 
 
 def process_collect_flag(no_flag, context):
@@ -115,7 +111,7 @@ def cli(ctx, model, pytest_args, no_collect):
     if collect:
         if "--tb" not in args:
             args.extend(["--tb", "no"])
-        errno = pytest.main(args, plugins=[MyPlugin()])
+        errno = pytest.main(args, plugins=[ResultCollectionPlugin()])
     else:
         errno = pytest.main(args)
     sys.exit(errno)

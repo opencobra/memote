@@ -29,18 +29,21 @@ def test_model_id_presence(model):
     """Expect that the model has an ID."""
     assert hasattr(model, "id")
     assert bool(model.id)
+    return model.id
 
 
 def test_metabolites_presence(model):
     """Expect that >= 1 metabolites are present in the model."""
     assert hasattr(model, "metabolites")
     assert len(model.metabolites) > 0
+    return len(model.metabolites)
 
 
 def test_reactions_presence(model):
     """Expect that >= 1 reactions are present in the model."""
     assert hasattr(model, "reactions")
     assert len(model.reactions) > 0
+    return len(model.reactions)
 
 
 def test_metabolites_formula_presence(model):
@@ -48,3 +51,4 @@ def test_metabolites_formula_presence(model):
     missing = check_metabolites_formula_presence(model)
     assert len(missing) == 0, "No formula found for the following "\
         "metabolites: {}".format(", ".join([met.id for met in missing]))
+    return [met.id for met in missing]
