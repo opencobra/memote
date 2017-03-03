@@ -21,6 +21,7 @@ Run the test suite on an instance of `cobra.Model`.
 
 from __future__ import absolute_import
 
+import locale
 import os
 import shlex
 import sys
@@ -32,7 +33,9 @@ from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 
 from memote import __version__
-from memote.suite.report import ResultCollectionPlugin
+from memote.suite.collect import ResultCollectionPlugin
+
+locale.setlocale(locale.LC_ALL, "")  # set to system default
 
 
 class ConfigSectionSchema(object):
@@ -108,10 +111,8 @@ def cli(ctx, model, pytest_args, no_collect):
         click.echo(str(err))
         sys.exit(1)
     click.echo(os.environ["MEMOTE_MODEL"])
-    if collect:
-        if "--tb" not in args:
-            args.extend(["--tb", "no"])
-        errno = pytest.main(args, plugins=[ResultCollectionPlugin()])
-    else:
-        errno = pytest.main(args)
+    if collect and ("--tb" not in args):
+        args.extend(["--tb", "no"])
+    errno = pytest.main(args, plugins=[ResultCollectionPlugin(
+        collect, u"test.json")])
     sys.exit(errno)
