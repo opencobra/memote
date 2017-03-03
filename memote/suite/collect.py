@@ -36,7 +36,7 @@ class ResultCollectionPlugin:
     """
     """
 
-    def __init__(self, collect=True, filename=u"json.test"):
+    def __init__(self, collect, filename):
         """
         Collect and store values during testing.
 
@@ -53,7 +53,6 @@ class ResultCollectionPlugin:
         else:
             self._store = None
             self.__class__.__setitem__ = self.__class__._dummy_set
-        self._time = None
         self._filename = filename
 
     def __setitem__(self, key, value):
@@ -81,4 +80,4 @@ class ResultCollectionPlugin:
         if not self._collect:
             return
         terminalreporter.write_sep(
-            u"-", u"generated json file: '{0}'".format(self._filename))
+            u"*", u"update JSON file: '{0}'".format(self._filename))
