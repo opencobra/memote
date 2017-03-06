@@ -44,7 +44,7 @@ def model_builder(name):
         rxn_2 = cobra.Reaction("R2")
         rxn_2.add_metabolites({met_b: -1, met_b_prime: -1, met_c: 1})
         rxn_3 = cobra.Reaction("R3")
-        rxn_3.add_metabolites({met_c: -1, met_c_prime: -1, met_a: 1})
+        rxn_3.add_metabolites({met_c: -1, met_c_prime: -2, met_a: 1})
         model.add_reactions([rxn_1, rxn_2, rxn_3])
         return model
     if name == "eq-8":
@@ -63,7 +63,7 @@ def model_builder(name):
         model.add_reactions([rxn_1, rxn_2, rxn_3])
         return model
     if name == "fig-2":
-        # Example in figure 3 of Gevorgyan et al. (2008) Bioinformatics
+        # Example in figure 2 of Gevorgyan et al. (2008) Bioinformatics
         # Metabolites
         met_a = cobra.Metabolite("A")
         met_b = cobra.Metabolite("B")
