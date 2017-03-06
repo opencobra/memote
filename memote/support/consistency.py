@@ -38,6 +38,15 @@ def check_stoichiometric_consistency(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
+    Notes
+    -----
+    See [1]_ section 3.1 for a complete description of the algorithm.
+
+
+    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
+           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           Bioinformatics 24, no. 19 (2008): 2245.
     """
     Model = model.solver.interface.Model
     Constraint = model.solver.interface.Constraint
@@ -78,6 +87,15 @@ def find_unconserved_metabolites(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
+    Notes
+    -----
+    See [1]_ section 3.2 for a complete description of the algorithm.
+
+
+    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
+           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           Bioinformatics 24, no. 19 (2008): 2245.
     """
     Model = model.solver.interface.Model
     Constraint = model.solver.interface.Constraint
@@ -104,12 +122,29 @@ def find_unconserved_metabolites(model):
     mass_balances_model.objective = Objective(1)
     mass_balances_model.objective.set_linear_coefficients(
         {var: 1. for var in y_vars})
+    mass_balances_model.objective.direction = 'max'
     status = mass_balances_model.optimize()
     if status == 'optimal':
-        return [model.metabolites.get_by_id(var.name.replace('y_', ''))
-                for var in y_vars if var.primal < 0.8]
+        return set([model.metabolites.get_by_id(var.name.replace('y_', ''))
+                    for var in y_vars if var.primal < 0.8])
     else:
-        raise Exception(
+        raise RuntimeError(
             "Couldn't compute list of unconserved metabolites."
             " Solver returned '{}' solution status"
-            " (only feasible or optimal expected).".format(status))
+            " (only optimal or infeasible expected).".format(status))
+
+
+def find_inconsistent_min_stoichiometry(model):
+    """
+    Find minimal unbalanced reaction sets.
+
+    Notes
+    -----
+    See [1]_ section 3.3 for a complete description of the algorithm.
+
+
+    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
+           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           Bioinformatics 24, no. 19 (2008): 2245.
+    """
+    return set()
