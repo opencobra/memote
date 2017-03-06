@@ -15,7 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+<<<<<<< 8ef05eb8742fad1ea01d2412c8fc3438617aa647
 """Supporting functions for stoichiometric consistency checks."""
+=======
+"""
+Supporting functions for stoichiometric consistency checks.
+"""
+>>>>>>> first steps on implementing the third method
 
 from __future__ import absolute_import
 
@@ -24,7 +30,11 @@ from operator import attrgetter
 
 import numpy as np
 import sympy
+<<<<<<< 8ef05eb8742fad1ea01d2412c8fc3438617aa647
 from numpy.linalg import svd
+=======
+from nump.linalg import svd
+>>>>>>> first steps on implementing the third method
 from six import iteritems
 
 __all__ = (
