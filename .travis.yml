@@ -13,7 +13,12 @@ addons:
     - libglpk-dev
     - glpk-utils
 
+branches:
+  only:
+  - master
+
 matrix:
+  fast_finish: true
   include:
   - python: 2.7
     env: TOXENV=py27
@@ -31,7 +36,7 @@ before_install:
 install:
   - travis_retry pip install -U tox
 script:
-  - travis_wait tox -e "${TOXENV}"
+  - travis_wait tox
 
 notifications:
   slack:
