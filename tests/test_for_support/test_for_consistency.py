@@ -63,7 +63,11 @@ def model_builder(name):
         model.add_reactions([rxn_1, rxn_2, rxn_3])
         return model
     if name == "fig-2":
+<<<<<<< dd7cd99916fce2ea0630e9d1e80db39f76a231e7
         # Example in figure 2 of Gevorgyan et al. (2008) Bioinformatics
+=======
+        # Example in figure 3 of Gevorgyan et al. (2008) Bioinformatics
+>>>>>>> add tests for stoichiometric inconsistency
         # Metabolites
         met_a = cobra.Metabolite("A")
         met_b = cobra.Metabolite("B")
