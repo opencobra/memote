@@ -1,5 +1,5 @@
 python-libsbml
 swiglpk
-git+https://github.com/opencobra/cobrapy.git@memote-fixes#egg=cobra
+git+https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra
 click
 click-configfile
