@@ -285,7 +285,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
             solution = [model.metabolites.get_by_id(var.name[2:])
-                        for var in k_vars if var.primal > 0.2]
+                        for var in k_vars if var.primal > 0.0]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
             cuts.append(add_cut(len(solution)))
