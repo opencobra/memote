@@ -105,10 +105,11 @@ def test_find_unconserved_metabolites(model, inconsistent):
 
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
-    ("fig-1", ["R1", "R2", "R3"]),
-    ("eq-8", ["R1", "R2", "R3"]),
-    ("fig-2", ["R2", "R4"]),
+    ("fig-1", [("A'",), ("B'",), ("C'",)]),
+    ("eq-8", [("A",), ("B",), ("C",)]),
+    ("fig-2", [("X",)]),
 ], indirect=["model"])
 def test_find_inconsistent_min_stoichiometry(model, inconsistent):
-    unconserved_rxns = consistency.find_inconsistent_min_stoichiometry(model)
-    assert set([rxn.id for rxn in unconserved_rxns]) == set(inconsistent)
+    unconserved_sets = consistency.find_inconsistent_min_stoichiometry(model)
+    for unconserved in unconserved_sets:
+        assert tuple(met.id for met in unconserved) in set(inconsistent)
