@@ -267,6 +267,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     # deal with numerical instabilities
     left_ns[np.abs(left_ns) < tol] = 0.0
     inc_minimal = set()
+    LOGGER.debug("model has %d unconserved metabolites", len(unconserved_mets))
     for met in unconserved_mets:
         row = met_index[met]
         if (left_ns[row] == 0.0).all():
@@ -279,7 +280,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
             solution = [model.metabolites.get_by_id(var.name[2:])
-                        for var in k_vars if var.primal > 0.1]
+                        for var in k_vars if var.primal > 0.0]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
             add_cut(len(solution))
