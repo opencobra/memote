@@ -228,12 +228,13 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
                 continue
             met = met_inv_map[i]
             y_var = ns_problem.variables[met_inv_map[i].id]
-            expression = sympy.Add(*[coef * y_var for coef in row if coef != 0.0])
+            expression = sympy.Add(
+                *[coef * y_var for coef in row if coef != 0.0])
             constraint = Constraint(expression, lb=0, ub=0,
                                     name="ns_{}".format(met.id))
             ns_problem.add(constraint)
-        # The objective is to minimize the binary indicators k[i], subject to the
-        # above inequality constraints.
+        # The objective is to minimize the binary indicators k[i], subject to
+        # the above inequality constraints.
         ns_problem.objective = Objective(1)
         ns_problem.objective.set_linear_coefficients(
             {k_var: 1. for k_var in k_vars})
@@ -245,7 +246,6 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         expr = sympy.Add(*k_vars)
         constr = Constraint(expr, ub=non_zero - 1)
         problem.add(constr)
-
 
     if check_stoichiometric_consistency(model):
         return set()
