@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Supporting functions for stoichiometric consistency checks.
-"""
+"""Supporting functions for stoichiometric consistency checks."""
 
 from __future__ import absolute_import
 
@@ -73,6 +71,8 @@ def stoichiometry_matrix(metabolites, reactions):
 
 def nullspace(matrix, atol=1e-13, rtol=0.0):
     """
+    Compute the nullspace of a 2D `numpy.array`.
+
     Notes
     -----
     Adapted from:
@@ -246,6 +246,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         expr = sympy.Add(*k_vars)
         constr = Constraint(expr, ub=non_zero - 1)
         problem.add(constr)
+        return constr
 
     if check_stoichiometric_consistency(model):
         return set()
@@ -268,6 +269,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     left_ns[np.abs(left_ns) < tol] = 0.0
     inc_minimal = set()
     LOGGER.debug("model has %d unconserved metabolites", len(unconserved_mets))
+    problem, k_vars = create_milp_problem()
     for met in unconserved_mets:
         row = met_index[met]
         if (left_ns[row] == 0.0).all():
@@ -275,15 +277,16 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
             # singleton set!
             inc_minimal.add((met,))
             continue
-        problem, k_vars = create_milp_problem()
         status = problem.optimize()
+        cuts = list()
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
             solution = [model.metabolites.get_by_id(var.name[2:])
                         for var in k_vars if var.primal > 0.0]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
-            add_cut(len(solution))
+            cuts.append(add_cut(len(solution)))
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
+        problem.remove(cuts)
     return inc_minimal

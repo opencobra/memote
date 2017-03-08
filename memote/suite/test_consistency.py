@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Supporting functions for consistency checks performed on the model object.
-"""
+"""Supporting functions for stoichiometric consistency checks."""
 
 from __future__ import absolute_import
 
