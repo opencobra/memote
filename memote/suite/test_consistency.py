@@ -29,8 +29,13 @@ from memote.support.consistency import (
 LOGGER = logging.getLogger(__name__)
 
 
-def test_stoichiometric_consistency(model):
+def test_stoichiometric_consistency(model, store):
     """Expect that the metabolic model is mass-balanced."""
-    assert check_stoichiometric_consistency(model),\
-        "The following metabolites are involved in unconserved reactions:"\
-        " {}".format(find_unconserved_metabolites(model))
+    is_consistent = check_stoichiometric_consistency(model)
+    store["is_consistent"] = is_consistent
+    unconserved = [] if is_consistent else\
+        [met.id for met in find_unconserved_metabolites(model)]
+    store["unconserved_metabolites"] = unconserved
+    assert is_consistent,\
+        "The following metabolites are involved in inconsistent reactions:"\
+        " {}".format(", ".join(unconserved))

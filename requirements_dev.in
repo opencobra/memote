@@ -2,6 +2,7 @@ bumpversion
 wheel
 watchdog
 flake8
+flake8-docstrings
 tox
 coverage
 Sphinx
@@ -10,4 +11,3 @@ pytest
 pytest-cov
 codecov
 travis-encrypt
-pydocstyle
