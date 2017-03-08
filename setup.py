@@ -23,7 +23,7 @@ if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
 requirements = [
     "python-libsbml",
     "swiglpk",
-    "cobra>=0.6.0",
+    "cobra==0.6.0a1",
     "click",
     "click-configfile",
     "future",
