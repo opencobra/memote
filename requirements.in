@@ -1,5 +1,5 @@
 python-libsbml
 swiglpk
-git+https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra
+cobra>=0.6.0
 click
 click-configfile

@@ -113,6 +113,8 @@ def cli(ctx, model, pytest_args, no_collect):
         sys.exit(1)
     click.echo(os.environ["MEMOTE_MODEL"])
     if collect:
+        if "--tb" not in args:
+            args.extend(["--tb", "no"])
         errno = pytest.main(args, plugins=[MyPlugin()])
     else:
         errno = pytest.main(args)
