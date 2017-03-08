@@ -21,6 +21,8 @@ Collect results for reporting model quality.
 
 from __future__ import absolute_import
 
+import os
+import sys
 import io
 try:
     import simplejson as json
@@ -30,6 +32,14 @@ from builtins import dict
 from datetime import datetime
 
 import pytest
+
+
+class DummyDict(object):
+    """
+    Expose a fake `__setitem__` interface.
+    """
+    def __setitem__(self, key, value):
+        pass
 
 
 class ResultCollectionPlugin:
@@ -50,34 +60,43 @@ class ResultCollectionPlugin:
         self._collect = bool(collect)
         if self._collect:
             self._store = dict()
+            self._store["meta"] = self._meta = dict()
+            self._store["test_data"] = self._data = dict()
         else:
-            self._store = None
+            self._store = DummyDict()
+            self._meta = DummyDict()
+            self._data = DummyDict()
             self.__class__.__setitem__ = self.__class__._dummy_set
         self._filename = filename
 
     def __setitem__(self, key, value):
-        self._store[key] = value
+        self._data[key] = value
 
-    def _dummy_set(self, key, value):
-        pass
-
-    @pytest.fixture(autouse=True, scope="session")
-    def store(self):
-        return self
+    @pytest.fixture(scope="module")
+    def store(self, request):
+        if self._collect:
+            mod = request.module.__name__
+            self._data[mod] = store = dict()
+        else:
+            store = self._data
+        return store
 
     def pytest_sessionstart(self):
         if not self._collect:
             return
-        self._store["utc_timestamp"] = datetime.utcnow().isoformat(" ")
+        self._meta["utc_timestamp"] = datetime.utcnow().isoformat(" ")
 
     def pytest_sessionfinish(self):
         if not self._collect:
             return
         with io.open(self._filename, "w", encoding=None) as file_h:
-            json.dump(self._store, file_h, sort_keys=True)
+            json.dump(self._store, file_h, sort_keys=True, indent=4,
+                      separators=(",", ": "))
 
     def pytest_terminal_summary(self, terminalreporter):
         if not self._collect:
             return
         terminalreporter.write_sep(
             u"*", u"update JSON file: '{0}'".format(self._filename))
+        sys.stderr = os.devnull
+        sys.stout = os.devnull

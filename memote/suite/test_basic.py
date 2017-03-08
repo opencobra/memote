@@ -36,19 +36,19 @@ def test_metabolites_presence(model, store):
     """Expect that >= 1 metabolites are present in the model."""
     assert hasattr(model, "metabolites")
     assert len(model.metabolites) > 0
-    store["metabolites_len"] = len(model.metabolites)
+    store["num_metabolites"] = len(model.metabolites)
 
 
 def test_reactions_presence(model, store):
     """Expect that >= 1 reactions are present in the model."""
     assert hasattr(model, "reactions")
     assert len(model.reactions) > 0
-    store["reactions_len"] = len(model.reactions)
+    store["num_reactions"] = len(model.reactions)
 
 
 def test_metabolites_formula_presence(model, store):
     """Expect all metabolites to have a formula."""
-    missing = check_metabolites_formula_presence(model)
+    missing = [met.id for met in check_metabolites_formula_presence(model)]
+    store["metabolites_missing_formula"] = missing
     assert len(missing) == 0, "No formula found for the following "\
-        "metabolites: {}".format(", ".join([met.id for met in missing]))
-    store["metabolites_missing_formula"] = [met.id for met in missing]
+        "metabolites: {}".format(", ".join(missing))
