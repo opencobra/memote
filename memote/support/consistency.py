@@ -272,21 +272,26 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     problem, k_vars = create_milp_problem()
     for met in unconserved_mets:
         row = met_index[met]
+        switch = "switch_{}".format(met.id)
         if (left_ns[row] == 0.0).all():
             LOGGER.debug("%s: singleton minimal unconservable set", met.id)
             # singleton set!
             inc_minimal.add((met,))
             continue
+        # expect a positive mass for the unconserved metabolite
+        problem.constraints[switch].lb = 1e-6
         status = problem.optimize()
         cuts = list()
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
             solution = [model.metabolites.get_by_id(var.name[2:])
-                        for var in k_vars if var.primal > 0.0]
+                        for var in k_vars if var.primal > 0.2]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
             cuts.append(add_cut(len(solution)))
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
+        # reset
+        problem.constraints[switch].lb = 0.0
         problem.remove(cuts)
     return inc_minimal
