@@ -29,6 +29,7 @@ Tests ensuring that the functions in `memote.support.syntax` work as expected.
 
 
 def model_builder(name):
+    """Returns a cobra.model built to reflect the required test case"""
     model = cobra.Model(id_or_model=name, name=name)
     if name == "rxn_correct_tags":
         for i, pairs in enumerate(syntax.SUFFIX_MAP.items()):
@@ -48,6 +49,29 @@ def model_builder(name):
     if name == "rxn_no_tags":
         for i, pairs in enumerate(syntax.SUFFIX_MAP.items()):
             rxn = cobra.Reaction('R{}'.format(i))
+            rxn.add_metabolites(
+                {cobra.Metabolite(id="m{0:d}_{1:s}".format(i, pairs[0]),
+                                  compartment=pairs[0]): -1,
+                 cobra.Metabolite(id="b{0:d}_{1:s}".format(i, pairs[0]),
+                                  compartment=pairs[0]): 1}
+            )
+            model.add_reaction(rxn)
+        return model
+
+    if name == "rxn_tags_but_wrong_compartments":
+        misaligned_suffix_map = dict({'p': 'c',
+                                      'c': 'e',
+                                      'e': 'er',
+                                      'er': 'g',
+                                      'g': 'l',
+                                      'l': 'm',
+                                      'm': 'n',
+                                      'n': 'x',
+                                      'x': 'v',
+                                      'v': 'pp'})
+
+        for i, pairs in enumerate(misaligned_suffix_map.items()):
+            rxn = cobra.Reaction('R{}{}'.format(i, pairs[1]))
             rxn.add_metabolites(
                 {cobra.Metabolite(id="m{0:d}_{1:s}".format(i, pairs[0]),
                                   compartment=pairs[0]): -1,
@@ -217,6 +241,52 @@ def model_builder(name):
         model.add_reaction(rxn)
         return model
 
+    if name == "correct_demand_tag":
+        rxn = cobra.Reaction('DM_abc_c')
+        rxn.add_metabolites(
+            {cobra.Metabolite(id="abc_c",
+                              compartment='c'): -1}
+        )
+        model.add_reaction(rxn)
+        return model
+
+    if name == "incorrect_demand_tag":
+        rxn = cobra.Reaction('EX_abc_c')
+        rxn.add_metabolites(
+            {cobra.Metabolite(id="abc_c",
+                              compartment='c'): -1}
+        )
+        rxn1 = cobra.Reaction('def_c')
+        rxn1.add_metabolites(
+            {cobra.Metabolite(id="def_c",
+                              compartment='c'): -1}
+        )
+        model.add_reactions([rxn, rxn1])
+        return model
+
+    if name == "correct_exchange_tag":
+        rxn = cobra.Reaction('EX_abc_e')
+        rxn.add_metabolites(
+            {cobra.Metabolite(id="abc_e",
+                              compartment='e'): -1}
+        )
+        model.add_reaction(rxn)
+        return model
+
+    if name == "incorrect_exchange_tag":
+        rxn = cobra.Reaction('DM_ghi_e')
+        rxn.add_metabolites(
+            {cobra.Metabolite(id="ghi_e",
+                              compartment='e'): -1}
+        )
+        rxn1 = cobra.Reaction('jkm_e')
+        rxn1.add_metabolites(
+            {cobra.Metabolite(id="jkm_e",
+                              compartment='e'): -1}
+        )
+        model.add_reactions([rxn, rxn1])
+        return model
+
 
 @pytest.mark.parametrize("model, num", [
     ("rxn_correct_tags", 0),
@@ -228,6 +298,24 @@ def test_non_transp_rxn_id_compartment_suffix_match(model, num):
         if compartment != 'c':
             rxn_lst = syntax.find_rxn_id_compartment_suffix(model, compartment)
             assert len(rxn_lst) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("rxn_correct_tags", 0),
+    ("rxn_tags_but_wrong_compartments", 1)
+], indirect=["model"])
+def test_non_transp_rxn_id_suffix_compartment_match(model, num):
+    """
+    Expect all rxns that are tagged to be in a compartment to at least
+    partially involve mets from that compartment
+    """
+    for compartment in model.compartments:
+        if compartment != 'c':
+            mislab_rxns = syntax.find_rxn_id_suffix_compartment(
+                model, compartment
+            )
+            assert \
+                len(mislab_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [
@@ -260,3 +348,23 @@ def test_upper_case_mets(model, num):
     """Expect all metabolites to be lower case within accepted exceptions"""
     upper_case_mets = syntax.find_upper_case_mets(model)
     assert len(upper_case_mets) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_demand_tag", 0),
+    ("incorrect_demand_tag", 2)
+], indirect=["model"])
+def test_demand_reaction_tag_match(model, num):
+    """Expect all demand rxn IDs to be prefixed with 'DM_'"""
+    falsely_tagged_demand_rxns = syntax.find_untagged_demand_rxns(model)
+    assert len(falsely_tagged_demand_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_exchange_tag", 0),
+    ("incorrect_exchange_tag", 2)
+], indirect=["model"])
+def test_exchange_reaction_tag_match(model, num):
+    """Expect all exchange rxn IDs to be prefixed with 'EX_'"""
+    falsely_tagged_exchange_rxns = syntax.find_untagged_exchange_rxns(model)
+    assert len(falsely_tagged_exchange_rxns) == num

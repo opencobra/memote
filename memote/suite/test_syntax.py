@@ -19,7 +19,9 @@ from __future__ import absolute_import
 
 from memote.support.syntax import (
     find_reaction_tag_transporter, find_rxn_id_compartment_suffix,
-    find_abc_tag_transporter, find_upper_case_mets
+    find_abc_tag_transporter, find_upper_case_mets,
+    find_rxn_id_suffix_compartment, find_untagged_demand_rxns,
+    find_untagged_exchange_rxns
 )
 
 
@@ -41,6 +43,24 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
                                            [rxn.id for rxn in no_match_rxns]
                                        )
                                        )
+
+
+def test_non_transp_rxn_id_suffix_compartment_match(model):
+    """
+    Expect all rxns that are tagged to be in a compartment to at least
+    partially involve mets from that compartment
+    """
+    for compartment in model.compartments:
+        if compartment != 'c':
+            mislab_rxns = find_rxn_id_suffix_compartment(model, compartment)
+            assert \
+                len(mislab_rxns) == 0, \
+                "The following reactions in compartment {} are tagged to" \
+                "don not contain metabolites from that " \
+                "compartment: {}".format(compartment, ", ".join(
+                                         [rxn.id for rxn in mislab_rxns]
+                                         )
+                                         )
 
 
 def test_non_abc_transp_rxn_tag_match(model):
@@ -68,3 +88,21 @@ def test_upper_case_mets(model):
         "The IDs of the following metabolites are not written in lower case" \
         " {}".format(
         ", ".join([met.id for met in upper_case_mets]))
+
+
+def test_demand_reaction_tag_match(model):
+    """Expect all demand rxns IDs to be prefixed with 'DM_'"""
+    falsely_tagged_demand_rxns = find_untagged_demand_rxns(model)
+    assert len(falsely_tagged_demand_rxns) == 0, \
+        "The IDs of the following demand reactions are not tagged with 'DM_'" \
+        " {}".format(
+        ", ".join([rxn.id for rxn in falsely_tagged_demand_rxns]))
+
+
+def test_exchange_reaction_tag_match(model):
+    """Expect all exchange rxns IDs to be prefixed with 'EX_'"""
+    falsely_tagged_exchange_rxns = find_untagged_exchange_rxns(model)
+    assert len(falsely_tagged_exchange_rxns) == 0, \
+        "The IDs of the following demand reactions are not tagged with 'EX_'" \
+        " {}".format(
+        ", ".join([rxn.id for rxn in falsely_tagged_exchange_rxns]))
