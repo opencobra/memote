@@ -16,6 +16,7 @@ addons:
 branches:
   only:
   - master
+  - develop
 
 matrix:
   fast_finish: true
