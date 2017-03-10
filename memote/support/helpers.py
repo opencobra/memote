@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Helper functions that are used all over the memote package.
-"""
+"""Helper functions that are used all over the memote package."""
 
 from __future__ import absolute_import
 
@@ -28,7 +26,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 def find_demand_and_exchange_reactions(model):
-    """Return a list containing demand and exchange reactions of model
+    """
+    Return a list containing demand and exchange reactions of model.
 
     :param model: A cobrapy metabolic model
     :type model: cobra.core.Model.Model
@@ -76,8 +75,7 @@ def find_transport_reactions(model):
 
 def find_atp_adp_converting_reactions(model):
     """
-    Return a list of all reactions in which interact with both
-    atp and adp in all compartments.
+    Find reactions which interact with ATP and ADP.
 
     Parameters
     ----------

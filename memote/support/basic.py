@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Supporting functions for basic checks performed on the model object.
-"""
+"""Supporting functions for basic checks performed on the model object."""
 
 from __future__ import absolute_import
 

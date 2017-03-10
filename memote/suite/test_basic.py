@@ -15,14 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Basic tests performed on an instance of `cobra.Model`."""
+
 from __future__ import absolute_import
 
 from memote.support.basic import check_metabolites_formula_presence
-
-
-"""
-Basic tests performed on an instance of `cobra.Model`.
-"""
 
 
 def test_model_id_presence(model, store):

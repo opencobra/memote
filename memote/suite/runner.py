@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Run the test suite on an instance of `cobra.Model`.
-"""
+"""Run the test suite on an instance of `cobra.Model`."""
 
 from __future__ import absolute_import
 
@@ -44,6 +42,7 @@ class ConfigSectionSchema(object):
     @matches_section("memote")
     class Memote(SectionSchema):
         """Describes the memote configuration keys and values."""
+
         collect = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
         model = Param(type=click.Path(exists=True, dir_okay=False),
@@ -51,11 +50,14 @@ class ConfigSectionSchema(object):
 
 
 class ConfigFileProcessor(ConfigFileReader):
+    """Determine which files to look for and what sections."""
+
     config_files = ["memote.ini", "setup.cfg"]
     config_section_schemas = [ConfigSectionSchema.Memote]
 
 
 def process_collect_flag(no_flag, context):
+    """Handle the report collection flag."""
     if no_flag is not None:
         return not no_flag
     elif "collect" in context.default_map:
@@ -65,6 +67,7 @@ def process_collect_flag(no_flag, context):
 
 
 def process_addargs(args, context):
+    """Handle additional args to pytest."""
     if args is not None:
         return shlex.split(args) + [dirname(__file__)]
     elif "addargs" in context.default_map:
@@ -75,6 +78,7 @@ def process_addargs(args, context):
 
 
 def process_model(model, context):
+    """Load model path(s) from different locations."""
     if len(model) > 0:
         os.environ["MEMOTE_MODEL"] = os.pathsep.join(model)
     elif "MEMOTE_MODEL" in os.environ:
@@ -103,6 +107,11 @@ def process_model(model, context):
 @click.argument("model", type=click.Path(exists=True, dir_okay=False), nargs=-1)
 @click.pass_context
 def cli(ctx, model, pytest_args, no_collect):
+    """
+    Memote command line tool.
+
+    Run `memote -h` for a better explanation.
+    """
     collect = process_collect_flag(no_collect, ctx)
     args = process_addargs(pytest_args, ctx)
     try:
