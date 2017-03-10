@@ -21,8 +21,6 @@ Collect results for reporting model quality.
 
 from __future__ import absolute_import
 
-import os
-import sys
 import io
 try:
     import simplejson as json
@@ -98,5 +96,3 @@ class ResultCollectionPlugin:
             return
         terminalreporter.write_sep(
             u"*", u"update JSON file: '{0}'".format(self._filename))
-        sys.stderr = os.devnull
-        sys.stout = os.devnull
