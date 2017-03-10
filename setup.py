@@ -21,9 +21,7 @@ if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
     setup_requirements.append("pytest-runner")
 
 requirements = [
-    "python-libsbml",
-    "swiglpk",
-    "cobra==0.6.0a1",
+    "cobra==0.6.0a2",
     "click",
     "click-configfile",
     "future",
