@@ -43,10 +43,7 @@ def test_non_transp_rxn_id_compartment_suffix_match(model):
 
 
 def test_non_transp_rxn_id_suffix_compartment_match(model):
-    """
-    Expect all rxns that are tagged to be in a compartment to at least
-    partially involve mets from that compartment
-    """
+    """Expect compartment-tagged reactions to involve fitting metabolites."""
     for compartment in model.compartments:
         if compartment != 'c':
             mislab_rxns = find_rxn_id_suffix_compartment(model, compartment)
@@ -70,7 +67,7 @@ def test_non_abc_transp_rxn_tag_match(model):
 
 
 def test_abc_transp_rxn_tag_match(model):
-    """Expect all abc transport rxns to be tagged with 'abc'"""
+    """Expect all abc transport reactions to be tagged with 'abc'."""
     untagged_atp_transport_rxns = find_abc_tag_transporter(model)
     assert len(untagged_atp_transport_rxns) == 0, \
         "The following abc transport reactions are not tagged" \
@@ -79,7 +76,7 @@ def test_abc_transp_rxn_tag_match(model):
 
 
 def test_upper_case_mets(model):
-    """Expect all metabolites to be lower case within accepted exceptions"""
+    """Expect all metabolites to be lower case with accepted exceptions."""
     upper_case_mets = find_upper_case_mets(model)
     assert len(upper_case_mets) == 0, \
         "The IDs of the following metabolites are not written in lower case" \
@@ -88,7 +85,7 @@ def test_upper_case_mets(model):
 
 
 def test_demand_reaction_tag_match(model):
-    """Expect all demand rxns IDs to be prefixed with 'DM_'"""
+    """Expect all demand reaction IDs to be prefixed with 'DM_'."""
     falsely_tagged_demand_rxns = find_untagged_demand_rxns(model)
     assert len(falsely_tagged_demand_rxns) == 0, \
         "The IDs of the following demand reactions are not tagged with 'DM_'" \
@@ -97,7 +94,7 @@ def test_demand_reaction_tag_match(model):
 
 
 def test_exchange_reaction_tag_match(model):
-    """Expect all exchange rxns IDs to be prefixed with 'EX_'"""
+    """Expect all exchange reaction IDs to be prefixed with 'EX_'."""
     falsely_tagged_exchange_rxns = find_untagged_exchange_rxns(model)
     assert len(falsely_tagged_exchange_rxns) == 0, \
         "The IDs of the following demand reactions are not tagged with 'EX_'" \

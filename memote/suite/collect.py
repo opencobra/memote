@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Collect results for reporting model quality.
-"""
+"""Collect results for reporting model quality."""
 
 from __future__ import absolute_import
 
@@ -33,15 +31,20 @@ import pytest
 
 
 class DummyDict(object):
-    """
-    Expose a fake `__setitem__` interface.
-    """
+    """Expose a fake `__setitem__` interface."""
+
     def __setitem__(self, key, value):
+        """Dummy `__setitem__` method."""
         pass
 
 
 class ResultCollectionPlugin:
     """
+    Local pytest plugin that exposes a fixture for result collection.
+
+    The plugin exposes the fixture `store` which can be used in test functions
+    to store values in a dictionary. The dictionary is namespaced to the module
+    so within a module the same keys should not be re-used (unless intended).
     """
 
     def __init__(self, collect, filename):
@@ -67,11 +70,9 @@ class ResultCollectionPlugin:
             self.__class__.__setitem__ = self.__class__._dummy_set
         self._filename = filename
 
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
     @pytest.fixture(scope="module")
     def store(self, request):
+        """Expose a `dict` to store values on."""
         if self._collect:
             mod = request.module.__name__
             self._data[mod] = store = dict()
@@ -80,11 +81,13 @@ class ResultCollectionPlugin:
         return store
 
     def pytest_sessionstart(self):
+        """Hook that runs at pytest session begin."""
         if not self._collect:
             return
         self._meta["utc_timestamp"] = datetime.utcnow().isoformat(" ")
 
     def pytest_sessionfinish(self):
+        """Hook that runs at pytest session end."""
         if not self._collect:
             return
         with io.open(self._filename, "w", encoding=None) as file_h:
@@ -92,6 +95,7 @@ class ResultCollectionPlugin:
                       separators=(",", ": "))
 
     def pytest_terminal_summary(self, terminalreporter):
+        """Print the JSON file location if relevant."""
         if not self._collect:
             return
         terminalreporter.write_sep(

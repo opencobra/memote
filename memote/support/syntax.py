@@ -51,7 +51,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
 
     Parameters
     ----------
-    model : cobra.core.Model.Model
+    model : cobra.Model
         A cobrapy metabolic model.
     suffix : str
         The suffix of the compartment to be checked.
@@ -83,12 +83,14 @@ def find_rxn_id_compartment_suffix(model, suffix):
 
 def find_rxn_id_suffix_compartment(model, suffix):
     """
+    Find incorrectly tagged non-transport reactions.
+
     Find non-transport reactions whose ID bear a compartment tag but which do
     not contain any metabolites in the given compartment.
 
     Parameters
     ----------
-    model : cobra.core.Model.Model
+    model : cobra.Model
         A cobrapy metabolic model.
     suffix : str
         The suffix of the compartment to be checked.
@@ -100,7 +102,6 @@ def find_rxn_id_suffix_compartment(model, suffix):
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
     """
-
     transport_rxns = find_transport_reactions(model)
     exchange_demand_rxns = find_demand_and_exchange_reactions(model)
 
@@ -135,7 +136,7 @@ def find_reaction_tag_transporter(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
+    model : cobra.Model
             A cobrapy metabolic model
     """
     transport_rxns = find_transport_reactions(model)
@@ -148,9 +149,8 @@ def find_reaction_tag_transporter(model):
 
 
 def find_abc_tag_transporter(model):
-    """Return a list of Atp-binding cassette transport rxns that have not been
-    tagged with 'abc'.
-
+    """
+    Find Atp-binding cassette transport rxns without 'abc' tag.
 
     An ABC transport reaction is defined as follows:
        -- It contains metabolites from at least 2 compartments
@@ -165,7 +165,7 @@ def find_abc_tag_transporter(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
+    model : cobra.Model
             A cobrapy metabolic model
     """
     transport_rxns = find_transport_reactions(model)
@@ -178,8 +178,8 @@ def find_abc_tag_transporter(model):
 
 
 def find_upper_case_mets(model):
-    """Return a list of metabolites whose ID roots contain uppercase
-    characters
+    """
+    Find metabolites whose ID roots contain uppercase characters.
 
     In metabolite names, individual uppercase exceptions are allowed:
     -- Dextorotary prefix: 'D'
@@ -190,7 +190,7 @@ def find_upper_case_mets(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
+    model : cobra.Model
             A cobrapy metabolic model
     """
     comp_pattern = "^([a-z0-9]|Z|E|L|D|ACP|S|R)+_\w+"
@@ -199,8 +199,8 @@ def find_upper_case_mets(model):
 
 
 def find_untagged_demand_rxns(model):
-    """Return a list of demand reactions whose IDs do not begin with 'DM_',
-    the customary tag.
+    """
+    Find demand reactions whose IDs do not begin with 'DM_'.
 
     [1] defines demand reactions as:
     -- 'unbalanced network reactions that allow the accumulation of a compound'
@@ -217,7 +217,7 @@ def find_untagged_demand_rxns(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
+    model : cobra.Model
             A cobrapy metabolic model
 
     References
@@ -237,8 +237,8 @@ def find_untagged_demand_rxns(model):
 
 
 def find_untagged_exchange_rxns(model):
-    """Return a list of exchange reactions whose IDs do not begin with 'EX_',
-    the customary tag.
+    """
+    Find exchange reactions whose IDs do not begin with 'EX_'.
 
     [1] defines exchange reactions as:
     -- reactions that 'define the extracellular environment'
@@ -253,7 +253,7 @@ def find_untagged_exchange_rxns(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
+    model : cobra.Model
             A cobrapy metabolic model
 
     References
