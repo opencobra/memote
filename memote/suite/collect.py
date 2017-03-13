@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import io
+import sys
 try:
     import simplejson as json
 except ImportError:
@@ -28,6 +29,10 @@ from builtins import dict
 from datetime import datetime
 
 import pytest
+import git
+import pip
+
+from memote.suite.report import Report
 
 
 class DummyDict(object):
@@ -47,7 +52,7 @@ class ResultCollectionPlugin:
     so within a module the same keys should not be re-used (unless intended).
     """
 
-    def __init__(self, collect, filename):
+    def __init__(self, collect, filename, **kwargs):
         """
         Collect and store values during testing.
 
@@ -58,11 +63,12 @@ class ResultCollectionPlugin:
         filename : str or path
             Path of the JSON file where collected items are stored.
         """
+        super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._collect = bool(collect)
         if self._collect:
             self._store = dict()
             self._store["meta"] = self._meta = dict()
-            self._store["test_data"] = self._data = dict()
+            self._store["report"] = self._data = dict()
         else:
             self._store = DummyDict()
             self._meta = DummyDict()
@@ -84,11 +90,35 @@ class ResultCollectionPlugin:
         """Hook that runs at pytest session begin."""
         if not self._collect:
             return
-        self._meta["utc_timestamp"] = datetime.utcnow().isoformat(" ")
+        self._meta["platform"] = sys.platform
+        self._meta["python_version"] = sys.version
+        if self._one_shot:
+            self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
+            return
+        # allowed to fail
+        repo = git.Repo()
+        if repo.is_dirty():
+            raise RuntimeError(
+                "Please git commit or git stash all changes before running the"
+                " memote suite.")
+        branch = repo.active_branch
+        self._meta["branch"] = branch.name
+        commit = branch.commit
+        self._meta["commit_author"] = commit.author
+        self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
+        self._meta["commit_hash"] = commit.hexsha
+        self._meta["python_environment"] = [
+            str(dist.as_requirement()) for dist in\
+            pip.get_installed_distributions()]
 
     def pytest_sessionfinish(self):
         """Hook that runs at pytest session end."""
         if not self._collect:
+            return
+        if self._one_shot:
+            report = Report(self._filename, self._store)
+            with io.open(self._filename, "w", encoding="utf-8") as file_h:
+                file_h.write(report.render_individual())
             return
         with io.open(self._filename, "w", encoding=None) as file_h:
             json.dump(self._store, file_h, sort_keys=True, indent=4,
@@ -97,6 +127,10 @@ class ResultCollectionPlugin:
     def pytest_terminal_summary(self, terminalreporter):
         """Print the JSON file location if relevant."""
         if not self._collect:
+            return
+        if self._one_shot:
+            terminalreporter.write_sep(
+                u"*", u"generating report: '{0}'".format(self._filename))
             return
         terminalreporter.write_sep(
             u"*", u"update JSON file: '{0}'".format(self._filename))
