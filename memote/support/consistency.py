@@ -80,7 +80,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
     """
     matrix = np.atleast_2d(matrix)
-    u, s, vh = svd(matrix)
+    _, s, vh = svd(matrix)
     tol = max(atol, rtol * s[0])
     return np.compress(s < tol, vh, axis=0).T
 
