@@ -94,8 +94,8 @@ def process_model(model, context):
 
 @click.group(invoke_without_command=True,
              context_settings=dict(
-                default_map=ConfigFileProcessor.read_config()
-            ))
+                 default_map=ConfigFileProcessor.read_config()
+             ))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
@@ -153,6 +153,11 @@ def cli(ctx, model, pytest_args, no_collect, filename):
               help="Create report from JSON files in the given directory.")
 @click.pass_context
 def report(ctx, directory):
+    """
+    Memote 'report' subcommand.
+
+    Run `memote report -h` for a better explanation.
+    """
     try:
         process_model(ctx.obj["model"], ctx)
     except ValueError as err:

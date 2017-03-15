@@ -106,8 +106,8 @@ class ResultCollectionPlugin:
             repo = git.Repo()
             if repo.is_dirty():
                 raise RuntimeError(
-                    "Please git commit or git stash all changes before running the"
-                    " memote suite.")
+                    "Please git commit or git stash all changes before running"
+                    " the memote suite.")
             branch = repo.active_branch
             self._meta["branch"] = branch.name
             commit = branch.commit

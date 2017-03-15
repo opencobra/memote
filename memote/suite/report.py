@@ -19,23 +19,21 @@
 
 from __future__ import absolute_import
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-from builtins import dict
+# try:
+#     import simplejson as json
+# except ImportError:
+#     import json
+# from builtins import dict
 
-import dask
+# import dask
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 class Report(object):
-    """
-    """
+    """Render different types of reports from the given data."""
 
-    def __init__(self, filename, data=None, **kwargs):
-        """
-        """
+    def __init__(self, data=None, **kwargs):
+        """Initialize the Jinja2 environment and data."""
         super(Report, self).__init__(**kwargs)
         self.env = Environment(
             loader=PackageLoader("memote.suite", "templates"),
@@ -43,22 +41,22 @@ class Report(object):
         )
         self.data = data
 
-
     def render_individual(self):
-        """
-        """
+        """Render a one-shot report for a model."""
         template = self.env.get_template("individual.html")
         return template.render(
             name=self.data["report"]["memote.suite.test_basic"]["model_id"],
             timestamp=self.data["meta"]["timestamp"],
             data=self.data)
 
-def render_diff():
-    """
-    """
-    pass
 
-def render_with_history():
-    """
-    """
-    pass
+# def render_diff():
+#     """
+#     """
+#     pass
+
+
+# def render_with_history():
+#     """
+#     """
+#     pass
