@@ -52,20 +52,28 @@ class ResultCollectionPlugin:
     so within a module the same keys should not be re-used (unless intended).
     """
 
-    def __init__(self, collect, filename, **kwargs):
+    _valid_modes = frozenset(["collect", "basic", "html"])
+
+    def __init__(self, mode="collect", filename=None, **kwargs):
         """
         Collect and store values during testing.
 
         Parameters
         ----------
-        collect : bool
-            Whether to store values or perform dummy operations.
-        filename : str or path
-            Path of the JSON file where collected items are stored.
+        mode : {"collect", "basic", "html"}, optional
+            The default is to "collect" test results and store them as JSON.
+            Other modes include "basic" that simply runs the test suite and
+            nothing more, or "html" that creates a pretty HTML report of the
+            test results.
+        filename : str, path, or None, optional
+            Depending on `mode` the `filename` is the JSON output path in
+            "collect" mode, `None` in "basic" mode, or the output path for the
+            HTML report in "html" mode.
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
-        self._collect = bool(collect)
-        if self._collect:
+        self._mode = mode.lower()
+        assert self._mode in self._valid_modes
+        if self._mode in ("collect", "html"):
             self._store = dict()
             self._store["meta"] = self._meta = dict()
             self._store["report"] = self._data = dict()
@@ -79,7 +87,7 @@ class ResultCollectionPlugin:
     @pytest.fixture(scope="module")
     def store(self, request):
         """Expose a `dict` to store values on."""
-        if self._collect:
+        if self._mode in ("collect", "html"):
             mod = request.module.__name__
             self._data[mod] = store = dict()
         else:
@@ -88,11 +96,11 @@ class ResultCollectionPlugin:
 
     def pytest_sessionstart(self):
         """Hook that runs at pytest session begin."""
-        if not self._collect:
+        if self._mode == "basic":
             return
         self._meta["platform"] = sys.platform
         self._meta["python_version"] = sys.version
-        if self._one_shot:
+        if self._mode == "html":
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
             return
         # allowed to fail
@@ -108,14 +116,14 @@ class ResultCollectionPlugin:
         self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
         self._meta["commit_hash"] = commit.hexsha
         self._meta["python_environment"] = [
-            str(dist.as_requirement()) for dist in\
+            str(dist.as_requirement()) for dist in
             pip.get_installed_distributions()]
 
     def pytest_sessionfinish(self):
         """Hook that runs at pytest session end."""
-        if not self._collect:
+        if self._mode == "basic":
             return
-        if self._one_shot:
+        if self._mode == "html":
             report = Report(self._filename, self._store)
             with io.open(self._filename, "w", encoding="utf-8") as file_h:
                 file_h.write(report.render_individual())
@@ -126,9 +134,9 @@ class ResultCollectionPlugin:
 
     def pytest_terminal_summary(self, terminalreporter):
         """Print the JSON file location if relevant."""
-        if not self._collect:
+        if self._mode == "basic":
             return
-        if self._one_shot:
+        if self._mode == "html":
             terminalreporter.write_sep(
                 u"*", u"generating report: '{0}'".format(self._filename))
             return
