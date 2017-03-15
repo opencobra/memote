@@ -113,8 +113,8 @@ def check_stoichiometric_consistency(model):
     # We exclude them here and only consider metabolites of the others.
     internal_rxns = set(model.reactions) - set(model.exchanges)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.debug("model has %d internal metabolites", len(metabolites))
-    LOGGER.debug("model has %d internal reactions", len(internal_rxns))
+    LOGGER.info("model has %d internal metabolites", len(metabolites))
+    LOGGER.info("model has %d internal reactions", len(internal_rxns))
     for metabolite in metabolites:
         stoich_trans.add(Variable(metabolite.id, lb=1))
     stoich_trans.update()
@@ -163,8 +163,8 @@ def find_unconserved_metabolites(model):
     # We exclude them here and only consider metabolites of the others.
     internal_rxns = set(model.reactions) - set(model.exchanges)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.debug("model has %d internal metabolites", len(metabolites))
-    LOGGER.debug("model has %d internal reactions", len(internal_rxns))
+    LOGGER.info("model has %d internal metabolites", len(metabolites))
+    LOGGER.info("model has %d internal reactions", len(internal_rxns))
     # The binary variables k[i] in the paper.
     k_vars = list()
     for met in metabolites:
@@ -267,7 +267,7 @@ def add_cut(problem, indicators, bound, Constraint):
     indicators : iterable
         Binary indicator `optlang.Variable`s.
     bound : int
-        Should be one less than the sum of indicators. Corresponds to P in
+        Should be one less than the sum of indicators. Corresponds to P - 1 in
         equation (14) in [1]_.
     Constraint : optlang.Constraint
         Constraint class for a specific optlang interface.
@@ -276,7 +276,6 @@ def add_cut(problem, indicators, bound, Constraint):
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
-    # non_zero corresponds to 'P' in the paper
     cut = Constraint(sympy.Add(*indicators), ub=bound)
     problem.add(cut)
     return cut
@@ -310,10 +309,11 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     Variable = model.solver.interface.Variable
     Objective = model.solver.interface.Objective
     unconserved_mets = find_unconserved_metabolites(model)
+    LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
     internal_rxns = set(model.reactions) - set(model.exchanges)
     internal_mets = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.debug("model has %d internal metabolites", len(internal_mets))
-    LOGGER.debug("model has %d internal reactions", len(internal_rxns))
+    LOGGER.info("model has %d internal metabolites", len(internal_mets))
+    LOGGER.info("model has %d internal reactions", len(internal_rxns))
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
@@ -321,8 +321,8 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     left_ns = nullspace(stoich.T)
     # deal with numerical instabilities
     left_ns[np.abs(left_ns) < tol] = 0.0
+    LOGGER.info("nullspace has dimension %d", left_ns.shape[1])
     inc_minimal = set()
-    LOGGER.debug("model has %d unconserved metabolites", len(unconserved_mets))
     (problem, indicators) = create_milp_problem(
         left_ns, metabolites, Model, Variable, Constraint, Objective)
     LOGGER.debug(str(problem))
@@ -347,6 +347,8 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
                         for var in indicators if var.primal > 0.2]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
+            if len(solution) == 1:
+                break
             cuts.append(add_cut(problem, indicators, len(solution) - 1,
                                 Constraint))
             status = problem.optimize()
