@@ -81,7 +81,6 @@ class ResultCollectionPlugin:
             self._store = DummyDict()
             self._meta = DummyDict()
             self._data = DummyDict()
-            self.__class__.__setitem__ = self.__class__._dummy_set
         self._filename = filename
 
     @pytest.fixture(scope="module")
@@ -137,8 +136,8 @@ class ResultCollectionPlugin:
         if self._mode == "basic":
             return
         if self._mode == "html":
-            terminalreporter.write_sep(
-                u"*", u"generating report: '{0}'".format(self._filename))
+            terminalreporter.write_line(
+                u"generating report '{0}'".format(self._filename))
             return
-        terminalreporter.write_sep(
-            u"*", u"update JSON file: '{0}'".format(self._filename))
+        terminalreporter.write_line(
+            u"generating JSON file '{0}'".format(self._filename))
