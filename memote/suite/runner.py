@@ -18,6 +18,7 @@
 """Run the test suite on an instance of `cobra.Model`."""
 
 from __future__ import absolute_import
+from builtins import dict
 
 import locale
 import os
@@ -45,8 +46,7 @@ class ConfigSectionSchema(object):
 
         collect = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
-        model = Param(type=click.Path(exists=True, dir_okay=False),
-                      multiple=True)
+        model = Param(type=click.Path(exists=True, dir_okay=False))
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -78,25 +78,24 @@ def process_addargs(args, context):
 
 
 def process_model(model, context):
-    """Load model path(s) from different locations."""
-    if len(model) > 0:
-        os.environ["MEMOTE_MODEL"] = os.pathsep.join(model)
+    """Load model path from different locations."""
+    if model is not None:
+        os.environ["MEMOTE_MODEL"] = model
     elif "MEMOTE_MODEL" in os.environ:
-        return
+        assert os.path.isfile(os.environ["MEMOTE_MODEL"])
     elif "model" in context.default_map:
-        os.environ["MEMOTE_MODEL"] = os.pathsep.join(
-            context.default_map["model"]
-        )
+        os.environ["MEMOTE_MODEL"] = context.default_map["model"]
     else:
         raise ValueError(
-            "No metabolic model found. Specify one as an argument, as an"
+            "No metabolic model found. Specify one as an option, in the"
             " environment variable MEMOTE_MODEL, or in a configuration file."
         )
 
 
-@click.command(context_settings=dict(
-    default_map=ConfigFileProcessor.read_config()
-))
+@click.group(invoke_without_command=True,
+             context_settings=dict(
+                 default_map=ConfigFileProcessor.read_config()
+             ))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
@@ -104,9 +103,16 @@ def process_model(model, context):
 @click.option("--pytest-args", "-a",
               help="Any additional arguments you want to pass to pytest as a"
                    " string.")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False), nargs=-1)
+@click.option("--model", type=click.Path(exists=True, dir_okay=False),
+              help="Path to model file. Can also be given via the environment"
+              " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
+              " 'memote.ini'.")
+@click.option("--filename", type=click.Path(exists=False, writable=True),
+              help="Path for either the collected results as JSON or the"
+              " HTML report. In the former case the default is either"
+              " 'out.json'. In the latter case the default is 'out.html'.")
 @click.pass_context
-def cli(ctx, model, pytest_args, no_collect):
+def cli(ctx, model, pytest_args, no_collect, filename):
     """
     Memote command line tool.
 
@@ -114,14 +120,51 @@ def cli(ctx, model, pytest_args, no_collect):
     """
     collect = process_collect_flag(no_collect, ctx)
     args = process_addargs(pytest_args, ctx)
-    try:
-        process_model(model, ctx)
-    except ValueError as err:
-        click.echo(str(err))
-        sys.exit(1)
-    click.echo(os.environ["MEMOTE_MODEL"])
     if collect and ("--tb" not in args):
         args.extend(["--tb", "no"])
-    errno = pytest.main(args, plugins=[ResultCollectionPlugin(
-        collect, u"test.json")])
+    if ctx.invoked_subcommand is None:
+        try:
+            process_model(model, ctx)
+        except ValueError as err:
+            click.echo(str(err))
+            sys.exit(2)
+        if collect:
+            collect = "collect"
+        else:
+            collect = "basic"
+        if filename is None:
+            filename = "out.json"
+        errno = pytest.main(args, plugins=[ResultCollectionPlugin(
+            collect, filename)])
+        sys.exit(errno)
+    else:
+        if "--tb" not in args:
+            args.extend(["--tb", "no"])
+        ctx.obj = dict()
+        ctx.obj["pytest_args"] = args
+        ctx.obj["model"] = model
+        ctx.obj["filename"] = filename
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="Create report from JSON files in the given directory.")
+@click.pass_context
+def report(ctx, directory):
+    """
+    Memote 'report' subcommand.
+
+    Run `memote report -h` for a better explanation.
+    """
+    try:
+        process_model(ctx.obj["model"], ctx)
+    except ValueError as err:
+        click.echo(str(err))
+        sys.exit(2)
+    if ctx.obj["filename"] is None:
+        ctx.obj["filename"] = "out.html"
+    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
+        "html", ctx.obj["filename"])])
     sys.exit(errno)

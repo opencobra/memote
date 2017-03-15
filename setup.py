@@ -1,7 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Install the metabolic model checks provided by memote."""
+# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Install the metabolic model test suite."""
 
 from __future__ import absolute_import
 
@@ -25,7 +40,12 @@ requirements = [
     "click",
     "click-configfile",
     "future",
-    "pytest"
+    "pytest",
+    "gitpython",
+    "dask",
+    "cloudpickle",
+    "toolz",
+    "Jinja2"
 ]
 
 test_requirements = [
@@ -45,10 +65,6 @@ setup(
     setup_requires=setup_requirements,
     install_requires=requirements,
     tests_require=test_requirements,
-    # this is currently not working, setup ignores the link
-    # could subprocess the pip install or for now:
-    # pip install -r requirements.in
-    #   "https://github.com/opencobra/cobrapy.git@devel-2#egg=cobra"
     dependency_links=[],
     entry_points="""
         [console_scripts]
@@ -60,6 +76,8 @@ setup(
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
         "Programming Language :: Python :: 2",

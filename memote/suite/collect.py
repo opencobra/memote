@@ -15,15 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Collect results for reporting model quality.
-"""
+"""Collect results for reporting model quality."""
 
 from __future__ import absolute_import
 
-import os
-import sys
 import io
+import sys
 try:
     import simplejson as json
 except ImportError:
@@ -32,71 +29,115 @@ from builtins import dict
 from datetime import datetime
 
 import pytest
+import git
+import pip
+
+from memote.suite.report import Report
 
 
 class DummyDict(object):
-    """
-    Expose a fake `__setitem__` interface.
-    """
+    """Expose a fake `__setitem__` interface."""
+
     def __setitem__(self, key, value):
+        """Dummy `__setitem__` method."""
         pass
 
 
 class ResultCollectionPlugin:
     """
+    Local pytest plugin that exposes a fixture for result collection.
+
+    The plugin exposes the fixture `store` which can be used in test functions
+    to store values in a dictionary. The dictionary is namespaced to the module
+    so within a module the same keys should not be re-used (unless intended).
     """
 
-    def __init__(self, collect, filename):
+    _valid_modes = frozenset(["collect", "basic", "html"])
+
+    def __init__(self, mode="collect", filename=None, **kwargs):
         """
         Collect and store values during testing.
 
         Parameters
         ----------
-        collect : bool
-            Whether to store values or perform dummy operations.
-        filename : str or path
-            Path of the JSON file where collected items are stored.
+        mode : {"collect", "basic", "html"}, optional
+            The default is to "collect" test results and store them as JSON.
+            Other modes include "basic" that simply runs the test suite and
+            nothing more, or "html" that creates a pretty HTML report of the
+            test results.
+        filename : str, path, or None, optional
+            Depending on `mode` the `filename` is the JSON output path in
+            "collect" mode, `None` in "basic" mode, or the output path for the
+            HTML report in "html" mode.
         """
-        self._collect = bool(collect)
-        if self._collect:
+        super(ResultCollectionPlugin, self).__init__(**kwargs)
+        self._mode = mode.lower()
+        assert self._mode in self._valid_modes
+        if self._mode in ("collect", "html"):
             self._store = dict()
             self._store["meta"] = self._meta = dict()
-            self._store["test_data"] = self._data = dict()
+            self._store["report"] = self._data = dict()
         else:
             self._store = DummyDict()
             self._meta = DummyDict()
             self._data = DummyDict()
-            self.__class__.__setitem__ = self.__class__._dummy_set
         self._filename = filename
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
 
     @pytest.fixture(scope="module")
     def store(self, request):
-        if self._collect:
-            mod = request.module.__name__
-            self._data[mod] = store = dict()
+        """Expose a `dict` to store values on."""
+        if self._mode in ("collect", "html"):
+            self._data[request.module.__name__] = store = dict()
         else:
             store = self._data
         return store
 
     def pytest_sessionstart(self):
-        if not self._collect:
+        """Hook that runs at pytest session begin."""
+        if self._mode == "basic":
             return
-        self._meta["utc_timestamp"] = datetime.utcnow().isoformat(" ")
+        self._meta["platform"] = sys.platform
+        self._meta["python_version"] = sys.version
+        if self._mode == "html":
+            self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
+            return
+        # allowed to fail
+        if False:
+            repo = git.Repo()
+            if repo.is_dirty():
+                raise RuntimeError(
+                    "Please git commit or git stash all changes before running"
+                    " the memote suite.")
+            branch = repo.active_branch
+            self._meta["branch"] = branch.name
+            commit = branch.commit
+            self._meta["commit_author"] = commit.author
+            self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
+            self._meta["commit_hash"] = commit.hexsha
+            self._meta["python_environment"] = [
+                str(dist.as_requirement()) for dist in
+                pip.get_installed_distributions()]
 
     def pytest_sessionfinish(self):
-        if not self._collect:
+        """Hook that runs at pytest session end."""
+        if self._mode == "basic":
+            return
+        if self._mode == "html":
+            report = Report(self._filename, self._store)
+            with io.open(self._filename, "w", encoding="utf-8") as file_h:
+                file_h.write(report.render_individual())
             return
         with io.open(self._filename, "w", encoding=None) as file_h:
             json.dump(self._store, file_h, sort_keys=True, indent=4,
                       separators=(",", ": "))
 
     def pytest_terminal_summary(self, terminalreporter):
-        if not self._collect:
+        """Print the JSON file location if relevant."""
+        if self._mode == "basic":
             return
-        terminalreporter.write_sep(
-            u"*", u"update JSON file: '{0}'".format(self._filename))
-        sys.stderr = os.devnull
-        sys.stout = os.devnull
+        if self._mode == "html":
+            terminalreporter.write_line(
+                u"generating report '{0}'".format(self._filename))
+            return
+        terminalreporter.write_line(
+            u"generating JSON file '{0}'".format(self._filename))

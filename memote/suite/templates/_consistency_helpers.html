@@ -1,0 +1,20 @@
+{% macro render_consistency(data) -%}
+<h2>Stoichiometric Consistency</h2>
+
+{% if data['is_consistent'] -%}
+<p>
+    The model stoichiometry (ignoring exchange reactions) is consistent! Well
+    done!
+</p>
+{% else -%}
+<p>
+    <span class="warn">Inconsistent model stoichiometry</span>
+</p>
+<dl>
+    <dt>Number of unconserved metabolites</dt>
+    <dd>{{ data['unconserved_metabolites']|length }}</dd>
+    <dt>Unconserved metabolites</dt>
+    <dd>{{ data['unconserved_metabolites'] }}</dd>
+</dl>
+{% endif -%}
+{%- endmacro %}

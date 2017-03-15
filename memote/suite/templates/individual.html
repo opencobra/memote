@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% from '_basic_helpers.html' import render_basic %}
+{% from '_consistency_helpers.html' import render_consistency %}
+{% block content -%}
+<div>
+{{ render_basic(data['report']['memote.suite.test_basic']) }}
+</div>
+<div>
+{{ render_consistency(data['report']['memote.suite.test_consistency']) }}
+</div>
+{%- endblock %}
