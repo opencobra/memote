@@ -18,6 +18,7 @@
 """Run the test suite on an instance of `cobra.Model`."""
 
 from __future__ import absolute_import
+from builtins import dict
 
 import locale
 import os
@@ -94,9 +95,10 @@ def process_model(model, context):
         )
 
 
-@click.command(context_settings=dict(
-    default_map=ConfigFileProcessor.read_config()
-))
+@click.group(invoke_without_command=True,
+             context_settings=dict(
+                default_map=ConfigFileProcessor.read_config()
+            ))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
@@ -104,7 +106,7 @@ def process_model(model, context):
 @click.option("--pytest-args", "-a",
               help="Any additional arguments you want to pass to pytest as a"
                    " string.")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False), nargs=-1)
+@click.argument("model", type=click.Path(exists=True, dir_okay=False), nargs=1)
 @click.pass_context
 def cli(ctx, model, pytest_args, no_collect):
     """
@@ -115,13 +117,27 @@ def cli(ctx, model, pytest_args, no_collect):
     collect = process_collect_flag(no_collect, ctx)
     args = process_addargs(pytest_args, ctx)
     try:
-        process_model(model, ctx)
+        process_model([model], ctx)
     except ValueError as err:
         click.echo(str(err))
         sys.exit(1)
     click.echo(os.environ["MEMOTE_MODEL"])
     if collect and ("--tb" not in args):
         args.extend(["--tb", "no"])
-    errno = pytest.main(args, plugins=[ResultCollectionPlugin(
-        collect, u"test.json")])
+    if ctx.invoked_subcommand is None:
+        errno = pytest.main(args, plugins=[ResultCollectionPlugin(
+            "collect", u"test.json")])
+        sys.exit(errno)
+    else:
+        ctx.obj = dict()
+        ctx.obj["pytest_args"] = args
+
+
+@cli.command()
+@click.option("--dir", type=bool, is_flag=True,
+              help="Create report from directory.")
+@click.pass_context
+def report(ctx, dir):
+    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
+        "html", u"out.html")])
     sys.exit(errno)

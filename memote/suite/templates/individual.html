@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{%- block content %}
-<h2>{{ data['meta']['timestamp'] }}</h2>
-
-{% endblock -%}
+{% from '_basic_helpers.html' import render_basic %}
+{% block content -%}
+<div>
+{{ render_basic(data['report']['memote.suite.test_basic']) }}
+</div>
+{%- endblock %}

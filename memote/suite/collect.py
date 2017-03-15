@@ -88,8 +88,7 @@ class ResultCollectionPlugin:
     def store(self, request):
         """Expose a `dict` to store values on."""
         if self._mode in ("collect", "html"):
-            mod = request.module.__name__
-            self._data[mod] = store = dict()
+            self._data[request.module.__name__] = store = dict()
         else:
             store = self._data
         return store
@@ -104,20 +103,21 @@ class ResultCollectionPlugin:
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
             return
         # allowed to fail
-        repo = git.Repo()
-        if repo.is_dirty():
-            raise RuntimeError(
-                "Please git commit or git stash all changes before running the"
-                " memote suite.")
-        branch = repo.active_branch
-        self._meta["branch"] = branch.name
-        commit = branch.commit
-        self._meta["commit_author"] = commit.author
-        self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
-        self._meta["commit_hash"] = commit.hexsha
-        self._meta["python_environment"] = [
-            str(dist.as_requirement()) for dist in
-            pip.get_installed_distributions()]
+        if False:
+            repo = git.Repo()
+            if repo.is_dirty():
+                raise RuntimeError(
+                    "Please git commit or git stash all changes before running the"
+                    " memote suite.")
+            branch = repo.active_branch
+            self._meta["branch"] = branch.name
+            commit = branch.commit
+            self._meta["commit_author"] = commit.author
+            self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
+            self._meta["commit_hash"] = commit.hexsha
+            self._meta["python_environment"] = [
+                str(dist.as_requirement()) for dist in
+                pip.get_installed_distributions()]
 
     def pytest_sessionfinish(self):
         """Hook that runs at pytest session end."""

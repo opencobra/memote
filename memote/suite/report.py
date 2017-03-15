@@ -47,8 +47,11 @@ class Report(object):
     def render_individual(self):
         """
         """
-        template = self.env.get_template('individual.html')
-        return template.render(data=self.data)
+        template = self.env.get_template("individual.html")
+        return template.render(
+            name=self.data["report"]["memote.suite.test_basic"]["model_id"],
+            timestamp=self.data["meta"]["timestamp"],
+            data=self.data)
 
 def render_diff():
     """

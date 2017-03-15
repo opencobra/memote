@@ -1,0 +1,14 @@
+{% macro render_basic(data) -%}
+<h2>Basic Information</h2>
+
+<dl>
+    <dt>Number of genes</dt>
+    <dd>{{ data['num_genes'] }}</dd>
+    <dt>Number of reactions</dt>
+    <dd>{{ data['num_reactions'] }}</dd>
+    <dt>Number of metabolites</dt>
+    <dd>{{ data['num_metabolites'] }}</dd>
+    <dt>Number of metabolites without known formula</dt>
+    <dd>{{ data['num_metabolites_no_formula']|length }}</dd>
+</dl>
+{%- endmacro %}
