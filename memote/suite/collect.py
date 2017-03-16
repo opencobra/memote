@@ -123,7 +123,7 @@ class ResultCollectionPlugin:
         if self._mode == "basic":
             return
         if self._mode == "html":
-            report = Report(self._filename, self._store)
+            report = Report(self._store)
             with io.open(self._filename, "w", encoding="utf-8") as file_h:
                 file_h.write(report.render_individual())
             return
