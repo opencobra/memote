@@ -126,15 +126,8 @@ def probe_git():
     return repo
 
 
-def collect(ctx):
-    if ctx.obj["collect"]:
-        collect = "collect"
-        if "--tb" not in ctx.obj["pytest_args"]:
-            ctx.obj["pytest_args"].extend(["--tb", "no"])
-    else:
-        collect = "basic"
-    if ctx.obj["repo"] is not None and ctx.obj["collect"]:
-        collect = "git-{}".format(collect)
+def check_model(ctx):
+    """Ensure that the model option is defined."""
     if ctx.obj["model"] is None:
         click.echo(
             Fore.RED +
@@ -144,18 +137,36 @@ def collect(ctx):
             err=True
         )
         sys.exit(2)
+
+
+def check_directory(ctx):
+    """Ensure that the directory option is defined."""
+    if ctx.obj["directory"] is None:
+        click.echo(
+            Fore.RED +
+            "No suitable directory found. Specify one using the --directory"
+            " option, using the environment variable MEMOTE_DIRECTORY, or"
+            " in either the 'memote.ini' or 'setup.cfg' configuration file.",
+            err=True
+        )
+        sys.exit(2)
+
+
+def collect(ctx):
+    """Act like a collect subcommand."""
+    check_model(ctx)
+    if ctx.obj["collect"]:
+        collect = "collect"
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
+    else:
+        collect = "basic"
+    if ctx.obj["repo"] is not None and ctx.obj["collect"]:
+        collect = "git-{}".format(collect)
     if collect == "collect" and ctx.obj["filename"] is None:
         ctx.obj["filename"] = "out.json"
     elif collect == "git-collect" and ctx.obj["filename"] is None:
-        if ctx.obj["directory"] is None:
-            click.echo(
-                Fore.RED +
-                "No suitable directory found. Specify one using the --directory"
-                " option, using the environment variable MEMOTE_DIRECTORY, or"
-                " in either the 'memote.ini' or 'setup.cfg' configuration"
-                " file.", err=True
-            )
-            sys.exit(2)
+        check_directory(ctx)
         ctx.obj["filename"] = join(
             ctx.obj["directory"],
             "{}.json".format(ctx.obj["repo"].active_branch.commit.hexsha)
@@ -222,6 +233,7 @@ def report(ctx):
     If the model lives in a git repository and there is a history of test
     results, memote can generate a more rich report.
     """
+    check_model(ctx)
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "out.html"
     if ctx.obj["repo"] is None:
@@ -234,15 +246,7 @@ def report(ctx):
             ]
         )
         sys.exit(errno)
-    if ctx.obj["directory"] is None:
-        click.echo(
-            Fore.RED +
-            "No suitable directory found. Specify one using the --directory"
-            " option, using the environment variable MEMOTE_DIRECTORY, or"
-            " in either the 'memote.ini' or 'setup.cfg' configuration file.",
-            err=True
-        )
-        sys.exit(2)
+    check_directory(ctx)
     GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
 
 
