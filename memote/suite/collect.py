@@ -31,7 +31,10 @@ from datetime import datetime
 
 import pytest
 import pip
-from cobra.io import read_sbml_model
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", UserWarning)
+    # ignore Gurobi warning
+    from cobra.io import read_sbml_model
 
 from memote.suite.report import Report
 
@@ -75,7 +78,7 @@ class ResultCollectionPlugin:
             HTML report in "html" mode.
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
-        self.model = model
+        self._model = model
         self.mode = mode.lower()
         assert self.mode in self._valid_modes
         if self.mode in ("collect", "git-collect", "html"):
@@ -96,7 +99,7 @@ class ResultCollectionPlugin:
         # TODO: record warnings and add them to the report
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            return read_sbml_model(self.model)
+            return read_sbml_model(self._model)
 
     @pytest.fixture(scope="module")
     def store(self, request):
@@ -134,7 +137,7 @@ class ResultCollectionPlugin:
         if self.mode == "html":
             report = Report(self._store)
             with io.open(self.filename, "w", encoding="utf-8") as file_h:
-                file_h.write(report.render_individual())
+                file_h.write(report.render_html())
             return
         with io.open(self.filename, "w", encoding=None) as file_h:
             json.dump(self._store, file_h, sort_keys=True, indent=4,

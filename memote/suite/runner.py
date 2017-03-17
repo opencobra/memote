@@ -34,7 +34,7 @@ from click_configfile import (
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.report import RichReport
+from memote.suite.report import GitEnabledReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 
@@ -227,4 +227,4 @@ def report(ctx):
             " in either the 'memote.ini' or 'setup.cfg' configuration file."
         )
         sys.exit(2)
-    RichReport()
+    GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
