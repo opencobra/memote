@@ -19,18 +19,18 @@
 
 from __future__ import absolute_import
 
-# try:
-#     import simplejson as json
-# except ImportError:
-#     import json
-# from builtins import dict
+try:
+    import simplejson as json
+except ImportError:
+    import json
+from os.path import join
 
-# import dask
+import dask.bag as db
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 class Report(object):
-    """Render different types of reports from the given data."""
+    """Render a basic report from the given data."""
 
     def __init__(self, data=None, **kwargs):
         """Initialize the Jinja2 environment and data."""
@@ -41,22 +41,37 @@ class Report(object):
         )
         self.data = data
 
-    def render_individual(self):
+    def render_html(self):
         """Render a one-shot report for a model."""
-        template = self.env.get_template("individual.html")
+        template = self.env.get_template("basic.html")
         return template.render(
             name=self.data["report"]["memote.suite.test_basic"]["model_id"],
             timestamp=self.data["meta"]["timestamp"],
             data=self.data)
 
 
-# def render_diff():
-#     """
-#     """
-#     pass
+class GitEnabledReport(Report):
+    """Render a rich report using the git repository history."""
+
+    def __init__(self, repo, directory, **kwargs):
+        """Initialize the Jinja2 environment and data."""
+        super(GitEnabledReport, self).__init__(**kwargs)
+        self.repo = repo
+        self.latest = self.repo.active_branch.commit
+        self.bag = self._collect_bag()
+
+    def render_html(self):
+        """Render a rich report for the repository."""
+        template = self.env.get_template("git_enabled.html")
+        return template.render(
+            name=self.data["report"]["memote.suite.test_basic"]["model_id"],
+            timestamp=self.data["meta"]["timestamp"],
+            data=self.data)
+
+    def _collect_bag(self):
+        """Collect all data into a dask bag."""
+        files = [join(self.directory, "{}.json".format(commit.hexsha))
+                 for commit in self.latest.iter_parents()]
+        return db.read_text(files).map(json.loads)
 
 
-# def render_with_history():
-#     """
-#     """
-#     pass
