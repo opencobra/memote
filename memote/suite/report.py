@@ -19,14 +19,20 @@
 
 from __future__ import absolute_import
 
+import io
+import logging
 try:
     import simplejson as json
 except ImportError:
     import json
-from os.path import join
+from os.path import join, exists
 
+import pandas as pd
 import dask.bag as db
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, select_autoescape, Markup
+from colorama import Fore
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Report(object):
@@ -58,20 +64,38 @@ class GitEnabledReport(Report):
         super(GitEnabledReport, self).__init__(**kwargs)
         self.repo = repo
         self.latest = self.repo.active_branch.commit
+        self.directory = directory
         self.bag = self._collect_bag()
 
     def render_html(self):
         """Render a rich report for the repository."""
         template = self.env.get_template("git_enabled.html")
         return template.render(
-            name=self.data["report"]["memote.suite.test_basic"]["model_id"],
-            timestamp=self.data["meta"]["timestamp"],
-            data=self.data)
+            names=self.bag.pluck("report").pluck("memote.suite.test_basic").
+                pluck("model_id").distinct().compute(),
+            meta=Markup(self._get_basics_df().to_html())
+            )
 
     def _collect_bag(self):
         """Collect all data into a dask bag."""
-        files = [join(self.directory, "{}.json".format(commit.hexsha))
-                 for commit in self.latest.iter_parents()]
-        return db.read_text(files).map(json.loads)
+        # load all into memory and avoid strange dask JSON object expectation
+        objects = list()
+        for commit in self.latest.iter_parents():
+            filename = join(self.directory, "{}.json".format(commit.hexsha))
+            if not exists(filename):
+                LOGGER.warn(
+                    Fore.YELLOW +
+                    "Results for commit %s are missing."
+                    + Fore.RESET, commit.hexsha)
+                continue
+            with io.open(filename, "r") as file_h:
+                objects.append(json.load(file_h))
+        return db.from_sequence(objects)
 
-
+    def _get_basics_df(self):
+        """Collect basic information from the bag into a data frame."""
+        columns = ["commit_hash", "timestamp"]
+        data_types = ["str", "datetime64[ns]"]
+        expected = pd.DataFrame({col: pd.Series(dtype=dt)
+                                 for (col, dt) in zip(columns, data_types)})
+        return self.bag.pluck("meta").to_dataframe(expected).compute()

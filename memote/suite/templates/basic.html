@@ -1,6 +1,12 @@
 {% extends "layout.html" %}
 {% from '_basic_helpers.html' import render_basic %}
 {% from '_consistency_helpers.html' import render_consistency %}
+
+{% block header -%}
+super()
+<h2>{{ timestamp }}</h2>
+{%- endblock %}
+
 {% block content -%}
 <div>
 {{ render_basic(data['report']['memote.suite.test_basic']) }}

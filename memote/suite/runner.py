@@ -22,6 +22,7 @@ from builtins import dict
 
 import locale
 import os
+import io
 import shlex
 import sys
 from os.path import join, dirname
@@ -247,7 +248,9 @@ def report(ctx):
         )
         sys.exit(errno)
     check_directory(ctx)
-    GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
+    report = GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
+    with io.open(ctx.obj["filename"], "w", encoding="utf-8") as file_h:
+        file_h.write(report.render_html())
 
 
 @cli.command()

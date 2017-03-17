@@ -126,7 +126,7 @@ class ResultCollectionPlugin:
             branch = self.repo.active_branch
             self._meta["branch"] = branch.name
             commit = branch.commit
-            self._meta["commit_author"] = commit.author
+            self._meta["commit_author"] = commit.author.name
             self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
             self._meta["commit_hash"] = commit.hexsha
 
