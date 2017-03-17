@@ -46,7 +46,7 @@ def test_stoichiometric_consistency(model, store):
 
 def test_biomass_consistency(model):
     """
-    Expect that the sum of total mass of all biomass components equals 1
+    Expect that the sum of total mass of all biomass components equals 1.
 
     A deviation of 0.001 is considered as close enough.
     """

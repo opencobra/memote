@@ -107,5 +107,4 @@ def find_biomass_reaction(model):
     model : model: cobra.core.Model.Model
             A cobrapy metabolic model
     """
-
     return [rxn for rxn in model.reactions if 'biomass' in rxn.id.lower()]
