@@ -24,15 +24,17 @@ import locale
 import os
 import shlex
 import sys
-from os.path import dirname
+from os.path import join, dirname
 
 import click
 import pytest
+import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
+from memote.suite.report import RichReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 
@@ -47,6 +49,8 @@ class ConfigSectionSchema(object):
         collect = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
         model = Param(type=click.Path(exists=True, dir_okay=False))
+        directory = Param(type=click.Path(exists=True, file_okay=False,
+                                          writable=True))
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -80,16 +84,77 @@ def process_addargs(args, context):
 def process_model(model, context):
     """Load model path from different locations."""
     if model is not None:
-        os.environ["MEMOTE_MODEL"] = model
+        return model
     elif "MEMOTE_MODEL" in os.environ:
         assert os.path.isfile(os.environ["MEMOTE_MODEL"])
+        return os.environ["MEMOTE_MODEL"]
     elif "model" in context.default_map:
-        os.environ["MEMOTE_MODEL"] = context.default_map["model"]
+        return context.default_map["model"]
+
+
+def process_directory(directory, context):
+    """Load directory from different locations."""
+    if directory is not None:
+        return directory
+    elif "MEMOTE_DIRECTORY" in os.environ:
+        assert os.path.isdir(os.environ["MEMOTE_DIRECTORY"])
+        return os.environ["MEMOTE_DIRECTORY"]
+    elif "directory" in context.default_map:
+        return context.default_map["directory"]
+
+
+def probe_git():
+    """Return meta data if in git repository."""
+    try:
+        repo = git.Repo()
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            "We highly recommend keeping your model in a git repository."
+            " It allows you to track changes and easily collaborate with"
+            " others via online platforms such as https://github.com.")
+        return
+    if repo.is_dirty():
+        click.echo(
+            "Please git commit or git stash all changes before running"
+            " the memote suite.")
+        sys.exit(1)
+    return repo
+
+
+def collect(ctx):
+    if ctx.obj["collect"]:
+        collect = "collect"
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
     else:
-        raise ValueError(
-            "No metabolic model found. Specify one as an option, in the"
-            " environment variable MEMOTE_MODEL, or in a configuration file."
+        collect = "basic"
+    if ctx.obj["repo"] is not None and ctx.obj["collect"]:
+        collect = "git-{}".format(collect)
+    if ctx.obj["model"] is None:
+        click.echo(
+            "No metabolic model found. Specify one using the --model"
+            " option, using the environment variable MEMOTE_MODEL, or in"
+            " either the 'memote.ini' or 'setup.cfg' configuration file."
         )
+        sys.exit(2)
+    if collect == "collect" and ctx.obj["filename"] is None:
+        ctx.obj["filename"] = "out.json"
+    elif collect == "git-collect" and ctx.obj["filename"] is None:
+        if ctx.obj["directory"] is None:
+            click.echo(
+                "No suitable directory found. Specify one using the --directory"
+                " option, using the environment variable MEMOTE_DIRECTORY, or"
+                " in either the 'memote.ini' or 'setup.cfg' configuration file."
+            )
+            sys.exit(2)
+        ctx.obj["filename"] = join(
+            ctx.obj["directory"],
+            "{}.json".format(ctx.obj["repo"].active_branch.commit.hexsha)
+        )
+    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
+        ctx.obj["model"], mode=collect, filename=ctx.obj["filename"],
+        directory=ctx.obj["directory"], repo=ctx.obj["repo"])])
+    sys.exit(errno)
 
 
 @click.group(invoke_without_command=True,
@@ -100,71 +165,66 @@ def process_model(model, context):
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
               help="Do *not* collect test data needed for generating a report.")
-@click.option("--pytest-args", "-a",
-              help="Any additional arguments you want to pass to pytest as a"
-                   " string.")
 @click.option("--model", type=click.Path(exists=True, dir_okay=False),
               help="Path to model file. Can also be given via the environment"
               " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
               " 'memote.ini'.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               help="Path for either the collected results as JSON or the"
-              " HTML report. In the former case the default is either"
-              " 'out.json'. In the latter case the default is 'out.html'.")
+              " HTML report. In the former case the default is 'out.json'."
+              " In the latter case the default is 'out.html'.")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="Either Create a report from JSON files in the given"
+              " directory or write test results to the directory using the"
+              " git commit hash.")
+@click.option("--pytest-args", "-a",
+              help="Any additional arguments you want to pass to pytest."
+              "Should be given as one continuous string.")
 @click.pass_context
-def cli(ctx, model, pytest_args, no_collect, filename):
+def cli(ctx, no_collect, model, filename, directory, pytest_args):
     """
     Memote command line tool.
 
     Run `memote -h` for a better explanation.
     """
-    collect = process_collect_flag(no_collect, ctx)
-    args = process_addargs(pytest_args, ctx)
-    if collect and ("--tb" not in args):
-        args.extend(["--tb", "no"])
+    ctx.obj = dict()
+    ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
+    ctx.obj["model"] = process_model(model, ctx)
+    ctx.obj["filename"] = filename
+    ctx.obj["directory"] = process_model(directory, ctx)
+    ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
+    ctx.obj["repo"] = probe_git()
     if ctx.invoked_subcommand is None:
-        try:
-            process_model(model, ctx)
-        except ValueError as err:
-            click.echo(str(err))
-            sys.exit(2)
-        if collect:
-            collect = "collect"
-        else:
-            collect = "basic"
-        if filename is None:
-            filename = "out.json"
-        errno = pytest.main(args, plugins=[ResultCollectionPlugin(
-            collect, filename)])
-        sys.exit(errno)
-    else:
-        if "--tb" not in args:
-            args.extend(["--tb", "no"])
-        ctx.obj = dict()
-        ctx.obj["pytest_args"] = args
-        ctx.obj["model"] = model
-        ctx.obj["filename"] = filename
+        collect(ctx)
 
 
 @cli.command()
 @click.help_option("--help", "-h")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False,
-                                             writable=True),
-              help="Create report from JSON files in the given directory.")
 @click.pass_context
-def report(ctx, directory):
+def report(ctx):
     """
     Memote 'report' subcommand.
 
     Run `memote report -h` for a better explanation.
     """
-    try:
-        process_model(ctx.obj["model"], ctx)
-    except ValueError as err:
-        click.echo(str(err))
-        sys.exit(2)
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "out.html"
-    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
-        "html", ctx.obj["filename"])])
-    sys.exit(errno)
+    if ctx.obj["repo"] is None:
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
+        errno = pytest.main(
+            ctx.obj["pytest_args"],
+            plugins=[ResultCollectionPlugin(
+                ctx.obj["model"], mode="html", filename=ctx.obj["filename"])
+            ]
+        )
+        sys.exit(errno)
+    if ctx.obj["directory"] is None:
+        click.echo(
+            "No suitable directory found. Specify one using the --directory"
+            " option, using the environment variable MEMOTE_DIRECTORY, or"
+            " in either the 'memote.ini' or 'setup.cfg' configuration file."
+        )
+        sys.exit(2)
+    RichReport()

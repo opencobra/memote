@@ -25,12 +25,13 @@ try:
     import simplejson as json
 except ImportError:
     import json
+import warnings
 from builtins import dict
 from datetime import datetime
 
 import pytest
-import git
 import pip
+from cobra.io import read_sbml_model
 
 from memote.suite.report import Report
 
@@ -52,14 +53,17 @@ class ResultCollectionPlugin:
     so within a module the same keys should not be re-used (unless intended).
     """
 
-    _valid_modes = frozenset(["collect", "basic", "html"])
+    _valid_modes = frozenset(["collect", "git-collect", "basic", "html"])
 
-    def __init__(self, mode="collect", filename=None, **kwargs):
+    def __init__(self, model, mode="collect", filename=None, directory=None,
+                 repo=None, **kwargs):
         """
         Collect and store values during testing.
 
         Parameters
         ----------
+        model : str or path
+            Path to model that is to be tested in the suite.
         mode : {"collect", "basic", "html"}, optional
             The default is to "collect" test results and store them as JSON.
             Other modes include "basic" that simply runs the test suite and
@@ -71,9 +75,10 @@ class ResultCollectionPlugin:
             HTML report in "html" mode.
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
-        self._mode = mode.lower()
-        assert self._mode in self._valid_modes
-        if self._mode in ("collect", "html"):
+        self.model = model
+        self.mode = mode.lower()
+        assert self.mode in self._valid_modes
+        if self.mode in ("collect", "git-collect", "html"):
             self._store = dict()
             self._store["meta"] = self._meta = dict()
             self._store["report"] = self._data = dict()
@@ -81,12 +86,22 @@ class ResultCollectionPlugin:
             self._store = DummyDict()
             self._meta = DummyDict()
             self._data = DummyDict()
-        self._filename = filename
+        self.filename = filename
+        self.directory = directory
+        self.repo = repo
+
+    @pytest.fixture(scope="session")
+    def model(self):
+        """Provide the model for the complete test session."""
+        # TODO: record warnings and add them to the report
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            return read_sbml_model(self.model)
 
     @pytest.fixture(scope="module")
     def store(self, request):
         """Expose a `dict` to store values on."""
-        if self._mode in ("collect", "html"):
+        if self.mode in ("collect", "git-collect", "html"):
             self._data[request.module.__name__] = store = dict()
         else:
             store = self._data
@@ -94,50 +109,44 @@ class ResultCollectionPlugin:
 
     def pytest_sessionstart(self):
         """Hook that runs at pytest session begin."""
-        if self._mode == "basic":
+        if self.mode == "basic":
             return
         self._meta["platform"] = sys.platform
         self._meta["python_version"] = sys.version
-        if self._mode == "html":
+        self._meta["python_environment"] = [
+            str(dist.as_requirement()) for dist in
+            pip.get_installed_distributions()]
+        if self.mode == "html":
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
             return
-        # allowed to fail
-        if False:
-            repo = git.Repo()
-            if repo.is_dirty():
-                raise RuntimeError(
-                    "Please git commit or git stash all changes before running"
-                    " the memote suite.")
-            branch = repo.active_branch
+        if self.mode == "git-collect":
+            branch = self.repo.active_branch
             self._meta["branch"] = branch.name
             commit = branch.commit
             self._meta["commit_author"] = commit.author
             self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
             self._meta["commit_hash"] = commit.hexsha
-            self._meta["python_environment"] = [
-                str(dist.as_requirement()) for dist in
-                pip.get_installed_distributions()]
 
     def pytest_sessionfinish(self):
         """Hook that runs at pytest session end."""
-        if self._mode == "basic":
+        if self.mode == "basic":
             return
-        if self._mode == "html":
+        if self.mode == "html":
             report = Report(self._store)
-            with io.open(self._filename, "w", encoding="utf-8") as file_h:
+            with io.open(self.filename, "w", encoding="utf-8") as file_h:
                 file_h.write(report.render_individual())
             return
-        with io.open(self._filename, "w", encoding=None) as file_h:
+        with io.open(self.filename, "w", encoding=None) as file_h:
             json.dump(self._store, file_h, sort_keys=True, indent=4,
                       separators=(",", ": "))
 
     def pytest_terminal_summary(self, terminalreporter):
         """Print the JSON file location if relevant."""
-        if self._mode == "basic":
+        if self.mode == "basic":
             return
-        if self._mode == "html":
+        if self.mode == "html":
             terminalreporter.write_line(
-                u"generating report '{0}'".format(self._filename))
+                u"writing report '{0}'".format(self.filename))
             return
         terminalreporter.write_line(
-            u"generating JSON file '{0}'".format(self._filename))
+            u"writing JSON output '{0}'".format(self.filename))
