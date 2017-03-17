@@ -20,9 +20,14 @@
 from __future__ import absolute_import
 
 import logging
+import numpy as np
 
 from memote.support.consistency import (
-    check_stoichiometric_consistency, find_unconserved_metabolites)
+    check_stoichiometric_consistency, find_unconserved_metabolites,
+    calculate_sum_of_biomass_components)
+
+from memote.support.helpers import (
+    find_biomass_reaction)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,3 +42,18 @@ def test_stoichiometric_consistency(model, store):
     assert is_consistent,\
         "The following metabolites are involved in inconsistent reactions:"\
         " {}".format(", ".join(unconserved))
+
+
+def test_biomass_consistency(model):
+    """
+    Expect that the sum of total mass of all biomass components equals 1
+
+    A deviation of 0.001 is considered as close enough.
+    """
+    biomass_rxns = find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        control_sum = calculate_sum_of_biomass_components(rxn)
+        assert np.isclose([1], [control_sum], atol=1e-03)[0] is True, \
+            "The following biomass reaction does not sum close enough to 1'" \
+            " {}".format(
+            ", ".join(rxn.id))

@@ -295,3 +295,11 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         problem.constraints[switch].lb = 0.0
         problem.remove(cuts)
     return inc_minimal
+
+
+def calculate_sum_of_biomass_components(rxn):
+    cum_sum = 0
+    for met, coef in rxn.metabolites.items():
+        cum_sum += (-(coef / 1000)) * met.formula_weight
+
+    return cum_sum
