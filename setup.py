@@ -39,6 +39,7 @@ requirements = [
     "cobra==0.6.0a2",
     "click",
     "click-configfile",
+    "colorama",
     "future",
     "pytest",
     "gitpython",

@@ -31,12 +31,14 @@ import pytest
 import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
+from colorama import init, Fore
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.report import GitEnabledReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
+init()
 
 
 class ConfigSectionSchema(object):
@@ -109,14 +111,17 @@ def probe_git():
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         click.echo(
+            Fore.YELLOW +
             "We highly recommend keeping your model in a git repository."
             " It allows you to track changes and easily collaborate with"
-            " others via online platforms such as https://github.com.")
+            " others via online platforms such as https://github.com.\n"
+            + Fore.RESET)
         return
     if repo.is_dirty():
         click.echo(
+            Fore.RED +
             "Please git commit or git stash all changes before running"
-            " the memote suite.")
+            " the memote suite.", err=True)
         sys.exit(1)
     return repo
 
@@ -132,9 +137,11 @@ def collect(ctx):
         collect = "git-{}".format(collect)
     if ctx.obj["model"] is None:
         click.echo(
+            Fore.RED +
             "No metabolic model found. Specify one using the --model"
             " option, using the environment variable MEMOTE_MODEL, or in"
-            " either the 'memote.ini' or 'setup.cfg' configuration file."
+            " either the 'memote.ini' or 'setup.cfg' configuration file.",
+            err=True
         )
         sys.exit(2)
     if collect == "collect" and ctx.obj["filename"] is None:
@@ -142,9 +149,11 @@ def collect(ctx):
     elif collect == "git-collect" and ctx.obj["filename"] is None:
         if ctx.obj["directory"] is None:
             click.echo(
+                Fore.RED +
                 "No suitable directory found. Specify one using the --directory"
                 " option, using the environment variable MEMOTE_DIRECTORY, or"
-                " in either the 'memote.ini' or 'setup.cfg' configuration file."
+                " in either the 'memote.ini' or 'setup.cfg' configuration"
+                " file.", err=True
             )
             sys.exit(2)
         ctx.obj["filename"] = join(
@@ -184,9 +193,12 @@ def collect(ctx):
 @click.pass_context
 def cli(ctx, no_collect, model, filename, directory, pytest_args):
     """
-    Memote command line tool.
+    Metabolic model testing command line tool.
 
-    Run `memote -h` for a better explanation.
+    In its basic invocation memote performs a test suite on a metabolic model.
+    Through various subcommands it can further generate a pretty HTML report,
+    generate a model repository structure for starting a new project, and
+    recreate the test result history.
     """
     ctx.obj = dict()
     ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
@@ -204,9 +216,11 @@ def cli(ctx, no_collect, model, filename, directory, pytest_args):
 @click.pass_context
 def report(ctx):
     """
-    Memote 'report' subcommand.
+    Generate a one-time or feature rich report.
 
-    Run `memote report -h` for a better explanation.
+    The one-time report generates a quick overview of the current model state.
+    If the model lives in a git repository and there is a history of test
+    results, memote can generate a more rich report.
     """
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "out.html"
@@ -222,9 +236,47 @@ def report(ctx):
         sys.exit(errno)
     if ctx.obj["directory"] is None:
         click.echo(
+            Fore.RED +
             "No suitable directory found. Specify one using the --directory"
             " option, using the environment variable MEMOTE_DIRECTORY, or"
-            " in either the 'memote.ini' or 'setup.cfg' configuration file."
+            " in either the 'memote.ini' or 'setup.cfg' configuration file.",
+            err=True
         )
         sys.exit(2)
     GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.pass_context
+def new(ctx):
+    """
+    Create a suitable model repository structure from a template.
+
+    By using a cookiecutter template, memote will ask you a couple of questions
+    and set up a new directory structure that will make your life easier.
+    """
+    raise NotImplementedError(u"coming soon™")
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
+@click.pass_context
+def history(ctx, commits):
+    """
+    Re-compute test results for the complete git branch history.
+
+    There are three distinct modes:
+
+    \b
+    1. Completely re-compute test results for each commit in the git history.
+       This should only be necessary when memote is first used with existing
+       model repositories.
+    2. Update mode complements existing test results with metrics that were
+       newly introduced and not available before. It also fills gaps in the
+       history.
+    3. By giving memote specific commit hashes, it will re-compute test results
+       for those only.
+    """
+    raise NotImplementedError(u"coming soon™")
