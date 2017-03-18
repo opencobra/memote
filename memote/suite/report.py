@@ -26,6 +26,7 @@ try:
 except ImportError:
     import json
 from os.path import join, exists
+from builtins import dict, zip
 
 import pandas as pd
 import dask.bag as db
@@ -59,13 +60,33 @@ class Report(object):
 class GitEnabledReport(Report):
     """Render a rich report using the git repository history."""
 
-    def __init__(self, repo, directory, **kwargs):
-        """Initialize the Jinja2 environment and data."""
+    _valid_indexes = frozenset(["time", "hash"])
+
+    def __init__(self, repo, directory, index="time", **kwargs):
+        """
+        Initialize the Jinja2 environment and data.
+
+        Paramters
+        ---------
+        repo : git.Repo
+            Instance of the working directory git repository.
+        directory : str or path
+            Where previously collected test results can be found.
+        index : {'time', 'hash'}, optional
+            Whether to use time (the default) or commit hashes as the default
+            axis in plots.
+        """
         super(GitEnabledReport, self).__init__(**kwargs)
+        self.index_dim = index.lower()
+        if self.index_dim not in self._valid_indexes:
+            raise ValueError(
+                "Given index '{0}' must be one of {1}."
+                "".format(self.index_dim, str(self._valid_indexes)))
         self.repo = repo
         self.latest = self.repo.active_branch.commit
         self.directory = directory
         self.bag = self._collect_bag()
+        self.index = self._build_index()
 
     def render_html(self):
         """Render a rich report for the repository."""
@@ -91,6 +112,14 @@ class GitEnabledReport(Report):
             with io.open(filename, "r") as file_h:
                 objects.append(json.load(file_h))
         return db.from_sequence(objects)
+
+    def _build_index(self):
+        """Collect basic information from the bag into a data frame."""
+        column = dict(hash="commit_hash", time="timestamp")
+        data_type = dict(hash="str", time="datetime64[ns]")
+        return pd.Series(
+            self.bag.pluck("meta", dict()).pluck(column[self.index_dim]),
+            dtype=data_type[self.index_dim])
 
     def _get_basics_df(self):
         """Collect basic information from the bag into a data frame."""

@@ -153,6 +153,18 @@ def check_directory(ctx):
         sys.exit(2)
 
 
+def check_repo(ctx):
+    """Ensure that the repository option is defined."""
+    if ctx.obj["repo"] is None:
+        click.echo(
+            Fore.RED +
+            "The feature rich report only works in a git repository."
+            " Please use the --one-time option instead or setup a repository.",
+            err=True
+        )
+        sys.exit(2)
+
+
 def abort_if_false(ctx, param, value):
     if not value:
         ctx.abort()
@@ -230,10 +242,12 @@ def cli(ctx, no_collect, model, filename, directory, pytest_args):
 
 @cli.command()
 @click.help_option("--help", "-h")
+@click.option("--one-time", is_flag=True,
+              help="Generate a one-time report.")
 @click.option("--index", type=click.Choice(["time", "hash"]), default="time",
               help="Use either time (default) or commit hashes as the index.")
 @click.pass_context
-def report(ctx, index):
+def report(ctx, one_time, index):
     """
     Generate a one-time or feature rich report.
 
@@ -244,7 +258,7 @@ def report(ctx, index):
     check_model(ctx)
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "out.html"
-    if ctx.obj["repo"] is None:
+    if one_time:
         if "--tb" not in ctx.obj["pytest_args"]:
             ctx.obj["pytest_args"].extend(["--tb", "no"])
         errno = pytest.main(
@@ -255,8 +269,11 @@ def report(ctx, index):
         )
         sys.exit(errno)
     check_directory(ctx)
-    report = GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"])
-    with io.open(ctx.obj["filename"], "w", encoding="utf-8") as file_h:
+    check_repo(ctx)
+    report = GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"],
+                              index=index)
+    click.echo(u"Writing report '{}'".format(ctx.obj["filename"]))
+    with io.open(ctx.obj["filename"], "w") as file_h:
         file_h.write(report.render_html())
 
 
