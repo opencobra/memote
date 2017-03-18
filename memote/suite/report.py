@@ -84,6 +84,7 @@ class GitEnabledReport(Report):
                 "".format(self.index_dim, str(self._valid_indexes)))
         self.repo = repo
         self.latest = self.repo.active_branch.commit
+        self.history = [commit.hexsha for commit in self.latest.iter_parents()]
         self.directory = directory
         self.bag = self._collect_bag()
         self.index = self._build_index()
@@ -94,20 +95,20 @@ class GitEnabledReport(Report):
         return template.render(
             names=self.bag.pluck("report").pluck("memote.suite.test_basic").
                 pluck("model_id").distinct().compute(),
-            meta=Markup(self._get_basics_df().to_html())
+            basics=Markup(self._get_basics_df().to_html())
             )
 
     def _collect_bag(self):
         """Collect all data into a dask bag."""
         # load all into memory and avoid strange dask JSON object expectation
         objects = list()
-        for commit in self.latest.iter_parents():
-            filename = join(self.directory, "{}.json".format(commit.hexsha))
+        for commit in self.history:
+            filename = join(self.directory, "{}.json".format(commit))
             if not exists(filename):
                 LOGGER.warn(
                     Fore.YELLOW +
                     "Results for commit %s are missing."
-                    + Fore.RESET, commit.hexsha)
+                    + Fore.RESET, commit)
                 continue
             with io.open(filename, "r") as file_h:
                 objects.append(json.load(file_h))
@@ -118,13 +119,19 @@ class GitEnabledReport(Report):
         column = dict(hash="commit_hash", time="timestamp")
         data_type = dict(hash="str", time="datetime64[ns]")
         return pd.Series(
-            self.bag.pluck("meta", dict()).pluck(column[self.index_dim]),
+            list(self.bag.pluck("meta",
+                dict()).pluck(column[self.index_dim])),
             dtype=data_type[self.index_dim])
 
     def _get_basics_df(self):
         """Collect basic information from the bag into a data frame."""
-        columns = ["commit_hash", "timestamp"]
-        data_types = ["str", "datetime64[ns]"]
-        expected = pd.DataFrame({col: pd.Series(dtype=dt)
-                                 for (col, dt) in zip(columns, data_types)})
-        return self.bag.pluck("meta").to_dataframe(expected).compute()
+#        columns = ["commit_hash", "timestamp"]
+#        data_types = ["str", "datetime64[ns]"]
+#        expected = pd.DataFrame({col: pd.Series(dtype=dt)
+#                                 for (col, dt) in zip(columns, data_types)})
+        df = self.bag.pluck("report", dict()).\
+            pluck("memote.suite.test_basic", dict()).\
+            to_dataframe().compute()
+        df.index = self.index
+        df.sort_index(inplace=True)
+        return df

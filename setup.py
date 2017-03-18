@@ -36,7 +36,7 @@ if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
     setup_requirements.append("pytest-runner")
 
 requirements = [
-    "cobra==0.6.0a2",
+    "pip",
     "click",
     "click-configfile",
     "colorama",
@@ -46,7 +46,10 @@ requirements = [
     "dask",
     "cloudpickle",
     "toolz",
-    "Jinja2"
+    "Jinja2",
+    "jinja2-ospath",
+    "cookiecutter",
+    "cobra==0.6.0a2"
 ]
 
 test_requirements = [

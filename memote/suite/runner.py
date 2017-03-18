@@ -33,6 +33,7 @@ import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 from colorama import init, Fore
+from cookiecutter.main import cookiecutter
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
@@ -213,9 +214,10 @@ def collect(ctx):
               " In the latter case the default is 'out.html'.")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
-              help="Either Create a report from JSON files in the given"
-              " directory or write test results to the directory using the"
-              " git commit hash.")
+              help="Depending on the invoked subcommand:"
+              " Either create a report from JSON files in the given"
+              " directory, write test results to the directory using the"
+              " git commit hash, or create a new model repository inside it.")
 @click.option("--pytest-args", "-a",
               help="Any additional arguments you want to pass to pytest."
               "Should be given as one continuous string.")
@@ -285,14 +287,17 @@ def new(ctx):
     Create a suitable model repository structure from a template.
 
     By using a cookiecutter template, memote will ask you a couple of questions
-    and set up a new directory structure that will make your life easier.
+    and set up a new directory structure that will make your life easier. The
+    new directory will be placed in the current directory or respect the given
+    --directory option.
     """
-    raise NotImplementedError(u"coming soon™")
+    cookiecutter("gh:biosustain/cookiecutter-memote",
+                 output_dir=ctx.obj.get("directory", "."))
 
 
 @cli.command()
 @click.help_option("--help", "-h")
-@click.option("--yes", is_flag=True, callback=abort_if_false,
+@click.option("--yes", "-y", is_flag=True, callback=abort_if_false,
               expose_value=False,
               prompt="Are you sure that you want to change history?")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
