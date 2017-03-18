@@ -153,6 +153,11 @@ def check_directory(ctx):
         sys.exit(2)
 
 
+def abort_if_false(ctx, param, value):
+    if not value:
+        ctx.abort()
+
+
 def collect(ctx):
     """Act like a collect subcommand."""
     check_model(ctx)
@@ -225,8 +230,10 @@ def cli(ctx, no_collect, model, filename, directory, pytest_args):
 
 @cli.command()
 @click.help_option("--help", "-h")
+@click.option("--index", type=click.Choice(["time", "hash"]), default="time",
+              help="Use either time (default) or commit hashes as the index.")
 @click.pass_context
-def report(ctx):
+def report(ctx, index):
     """
     Generate a one-time or feature rich report.
 
@@ -268,6 +275,9 @@ def new(ctx):
 
 @cli.command()
 @click.help_option("--help", "-h")
+@click.option("--yes", is_flag=True, callback=abort_if_false,
+              expose_value=False,
+              prompt="Are you sure that you want to change history?")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 @click.pass_context
 def history(ctx, commits):
