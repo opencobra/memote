@@ -31,15 +31,15 @@ def scatter_line_chart(df, y_axis, y_title):
     """Generate the Vega spec for a point and line plot."""
     chart = LayeredChart(df)
     chart += Chart().mark_circle().encode(
-        x=X("index:T",
+        x=X("x:T",
             title="Timestamp",
             axis=Axis(labelAngle=-45, labelAlign="right")),
-        y=Y("y_axis",
+        y=Y(y_axis,
             title=y_title)
     )
     if len(df) > 1:
         chart += Chart().mark_line().encode(
-            x="index:T",
+            x="x:T",
             y=y_axis
         )
     return Markup(chart.to_json())

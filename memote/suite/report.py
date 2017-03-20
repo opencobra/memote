@@ -142,22 +142,23 @@ class GitEnabledReport(Report):
         df = self.bag.pluck("report", dict()).\
             pluck("memote.suite.test_basic", dict()).\
             to_dataframe().compute()
-        df["index"] = self.index
-        df.sort_values("index", inplace=True)
+        df.index = self.index
+        df["x"] = df.index
+        df.sort_index(inplace=True)
         specs = dict()
         uuids = dict()
         # create gene spec
         specs["genes"] = plt.scatter_line_chart(
-            df[["index", "num_genes"]], "num_genes:Q", "Number of Genes")
-        uuids["genes"] = uuid4().hex
+            df[["x", "num_genes"]], "num_genes:Q", "Number of Genes")
+        uuids["genes"] = "uuid" + uuid4().hex
         # reactions
         specs["reactions"] = plt.scatter_line_chart(
-            df[["index", "num_reactions"]], "num_reactions:Q",
+            df[["x", "num_reactions"]], "num_reactions:Q",
             "Number of Reactions")
-        uuids["reactions"] = uuid4().hex
+        uuids["reactions"] = "uuid" + uuid4().hex
         # metabolites
         specs["metabolites"] = plt.scatter_line_chart(
-            df[["index", "num_metabolites"]], "num_metabolites:Q",
+            df[["x", "num_metabolites"]], "num_metabolites:Q",
             "Number of Metabolites")
-        uuids["metabolites"] = uuid4().hex
+        uuids["metabolites"] = "uuid" + uuid4().hex
         return (specs, uuids)
