@@ -29,5 +29,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 def sum_biomass_weight(rxn):
+    """Compute the sum of all reaction compounds."""
     return sum(-coef * met.formula_weight
                for (met, coef) in iteritems(rxn.metabolites)) / 1000.0
