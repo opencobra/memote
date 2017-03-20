@@ -117,7 +117,7 @@ def probe_git():
             "We highly recommend keeping your model in a git repository."
             " It allows you to track changes and easily collaborate with"
             " others via online platforms such as https://github.com.\n"
-            + Fore.RESET)
+            + Fore.RESET)  # noqa: W503
         return
     if repo.is_dirty():
         click.echo(
@@ -167,6 +167,7 @@ def check_repo(ctx):
 
 
 def abort_if_false(ctx, param, value):
+    """Require confirmation."""
     if not value:
         ctx.abort()
 

@@ -43,4 +43,3 @@ def scatter_line_chart(df, y_axis, y_title, x_axis="x", x_title="Timestamp"):
             y=y_axis
         )
     return Markup(chart.to_json())
-

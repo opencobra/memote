@@ -37,11 +37,20 @@ LOGGER = logging.getLogger(__name__)
 class ResultBagWrapper(object):
     """
     Report-specific wrapper around a `dask.bag`.
+
+    Attributes
+    ----------
+    axis_description : dict
+        Can be passed as keyword arguments to Altair plotting functions to
+        describe the x-axis.
     """
 
     def __init__(self, files, **kwargs):
         """
         Load (JSON) documents into memory managed by a `dask.bag`.
+
+        The order of the `files` argument determines the order of rows in data
+        frames returned by other methods.
 
         Parameters
         ----------
@@ -56,12 +65,12 @@ class ResultBagWrapper(object):
                 LOGGER.warn(
                     Fore.YELLOW +
                     "Expected file %s is missing."
-                    + Fore.RESET, filename)
+                    + Fore.RESET, filename)  # noqa: W503
                 continue
             with io.open(filename) as file_h:
                 objects.append(json.load(file_h))
-        self.bag = db.from_sequence(objects)
-        self.index = None
+        self._bag = db.from_sequence(objects)
+        self._index = None
         self.axis_description = None
 
     def build_index(self, dimension):
@@ -75,40 +84,38 @@ class ResultBagWrapper(object):
 
     def _build_time_index(self):
         """Build an index from timestamps."""
-        self.index = pd.Series(
-            list(self.bag.pluck("meta", dict()).pluck("timestamp")),
+        self._index = pd.Series(
+            list(self._bag.pluck("meta", dict()).pluck("timestamp")),
             dtype="datetime64[ns]")
         self.axis_description = dict(x_axis="x:T", x_title="Timestamp")
 
     def _build_commit_index(self):
         """Build an index from commit hashes."""
         series = pd.Series(
-            list(self.bag.pluck("meta", dict()).pluck("commit_hash")),
+            list(self._bag.pluck("meta", dict()).pluck("commit_hash")),
             dtype="str")
         trunc = 5
         res = series.str[:trunc]
         while len(res.unique()) < len(series):
             trunc += 1
             res = series.str[:trunc]
-        self.index = res
+        self._index = res
         self.axis_description = dict(x_axis="x:O", x_title="Commit Hash")
 
     def get_model_ids(self):
         """Get unique model IDs. Should normally be of length one."""
-        return self.bag.pluck("report").pluck("memote.suite.test_basic").\
-                pluck("model_id").distinct().compute()
+        return self._bag.pluck("report").pluck("memote.suite.test_basic").\
+            pluck("model_id").distinct().compute()
 
     def get_basic_dataframe(self):
-        """
-        Collect results from `test_basic`.
-        """
+        """Collect results from `test_basic`."""
         columns = ["num_genes", "num_reactions", "num_metabolites"]
         data_types = ["int", "int", "int"]
         expected = pd.DataFrame({col: pd.Series(dtype=dt)
                                  for (col, dt) in zip(columns, data_types)})
-        df = self.bag.pluck("report", dict()).\
+        df = self._bag.pluck("report", dict()).\
             pluck("memote.suite.test_basic", dict()).\
             to_dataframe(expected).compute()
-        df.index = self.index
+        df.index = self._index
         df["x"] = df.index
         return df
