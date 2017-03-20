@@ -12,3 +12,15 @@
     <dd>{{ data['num_metabolites_no_formula']|length }}</dd>
 </dl>
 {%- endmacro %}
+
+{% macro render_plot(spec, uuid) -%}
+<div id="{{ uuid }}">
+    <script>
+        var embed_{{ uuid }} = {
+          mode: "vega-lite",
+          spec: {{ spec }}
+        }
+        vg.embed("{{ uuid }}", embed_{{ uuid }}, function(error, result) {});
+    </script>
+</div>
+{%- endmacro %}

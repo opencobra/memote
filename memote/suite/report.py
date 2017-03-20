@@ -26,12 +26,15 @@ try:
 except ImportError:
     import json
 from os.path import join, exists
-from builtins import dict, zip
+from builtins import dict
+from uuid import uuid4
 
 import pandas as pd
 import dask.bag as db
-from jinja2 import Environment, PackageLoader, select_autoescape, Markup
+from jinja2 import Environment, PackageLoader, select_autoescape
 from colorama import Fore
+
+import memote.suite.plots as plt
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,11 +95,18 @@ class GitEnabledReport(Report):
     def render_html(self):
         """Render a rich report for the repository."""
         template = self.env.get_template("git_enabled.html")
+        names = self.bag.pluck("report").pluck("memote.suite.test_basic").\
+                pluck("model_id").distinct().compute()
+        specs = dict()
+        uuids = dict()
+        (basic_specs, basic_uuids) = self._get_basics()
+        specs.update(basic_specs)
+        uuids.update(basic_uuids)
         return template.render(
-            names=self.bag.pluck("report").pluck("memote.suite.test_basic").
-                pluck("model_id").distinct().compute(),
-            basics=Markup(self._get_basics_df().to_html())
-            )
+            names=names,
+            specs=specs,
+            uuids=uuids
+        )
 
     def _collect_bag(self):
         """Collect all data into a dask bag."""
@@ -123,7 +133,7 @@ class GitEnabledReport(Report):
                 dict()).pluck(column[self.index_dim])),
             dtype=data_type[self.index_dim])
 
-    def _get_basics_df(self):
+    def _get_basics(self):
         """Collect basic information from the bag into a data frame."""
 #        columns = ["commit_hash", "timestamp"]
 #        data_types = ["str", "datetime64[ns]"]
@@ -132,6 +142,22 @@ class GitEnabledReport(Report):
         df = self.bag.pluck("report", dict()).\
             pluck("memote.suite.test_basic", dict()).\
             to_dataframe().compute()
-        df.index = self.index
-        df.sort_index(inplace=True)
-        return df
+        df["index"] = self.index
+        df.sort_values("index", inplace=True)
+        specs = dict()
+        uuids = dict()
+        # create gene spec
+        specs["genes"] = plt.scatter_line_chart(
+            df[["index", "num_genes"]], "num_genes:Q", "Number of Genes")
+        uuids["genes"] = uuid4().hex
+        # reactions
+        specs["reactions"] = plt.scatter_line_chart(
+            df[["index", "num_reactions"]], "num_reactions:Q",
+            "Number of Reactions")
+        uuids["reactions"] = uuid4().hex
+        # metabolites
+        specs["metabolites"] = plt.scatter_line_chart(
+            df[["index", "num_metabolites"]], "num_metabolites:Q",
+            "Number of Metabolites")
+        uuids["metabolites"] = uuid4().hex
+        return (specs, uuids)
