@@ -96,3 +96,15 @@ def find_atp_adp_converting_reactions(model):
     adp_union = set().union(*adp_all_comp_rxn_list)
 
     return atp_union.intersection(adp_union)
+
+
+def find_biomass_reaction(model):
+    """
+    Return a list of the biomass reaction(s) of the model.
+
+    Parameters
+    ----------
+    model : model: cobra.Model
+            A cobrapy metabolic model
+    """
+    return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]

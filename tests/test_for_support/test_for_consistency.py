@@ -103,6 +103,7 @@ def test_find_unconserved_metabolites(model, inconsistent):
     unconserved_mets = consistency.find_unconserved_metabolites(model)
     assert set([met.id for met in unconserved_mets]) == set(inconsistent)
 
+
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
     ("fig-1", [("A'",), ("B'",), ("C'",)]),
