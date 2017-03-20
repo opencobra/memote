@@ -22,19 +22,25 @@ from builtins import dict
 
 import locale
 import os
+import io
 import shlex
 import sys
-from os.path import dirname
+from os.path import join, dirname
 
 import click
 import pytest
+import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
+from colorama import init, Fore
+from cookiecutter.main import cookiecutter
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
+from memote.suite.reporting.report import GitEnabledReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
+init()
 
 
 class ConfigSectionSchema(object):
@@ -47,6 +53,8 @@ class ConfigSectionSchema(object):
         collect = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
         model = Param(type=click.Path(exists=True, dir_okay=False))
+        directory = Param(type=click.Path(exists=True, file_okay=False,
+                                          writable=True))
 
 
 class ConfigFileProcessor(ConfigFileReader):
@@ -80,16 +88,113 @@ def process_addargs(args, context):
 def process_model(model, context):
     """Load model path from different locations."""
     if model is not None:
-        os.environ["MEMOTE_MODEL"] = model
+        return model
     elif "MEMOTE_MODEL" in os.environ:
         assert os.path.isfile(os.environ["MEMOTE_MODEL"])
+        return os.environ["MEMOTE_MODEL"]
     elif "model" in context.default_map:
-        os.environ["MEMOTE_MODEL"] = context.default_map["model"]
-    else:
-        raise ValueError(
-            "No metabolic model found. Specify one as an option, in the"
-            " environment variable MEMOTE_MODEL, or in a configuration file."
+        return context.default_map["model"]
+
+
+def process_directory(directory, context):
+    """Load directory from different locations."""
+    if directory is not None:
+        return directory
+    elif "MEMOTE_DIRECTORY" in os.environ:
+        assert os.path.isdir(os.environ["MEMOTE_DIRECTORY"])
+        return os.environ["MEMOTE_DIRECTORY"]
+    elif "directory" in context.default_map:
+        return context.default_map["directory"]
+
+
+def probe_git():
+    """Return meta data if in git repository."""
+    try:
+        repo = git.Repo()
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            Fore.YELLOW +
+            "We highly recommend keeping your model in a git repository."
+            " It allows you to track changes and easily collaborate with"
+            " others via online platforms such as https://github.com.\n"
+            + Fore.RESET)  # noqa: W503
+        return
+    if repo.is_dirty():
+        click.echo(
+            Fore.RED +
+            "Please git commit or git stash all changes before running"
+            " the memote suite.", err=True)
+        sys.exit(1)
+    return repo
+
+
+def check_model(ctx):
+    """Ensure that the model option is defined."""
+    if ctx.obj["model"] is None:
+        click.echo(
+            Fore.RED +
+            "No metabolic model found. Specify one using the --model"
+            " option, using the environment variable MEMOTE_MODEL, or in"
+            " either the 'memote.ini' or 'setup.cfg' configuration file.",
+            err=True
         )
+        sys.exit(2)
+
+
+def check_directory(ctx):
+    """Ensure that the directory option is defined."""
+    if ctx.obj["directory"] is None:
+        click.echo(
+            Fore.RED +
+            "No suitable directory found. Specify one using the --directory"
+            " option, using the environment variable MEMOTE_DIRECTORY, or"
+            " in either the 'memote.ini' or 'setup.cfg' configuration file.",
+            err=True
+        )
+        sys.exit(2)
+
+
+def check_repo(ctx):
+    """Ensure that the repository option is defined."""
+    if ctx.obj["repo"] is None:
+        click.echo(
+            Fore.RED +
+            "The feature rich report only works in a git repository."
+            " Please use the --one-time option instead or setup a repository.",
+            err=True
+        )
+        sys.exit(2)
+
+
+def abort_if_false(ctx, param, value):
+    """Require confirmation."""
+    if not value:
+        ctx.abort()
+
+
+def collect(ctx):
+    """Act like a collect subcommand."""
+    check_model(ctx)
+    if ctx.obj["collect"]:
+        collect = "collect"
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
+    else:
+        collect = "basic"
+    if ctx.obj["repo"] is not None and ctx.obj["collect"]:
+        collect = "git-{}".format(collect)
+    if collect == "collect" and ctx.obj["filename"] is None:
+        ctx.obj["filename"] = "result.json"
+    elif collect == "git-collect" and ctx.obj["filename"] is None:
+        check_directory(ctx)
+        ctx.obj["filename"] = join(
+            ctx.obj["directory"],
+            "{}.json".format(ctx.obj["repo"].active_branch.commit.hexsha)
+        )
+    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
+        ctx.obj["model"], mode=collect, filename=ctx.obj["filename"],
+        directory=ctx.obj["directory"], repo=ctx.obj["repo"])])
+    sys.exit(errno)
 
 
 @click.group(invoke_without_command=True,
@@ -100,71 +205,118 @@ def process_model(model, context):
 @click.version_option(__version__, "--version", "-V")
 @click.option("--no-collect", type=bool, is_flag=True,
               help="Do *not* collect test data needed for generating a report.")
-@click.option("--pytest-args", "-a",
-              help="Any additional arguments you want to pass to pytest as a"
-                   " string.")
 @click.option("--model", type=click.Path(exists=True, dir_okay=False),
               help="Path to model file. Can also be given via the environment"
               " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
               " 'memote.ini'.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               help="Path for either the collected results as JSON or the"
-              " HTML report. In the former case the default is either"
-              " 'out.json'. In the latter case the default is 'out.html'.")
+              " HTML report. In the former case the default is 'result.json'."
+              " In the latter case the default is 'index.html'.")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="Depending on the invoked subcommand:"
+              " Either create a report from JSON files in the given"
+              " directory, write test results to the directory using the"
+              " git commit hash, or create a new model repository inside it.")
+@click.option("--pytest-args", "-a",
+              help="Any additional arguments you want to pass to pytest."
+              "Should be given as one continuous string.")
 @click.pass_context
-def cli(ctx, model, pytest_args, no_collect, filename):
+def cli(ctx, no_collect, model, filename, directory, pytest_args):
     """
-    Memote command line tool.
+    Metabolic model testing command line tool.
 
-    Run `memote -h` for a better explanation.
+    In its basic invocation memote performs a test suite on a metabolic model.
+    Through various subcommands it can further generate a pretty HTML report,
+    generate a model repository structure for starting a new project, and
+    recreate the test result history.
     """
-    collect = process_collect_flag(no_collect, ctx)
-    args = process_addargs(pytest_args, ctx)
-    if collect and ("--tb" not in args):
-        args.extend(["--tb", "no"])
+    ctx.obj = dict()
+    ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
+    ctx.obj["model"] = process_model(model, ctx)
+    ctx.obj["filename"] = filename
+    ctx.obj["directory"] = process_model(directory, ctx)
+    ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
+    ctx.obj["repo"] = probe_git()
     if ctx.invoked_subcommand is None:
-        try:
-            process_model(model, ctx)
-        except ValueError as err:
-            click.echo(str(err))
-            sys.exit(2)
-        if collect:
-            collect = "collect"
-        else:
-            collect = "basic"
-        if filename is None:
-            filename = "out.json"
-        errno = pytest.main(args, plugins=[ResultCollectionPlugin(
-            collect, filename)])
-        sys.exit(errno)
-    else:
-        if "--tb" not in args:
-            args.extend(["--tb", "no"])
-        ctx.obj = dict()
-        ctx.obj["pytest_args"] = args
-        ctx.obj["model"] = model
-        ctx.obj["filename"] = filename
+        collect(ctx)
 
 
 @cli.command()
 @click.help_option("--help", "-h")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False,
-                                             writable=True),
-              help="Create report from JSON files in the given directory.")
+@click.option("--one-time", is_flag=True,
+              help="Generate a one-time report.")
+@click.option("--index", type=click.Choice(["time", "hash"]), default="time",
+              help="Use either time (default) or commit hashes as the index.")
 @click.pass_context
-def report(ctx, directory):
+def report(ctx, one_time, index):
     """
-    Memote 'report' subcommand.
+    Generate a one-time or feature rich report.
 
-    Run `memote report -h` for a better explanation.
+    The one-time report generates a quick overview of the current model state.
+    If the model lives in a git repository and there is a history of test
+    results, memote can generate a more rich report.
     """
-    try:
-        process_model(ctx.obj["model"], ctx)
-    except ValueError as err:
-        click.echo(str(err))
-        sys.exit(2)
+    check_model(ctx)
     if ctx.obj["filename"] is None:
-        ctx.obj["filename"] = "out.html"
-    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
-        "html", ctx.obj["filename"])])
-    sys.exit(errno)
+        ctx.obj["filename"] = "index.html"
+    if one_time:
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
+        errno = pytest.main(
+            ctx.obj["pytest_args"],
+            plugins=[ResultCollectionPlugin(
+                ctx.obj["model"], mode="html", filename=ctx.obj["filename"])
+            ]
+        )
+        sys.exit(errno)
+    check_directory(ctx)
+    check_repo(ctx)
+    report = GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"],
+                              index=index)
+    click.echo(u"Writing report '{}'".format(ctx.obj["filename"]))
+    with io.open(ctx.obj["filename"], "w") as file_h:
+        file_h.write(report.render_html())
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.pass_context
+def new(ctx):
+    """
+    Create a suitable model repository structure from a template.
+
+    By using a cookiecutter template, memote will ask you a couple of questions
+    and set up a new directory structure that will make your life easier. The
+    new directory will be placed in the current directory or respect the given
+    --directory option.
+    """
+    cookiecutter("gh:biosustain/cookiecutter-memote",
+                 output_dir=ctx.obj.get("directory", "."))
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.option("--yes", "-y", is_flag=True, callback=abort_if_false,
+              expose_value=False,
+              prompt="Are you sure that you want to change history?")
+@click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
+@click.pass_context
+def history(ctx, commits):
+    """
+    Re-compute test results for the complete git branch history.
+
+    There are three distinct modes:
+
+    \b
+    1. Completely re-compute test results for each commit in the git history.
+       This should only be necessary when memote is first used with existing
+       model repositories.
+    2. Update mode complements existing test results with metrics that were
+       newly introduced and not available before. It also fills gaps in the
+       history.
+    3. By giving memote specific commit hashes, it will re-compute test results
+       for those only.
+    """
+    raise NotImplementedError(u"coming soon™")

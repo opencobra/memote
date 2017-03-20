@@ -18,24 +18,3 @@
 """Configuration and fixtures for the test suite."""
 
 from __future__ import absolute_import
-
-import os
-import warnings
-from os.path import basename, splitext
-
-import pytest
-from cobra.io import read_sbml_model
-
-
-MODELS = os.environ["MEMOTE_MODEL"].split(os.pathsep)
-# MODELS = sorted(glob(join(dirname(__file__), "examples", "*.xml")))
-
-
-@pytest.fixture(scope="session", params=MODELS,
-                ids=[splitext(basename(mod))[0] for mod in MODELS])
-def model(request):
-    """Fixture that provides the model for the complete test session."""
-    # TODO: deal with and record warnings on load
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        return read_sbml_model(request.param)
