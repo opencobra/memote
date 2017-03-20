@@ -48,6 +48,7 @@ requirements = [
     "toolz",
     "Jinja2",
     "jinja2-ospath",
+    "altair",
     "cookiecutter",
     "cobra==0.6.0a2"
 ]
