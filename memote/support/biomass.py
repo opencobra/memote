@@ -15,25 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Supporting functions for stoichiometric consistency checks."""
+"""Supporting functions for biomass consistency checks."""
 
 from __future__ import absolute_import
 
 import logging
 
-from memote.support.consistency import (
-    check_stoichiometric_consistency, find_unconserved_metabolites)
+from six import iteritems
+
+__all__ = ("sum_biomass_weight",)
 
 LOGGER = logging.getLogger(__name__)
 
 
-def test_stoichiometric_consistency(model, store):
-    """Expect that the metabolic model is mass-balanced."""
-    is_consistent = check_stoichiometric_consistency(model)
-    store["is_consistent"] = is_consistent
-    unconserved = [] if is_consistent else\
-        [met.id for met in find_unconserved_metabolites(model)]
-    store["unconserved_metabolites"] = unconserved
-    assert is_consistent,\
-        "The following metabolites are involved in inconsistent reactions:"\
-        " {}".format(", ".join(unconserved))
+def sum_biomass_weight(rxn):
+    return sum(-coef * met.formula_weight
+               for (met, coef) in iteritems(rxn.metabolites)) / 1000.0

@@ -19,21 +19,23 @@
 
 from __future__ import absolute_import
 
-import logging
+import numpy as np
 
-from memote.support.consistency import (
-    check_stoichiometric_consistency, find_unconserved_metabolites)
+from memote.support.biomass import sum_biomass_weight
 
-LOGGER = logging.getLogger(__name__)
+from memote.support.helpers import find_biomass_reaction
 
 
-def test_stoichiometric_consistency(model, store):
-    """Expect that the metabolic model is mass-balanced."""
-    is_consistent = check_stoichiometric_consistency(model)
-    store["is_consistent"] = is_consistent
-    unconserved = [] if is_consistent else\
-        [met.id for met in find_unconserved_metabolites(model)]
-    store["unconserved_metabolites"] = unconserved
-    assert is_consistent,\
-        "The following metabolites are involved in inconsistent reactions:"\
-        " {}".format(", ".join(unconserved))
+def test_biomass_consistency(model):
+    """
+    Expect that the sum of total mass of all biomass components equals 1.
+
+    Allow for an absolute tolerance of 1e-03.
+    """
+    biomass_rxns = find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        control_sum = sum_biomass_weight(rxn)
+        assert np.isclose(1.0, control_sum, atol=1e-03), \
+            "The following biomass reaction does not sum close enough to 1'" \
+            " {}".format(
+            ", ".join(rxn.id))
