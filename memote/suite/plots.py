@@ -27,19 +27,19 @@ from altair import Chart, X, Y, Axis, LayeredChart
 LOGGER = logging.getLogger(__name__)
 
 
-def scatter_line_chart(df, y_axis, y_title):
+def scatter_line_chart(df, y_axis, y_title, x_axis="x", x_title="Timestamp"):
     """Generate the Vega spec for a point and line plot."""
     chart = LayeredChart(df)
     chart += Chart().mark_circle().encode(
-        x=X("x:T",
-            title="Timestamp",
+        x=X(x_axis,
+            title=x_title,
             axis=Axis(labelAngle=-45, labelAlign="right")),
         y=Y(y_axis,
             title=y_title)
     )
     if len(df) > 1:
         chart += Chart().mark_line().encode(
-            x="x:T",
+            x=x_axis,
             y=y_axis
         )
     return Markup(chart.to_json())

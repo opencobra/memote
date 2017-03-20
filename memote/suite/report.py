@@ -90,6 +90,7 @@ class GitEnabledReport(Report):
         self.history = [commit.hexsha for commit in self.latest.iter_parents()]
         self.directory = directory
         self.bag = self._collect_bag()
+        self.index_args = None
         self.index = self._build_index()
 
     def render_html(self):
@@ -126,12 +127,20 @@ class GitEnabledReport(Report):
 
     def _build_index(self):
         """Collect basic information from the bag into a data frame."""
-        column = dict(hash="commit_hash", time="timestamp")
-        data_type = dict(hash="str", time="datetime64[ns]")
-        return pd.Series(
-            list(self.bag.pluck("meta",
-                dict()).pluck(column[self.index_dim])),
-            dtype=data_type[self.index_dim])
+        if self.index_dim == "time":
+            self.index_args = dict(x_axis="x:T", x_title="Timestamp")
+            return pd.Series(
+                list(self.bag.pluck("meta", dict()).pluck("timestamp")),
+                dtype="datetime64[ns]")
+        elif self.index_dim == "hash":
+            self.index_args = dict(x_axis="x:O", x_title="Commit Hash")
+            series = pd.Series(
+                list(self.bag.pluck("meta", dict()).pluck("commit_hash")),
+                dtype="str")
+            return series.str[:7]  # trust that hashes are unique
+        else:
+            raise ValueError(
+                "Unknown index dimension '{}'".format(self.index_dim))
 
     def _get_basics(self):
         """Collect basic information from the bag into a data frame."""
@@ -149,16 +158,17 @@ class GitEnabledReport(Report):
         uuids = dict()
         # create gene spec
         specs["genes"] = plt.scatter_line_chart(
-            df[["x", "num_genes"]], "num_genes:Q", "Number of Genes")
+            df[["x", "num_genes"]], "num_genes:Q", "Number of Genes",
+            **self.index_args)
         uuids["genes"] = "uuid" + uuid4().hex
         # reactions
         specs["reactions"] = plt.scatter_line_chart(
             df[["x", "num_reactions"]], "num_reactions:Q",
-            "Number of Reactions")
+            "Number of Reactions", **self.index_args)
         uuids["reactions"] = "uuid" + uuid4().hex
         # metabolites
         specs["metabolites"] = plt.scatter_line_chart(
             df[["x", "num_metabolites"]], "num_metabolites:Q",
-            "Number of Metabolites")
+            "Number of Metabolites", **self.index_args)
         uuids["metabolites"] = "uuid" + uuid4().hex
         return (specs, uuids)
