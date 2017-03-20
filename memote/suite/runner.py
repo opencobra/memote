@@ -37,7 +37,7 @@ from cookiecutter.main import cookiecutter
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.report import GitEnabledReport
+from memote.suite.reporting.report import GitEnabledReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
@@ -183,7 +183,7 @@ def collect(ctx):
     if ctx.obj["repo"] is not None and ctx.obj["collect"]:
         collect = "git-{}".format(collect)
     if collect == "collect" and ctx.obj["filename"] is None:
-        ctx.obj["filename"] = "out.json"
+        ctx.obj["filename"] = "result.json"
     elif collect == "git-collect" and ctx.obj["filename"] is None:
         check_directory(ctx)
         ctx.obj["filename"] = join(
@@ -210,8 +210,8 @@ def collect(ctx):
               " 'memote.ini'.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               help="Path for either the collected results as JSON or the"
-              " HTML report. In the former case the default is 'out.json'."
-              " In the latter case the default is 'out.html'.")
+              " HTML report. In the former case the default is 'result.json'."
+              " In the latter case the default is 'index.html'.")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
               help="Depending on the invoked subcommand:"
@@ -259,7 +259,7 @@ def report(ctx, one_time, index):
     """
     check_model(ctx)
     if ctx.obj["filename"] is None:
-        ctx.obj["filename"] = "out.html"
+        ctx.obj["filename"] = "index.html"
     if one_time:
         if "--tb" not in ctx.obj["pytest_args"]:
             ctx.obj["pytest_args"].extend(["--tb", "no"])

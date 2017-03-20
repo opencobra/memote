@@ -36,7 +36,7 @@ with warnings.catch_warnings():
     # ignore Gurobi warning
     from cobra.io import read_sbml_model
 
-from memote.suite.report import Report
+from memote.suite.reporting.report import Report
 
 
 class DummyDict(object):

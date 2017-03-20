@@ -25,9 +25,9 @@
 {% block content -%}
 <h2>Basic Information</h2>
 
-{{ render_plot(specs["genes"], uuids["genes"]) }}
+{{ render_plot(basic_specs["genes"], basic_uuids["genes"]) }}
 
-{{ render_plot(specs["reactions"], uuids["reactions"]) }}
+{{ render_plot(basic_specs["reactions"], basic_uuids["reactions"]) }}
 
-{{ render_plot(specs["metabolites"], uuids["metabolites"]) }}
+{{ render_plot(basic_specs["metabolites"], basic_uuids["metabolites"]) }}
 {%- endblock %}
