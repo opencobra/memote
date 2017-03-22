@@ -76,13 +76,14 @@ def process_collect_flag(no_flag, context):
 
 def process_addargs(args, context):
     """Handle additional args to pytest."""
+    tests_dir = join(dirname(__file__), "tests")
     if args is not None:
-        return shlex.split(args) + [dirname(__file__)]
+        return shlex.split(args) + [tests_dir]
     elif "addargs" in context.default_map:
         return shlex.split(context.default_map["addargs"]) +\
-            [dirname(__file__)]
+            [tests_dir]
     else:
-        return [dirname(__file__)]
+        return [tests_dir]
 
 
 def process_model(model, context):
