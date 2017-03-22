@@ -9,9 +9,9 @@ super()
 
 {% block content -%}
 <div>
-{{ render_basic(data['report']['memote.suite.test_basic']) }}
+{{ render_basic(data['report']['test_basic']) }}
 </div>
 <div>
-{{ render_consistency(data['report']['memote.suite.test_consistency']) }}
+{{ render_consistency(data['report']['test_consistency']) }}
 </div>
 {%- endblock %}

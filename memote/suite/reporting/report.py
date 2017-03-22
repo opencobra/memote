@@ -48,7 +48,7 @@ class Report(object):
         """Render a one-shot report for a model."""
         template = self.env.get_template("basic.html")
         return template.render(
-            name=self.data["report"]["memote.suite.test_basic"]["model_id"],
+            name=self.data["report"]["test_basic"]["model_id"],
             timestamp=self.data["meta"]["timestamp"],
             data=self.data)
 

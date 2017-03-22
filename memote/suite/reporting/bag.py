@@ -104,7 +104,7 @@ class ResultBagWrapper(object):
 
     def get_model_ids(self):
         """Get unique model IDs. Should normally be of length one."""
-        return self._bag.pluck("report").pluck("memote.suite.test_basic").\
+        return self._bag.pluck("report").pluck("test_basic").\
             pluck("model_id").distinct().compute()
 
     def get_basic_dataframe(self):
@@ -113,8 +113,7 @@ class ResultBagWrapper(object):
         data_types = ["int", "int", "int"]
         expected = pd.DataFrame({col: pd.Series(dtype=dt)
                                  for (col, dt) in zip(columns, data_types)})
-        df = self._bag.pluck("report", dict()).\
-            pluck("memote.suite.test_basic", dict()).\
+        df = self._bag.pluck("report", dict()).pluck("test_basic", dict()).\
             to_dataframe(expected).compute()
         df.index = self._index
         df["x"] = df.index
