@@ -136,10 +136,10 @@ class ResultCollectionPlugin(object):
             return
         if self.mode == "html":
             report = Report(self._store)
-            with io.open(self.filename, "w", encoding="utf-8") as file_h:
+            with io.open(self.filename, "w") as file_h:
                 file_h.write(report.render_html())
             return
-        with io.open(self.filename, "w", encoding=None) as file_h:
+        with open(self.filename, "w") as file_h:
             json.dump(self._store, file_h, sort_keys=True, indent=4,
                       separators=(",", ": "))
 
