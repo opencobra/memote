@@ -85,6 +85,10 @@ class GitEnabledReport(Report):
         self.directory = directory
         self.files = [join(self.directory, "{}.json".format(commit))
                       for commit in self.history]
+        if len(self.files) == 0:
+            raise RuntimeError(
+                "The given directory '{}' contains no JSON files."
+                " Cannot generate a report.".format(self.directory))
         self.bag = ResultBagWrapper(self.files)
         self.bag.build_index(index)
 
