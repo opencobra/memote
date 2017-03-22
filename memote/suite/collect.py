@@ -47,7 +47,7 @@ class DummyDict(object):
         pass
 
 
-class ResultCollectionPlugin:
+class ResultCollectionPlugin(object):
     """
     Local pytest plugin that exposes a fixture for result collection.
 
