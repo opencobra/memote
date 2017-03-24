@@ -293,8 +293,10 @@ def new(ctx):
     new directory will be placed in the current directory or respect the given
     --directory option.
     """
-    cookiecutter("gh:biosustain/cookiecutter-memote",
-                 output_dir=ctx.obj.get("directory", "."))
+    directory = ctx.obj["directory"]
+    if directory is None:
+        directory = os.getcwd()
+    cookiecutter("gh:biosustain/cookiecutter-memote", output_dir=directory)
 
 
 @cli.command()
