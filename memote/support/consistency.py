@@ -23,66 +23,14 @@ import logging
 from operator import attrgetter
 
 import numpy as np
-import sympy
-from numpy.linalg import svd
-from six import iteritems
-from builtins import zip
+
+import memote.support.consistency_helpers as helpers
 
 __all__ = (
     "check_stoichiometric_consistency", "find_unconserved_metabolites",
     "find_inconsistent_min_stoichiometry")
 
 LOGGER = logging.getLogger(__name__)
-
-
-def add_reaction_constraints(model, reactions, Constraint):
-    """
-    Add the stoichiometric coefficients as constraints.
-
-    Parameters
-    ----------
-    model : optlang.Model
-        The transposed stoichiometric matrix representation.
-    reactions : iterable
-        Container of `cobra.Reaction` instances.
-    Constraint : optlang.Constraint
-        The constraint class for the specific interface.
-    """
-    for rxn in reactions:
-        expression = sympy.Add(
-            *[coefficient * model.variables[metabolite.id]
-              for (metabolite, coefficient) in rxn.metabolites.items()])
-        constraint = Constraint(expression, lb=0, ub=0, name=rxn.id)
-        model.add(constraint)
-
-
-def stoichiometry_matrix(metabolites, reactions):
-    matrix = np.zeros((len(metabolites), len(reactions)))
-    met_index = {met: i for i, met in enumerate(metabolites)}
-    rxn_index = dict()
-
-    for i, rxn in enumerate(reactions):
-        rxn_index[rxn] = i
-        for met, coef in iteritems(rxn.metabolites):
-            j = met_index[met]
-            matrix[j, i] = coef
-
-    return matrix, met_index, rxn_index
-
-
-def nullspace(matrix, atol=1e-13, rtol=0.0):
-    """
-    Compute the nullspace of a 2D `numpy.array`.
-
-    Notes
-    -----
-    Adapted from:
-    https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-    """
-    matrix = np.atleast_2d(matrix)
-    _, s, vh = svd(matrix)
-    tol = max(atol, rtol * s[0])
-    return np.compress(s < tol, vh, axis=0).T
 
 
 def check_stoichiometric_consistency(model):
@@ -103,22 +51,14 @@ def check_stoichiometric_consistency(model):
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
-    Model = model.solver.interface.Model
-    Constraint = model.solver.interface.Constraint
-    Variable = model.solver.interface.Variable
-    Objective = model.solver.interface.Objective
+    Model, Constraint, Variable, Objective = helpers.get_interface(model)
     # The transpose of the stoichiometric matrix N.T in the paper.
     stoich_trans = Model()
-    # Exchange reactions are unbalanced by their nature.
-    # We exclude them here and only consider metabolites of the others.
-    internal_rxns = set(model.reactions) - set(model.exchanges)
-    metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.info("model has %d internal metabolites", len(metabolites))
-    LOGGER.info("model has %d internal reactions", len(internal_rxns))
+    internal_rxns, metabolites = helpers.get_internals(model)
     for metabolite in metabolites:
         stoich_trans.add(Variable(metabolite.id, lb=1))
     stoich_trans.update()
-    add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
+    helpers.add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
     # The objective is to minimize the metabolite mass vector.
     stoich_trans.objective = Objective(1)
     stoich_trans.objective.set_linear_coefficients(
@@ -154,17 +94,9 @@ def find_unconserved_metabolites(model):
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
-    Model = model.solver.interface.Model
-    Constraint = model.solver.interface.Constraint
-    Variable = model.solver.interface.Variable
-    Objective = model.solver.interface.Objective
+    Model, Constraint, Variable, Objective = helpers.get_interface(model)
     stoich_trans = Model()
-    # Exchange reactions are unbalanced by their nature.
-    # We exclude them here and only consider metabolites of the others.
-    internal_rxns = set(model.reactions) - set(model.exchanges)
-    metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.info("model has %d internal metabolites", len(metabolites))
-    LOGGER.info("model has %d internal reactions", len(internal_rxns))
+    internal_rxns, metabolites = helpers.get_internals(model)
     # The binary variables k[i] in the paper.
     k_vars = list()
     for met in metabolites:
@@ -177,7 +109,7 @@ def find_unconserved_metabolites(model):
         stoich_trans.add(Constraint(
             k_var - m_var, ub=0, name="switch_{}".format(met.id)))
     stoich_trans.update()
-    add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
+    helpers.add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
     # The objective is to maximize the binary indicators k[i], subject to the
     # above inequality constraints.
     stoich_trans.objective = Objective(1)
@@ -194,91 +126,6 @@ def find_unconserved_metabolites(model):
             "Could not compute list of unconserved metabolites."
             " Solver status is '{}'"
             " (only optimal or infeasible expected).".format(status))
-
-
-def create_milp_problem(nullspace, metabolites, Model, Variable, Constraint, Objective):
-    """
-    Create the MILP as defined by equation (13) in [1]_.
-
-    Parameters
-    ----------
-    nullspace : numpy.array
-        A 2-dimensional array that represents the left nullspace of the
-        stoichiometric matrix which is the nullspace of the transpose of the
-        stoichiometric matrix.
-    metabolites : iterable
-        The metabolites in the nullspace. The length of this vector must equal
-        the first dimension of the nullspace.
-    Model : optlang.Model
-        Model class for a specific optlang interface.
-    Variable : optlang.Variable
-        Variable class for a specific optlang interface.
-    Constraint : optlang.Constraint
-        Constraint class for a specific optlang interface.
-    Objective : optlang.Objective
-        Objective class for a specific optlang interface.
-
-    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
-           Bioinformatics 24, no. 19 (2008): 2245.
-    """
-    assert len(metabolites) == nullspace.shape[0],\
-        "metabolite vector and first nullspace dimension must be equal"
-    ns_problem = Model()
-    k_vars = list()
-    for met in metabolites:
-        # The element y[i] of the mass vector.
-        y_var = Variable(met.id)
-        k_var = Variable("k_{}".format(met.id), type="binary")
-        k_vars.append(k_var)
-        ns_problem.add([y_var, k_var])
-        # This constraint is equivalent to 0 <= y[i] <= k[i].
-        ns_problem.add(Constraint(
-            y_var - k_var, ub=0, name="switch_{}".format(met.id)))
-    ns_problem.update()
-    # add nullspace constraints
-    for (j, column) in enumerate(nullspace.T):
-        expression = sympy.Add(
-            *[coef * ns_problem.variables[met.id]
-              for (met, coef) in zip(metabolites, column) if coef != 0.0])
-        constraint = Constraint(expression, lb=0, ub=0,
-                                name="ns_{}".format(j))
-        ns_problem.add(constraint)
-    # The objective is to minimize the binary indicators k[i], subject to
-    # the above inequality constraints.
-    ns_problem.objective = Objective(1)
-    ns_problem.objective.set_linear_coefficients(
-        {k_var: 1. for k_var in k_vars})
-    ns_problem.objective.direction = "min"
-    return (ns_problem, k_vars)
-
-
-def add_cut(problem, indicators, bound, Constraint):
-    """
-    Add an integer cut to the problem.
-
-    Ensure that the same solution involving these indicator variables cannot be
-    found by enforcing their sum to be less than before.
-
-    Parameters
-    ----------
-    problem : optlang.Model
-        Specific optlang interface Model instance.
-    indicators : iterable
-        Binary indicator `optlang.Variable`s.
-    bound : int
-        Should be one less than the sum of indicators. Corresponds to P - 1 in
-        equation (14) in [1]_.
-    Constraint : optlang.Constraint
-        Constraint class for a specific optlang interface.
-
-    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
-           Bioinformatics 24, no. 19 (2008): 2245.
-    """
-    cut = Constraint(sympy.Add(*indicators), ub=bound)
-    problem.add(cut)
-    return cut
 
 
 def find_inconsistent_min_stoichiometry(model, atol=1e-13):
@@ -304,26 +151,21 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     """
     if check_stoichiometric_consistency(model):
         return set()
-    Model = model.solver.interface.Model
-    Constraint = model.solver.interface.Constraint
-    Variable = model.solver.interface.Variable
-    Objective = model.solver.interface.Objective
+    Model, Constraint, Variable, Objective = helpers.get_interface(model)
     unconserved_mets = find_unconserved_metabolites(model)
     LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
-    internal_rxns = set(model.reactions) - set(model.exchanges)
-    internal_mets = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.info("model has %d internal metabolites", len(internal_mets))
-    LOGGER.info("model has %d internal reactions", len(internal_rxns))
+    internal_rxns, internal_mets = helpers.get_internals(model)
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
-    stoich, met_index, rxn_index = stoichiometry_matrix(metabolites, reactions)
-    left_ns = nullspace(stoich.T)
+    stoich, met_index, rxn_index = helpers.stoichiometry_matrix(metabolites,
+                                                                reactions)
+    left_ns = helpers.nullspace(stoich.T)
     # deal with numerical instabilities
     left_ns[np.abs(left_ns) < atol] = 0.0
     LOGGER.info("nullspace has dimension %d", left_ns.shape[1])
     inc_minimal = set()
-    (problem, indicators) = create_milp_problem(
+    (problem, indicators) = helpers.create_milp_problem(
         left_ns, metabolites, Model, Variable, Constraint, Objective)
     LOGGER.debug(str(problem))
     cuts = list()
@@ -349,8 +191,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
             inc_minimal.add(tuple(solution))
             if len(solution) == 1:
                 break
-            cuts.append(add_cut(problem, indicators, len(solution) - 1,
-                                Constraint))
+            cuts.append(helpers.add_cut(problem, indicators, len(solution) - 1,
+                                        Constraint))
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
         # reset
@@ -384,4 +226,4 @@ def find_elementary_leakage_modes(model, atol=1e-13):
            Bioinformatics 24, no. 19 (2008): 2245.
     """
     raise NotImplementedError(
-        "This function is a stub and will be implemented soon™.")
+        "Coming soon™ if considered useful.")
