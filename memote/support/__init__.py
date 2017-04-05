@@ -20,7 +20,3 @@ Helper functions for the metabolic model test suite.
 """
 
 from __future__ import absolute_import
-
-from memote.support.basic import *
-from memote.support.syntax import *
-from memote.support.consistency import *
