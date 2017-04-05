@@ -87,7 +87,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
 
 def check_stoichiometric_consistency(model):
     """
-    Confirm that the metabolic model is mass-balanced.
+    Verify the consistency of the model stoichiometry.
 
     Parameters
     ----------
@@ -138,7 +138,7 @@ def check_stoichiometric_consistency(model):
 
 def find_unconserved_metabolites(model):
     """
-    Find unconserved metabolites in the metabolic model.
+    Detect unconserved metabolites.
 
     Parameters
     ----------
@@ -281,17 +281,17 @@ def add_cut(problem, indicators, bound, Constraint):
     return cut
 
 
-def find_inconsistent_min_stoichiometry(model, tol=1e-13):
+def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     """
-    Find inconsistent minimal net stoichiometries.
+    Detect inconsistent minimal net stoichiometries.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    tol : float, optional
-        Values below the tolerance are treated as zero. Expected to be very
-        small but larger than zero.
+    atol : float, optional
+        Values below the absolute tolerance are treated as zero. Expected to be 
+        very small but larger than zero.
 
     Notes
     -----
@@ -320,7 +320,7 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
     stoich, met_index, rxn_index = stoichiometry_matrix(metabolites, reactions)
     left_ns = nullspace(stoich.T)
     # deal with numerical instabilities
-    left_ns[np.abs(left_ns) < tol] = 0.0
+    left_ns[np.abs(left_ns) < atol] = 0.0
     LOGGER.info("nullspace has dimension %d", left_ns.shape[1])
     inc_minimal = set()
     (problem, indicators) = create_milp_problem(
@@ -358,3 +358,30 @@ def find_inconsistent_min_stoichiometry(model, tol=1e-13):
         problem.remove(cuts)
         cuts.clear()
     return inc_minimal
+
+
+def find_elementary_leakage_modes(model, atol=1e-13):
+    """
+    Detect elementary leakage modes.
+    
+    
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    atol : float, optional
+        Values below the absolute tolerance are treated as zero. Expected to be 
+        very small but larger than zero.
+
+    Notes
+    -----
+    See [1]_ section 3.4 for a complete description of the algorithm.
+
+
+    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
+           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           Bioinformatics 24, no. 19 (2008): 2245.
+    """
+    raise NotImplementedError(
+        "This function is a stub and will be implemented soon™.")
