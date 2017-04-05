@@ -57,6 +57,28 @@ def add_reaction_constraints(model, reactions, Constraint):
 
 
 def stoichiometry_matrix(metabolites, reactions):
+    """
+    Return the stoichiometry matrix representation of a set of reactions.
+
+    The reactions and metabolites order is respected. All metabolites are
+    expected to be contained and complete in terms of the reactions.
+
+    Parameters
+    ----------
+    reactions : iterable
+        A somehow ordered list of unique reactions.
+    metabolites : iterable
+        A somehow ordered list of unique metabolites.
+
+    Returns
+    -------
+    numpy.array
+        The 2D array that represents the stoichiometry matrix.
+    dict
+        A dictionary mapping metabolites to row indexes.
+    dict
+        A dictionary mapping reactions to column indexes.
+    """
     matrix = np.zeros((len(metabolites), len(reactions)))
     met_index = dict((met, i) for i, met in enumerate(metabolites))
     rxn_index = dict()
@@ -86,7 +108,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
 def get_interface(model):
     """
     Return the interface specific classes.
-    
+
     Parameters
     ----------
     model : cobra.Model
@@ -103,10 +125,10 @@ def get_interface(model):
 def get_internals(model):
     """
     Return non-exchange reactions and their metabolites.
-    
+
     Exchange reactions are unbalanced by their nature. They are excluded here
     and only the metabolites of the others are considered.
-    
+
     Parameters
     ----------
     model : cobra.Model
@@ -116,7 +138,7 @@ def get_internals(model):
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     LOGGER.info("model '%s' has %d internal metabolites", model.id,
                 len(metabolites))
-    LOGGER.info("model '%s' has %d internal reactions",model.id,
+    LOGGER.info("model '%s' has %d internal reactions", model.id,
                 len(internal_rxns))
     return internal_rxns, metabolites
 
@@ -205,4 +227,3 @@ def add_cut(problem, indicators, bound, Constraint):
     cut = Constraint(sympy.Add(*indicators), ub=bound)
     problem.add(cut)
     return cut
-

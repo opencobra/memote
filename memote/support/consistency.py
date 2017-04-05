@@ -137,7 +137,7 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     model : cobra.Model
         The metabolic model under investigation.
     atol : float, optional
-        Values below the absolute tolerance are treated as zero. Expected to be 
+        Values below the absolute tolerance are treated as zero. Expected to be
         very small but larger than zero.
 
     Notes
@@ -205,15 +205,13 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
 def find_elementary_leakage_modes(model, atol=1e-13):
     """
     Detect elementary leakage modes.
-    
-    
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
     atol : float, optional
-        Values below the absolute tolerance are treated as zero. Expected to be 
+        Values below the absolute tolerance are treated as zero. Expected to be
         very small but larger than zero.
 
     Notes
