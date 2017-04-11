@@ -26,8 +26,7 @@ import pytest
 import numpy as np
 
 import memote.support.helpers as helpers
-from memote.support.biomass import (
-    find_blocked_biomass_precursors_dflt,sum_biomass_weight)
+import memote.support.biomass as biomass
 
 
 def model_builder(name):
@@ -90,7 +89,7 @@ def model_builder(name):
                                })
         model.add_reactions([rxn_1])
         return model
-    if name == "precursors_producable":
+    if name == "precursors_producing":
         met_a = cobra.Metabolite("lipid_c")
         met_b = cobra.Metabolite("protein_c")
         met_c = cobra.Metabolite("rna_c")
@@ -128,7 +127,7 @@ def model_builder(name):
         rxn1.add_metabolites({met_a: 1, met_a1: -1})
         rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
         rxn2.add_metabolites({met_b: 1, met_b1: -1})
-        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=0, upper_bound=1000)
+        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=0)
         rxn3.add_metabolites({met_c: 1, met_c1: -1})
         rxn4 = cobra.Reaction("EX_met_a1", lower_bound=-1000, upper_bound=1000)
         rxn4.add_metabolites({met_a1: -1})
@@ -152,13 +151,13 @@ def test_biomass_weight_production(model, boolean):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        control_sum = sum_biomass_weight(rxn)
+        control_sum = biomass.sum_biomass_weight(rxn)
         assert np.isclose(1, control_sum, atol=1e-03) is boolean
 
 
 @pytest.mark.parametrize("model, num", [
-    ("precursors_producable", 0),
-    ("precursor_blocked", 1),
+    ("precursors_producing", 0),
+    ("precursors_blocked", 1),
 ], indirect=["model"])
 def test_production_biomass_precursors_dflt(model, num):
     """
@@ -168,5 +167,5 @@ def test_production_biomass_precursors_dflt(model, num):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        blocked_rxns = find_blocked_biomass_precursors_dflt(rxn, model)
+        blocked_rxns = biomass.find_blocked_biomass_precursors_dflt(rxn, model)
         assert len(blocked_rxns) == num

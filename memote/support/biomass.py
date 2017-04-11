@@ -50,15 +50,15 @@ def find_blocked_biomass_precursors_dflt(rxn, model):
     precursors = find_biomass_rxn_precursors(rxn)
     blocked_precursors = []
     for precursor in precursors:
-        dm_rxn = Reaction(id='TestDM_{}'.format(precursor.id))
-        dm_rxn.add_metabolites({precursor: -1})
-        model.add_reaction(dm_rxn)
-        model.change_objective(dm_rxn)
-        try:
-            obj_flux = model.optimize().f
-            if obj_flux == 0:
+        with model:
+            dm_rxn = Reaction(id='TestDM_{}'.format(precursor.id))
+            dm_rxn.add_metabolites({precursor: -1})
+            model.add_reaction(dm_rxn)
+            model.objective = dm_rxn
+            try:
+                obj_flux = model.optimize().f
+                if obj_flux == 0:
+                    blocked_precursors.append(precursor)
+            except Infeasible:
                 blocked_precursors.append(precursor)
-        except Infeasible:
-            blocked_precursors.append(precursor)
-        model.remove_reactions([dm_rxn])
     return blocked_precursors
