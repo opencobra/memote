@@ -21,9 +21,9 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from memote.support.biomass import sum_biomass_weight
+import memote.support.biomass as biomass
 
-from memote.support.helpers import find_biomass_reaction
+import memote.support.helpers as helpers
 
 
 def test_biomass_consistency(model):
@@ -32,10 +32,25 @@ def test_biomass_consistency(model):
 
     Allow for an absolute tolerance of 1e-03.
     """
-    biomass_rxns = find_biomass_reaction(model)
+    biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        control_sum = sum_biomass_weight(rxn)
+        control_sum = biomass.sum_biomass_weight(rxn)
         assert np.isclose(1.0, control_sum, atol=1e-03), \
-            "The following biomass reaction does not sum close enough to 1'" \
+            "The following biomass reaction does not sum close enough to 1" \
             " {}".format(
             ", ".join(rxn.id))
+
+
+def test_production_biomass_precursors_dflt(model):
+    """
+    Expect that there are no biomass precursors that cannot be produced.
+
+    This is without changing the model's default state.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        blocked_rxns = biomass.find_blocked_biomass_precursors_dflt(rxn, model)
+        assert len(blocked_rxns) == 0, \
+            " The biomass precursors of {} cannot be produced in the " \
+            "default state of the model: {}".format(
+            rxn, ", ".join([met.id for met in blocked_rxns]))

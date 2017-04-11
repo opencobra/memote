@@ -22,8 +22,12 @@ from __future__ import absolute_import
 import logging
 
 from six import iteritems
+from cobra import Reaction
+from cobra.exceptions import Infeasible
 
-__all__ = ("sum_biomass_weight",)
+__all__ = (
+    "sum_biomass_weight", "find_biomass_rxn_precursors",
+    "find_blocked_biomass_precursors_dflt")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,3 +36,29 @@ def sum_biomass_weight(rxn):
     """Compute the sum of all reaction compounds."""
     return sum(-coef * met.formula_weight
                for (met, coef) in iteritems(rxn.metabolites)) / 1000.0
+
+
+def find_biomass_rxn_precursors(rxn):
+    """Return a list of all biomass precursors excluding atp and h2o."""
+    return [met for met in rxn.reactants
+            if met.id != 'atp_c' or met.id != 'h2o_c']
+
+
+def find_blocked_biomass_precursors_dflt(rxn, model):
+    """Return a list of all biomass precursors that cannot be produced in the
+     default state of the model."""
+    precursors = find_biomass_rxn_precursors(rxn)
+    blocked_precursors = []
+    for precursor in precursors:
+        dm_rxn = Reaction(id='TestDM_{}'.format(precursor.id))
+        dm_rxn.add_metabolites({precursor: -1})
+        model.add_reaction(dm_rxn)
+        model.change_objective(dm_rxn)
+        try:
+            obj_flux = model.optimize().f
+            if obj_flux == 0:
+                blocked_precursors.append(precursor)
+        except Infeasible:
+            blocked_precursors.append(precursor)
+        model.remove_reactions([dm_rxn])
+    return blocked_precursors
