@@ -22,6 +22,7 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 from __future__ import absolute_import
 
 import cobra
+from cobra.exceptions import Infeasible
 import pytest
 import numpy as np
 
@@ -179,6 +180,30 @@ def test_biomass_weight_production(model, boolean):
         assert np.isclose(1, control_sum, atol=1e-03) is boolean
 
 
+@pytest.mark.parametrize("model, boolean", [
+    ("precursors_producing", True),
+    ("precursors_not_in_medium", False)
+], indirect=["model"])
+def test_biomass_production(model, boolean):
+    """
+    Expect that biomass can be produced when optimizing the model.
+
+    This is without changing the model's default state.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        model.objective = rxn
+        try:
+            solution = model.optimize()
+            if abs(solution.f) != 0:
+                status = True
+            else:
+                status = False
+        except Infeasible:
+            status = False
+        assert status is boolean
+
+
 @pytest.mark.parametrize("model, num", [
     ("precursors_producing", 0),
     ("precursors_not_in_medium", 2),
@@ -201,7 +226,7 @@ def test_production_biomass_precursors_dflt(model, num):
     ("precursors_not_in_medium", 0),
     ("precursors_blocked", 1)
 ], indirect=["model"])
-def test_production_biomass_precursors_xchngs(model,num):
+def test_production_biomass_precursors_xchngs(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
 

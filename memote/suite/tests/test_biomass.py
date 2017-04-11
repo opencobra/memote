@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import numpy as np
 
 import memote.support.biomass as biomass
-
+from cobra.exceptions import Infeasible
 import memote.support.helpers as helpers
 
 
@@ -41,6 +41,26 @@ def test_biomass_consistency(model):
             ", ".join(rxn.id))
 
 
+def test_biomass_production(model):
+    """
+    Expect that biomass can be produced when optimizing the model.
+
+    This is without changing the model's default state.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        model.objective = rxn
+        try:
+            solution = model.optimize()
+            if abs(solution.f) != 0:
+                status = True
+            else:
+                status = False
+        except Infeasible:
+            status = False
+        assert status is True
+
+
 def test_production_biomass_precursors_dflt(model):
     """
     Expect that there are no biomass precursors that cannot be produced.
@@ -51,7 +71,7 @@ def test_production_biomass_precursors_dflt(model):
     for rxn in biomass_rxns:
         blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
         assert len(blocked_mets) == 0, \
-            " The biomass precursors of {} cannot be produced in the " \
+            "The biomass precursors of {} cannot be produced in the " \
             "default state of the model: {}".format(
             rxn, ", ".join([met.id for met in blocked_mets]))
 
@@ -70,6 +90,6 @@ def test_production_biomass_precursors_xchngs(model):
                 exchange.bounds = [-1000, 1000]
             blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
             assert len(blocked_mets) == 0, \
-                " The biomass precursors of {} cannot be produced in the " \
+                "The biomass precursors of {} cannot be produced in the " \
                 "model despite all exchanges having been opened: {}".format(
                 rxn, ", ".join([met.id for met in blocked_mets]))
