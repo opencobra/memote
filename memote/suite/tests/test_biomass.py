@@ -49,8 +49,27 @@ def test_production_biomass_precursors_dflt(model):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        blocked_rxns = biomass.find_blocked_biomass_precursors_dflt(rxn, model)
-        assert len(blocked_rxns) == 0, \
+        blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+        assert len(blocked_mets) == 0, \
             " The biomass precursors of {} cannot be produced in the " \
             "default state of the model: {}".format(
-            rxn, ", ".join([met.id for met in blocked_rxns]))
+            rxn, ", ".join([met.id for met in blocked_mets]))
+
+
+def test_production_biomass_precursors_xchngs(model):
+    """
+    Expect that there are no biomass precursors that cannot be produced.
+
+    This is after opening the model's exchange reactions.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        with model:
+            xchngs = helpers.find_demand_and_exchange_reactions(model)
+            for exchange in xchngs:
+                exchange.bounds = [-1000, 1000]
+            blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+            assert len(blocked_mets) == 0, \
+                " The biomass precursors of {} cannot be produced in the " \
+                "model despite all exchanges having been opened: {}".format(
+                rxn, ", ".join([met.id for met in blocked_mets]))

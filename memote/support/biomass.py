@@ -27,7 +27,7 @@ from cobra.exceptions import Infeasible
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_rxn_precursors",
-    "find_blocked_biomass_precursors_dflt")
+    "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -44,9 +44,8 @@ def find_biomass_rxn_precursors(rxn):
             if met.id != 'atp_c' or met.id != 'h2o_c']
 
 
-def find_blocked_biomass_precursors_dflt(rxn, model):
-    """Return a list of all biomass precursors that cannot be produced in the
-     default state of the model."""
+def find_blocked_biomass_precursors(rxn, model):
+    """Return a list of all biomass precursors that cannot be produced"""
     precursors = find_biomass_rxn_precursors(rxn)
     blocked_precursors = []
     for precursor in precursors:

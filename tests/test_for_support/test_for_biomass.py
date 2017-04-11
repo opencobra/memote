@@ -137,6 +137,30 @@ def model_builder(name):
         rxn6.add_metabolites({met_c1: -1})
         model.add_reactions([rxn, rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
         return model
+    if name == "precursors_not_in_medium":
+        met_a = cobra.Metabolite("lipid_c")
+        met_b = cobra.Metabolite("protein_c")
+        met_c = cobra.Metabolite("rna_c")
+        met_a1 = cobra.Metabolite("lipid_e")
+        met_b1 = cobra.Metabolite("protein_e")
+        met_c1 = cobra.Metabolite("rna_e")
+        # Reactions
+        rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+        rxn.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1})
+        rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+        rxn1.add_metabolites({met_a: 1, met_a1: -1})
+        rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_b: 1, met_b1: -1})
+        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+        rxn3.add_metabolites({met_c: 1, met_c1: -1})
+        rxn4 = cobra.Reaction("EX_met_a1", lower_bound=0, upper_bound=1000)
+        rxn4.add_metabolites({met_a1: -1})
+        rxn5 = cobra.Reaction("EX_met_b1", lower_bound=0, upper_bound=1000)
+        rxn5.add_metabolites({met_b1: -1})
+        rxn6 = cobra.Reaction("EX_met_c1", lower_bound=-1000, upper_bound=1000)
+        rxn6.add_metabolites({met_c1: -1})
+        model.add_reactions([rxn, rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
+        return model
 
 
 @pytest.mark.parametrize("model, boolean", [
@@ -157,7 +181,8 @@ def test_biomass_weight_production(model, boolean):
 
 @pytest.mark.parametrize("model, num", [
     ("precursors_producing", 0),
-    ("precursors_blocked", 1),
+    ("precursors_not_in_medium", 2),
+    ("precursors_blocked", 1)
 ], indirect=["model"])
 def test_production_biomass_precursors_dflt(model, num):
     """
@@ -167,5 +192,26 @@ def test_production_biomass_precursors_dflt(model, num):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        blocked_rxns = biomass.find_blocked_biomass_precursors_dflt(rxn, model)
-        assert len(blocked_rxns) == num
+        blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+        assert len(blocked_mets) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("precursors_producing", 0),
+    ("precursors_not_in_medium", 0),
+    ("precursors_blocked", 1)
+], indirect=["model"])
+def test_production_biomass_precursors_xchngs(model,num):
+    """
+    Expect that there are no biomass precursors that cannot be produced.
+
+    This is after opening the model's exchange reactions.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        with model:
+            xchngs = helpers.find_demand_and_exchange_reactions(model)
+            for exchange in xchngs:
+                exchange.bounds = [-1000, 1000]
+            blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+            assert len(blocked_mets) == num
