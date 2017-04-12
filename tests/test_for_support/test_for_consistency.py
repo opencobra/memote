@@ -114,6 +114,27 @@ def model_builder(name):
         rxn5.add_metabolites({met_c: -1})
         model.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
         return model
+    if name == "all_balanced":
+        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+        rxn1 = cobra.Reaction("RA1")
+        rxn1.add_metabolites({met_a: -2, met_b: 1})
+        model.add_reactions([rxn1])
+        return model
+    if name == "mass_unbalanced":
+        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+        rxn1 = cobra.Reaction("RA1")
+        rxn1.add_metabolites({met_a: -1, met_b: 1})
+        model.add_reactions([rxn1])
+        return model
+    if name == "charge_unbalanced":
+        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
+        rxn1 = cobra.Reaction("RA1")
+        rxn1.add_metabolites({met_a: -2, met_b: 1})
+        model.add_reactions([rxn1])
+        return model
 
 
 @pytest.mark.parametrize("model, consistent", [
@@ -157,3 +178,14 @@ def test_production_of_atp_closed_bounds(model, atp_production):
     """Expect that ATP cannot be produced when all the bounds are closed."""
     production_of_atp = consistency.produce_atp_closed_xchngs(model)
     assert production_of_atp is atp_production
+
+
+@pytest.mark.parametrize("model, num", [
+    ("all_balanced", 0),
+    ("mass_unbalanced", 1),
+    ("charge_unbalanced", 1)
+], indirect=["model"])
+def test_unbalanced_reactions(model, num):
+    """Expect all reactions to be mass and charge balanced."""
+    list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
+    assert len(list_of_unbalanced_rxns) == num

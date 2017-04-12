@@ -263,3 +263,22 @@ def produce_atp_closed_xchngs(model):
         return status
     else:
         return status
+
+
+def find_unbalanced_reactions(model):
+    """
+    Finds metabolic reactions that not mass and/or charge balanced.
+
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    exchanges = helpers.find_demand_and_exchange_reactions(model)
+    biomass = helpers.find_biomass_reaction(model)
+    total_rxns = model.reactions
+    metab_rxns = set(total_rxns).difference(set().union(exchanges, biomass))
+    return [rxn for rxn in metab_rxns if rxn.check_mass_balance() != dict()]

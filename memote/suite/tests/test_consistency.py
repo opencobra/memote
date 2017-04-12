@@ -45,3 +45,12 @@ def test_production_of_atp_closed_bounds(model):
         "The model {} was able to produce ATP although all exchanges were"\
         "closed. This might be because there is an unbalanced reaction or a"\
         "loop in the model.".format(model.id)
+
+
+def test_unbalanced_reactions(model):
+    """Expect all reactions to be mass and charge balanced."""
+    list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
+    assert len(list_of_unbalanced_rxns) == 0, \
+        "The following reactions are not balanced" \
+        " {}".format(
+        ", ".join([rxn.id for rxn in list_of_unbalanced_rxns]))
