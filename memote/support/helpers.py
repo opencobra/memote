@@ -29,14 +29,17 @@ def find_demand_and_exchange_reactions(model):
     """
     Return a list containing demand and exchange reactions of model.
 
-    :param model: A cobrapy metabolic model
-    :type model: cobra.core.Model.Model
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     return [rxn for rxn in model.reactions if len(rxn.metabolites.keys()) == 1]
 
 
 def find_transport_reactions(model):
-    """Return a list of all transport reactions.
+    """
+    Return a list of all transport reactions.
 
        A transport reaction is defined as follows:
        -- It contains metabolites from at least 2 compartments
@@ -47,8 +50,8 @@ def find_transport_reactions(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
-            A cobrapy metabolic model
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     compartment_spanning_rxns = \
         [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
@@ -79,8 +82,8 @@ def find_atp_adp_converting_reactions(model):
 
     Parameters
     ----------
-    model : model: cobra.core.Model.Model
-            A cobrapy metabolic model
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     atp_all_comp_rxn_list = []
     for met in model.metabolites:
@@ -104,7 +107,7 @@ def find_biomass_reaction(model):
 
     Parameters
     ----------
-    model : model: cobra.Model
-            A cobrapy metabolic model
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]

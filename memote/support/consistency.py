@@ -23,12 +23,14 @@ import logging
 from operator import attrgetter
 
 import numpy as np
-
-import memote.support.consistency_helpers as helpers
+from cobra.exceptions import Infeasible
+from cobra import Reaction
+import memote.support.consistency_helpers as cons_helpers
+import memote.support.helpers as helpers
 
 __all__ = (
     "check_stoichiometric_consistency", "find_unconserved_metabolites",
-    "find_inconsistent_min_stoichiometry")
+    "find_inconsistent_min_stoichiometry", "produce_atp_closed_xchngs")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -48,17 +50,19 @@ def check_stoichiometric_consistency(model):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+        "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
-    Model, Constraint, Variable, Objective = helpers.get_interface(model)
+    Model, Constraint, Variable, Objective = cons_helpers.get_interface(model)
     # The transpose of the stoichiometric matrix N.T in the paper.
     stoich_trans = Model()
-    internal_rxns, metabolites = helpers.get_internals(model)
+    internal_rxns, metabolites = cons_helpers.get_internals(model)
     for metabolite in metabolites:
         stoich_trans.add(Variable(metabolite.id, lb=1))
     stoich_trans.update()
-    helpers.add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
+    cons_helpers.add_reaction_constraints(
+        stoich_trans, internal_rxns, Constraint
+    )
     # The objective is to minimize the metabolite mass vector.
     stoich_trans.objective = Objective(1)
     stoich_trans.objective.set_linear_coefficients(
@@ -91,12 +95,12 @@ def find_unconserved_metabolites(model):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+        "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
-    Model, Constraint, Variable, Objective = helpers.get_interface(model)
+    Model, Constraint, Variable, Objective = cons_helpers.get_interface(model)
     stoich_trans = Model()
-    internal_rxns, metabolites = helpers.get_internals(model)
+    internal_rxns, metabolites = cons_helpers.get_internals(model)
     # The binary variables k[i] in the paper.
     k_vars = list()
     for met in metabolites:
@@ -109,7 +113,9 @@ def find_unconserved_metabolites(model):
         stoich_trans.add(Constraint(
             k_var - m_var, ub=0, name="switch_{}".format(met.id)))
     stoich_trans.update()
-    helpers.add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
+    cons_helpers.add_reaction_constraints(
+        stoich_trans, internal_rxns, Constraint
+    )
     # The objective is to maximize the binary indicators k[i], subject to the
     # above inequality constraints.
     stoich_trans.objective = Objective(1)
@@ -146,26 +152,27 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+        "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
     if check_stoichiometric_consistency(model):
         return set()
-    Model, Constraint, Variable, Objective = helpers.get_interface(model)
+    Model, Constraint, Variable, Objective = cons_helpers.get_interface(model)
     unconserved_mets = find_unconserved_metabolites(model)
     LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
-    internal_rxns, internal_mets = helpers.get_internals(model)
+    internal_rxns, internal_mets = cons_helpers.get_internals(model)
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
-    stoich, met_index, rxn_index = helpers.stoichiometry_matrix(metabolites,
-                                                                reactions)
-    left_ns = helpers.nullspace(stoich.T)
+    stoich, met_index, rxn_index = cons_helpers.stoichiometry_matrix(
+        metabolites, reactions
+    )
+    left_ns = cons_helpers.nullspace(stoich.T)
     # deal with numerical instabilities
     left_ns[np.abs(left_ns) < atol] = 0.0
     LOGGER.info("nullspace has dimension %d", left_ns.shape[1])
     inc_minimal = set()
-    (problem, indicators) = helpers.create_milp_problem(
+    (problem, indicators) = cons_helpers.create_milp_problem(
         left_ns, metabolites, Model, Variable, Constraint, Objective)
     LOGGER.debug(str(problem))
     cuts = list()
@@ -191,8 +198,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
             inc_minimal.add(tuple(solution))
             if len(solution) == 1:
                 break
-            cuts.append(helpers.add_cut(problem, indicators, len(solution) - 1,
-                                        Constraint))
+            cuts.append(cons_helpers.add_cut(problem, indicators,
+                                             len(solution) - 1, Constraint))
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
         # reset
@@ -220,8 +227,58 @@ def find_elementary_leakage_modes(model, atol=1e-13):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+        "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
     """
     raise NotImplementedError(
         "Coming soon™ if considered useful.")
+
+
+def produce_atp_closed_xchngs(model):
+    """
+    Close the model's exchanges and tries to optimize the production of atp_c.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    status = False
+    if 'atp_c' in model.metabolites:
+        with model:
+            xchngs = helpers.find_demand_and_exchange_reactions(model)
+            for exchange in xchngs:
+                exchange.bounds = [0, 0]
+            met = model.metabolites.get_by_id('atp_c')
+            dm_rxn = Reaction(id='TestDM_{}'.format(met.id))
+            dm_rxn.add_metabolites({met: -1})
+            model.add_reactions([dm_rxn])
+            model.objective = dm_rxn
+            try:
+                solution = model.optimize()
+                if solution.objective_value != 0:
+                    status = True
+            except Infeasible:
+                status = False
+        return status
+    else:
+        return status
+
+
+def find_unbalanced_reactions(model):
+    """
+    Find metabolic reactions that not mass and/or charge balanced.
+
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    exchanges = helpers.find_demand_and_exchange_reactions(model)
+    biomass = helpers.find_biomass_reaction(model)
+    total_rxns = model.reactions
+    metab_rxns = set(total_rxns).difference(set().union(exchanges, biomass))
+    return [rxn for rxn in metab_rxns if rxn.check_mass_balance() != dict()]
