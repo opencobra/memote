@@ -60,7 +60,7 @@ def find_biomass_rxn_precursors(rxn):
 
 def find_blocked_biomass_precursors(rxn, model):
     """
-    Return a list of all biomass precursors that cannot be produced
+    Return a list of all biomass precursors that cannot be produced.
 
     Parameters
     ----------
