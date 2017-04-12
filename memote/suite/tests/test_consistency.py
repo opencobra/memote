@@ -37,3 +37,21 @@ def test_stoichiometric_consistency(model, store):
     assert is_consistent,\
         "The following metabolites are involved in inconsistent reactions:"\
         " {}".format(", ".join(unconserved))
+
+
+def test_production_of_atp_closed_bounds(model):
+    """Expect that ATP cannot be produced when all the bounds are closed."""
+    production_of_atp = consistency.produce_atp_closed_xchngs(model)
+    assert production_of_atp is False,\
+        "The model {} was able to produce ATP although all exchanges were"\
+        "closed. This might be because there is an unbalanced reaction or a"\
+        "loop in the model.".format(model.id)
+
+
+def test_unbalanced_reactions(model):
+    """Expect all reactions to be mass and charge balanced."""
+    list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
+    assert len(list_of_unbalanced_rxns) == 0, \
+        "The following reactions are not balanced" \
+        " {}".format(
+        ", ".join([rxn.id for rxn in list_of_unbalanced_rxns]))

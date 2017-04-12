@@ -225,3 +225,53 @@ def find_elementary_leakage_modes(model, atol=1e-13):
     """
     raise NotImplementedError(
         "Coming soon™ if considered useful.")
+
+
+def produce_atp_closed_xchngs(model):
+    """
+    Closes the model's exchanges and tries to optimize the production of atp_c.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    status = False
+    if 'atp_c' in model.metabolites:
+        with model:
+            xchngs = helpers.find_demand_and_exchange_reactions(model)
+            for exchange in xchngs:
+                exchange.bounds = [0, 0]
+            met = model.metabolites.get_by_id('atp_c')
+            dm_rxn = Reaction(id='TestDM_{}'.format(met.id))
+            dm_rxn.add_metabolites({met: -1})
+            model.add_reactions([dm_rxn])
+            model.objective = dm_rxn
+            try:
+                solution = model.optimize()
+                if solution.objective_value != 0:
+                    status = True
+            except Infeasible:
+                status = False
+        return status
+    else:
+        return status
+
+
+def find_unbalanced_reactions(model):
+    """
+    Finds metabolic reactions that not mass and/or charge balanced.
+
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    exchanges = helpers.find_demand_and_exchange_reactions(model)
+    biomass = helpers.find_biomass_reaction(model)
+    total_rxns = model.reactions
+    metab_rxns = set(total_rxns).difference(set().union(exchanges, biomass))
+    return [rxn for rxn in metab_rxns if rxn.check_mass_balance() != dict()]
