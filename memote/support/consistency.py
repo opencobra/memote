@@ -229,7 +229,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
 
 def produce_atp_closed_xchngs(model):
     """
-    Closes the model's exchanges and tries to optimize the production of atp_c.
+    Close the model's exchanges and tries to optimize the production of atp_c.
 
     Parameters
     ----------
@@ -260,7 +260,7 @@ def produce_atp_closed_xchngs(model):
 
 def find_unbalanced_reactions(model):
     """
-    Finds metabolic reactions that not mass and/or charge balanced.
+    Find metabolic reactions that not mass and/or charge balanced.
 
     This will exclude biomass, exchange and demand reactions as they are
     unbalanced by definition.
