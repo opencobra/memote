@@ -31,6 +31,11 @@ def test_biomass_consistency(model):
     Expect that the sum of total mass of all biomass components equals 1.
 
     Allow for an absolute tolerance of 1e-03.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -46,6 +51,11 @@ def test_biomass_production(model):
     Expect that biomass can be produced when optimizing the model.
 
     This is without changing the model's default state.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -66,6 +76,11 @@ def test_production_biomass_precursors_dflt(model):
     Expect that there are no biomass precursors that cannot be produced.
 
     This is without changing the model's default state.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -81,6 +96,11 @@ def test_production_biomass_precursors_xchngs(model):
     Expect that there are no biomass precursors that cannot be produced.
 
     This is after opening the model's exchange reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
