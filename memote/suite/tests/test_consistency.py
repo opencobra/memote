@@ -21,19 +21,27 @@ from __future__ import absolute_import
 
 import logging
 
-from memote.support.consistency import (
-    check_stoichiometric_consistency, find_unconserved_metabolites)
+import memote.support.consistency as consistency
 
 LOGGER = logging.getLogger(__name__)
 
 
 def test_stoichiometric_consistency(model, store):
     """Expect that the metabolic model is mass-balanced."""
-    is_consistent = check_stoichiometric_consistency(model)
+    is_consistent = consistency.check_stoichiometric_consistency(model)
     store["is_consistent"] = is_consistent
     unconserved = [] if is_consistent else\
-        [met.id for met in find_unconserved_metabolites(model)]
+        [met.id for met in consistency.find_unconserved_metabolites(model)]
     store["unconserved_metabolites"] = unconserved
     assert is_consistent,\
         "The following metabolites are involved in inconsistent reactions:"\
         " {}".format(", ".join(unconserved))
+
+
+def test_production_of_atp_closed_bounds(model):
+    """Expect that ATP cannot be produced when all the bounds are closed."""
+    production_of_atp = consistency.produce_atp_closed_xchngs(model)
+    assert production_of_atp is False,\
+        "The model {} was able to produce ATP although all exchanges were"\
+        "closed. This might be because there is an unbalanced reaction or a"\
+        "loop in the model.".format(model.id)

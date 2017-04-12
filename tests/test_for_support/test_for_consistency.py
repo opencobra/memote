@@ -81,6 +81,39 @@ def model_builder(name):
         rxn_4.add_metabolites({met_p: -1, met_q: 1, met_x: 1})
         model.add_reactions([rxn_1, rxn_2, rxn_3, rxn_4])
         return model
+    if name == "produces_atp":
+        met_a = cobra.Metabolite("atp_c")
+        met_b = cobra.Metabolite("A")
+        met_c = cobra.Metabolite("B")
+        rxn1 = cobra.Reaction("Gen")
+        rxn1.add_metabolites({met_b: -1, met_a: 1, met_c: 1})
+        rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_c: -1, met_b: 1})
+        rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+        rxn3.add_metabolites({met_a: -1})
+        rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
+        rxn4.add_metabolites({met_b: -1})
+        rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
+        rxn5.add_metabolites({met_c: -1})
+        model.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
+        return model
+    if name == "no_atp":
+        met_a = cobra.Metabolite("atp_c")
+        met_b = cobra.Metabolite("A")
+        met_c = cobra.Metabolite("B")
+        met_d = cobra.Metabolite("adp_c")
+        rxn1 = cobra.Reaction("Gen")
+        rxn1.add_metabolites({met_d: -1, met_b: -1, met_a: 1, met_c: 1})
+        rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_c: -1, met_b: 1})
+        rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+        rxn3.add_metabolites({met_a: -1})
+        rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
+        rxn4.add_metabolites({met_b: -1})
+        rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
+        rxn5.add_metabolites({met_c: -1})
+        model.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
+        return model
 
 
 @pytest.mark.parametrize("model, consistent", [
@@ -114,3 +147,13 @@ def test_find_inconsistent_min_stoichiometry(model, inconsistent):
     unconserved_sets = consistency.find_inconsistent_min_stoichiometry(model)
     for unconserved in unconserved_sets:
         assert tuple(met.id for met in unconserved) in set(inconsistent)
+
+
+@pytest.mark.parametrize("model, atp_production", [
+    ("produces_atp", True),
+    ("no_atp", False)
+], indirect=["model"])
+def test_production_of_atp_closed_bounds(model, atp_production):
+    """Expect that ATP cannot be produced when all the bounds are closed."""
+    production_of_atp = consistency.produce_atp_closed_xchngs(model)
+    assert production_of_atp is atp_production
