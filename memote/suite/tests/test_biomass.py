@@ -52,7 +52,7 @@ def test_biomass_production(model):
         model.objective = rxn
         try:
             solution = model.optimize()
-            if abs(solution.f) != 0:
+            if solution.objective_value > 0:
                 status = True
             else:
                 status = False

@@ -55,8 +55,8 @@ def find_blocked_biomass_precursors(rxn, model):
             model.add_reaction(dm_rxn)
             model.objective = dm_rxn
             try:
-                obj_flux = model.optimize().f
-                if obj_flux == 0:
+                solution = model.optimize()
+                if solution.objective_value > 0:
                     blocked_precursors.append(precursor)
             except Infeasible:
                 blocked_precursors.append(precursor)
