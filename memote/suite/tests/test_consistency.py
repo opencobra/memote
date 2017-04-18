@@ -54,3 +54,12 @@ def test_unbalanced_reactions(model):
         "The following reactions are not balanced" \
         " {}".format(
         ", ".join([rxn.id for rxn in list_of_unbalanced_rxns]))
+
+
+def test_blocked_reactions(model):
+    """Expect all reactions to be able to carry flux."""
+    dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
+    assert len(dict_of_blocked_rxns) == 0, \
+        "The following reactions are blocked" \
+        " {}".format(
+            ", ".join([rxn_id for rxn_id in dict_of_blocked_rxns.keys()]))
