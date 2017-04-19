@@ -22,13 +22,66 @@ from __future__ import absolute_import
 import logging
 
 from six import iteritems
+from cobra import Reaction
+from cobra.exceptions import Infeasible
 
-__all__ = ("sum_biomass_weight",)
+__all__ = (
+    "sum_biomass_weight", "find_biomass_rxn_precursors",
+    "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
 
 
 def sum_biomass_weight(rxn):
-    """Compute the sum of all reaction compounds."""
+    """
+    Compute the sum of all reaction compounds.
+
+    Parameters
+    ----------
+    rxn : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+    """
     return sum(-coef * met.formula_weight
                for (met, coef) in iteritems(rxn.metabolites)) / 1000.0
+
+
+def find_biomass_rxn_precursors(rxn):
+    """
+    Return a list of all biomass precursors excluding atp and h2o.
+
+    Parameters
+    ----------
+    rxn : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+    """
+    return [met for met in rxn.reactants
+            if met.id != 'atp_c' or met.id != 'h2o_c']
+
+
+def find_blocked_biomass_precursors(rxn, model):
+    """
+    Return a list of all biomass precursors that cannot be produced.
+
+    Parameters
+    ----------
+    rxn : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    precursors = find_biomass_rxn_precursors(rxn)
+    blocked_precursors = []
+    for precursor in precursors:
+        with model:
+            dm_rxn = Reaction(id='TestDM_{}'.format(precursor.id))
+            dm_rxn.add_metabolites({precursor: -1})
+            model.add_reaction(dm_rxn)
+            model.objective = dm_rxn
+            try:
+                solution = model.optimize()
+                if solution.objective_value == 0:
+                    blocked_precursors.append(precursor)
+            except Infeasible:
+                blocked_precursors.append(precursor)
+    return blocked_precursors
