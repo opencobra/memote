@@ -287,8 +287,10 @@ def find_unbalanced_reactions(model):
 
 def find_blocked_reactions(model):
     """
-    Find metabolic reactions that cannot carry any flux when all exchanges are
-    open.
+    Find metabolic reactions that are blocked.
+
+    Blocked reactions are those reactions that when optimized for cannot carry
+    any flux while all exchanges are open.
 
     Parameters
     ----------
