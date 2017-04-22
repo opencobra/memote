@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Syntax tests performed on an instance of `cobra.Model`."""
+
 from __future__ import absolute_import
 
 from memote.support.syntax import (
@@ -23,11 +25,6 @@ from memote.support.syntax import (
     find_rxn_id_suffix_compartment, find_untagged_demand_rxns,
     find_untagged_exchange_rxns
 )
-
-
-"""
-Syntax tests performed on an instance of `cobra.Model`.
-"""
 
 
 def test_non_transp_rxn_id_compartment_suffix_match(model):

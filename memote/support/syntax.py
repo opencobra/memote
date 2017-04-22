@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Supporting functions for syntax checks performed on the model object.
-"""
+"""Supporting functions for syntax checks performed on the model object."""
 
 from __future__ import absolute_import
 
@@ -46,6 +44,8 @@ SUFFIX_MAP = dict({
 
 def find_rxn_id_compartment_suffix(model, suffix):
     """
+    Find incorrectly tagged IDs.
+
     Find non-transport reactions with metabolites in the given compartment
     whose ID is not tagged accordingly.
 
@@ -63,7 +63,6 @@ def find_rxn_id_compartment_suffix(model, suffix):
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
     """
-
     transport_rxns = find_transport_reactions(model)
     exchange_demand_rxns = find_demand_and_exchange_reactions(model)
 
@@ -122,8 +121,8 @@ def find_rxn_id_suffix_compartment(model, suffix):
 
 
 def find_reaction_tag_transporter(model):
-    """Return a list of transport reactions that have not been tagged as such.
-
+    """
+    Return incorrectly tagged transport reactions.
 
     A transport reaction is defined as follows:
        -- It contains metabolites from at least 2 compartments
