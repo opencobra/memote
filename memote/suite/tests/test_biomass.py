@@ -71,7 +71,7 @@ def test_biomass_production(model):
         assert status is True
 
 
-def test_production_biomass_precursors_dflt(model):
+def test_production_biomass_precursors_default(model):
     """
     Expect that there are no biomass precursors that cannot be produced.
 
@@ -91,11 +91,11 @@ def test_production_biomass_precursors_dflt(model):
             rxn, ", ".join([met.id for met in blocked_mets]))
 
 
-def test_production_biomass_precursors_xchngs(model):
+def test_production_biomass_precursors_open(model):
     """
     Expect that there are no biomass precursors that cannot be produced.
 
-    This is after opening the model's exchange reactions.
+    This is after opening all the model's exchange reactions.
 
     Parameters
     ----------
