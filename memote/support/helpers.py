@@ -25,18 +25,6 @@ import re
 LOGGER = logging.getLogger(__name__)
 
 
-def find_demand_and_exchange_reactions(model):
-    """
-    Return a list containing demand and exchange reactions of model.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-    """
-    return [rxn for rxn in model.reactions if len(rxn.metabolites.keys()) == 1]
-
-
 def find_transport_reactions(model):
     """
     Return a list of all transport reactions.

@@ -105,9 +105,8 @@ def test_production_biomass_precursors_xchngs(model):
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         with model:
-            xchngs = helpers.find_demand_and_exchange_reactions(model)
-            for exchange in xchngs:
-                exchange.bounds = [-1000, 1000]
+            for exchange in model.exchanges:
+                exchange.bounds = (-1000, 1000)
             blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
             assert len(blocked_mets) == 0, \
                 "The biomass precursors of {} cannot be produced in the " \
