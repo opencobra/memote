@@ -22,9 +22,9 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 from __future__ import absolute_import
 
 import cobra
-from cobra.exceptions import Infeasible
 import pytest
 import numpy as np
+from optlang.interface import OPTIMAL
 
 import memote.support.helpers as helpers
 import memote.support.biomass as biomass
@@ -99,20 +99,18 @@ def model_builder(name):
         met_c1 = cobra.Metabolite("rna_e")
         # Reactions
         rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
-        rxn.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1})
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
         rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
         rxn1.add_metabolites({met_a: 1, met_a1: -1})
         rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
         rxn2.add_metabolites({met_b: 1, met_b1: -1})
         rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
         rxn3.add_metabolites({met_c: 1, met_c1: -1})
-        rxn4 = cobra.Reaction("EX_met_a1", lower_bound=-1000, upper_bound=1000)
-        rxn4.add_metabolites({met_a1: -1})
-        rxn5 = cobra.Reaction("EX_met_b1", lower_bound=-1000, upper_bound=1000)
-        rxn5.add_metabolites({met_b1: -1})
-        rxn6 = cobra.Reaction("EX_met_c1", lower_bound=-1000, upper_bound=1000)
-        rxn6.add_metabolites({met_c1: -1})
-        model.add_reactions([rxn, rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1)
+        rxn5 = model.add_boundary(met_b1)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
         return model
     if name == "precursors_blocked":
         met_a = cobra.Metabolite("lipid_c")
@@ -123,20 +121,18 @@ def model_builder(name):
         met_c1 = cobra.Metabolite("rna_e")
         # Reactions
         rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
-        rxn.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1})
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
         rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
         rxn1.add_metabolites({met_a: 1, met_a1: -1})
         rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
         rxn2.add_metabolites({met_b: 1, met_b1: -1})
         rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=0)
         rxn3.add_metabolites({met_c: 1, met_c1: -1})
-        rxn4 = cobra.Reaction("EX_met_a1", lower_bound=-1000, upper_bound=1000)
-        rxn4.add_metabolites({met_a1: -1})
-        rxn5 = cobra.Reaction("EX_met_b1", lower_bound=-1000, upper_bound=1000)
-        rxn5.add_metabolites({met_b1: -1})
-        rxn6 = cobra.Reaction("EX_met_c1", lower_bound=-1000, upper_bound=1000)
-        rxn6.add_metabolites({met_c1: -1})
-        model.add_reactions([rxn, rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1)
+        rxn5 = model.add_boundary(met_b1)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
         return model
     if name == "precursors_not_in_medium":
         met_a = cobra.Metabolite("lipid_c")
@@ -147,28 +143,26 @@ def model_builder(name):
         met_c1 = cobra.Metabolite("rna_e")
         # Reactions
         rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
-        rxn.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1})
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
         rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
         rxn1.add_metabolites({met_a: 1, met_a1: -1})
         rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
         rxn2.add_metabolites({met_b: 1, met_b1: -1})
         rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
         rxn3.add_metabolites({met_c: 1, met_c1: -1})
-        rxn4 = cobra.Reaction("EX_met_a1", lower_bound=0, upper_bound=1000)
-        rxn4.add_metabolites({met_a1: -1})
-        rxn5 = cobra.Reaction("EX_met_b1", lower_bound=0, upper_bound=1000)
-        rxn5.add_metabolites({met_b1: -1})
-        rxn6 = cobra.Reaction("EX_met_c1", lower_bound=-1000, upper_bound=1000)
-        rxn6.add_metabolites({met_c1: -1})
-        model.add_reactions([rxn, rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1, ub=0)
+        rxn5 = model.add_boundary(met_b1, ub=0)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
         return model
 
 
-@pytest.mark.parametrize("model, boolean", [
+@pytest.mark.parametrize("model, expected", [
     ("sum_within_deviation", True),
     ("sum_outside_of_deviation", False),
 ], indirect=["model"])
-def test_biomass_weight_production(model, boolean):
+def test_biomass_weight_production(model, expected):
     """
     Expect that the sum of total mass of all biomass components equals 1.
 
@@ -177,31 +171,22 @@ def test_biomass_weight_production(model, boolean):
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         control_sum = biomass.sum_biomass_weight(rxn)
-        assert np.isclose(1, control_sum, atol=1e-03) is boolean
+        assert np.isclose(1, control_sum, atol=1e-03) is expected
 
 
-@pytest.mark.parametrize("model, boolean", [
-    ("precursors_producing", True),
-    ("precursors_not_in_medium", False)
+@pytest.mark.parametrize("model, expected", [
+    ("precursors_producing", 200.0),
+    ("precursors_not_in_medium", 0.0)
 ], indirect=["model"])
-def test_biomass_production(model, boolean):
+def test_biomass_production(model, expected):
     """
     Expect that biomass can be produced when optimizing the model.
 
     This is without changing the model's default state.
     """
-    biomass_rxns = helpers.find_biomass_reaction(model)
-    for rxn in biomass_rxns:
-        model.objective = rxn
-        try:
-            solution = model.optimize()
-            if abs(solution.f) != 0:
-                status = True
-            else:
-                status = False
-        except Infeasible:
-            status = False
-        assert status is boolean
+    solution = model.optimize()
+    assert solution.status == OPTIMAL
+    assert solution.objective_value == expected
 
 
 @pytest.mark.parametrize("model, num", [
@@ -209,7 +194,7 @@ def test_biomass_production(model, boolean):
     ("precursors_not_in_medium", 2),
     ("precursors_blocked", 1)
 ], indirect=["model"])
-def test_production_biomass_precursors_dflt(model, num):
+def test_production_biomass_precursors_default(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
 
@@ -226,7 +211,7 @@ def test_production_biomass_precursors_dflt(model, num):
     ("precursors_not_in_medium", 0),
     ("precursors_blocked", 1)
 ], indirect=["model"])
-def test_production_biomass_precursors_xchngs(model, num):
+def test_production_biomass_precursors_exchange(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
 
