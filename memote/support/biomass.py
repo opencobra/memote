@@ -69,7 +69,7 @@ def find_blocked_biomass_precursors(reaction, model):
     model : cobra.Model
         The metabolic model under investigation.
     """
-    LOGGER.debug("Testing blocked biomass precursors")
+    LOGGER.debug("Finding blocked biomass precursors")
     precursors = find_biomass_precursors(reaction)
     blocked_precursors = list()
     for precursor in precursors:
@@ -78,9 +78,9 @@ def find_blocked_biomass_precursors(reaction, model):
             model.objective = dm_rxn
             try:
                 solution = model.optimize()
-                LOGGER.debug("%s: flux value %g and solver status %s",
-                             str(precursor), solution.objective_value,
-                             solution.status)
+                LOGGER.debug(
+                    "%s: demand flux is '%g' and solver status is '%s'",
+                    str(precursor), solution.objective_value, solution.status)
                 if solution.objective_value <= 0.0:
                     blocked_precursors.append(precursor)
             except Infeasible:
