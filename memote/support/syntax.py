@@ -24,8 +24,7 @@ import re
 from builtins import dict
 
 from memote.support.helpers import (
-    find_atp_adp_converting_reactions, find_demand_and_exchange_reactions,
-    find_transport_reactions)
+    find_atp_adp_converting_reactions, find_transport_reactions)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,8 +62,8 @@ def find_rxn_id_compartment_suffix(model, suffix):
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
     """
-    transport_rxns = find_transport_reactions(model)
-    exchange_demand_rxns = find_demand_and_exchange_reactions(model)
+    transport_rxns = set(find_transport_reactions(model))
+    exchange_demand_rxns = set(model.exchanges)
 
     comp_pattern = re.compile(
         "[A-Z0-9]+\w*?{}\w*?".format(SUFFIX_MAP[suffix])
@@ -102,8 +101,8 @@ def find_rxn_id_suffix_compartment(model, suffix):
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
     """
-    transport_rxns = find_transport_reactions(model)
-    exchange_demand_rxns = find_demand_and_exchange_reactions(model)
+    transport_rxns = set(find_transport_reactions(model))
+    exchange_demand_rxns = set(model.exchanges)
 
     comp_pattern = re.compile(
         "[A-Z0-9]+\w*?{}\w*?".format(SUFFIX_MAP[suffix])
@@ -226,7 +225,7 @@ def find_untagged_demand_rxns(model):
     a high-quality genome-scale metabolic reconstruction. Nature protocols.
     Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
     """
-    demand_and_exchange_rxns = find_demand_and_exchange_reactions(model)
+    demand_and_exchange_rxns = set(model.exchanges)
     demand_rxns = [rxn for rxn in demand_and_exchange_rxns
                    if not rxn.reversibility and
                    rxn.get_compartments() not in ['e']]
@@ -262,7 +261,7 @@ def find_untagged_exchange_rxns(model):
     a high-quality genome-scale metabolic reconstruction. Nature protocols.
     Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
     """
-    demand_and_exchange_rxns = find_demand_and_exchange_reactions(model)
+    demand_and_exchange_rxns = set(model.exchanges)
     exchange_rxns = [rxn for rxn in demand_and_exchange_rxns
                      if rxn.get_compartments() == ['e']]
 

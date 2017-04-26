@@ -24,9 +24,10 @@ from __future__ import absolute_import
 import cobra
 import pytest
 import numpy as np
+from optlang.interface import OPTIMAL
 
 import memote.support.helpers as helpers
-from memote.support.biomass import sum_biomass_weight
+import memote.support.biomass as biomass
 
 
 def model_builder(name):
@@ -89,13 +90,79 @@ def model_builder(name):
                                })
         model.add_reactions([rxn_1])
         return model
+    if name == "precursors_producing":
+        met_a = cobra.Metabolite("lipid_c")
+        met_b = cobra.Metabolite("protein_c")
+        met_c = cobra.Metabolite("rna_c")
+        met_a1 = cobra.Metabolite("lipid_e")
+        met_b1 = cobra.Metabolite("protein_e")
+        met_c1 = cobra.Metabolite("rna_e")
+        # Reactions
+        rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+        rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+        rxn1.add_metabolites({met_a: 1, met_a1: -1})
+        rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_b: 1, met_b1: -1})
+        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+        rxn3.add_metabolites({met_c: 1, met_c1: -1})
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1)
+        rxn5 = model.add_boundary(met_b1)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
+        return model
+    if name == "precursors_blocked":
+        met_a = cobra.Metabolite("lipid_c")
+        met_b = cobra.Metabolite("protein_c")
+        met_c = cobra.Metabolite("rna_c")
+        met_a1 = cobra.Metabolite("lipid_e")
+        met_b1 = cobra.Metabolite("protein_e")
+        met_c1 = cobra.Metabolite("rna_e")
+        # Reactions
+        rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+        rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+        rxn1.add_metabolites({met_a: 1, met_a1: -1})
+        rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_b: 1, met_b1: -1})
+        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=0)
+        rxn3.add_metabolites({met_c: 1, met_c1: -1})
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1)
+        rxn5 = model.add_boundary(met_b1)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
+        return model
+    if name == "precursors_not_in_medium":
+        met_a = cobra.Metabolite("lipid_c")
+        met_b = cobra.Metabolite("protein_c")
+        met_c = cobra.Metabolite("rna_c")
+        met_a1 = cobra.Metabolite("lipid_e")
+        met_b1 = cobra.Metabolite("protein_e")
+        met_c1 = cobra.Metabolite("rna_e")
+        # Reactions
+        rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+        rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+        rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+        rxn1.add_metabolites({met_a: 1, met_a1: -1})
+        rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+        rxn2.add_metabolites({met_b: 1, met_b1: -1})
+        rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+        rxn3.add_metabolites({met_c: 1, met_c1: -1})
+        model.add_reactions([rxn, rxn1, rxn2, rxn3])
+        rxn4 = model.add_boundary(met_a1, ub=0)
+        rxn5 = model.add_boundary(met_b1, ub=0)
+        rxn6 = model.add_boundary(met_c1)
+        model.objective = rxn
+        return model
 
 
-@pytest.mark.parametrize("model, boolean", [
+@pytest.mark.parametrize("model, expected", [
     ("sum_within_deviation", True),
     ("sum_outside_of_deviation", False),
 ], indirect=["model"])
-def test_biomass_weight_production(model, boolean):
+def test_biomass_weight_production(model, expected):
     """
     Expect that the sum of total mass of all biomass components equals 1.
 
@@ -103,5 +170,56 @@ def test_biomass_weight_production(model, boolean):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        control_sum = sum_biomass_weight(rxn)
-        assert np.isclose(1, control_sum, atol=1e-03) is boolean
+        control_sum = biomass.sum_biomass_weight(rxn)
+        assert np.isclose(1, control_sum, atol=1e-03) is expected
+
+
+@pytest.mark.parametrize("model, expected", [
+    ("precursors_producing", 200.0),
+    ("precursors_not_in_medium", 0.0)
+], indirect=["model"])
+def test_biomass_production(model, expected):
+    """
+    Expect that biomass can be produced when optimizing the model.
+
+    This is without changing the model's default state.
+    """
+    solution = model.optimize()
+    assert solution.status == OPTIMAL
+    assert solution.objective_value == expected
+
+
+@pytest.mark.parametrize("model, num", [
+    ("precursors_producing", 0),
+    ("precursors_not_in_medium", 2),
+    ("precursors_blocked", 1)
+], indirect=["model"])
+def test_production_biomass_precursors_default(model, num):
+    """
+    Expect that there are no biomass precursors that cannot be produced.
+
+    This is without changing the model's default state.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+        assert len(blocked_mets) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("precursors_producing", 0),
+    ("precursors_not_in_medium", 0),
+    ("precursors_blocked", 1)
+], indirect=["model"])
+def test_production_biomass_precursors_exchange(model, num):
+    """
+    Expect that there are no biomass precursors that cannot be produced.
+
+    This is after opening the model's exchange reactions.
+    """
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        for exchange in model.exchanges:
+            exchange.bounds = (-1000, 1000)
+        blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
+        assert len(blocked_mets) == num
