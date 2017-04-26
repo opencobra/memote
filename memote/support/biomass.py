@@ -22,65 +22,66 @@ from __future__ import absolute_import
 import logging
 
 from six import iteritems
-from cobra import Reaction
 from cobra.exceptions import Infeasible
 
 __all__ = (
-    "sum_biomass_weight", "find_biomass_rxn_precursors",
+    "sum_biomass_weight", "find_biomass_precursors",
     "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
 
 
-def sum_biomass_weight(rxn):
+def sum_biomass_weight(reaction):
     """
     Compute the sum of all reaction compounds.
 
     Parameters
     ----------
-    rxn : cobra.core.reaction.Reaction
+    reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
     """
     return sum(-coef * met.formula_weight
-               for (met, coef) in iteritems(rxn.metabolites)) / 1000.0
+               for (met, coef) in iteritems(reaction.metabolites)) / 1000.0
 
 
-def find_biomass_rxn_precursors(rxn):
+def find_biomass_precursors(reaction):
     """
-    Return a list of all biomass precursors excluding atp and h2o.
+    Return a list of all biomass precursors excluding ATP and H2O.
 
     Parameters
     ----------
-    rxn : cobra.core.reaction.Reaction
+    reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
     """
-    return [met for met in rxn.reactants
+    return [met for met in reaction.reactants
             if met.id != 'atp_c' or met.id != 'h2o_c']
 
 
-def find_blocked_biomass_precursors(rxn, model):
+def find_blocked_biomass_precursors(reaction, model):
     """
     Return a list of all biomass precursors that cannot be produced.
 
     Parameters
     ----------
-    rxn : cobra.core.reaction.Reaction
+    reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
 
     model : cobra.Model
         The metabolic model under investigation.
     """
-    precursors = find_biomass_rxn_precursors(rxn)
-    blocked_precursors = []
+    LOGGER.debug("Testing blocked biomass precursors")
+    precursors = find_biomass_precursors(reaction)
+    blocked_precursors = list()
     for precursor in precursors:
         with model:
-            dm_rxn = Reaction(id='TestDM_{}'.format(precursor.id))
-            dm_rxn.add_metabolites({precursor: -1})
-            model.add_reaction(dm_rxn)
+            dm_rxn = model.add_boundary(precursor, type="demand")
             model.objective = dm_rxn
             try:
                 solution = model.optimize()
-                if solution.objective_value == 0:
+                LOGGER.debug("%s: flux value %g and solver status %s",
+                             str(precursor), solution.objective_value,
+                             solution.status)
+                if solution.objective_value <= 0.0:
                     blocked_precursors.append(precursor)
             except Infeasible:
                 blocked_precursors.append(precursor)
