@@ -189,3 +189,13 @@ def test_unbalanced_reactions(model, num):
     """Expect all reactions to be mass and charge balanced."""
     list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
     assert len(list_of_unbalanced_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("produces_atp", 0),
+    ("no_atp", 2),
+], indirect=["model"])
+def test_blocked_reactions(model, num):
+    """Expect all reactions to be able to carry flux."""
+    dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
+    assert len(dict_of_blocked_rxns) == num

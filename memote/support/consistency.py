@@ -24,6 +24,7 @@ from operator import attrgetter
 
 import numpy as np
 from cobra.exceptions import Infeasible
+from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.helpers as helpers
 import memote.support.consistency_helpers as con_helpers
@@ -274,3 +275,25 @@ def find_unbalanced_reactions(model):
     total_rxns = set(model.reactions)
     metab_rxns = total_rxns - (exchanges | biomass)
     return [rxn for rxn in metab_rxns if len(rxn.check_mass_balance()) > 0]
+
+
+def find_blocked_reactions(model):
+    """
+    Find metabolic reactions that are blocked.
+
+    Blocked reactions are those reactions that when optimized for cannot carry
+    any flux while all exchanges are open.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    """
+    with model:
+        for rxn in model.exchanges:
+            rxn.bounds = (-1000, 1000)
+        fva_result = flux_variability_analysis(model)
+
+    blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
+                             (fva_result["minimum"] == 0.0)]
+    return [model.reactions.get_by_id(name) for name in blocked.index]
