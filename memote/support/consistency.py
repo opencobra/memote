@@ -290,15 +290,10 @@ def find_blocked_reactions(model):
         The metabolic model under investigation.
     """
     with model:
-        for rxn in helpers.find_demand_and_exchange_reactions(model):
+        for rxn in model.exchanges:
             rxn.bounds = (-1000, 1000)
+        fva_result = flux_variability_analysis(model)
 
-        fva_result = flux_variability_analysis(model, reactions=model.reactions)
-
-        result = fva_result.to_dict('index')
-
-        blocked = {}
-        for key in result:
-            if result[key]['maximum'] == 0 and result[key]['minimum'] == 0:
-                blocked.update({key: result[key]})
-        return blocked
+    blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
+                             (fva_result["minimum"] == 0.0)]
+    return [model.reactions.get_by_id(name) for name in blocked.index]
