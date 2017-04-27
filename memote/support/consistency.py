@@ -60,7 +60,8 @@ def check_stoichiometric_consistency(model):
     for metabolite in metabolites:
         stoich_trans.add(Variable(metabolite.id, lb=1))
     stoich_trans.update()
-    con_helpers.add_reaction_constraints(stoich_trans, internal_rxns, Constraint)
+    con_helpers.add_reaction_constraints(
+        stoich_trans, internal_rxns, Constraint)
     # The objective is to minimize the metabolite mass vector.
     stoich_trans.objective = Objective(1)
     stoich_trans.objective.set_linear_coefficients(
@@ -161,8 +162,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
-    stoich, met_index, rxn_index = con_helpers.stoichiometry_matrix(metabolites,
-                                                                reactions)
+    stoich, met_index, rxn_index = con_helpers.stoichiometry_matrix(
+        metabolites, reactions)
     left_ns = con_helpers.nullspace(stoich.T)
     # deal with numerical instabilities
     left_ns[np.abs(left_ns) < atol] = 0.0
@@ -194,8 +195,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
             inc_minimal.add(tuple(solution))
             if len(solution) == 1:
                 break
-            cuts.append(con_helpers.add_cut(problem, indicators, len(solution) - 1,
-                                        Constraint))
+            cuts.append(con_helpers.add_cut(
+                problem, indicators, len(solution) - 1, Constraint))
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
         # reset
