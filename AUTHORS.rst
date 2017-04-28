@@ -5,10 +5,10 @@ Credits
 Development Lead
 ----------------
 
-* Moritz E. Beber <morbeb@biosustain.dtu.dk>
+* `Moritz E. Beber <morbeb@biosustain.dtu.dk>`_
 
 Contributors
 ------------
 
-* Christian Lieven <clie@biosustain.dtu.dk>
-* Nikolaus Sonnenschein <niso@biosustain.dtu.dk>
+* `Christian Lieven <clie@biosustain.dtu.dk>`_
+* `Nikolaus Sonnenschein <niso@biosustain.dtu.dk>`_
