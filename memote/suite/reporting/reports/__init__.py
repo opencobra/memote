@@ -15,6 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subpackage for gathering information and creating reports."""
+"""
+Subpackage for creating visually pleasing reports of test results.
+
+There are three types of reports that we support:
+
+1. A one-time report of a model giving a good insight into its current state.
+2. A more elaborate report that makes use of the model development over time
+   (aka git history).
+3. A comparison report between two different versions of the same model or
+   across different models (similar to a diff).
+"""
 
 from __future__ import absolute_import
+
+from memote.suite.reporting.reports.basic import BasicReport
+from memote.suite.reporting.reports.history import HistoryReport
+from memote.suite.reporting.reports.diff import DiffReport

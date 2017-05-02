@@ -24,43 +24,21 @@ from os.path import join
 from builtins import dict
 from uuid import uuid4
 
-from jinja2 import Environment, PackageLoader, select_autoescape
-
+from memote.suite.reporting.reports.report import Report
 import memote.suite.reporting.plot as plt
 from memote.suite.reporting.bag import ResultBagWrapper
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Report(object):
-    """Render a basic report from the given data."""
-
-    def __init__(self, data=None, **kwargs):
-        """Initialize the Jinja2 environment and data."""
-        super(Report, self).__init__(**kwargs)
-        self.env = Environment(
-            loader=PackageLoader("memote.suite.reporting", "templates"),
-            autoescape=select_autoescape(["html", "xml"])
-        )
-        self.data = data
-
-    def render_html(self):
-        """Render a one-shot report for a model."""
-        template = self.env.get_template("basic.html")
-        return template.render(
-            name=self.data["report"]["test_basic"]["model_id"],
-            timestamp=self.data["meta"]["timestamp"],
-            data=self.data)
-
-
-class GitEnabledReport(Report):
+class HistoryReport(Report):
     """Render a rich report using the git repository history."""
 
     _valid_indexes = frozenset(["time", "hash"])
 
     def __init__(self, repo, directory, index="time", **kwargs):
         """
-        Initialize the Jinja2 environment and data.
+        Initialize the git interaction and dask bag.
 
         Paramters
         ---------
@@ -72,7 +50,7 @@ class GitEnabledReport(Report):
             Whether to use time (the default) or commit hashes as the default
             axis in plots.
         """
-        super(GitEnabledReport, self).__init__(**kwargs)
+        super(HistoryReport, self).__init__(**kwargs)
         self.index_dim = index.lower()
         if self.index_dim not in self._valid_indexes:
             raise ValueError(

@@ -15,6 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subpackage for gathering information and creating reports."""
+"""Render a basic one-time report."""
 
 from __future__ import absolute_import
+
+from memote.suite.reporting.reports.report import Report
+
+
+class BasicReport(Report):
+    """Render a basic report from the given data."""
+
+    def __init__(self, data, **kwargs):
+        """Initialize the data."""
+        super(BasicReport, self).__init__(**kwargs)
+        self.data = data
+
+    def render_html(self):
+        """Render a one-shot report for a model."""
+        template = self.env.get_template("basic.html")
+        return template.render(
+            name=self.data["report"]["test_basic"]["model_id"],
+            timestamp=self.data["meta"]["timestamp"],
+            data=self.data)

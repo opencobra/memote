@@ -15,6 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Subpackage for gathering information and creating reports."""
+"""Compare two models with one another."""
 
 from __future__ import absolute_import
+
+from memote.suite.reporting.reports.report import Report
+
+
+class DiffReport(Report):
+    """Render a report from the comparison of two models."""
+
+    def __init__(self, **kwargs):
+        """Initialize the data."""
+        super(DiffReport, self).__init__(**kwargs)
+
+    def render_html(self):
+        """Render an HTML report for a model."""
+        raise NotImplementedError(u"Coming soon™.")
