@@ -61,7 +61,7 @@ class ResultBagWrapper(object):
         objects = list()
         for filename in files:
             if not exists(filename):
-                LOGGER.warn(
+                LOGGER.warning(
                     Fore.YELLOW +
                     "Expected file %s is missing."
                     + Fore.RESET, filename)  # noqa: W503

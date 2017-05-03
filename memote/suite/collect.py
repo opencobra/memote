@@ -37,7 +37,7 @@ with warnings.catch_warnings():
     # ignore Gurobi warning
     from cobra.io import read_sbml_model
 
-from memote.suite.reporting.report import Report
+from memote.suite.reporting.reports import Report
 
 LOGGER = logging.getLogger(__name__)
 

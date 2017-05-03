@@ -29,6 +29,7 @@ There are three types of reports that we support:
 
 from __future__ import absolute_import
 
-from memote.suite.reporting.reports.basic import BasicReport
-from memote.suite.reporting.reports.history import HistoryReport
-from memote.suite.reporting.reports.diff import DiffReport
+from memote.suite.reporting.reports.report import Report
+from memote.suite.reporting.reports.basic_report import BasicReport
+from memote.suite.reporting.reports.history_report import HistoryReport
+from memote.suite.reporting.reports.diff_report import DiffReport

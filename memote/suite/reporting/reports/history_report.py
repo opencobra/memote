@@ -72,7 +72,7 @@ class HistoryReport(Report):
 
     def render_html(self):
         """Render a rich report for the repository."""
-        template = self.env.get_template("git_enabled.html")
+        template = self.env.get_template("history_report.html")
         names = self.bag.get_model_ids()
         (basic_specs, basic_uuids) = self._collect_basic_specs()
         return template.render(

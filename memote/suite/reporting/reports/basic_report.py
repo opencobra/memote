@@ -32,7 +32,7 @@ class BasicReport(Report):
 
     def render_html(self):
         """Render a one-shot report for a model."""
-        template = self.env.get_template("basic.html")
+        template = self.env.get_template("basic_report.html")
         return template.render(
             name=self.data["report"]["test_basic"]["model_id"],
             timestamp=self.data["meta"]["timestamp"],
