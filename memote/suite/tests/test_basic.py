@@ -19,7 +19,11 @@
 
 from __future__ import absolute_import
 
+import logging
+
 from memote.support.basic import check_metabolites_formula_presence
+
+LOGGER = logging.getLogger(__name__)
 
 
 def test_model_id_presence(model, store):

@@ -50,6 +50,7 @@ requirements = [
     "jinja2-ospath",
     "altair",
     "cookiecutter",
+    "python-libsbml",
     "cobra>=0.6.0a7"
 ]
 

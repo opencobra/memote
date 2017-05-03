@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import io
 import sys
+import logging
 try:
     import simplejson as json
 except ImportError:
@@ -37,6 +38,8 @@ with warnings.catch_warnings():
     from cobra.io import read_sbml_model
 
 from memote.suite.reporting.report import Report
+
+LOGGER = logging.getLogger(__name__)
 
 
 class DummyDict(object):
@@ -106,6 +109,7 @@ class ResultCollectionPlugin(object):
     @pytest.fixture(scope="module")
     def store(self, request):
         """Expose a `dict` to store values on."""
+        LOGGER.debug("requested in '%s'", request.module.__name__)
         if self.mode in ("collect", "git-collect", "html"):
             self._data[request.module.__name__] = store = dict()
         else:

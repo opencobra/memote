@@ -4,9 +4,10 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
-recursive-include memote *.py *.html
+recursive-include memote *.py
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
+recursive-include memote/suite/reporting/templates *
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif

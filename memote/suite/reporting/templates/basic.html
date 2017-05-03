@@ -3,8 +3,8 @@
 {% from '_consistency_helpers.html' import render_consistency %}
 
 {% block header -%}
-super()
-<h2>{{ timestamp }}</h2>
+{{ super() }}
+<h2 class="mdc-typography--display2">{{ timestamp }}</h2>
 {%- endblock %}
 
 {% block content -%}

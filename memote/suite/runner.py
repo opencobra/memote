@@ -25,6 +25,7 @@ import os
 import io
 import shlex
 import sys
+import logging
 from os.path import join, dirname
 
 import click
@@ -41,6 +42,7 @@ from memote.suite.reporting.report import GitEnabledReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
+logging.basicConfig(level="DEBUG", format="%(levelname)s - %(message)s")
 
 
 class ConfigSectionSchema(object):

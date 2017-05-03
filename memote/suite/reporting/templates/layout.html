@@ -1,11 +1,13 @@
 <!doctype html>
-<html lang="en-US">
+<html lang="en-US" class="mdc-typography">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         {% block title %}<title>{{ name }} Model Report</title>{% endblock %}
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet"
+              href="node_modules/material-components-web/dist/material-components-web.css">
         {% block topscript %}{% endblock %}
     </head>
     <body>
@@ -14,10 +16,12 @@
         <![endif]-->
 
         {% block header -%}
-        <h1>{{ name }} Model Report</h1>
+        <h1 class="mdc-typography--display1">{{ name }} Model Report</h1>
         {%- endblock %}
 
         <div id="content">{% block content %}{% endblock %}</div>
 
+        <script src="node_modules/material-components-web/dist/material-components-web.js"></script>
+        <script>mdc.autoInit()</script>
     </body>
 </html>

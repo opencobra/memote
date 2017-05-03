@@ -63,3 +63,6 @@ target/
 .ipynb_checkpoints/
 
 .idea
+
+memote/suite/reporting/templates/node_modules/
+memote/suite/reporting/templates/.nvmrc
