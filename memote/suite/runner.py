@@ -277,7 +277,7 @@ def report(ctx, one_time, index):
     check_directory(ctx)
     check_repo(ctx)
     report = HistoryReport(ctx.obj["repo"], ctx.obj["directory"],
-                              index=index)
+                           index=index)
     click.echo(u"Writing report '{}'".format(ctx.obj["filename"]))
     with io.open(ctx.obj["filename"], "w") as file_h:
         file_h.write(report.render_html())

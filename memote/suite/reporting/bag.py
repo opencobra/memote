@@ -35,13 +35,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ResultBagWrapper(object):
-    """
-    Report-specific wrapper around a `dask.bag`.
-
-    Attributes
-    ----------
-
-    """
+    """Report-specific wrapper around a `dask.bag`."""
 
     def __init__(self, files, **kwargs):
         """
