@@ -21,8 +21,8 @@ from __future__ import absolute_import
 
 import logging
 
-import plotly.offline as pyoff
-import plotly.graph_objects as go
+import plotly.offline as py
+import plotly.graph_objs as go
 from jinja2 import Markup
 
 LOGGER = logging.getLogger(__name__)
@@ -34,4 +34,4 @@ def scatter_line_chart(df, y_axis, y_title, x_axis="x", x_title="Timestamp"):
         "data": go.Scatter(),
         "layout": {}
     }
-    return Markup(pyoff.iplot())
+    return Markup(py.iplot())
