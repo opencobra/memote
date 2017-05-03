@@ -15,7 +15,8 @@ Contents:
    installation
    usage
    contributing
-   authorshistory
+   authors
+   history
 
 Indices and tables
 ==================

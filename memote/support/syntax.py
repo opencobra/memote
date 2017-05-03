@@ -61,6 +61,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
         Non-transport reactions that have at least one metabolite in the
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
+
     """
     transport_rxns = set(find_transport_reactions(model))
     exchange_demand_rxns = set(model.exchanges)
@@ -100,6 +101,7 @@ def find_rxn_id_suffix_compartment(model, suffix):
         Non-transport reactions that have at least one metabolite in the
         compartment given by `suffix` but whose IDs do not have
         the `suffix` appended.
+
     """
     transport_rxns = set(find_transport_reactions(model))
     exchange_demand_rxns = set(model.exchanges)
@@ -137,6 +139,7 @@ def find_reaction_tag_transporter(model):
     ----------
     model : cobra.Model
             A cobrapy metabolic model
+
     """
     transport_rxns = find_transport_reactions(model)
     atp_adp_rxns = find_atp_adp_converting_reactions(model)
@@ -166,6 +169,7 @@ def find_abc_tag_transporter(model):
     ----------
     model : cobra.Model
             A cobrapy metabolic model
+
     """
     transport_rxns = find_transport_reactions(model)
     atp_adp_rxns = find_atp_adp_converting_reactions(model)
@@ -191,6 +195,7 @@ def find_upper_case_mets(model):
     ----------
     model : cobra.Model
             A cobrapy metabolic model
+
     """
     comp_pattern = "^([a-z0-9]|Z|E|L|D|ACP|S|R)+_\w+"
     return [met for met in model.metabolites
@@ -224,6 +229,7 @@ def find_untagged_demand_rxns(model):
     [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
     a high-quality genome-scale metabolic reconstruction. Nature protocols.
     Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+
     """
     demand_and_exchange_rxns = set(model.exchanges)
     demand_rxns = [rxn for rxn in demand_and_exchange_rxns
@@ -260,6 +266,7 @@ def find_untagged_exchange_rxns(model):
     [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
     a high-quality genome-scale metabolic reconstruction. Nature protocols.
     Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+
     """
     demand_and_exchange_rxns = set(model.exchanges)
     exchange_rxns = [rxn for rxn in demand_and_exchange_rxns

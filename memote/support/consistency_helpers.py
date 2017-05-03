@@ -47,6 +47,7 @@ def add_reaction_constraints(model, reactions, Constraint):
         Container of `cobra.Reaction` instances.
     Constraint : optlang.Constraint
         The constraint class for the specific interface.
+
     """
     for rxn in reactions:
         expression = sympy.Add(
@@ -78,6 +79,7 @@ def stoichiometry_matrix(metabolites, reactions):
         A dictionary mapping metabolites to row indexes.
     dict
         A dictionary mapping reactions to column indexes.
+
     """
     matrix = np.zeros((len(metabolites), len(reactions)))
     met_index = dict((met, i) for i, met in enumerate(metabolites))
@@ -98,6 +100,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
     -----
     Adapted from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
+
     """
     matrix = np.atleast_2d(matrix)
     _, s, vh = svd(matrix)
@@ -113,6 +116,7 @@ def get_interface(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     return (
         model.solver.interface.Model,
@@ -133,6 +137,7 @@ def get_internals(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     internal_rxns = set(model.reactions) - set(model.exchanges)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
@@ -169,6 +174,7 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     assert len(metabolites) == kernel.shape[0],\
         "metabolite vector and first nullspace dimension must be equal"
@@ -223,6 +229,7 @@ def add_cut(problem, indicators, bound, Constraint):
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     cut = Constraint(sympy.Add(*indicators), ub=bound)
     problem.add(cut)
