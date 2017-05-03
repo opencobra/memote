@@ -15,30 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Templates for plotly figures."""
+"""Render a basic one-time report."""
 
 from __future__ import absolute_import
 
-import logging
-
-import plotly.offline as py
-import plotly.graph_objs as go
-from jinja2 import Markup
-
-LOGGER = logging.getLogger(__name__)
-_DEFAULT_ARGS = {
-    "output_type": "div",
-    "include_plotlyjs": False,
-    "show_link": False,
-    "link_text": ""
-}
+from memote.suite.reporting.reports.report import Report
 
 
-def scatter_line_chart(df, y_axis, y_title, x_axis="x",
-                       x_title="Timestamp", label=None):
-    """Generate a reproducible plotly scatter and line plot."""
-    figure = {
-        "data": [go.Scatter(x=df[x_axis], y=df[y_axis], name=label)],
-        "layout": {}
-    }
-    return Markup(py.plot(figure, **_DEFAULT_ARGS))
+class BasicReport(Report):
+    """Render a basic report from the given data."""
+
+    def __init__(self, data, **kwargs):
+        """Initialize the data."""
+        super(BasicReport, self).__init__(**kwargs)
+        self.data = data
+
+    def render_html(self):
+        """Render a one-shot report for a model."""
+        template = self.env.get_template("basic_report.html")
+        return template.render(
+            name=self.data["report"]["test_basic"]["model_id"],
+            timestamp=self.data["meta"]["timestamp"],
+            data=self.data)

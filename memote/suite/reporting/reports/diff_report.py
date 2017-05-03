@@ -15,30 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Templates for plotly figures."""
+"""Compare two models with one another."""
 
 from __future__ import absolute_import
 
-import logging
-
-import plotly.offline as py
-import plotly.graph_objs as go
-from jinja2 import Markup
-
-LOGGER = logging.getLogger(__name__)
-_DEFAULT_ARGS = {
-    "output_type": "div",
-    "include_plotlyjs": False,
-    "show_link": False,
-    "link_text": ""
-}
+from memote.suite.reporting.reports.report import Report
 
 
-def scatter_line_chart(df, y_axis, y_title, x_axis="x",
-                       x_title="Timestamp", label=None):
-    """Generate a reproducible plotly scatter and line plot."""
-    figure = {
-        "data": [go.Scatter(x=df[x_axis], y=df[y_axis], name=label)],
-        "layout": {}
-    }
-    return Markup(py.plot(figure, **_DEFAULT_ARGS))
+class DiffReport(Report):
+    """Render a report from the comparison of two models."""
+
+    def __init__(self, **kwargs):
+        """Initialize the data."""
+        super(DiffReport, self).__init__(**kwargs)
+
+    def render_html(self):
+        """Render an HTML report for a model."""
+        raise NotImplementedError(u"Coming soon™.")

@@ -16,9 +16,20 @@
 # limitations under the License.
 
 """
-(Me)tabolic (Mo)del (Te)st Reporting.
+Subpackage for creating visually pleasing reports of test results.
 
-Generate a visually pleasing (HTML) report of the test suite results.
+There are three types of reports that we support:
+
+1. A one-time report of a model giving a good insight into its current state.
+2. A more elaborate report that makes use of the model development over time
+   (aka git history).
+3. A comparison report between two different versions of the same model or
+   across different models (similar to a diff).
 """
 
 from __future__ import absolute_import
+
+from memote.suite.reporting.reports.report import Report
+from memote.suite.reporting.reports.basic_report import BasicReport
+from memote.suite.reporting.reports.history_report import HistoryReport
+from memote.suite.reporting.reports.diff_report import DiffReport

@@ -35,16 +35,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ResultBagWrapper(object):
-    """
-    Report-specific wrapper around a `dask.bag`.
-
-    Attributes
-    ----------
-    axis_description : dict
-        Can be passed as keyword arguments to Altair plotting functions to
-        describe the x-axis.
-
-    """
+    """Report-specific wrapper around a `dask.bag`."""
 
     def __init__(self, files, **kwargs):
         """
@@ -64,7 +55,7 @@ class ResultBagWrapper(object):
         objects = list()
         for filename in files:
             if not exists(filename):
-                LOGGER.warn(
+                LOGGER.warning(
                     Fore.YELLOW +
                     "Expected file %s is missing."
                     + Fore.RESET, filename)  # noqa: W503
@@ -73,7 +64,6 @@ class ResultBagWrapper(object):
                 objects.append(json.load(file_h))
         self._bag = db.from_sequence(objects)
         self._index = None
-        self.axis_description = None
 
     def build_index(self, dimension):
         """Build a data index either from timestamps or commit hashes."""
@@ -86,13 +76,14 @@ class ResultBagWrapper(object):
 
     def _build_time_index(self):
         """Build an index from timestamps."""
+        LOGGER.debug("Building index based on timestamps.")
         self._index = pd.Series(
             list(self._bag.pluck("meta", dict()).pluck("timestamp")),
             dtype="datetime64[ns]")
-        self.axis_description = dict(x_axis="x:T", x_title="Timestamp")
 
     def _build_commit_index(self):
         """Build an index from commit hashes."""
+        LOGGER.debug("Building index based on commit hashes.")
         series = pd.Series(
             list(self._bag.pluck("meta", dict()).pluck("commit_hash")),
             dtype="str")
@@ -101,8 +92,8 @@ class ResultBagWrapper(object):
         while len(res.unique()) < len(series):
             trunc += 1
             res = series.str[:trunc]
+        LOGGER.debug("Hashes truncated to %d characters.", trunc)
         self._index = res
-        self.axis_description = dict(x_axis="x:O", x_title="Commit Hash")
 
     def get_model_ids(self):
         """Get unique model IDs. Should normally be of length one."""
@@ -111,6 +102,7 @@ class ResultBagWrapper(object):
 
     def get_basic_dataframe(self):
         """Collect results from `test_basic`."""
+        LOGGER.debug("Collecting basic information from bag.")
         columns = ["num_genes", "num_reactions", "num_metabolites"]
         data_types = ["int", "int", "int"]
         expected = pd.DataFrame({col: pd.Series(dtype=dt)
