@@ -38,7 +38,7 @@ def scatter_line_chart(df, y_axis, y_title, x_axis="x",
                        x_title="Timestamp", label=None):
     """Generate a reproducible plotly scatter and line plot."""
     figure = {
-        "data": go.Scatter(x=df[x_axis], y=df[y_axis], name=label),
+        "data": [go.Scatter(x=df[x_axis], y=df[y_axis], name=label)],
         "layout": {}
     }
     return Markup(py.plot(figure, **_DEFAULT_ARGS))

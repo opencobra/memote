@@ -38,7 +38,7 @@ from cookiecutter.main import cookiecutter
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.reporting.report import GitEnabledReport
+from memote.suite.reporting.reports import HistoryReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
@@ -276,7 +276,7 @@ def report(ctx, one_time, index):
         sys.exit(errno)
     check_directory(ctx)
     check_repo(ctx)
-    report = GitEnabledReport(ctx.obj["repo"], ctx.obj["directory"],
+    report = HistoryReport(ctx.obj["repo"], ctx.obj["directory"],
                               index=index)
     click.echo(u"Writing report '{}'".format(ctx.obj["filename"]))
     with io.open(ctx.obj["filename"], "w") as file_h:
