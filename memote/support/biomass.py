@@ -39,6 +39,7 @@ def sum_biomass_weight(reaction):
     ----------
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
+
     """
     return sum(-coef * met.formula_weight
                for (met, coef) in iteritems(reaction.metabolites)) / 1000.0
@@ -52,6 +53,7 @@ def find_biomass_precursors(reaction):
     ----------
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
+
     """
     return [met for met in reaction.reactants
             if met.id != 'atp_c' or met.id != 'h2o_c']
@@ -68,6 +70,7 @@ def find_blocked_biomass_precursors(reaction, model):
 
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     LOGGER.debug("Finding blocked biomass precursors")
     precursors = find_biomass_precursors(reaction)

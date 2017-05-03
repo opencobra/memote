@@ -49,10 +49,10 @@ def check_stoichiometric_consistency(model):
     -----
     See [1]_ section 3.1 for a complete description of the algorithm.
 
-
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
     # The transpose of the stoichiometric matrix N.T in the paper.
@@ -97,6 +97,7 @@ def find_unconserved_metabolites(model):
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
     stoich_trans = Model()
@@ -153,6 +154,7 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     if check_stoichiometric_consistency(model):
         return set()
@@ -227,6 +229,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
            Bioinformatics 24, no. 19 (2008): 2245.
+
     """
     raise NotImplementedError(
         "Coming soon™ if considered useful.")
@@ -240,6 +243,7 @@ def produce_atp_closed_xchngs(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     try:
         met = model.metabolites.get_by_id('atp_c')
@@ -269,6 +273,7 @@ def find_unbalanced_reactions(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     exchanges = set(model.exchanges)
     biomass = set(helpers.find_biomass_reaction(model))
@@ -288,6 +293,7 @@ def find_blocked_reactions(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     with model:
         for rxn in model.exchanges:

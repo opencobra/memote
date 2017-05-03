@@ -36,6 +36,7 @@ def test_biomass_consistency(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -56,6 +57,7 @@ def test_biomass_production(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -81,6 +83,7 @@ def test_production_biomass_precursors_default(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
@@ -101,6 +104,7 @@ def test_production_biomass_precursors_open(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:

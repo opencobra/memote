@@ -40,6 +40,7 @@ def find_transport_reactions(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     compartment_spanning_rxns = \
         [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
@@ -72,6 +73,7 @@ def find_atp_adp_converting_reactions(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     atp_all_comp_rxn_list = []
     for met in model.metabolites:
@@ -97,5 +99,6 @@ def find_biomass_reaction(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
     """
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]

@@ -43,6 +43,7 @@ class ResultBagWrapper(object):
     axis_description : dict
         Can be passed as keyword arguments to Altair plotting functions to
         describe the x-axis.
+
     """
 
     def __init__(self, files, **kwargs):
@@ -56,6 +57,7 @@ class ResultBagWrapper(object):
         ----------
         files : iterable
             A list of filenames that should contain valid JSON.
+
         """
         super(ResultBagWrapper, self).__init__(**kwargs)
         # load all into memory and avoid strange dask JSON object expectations

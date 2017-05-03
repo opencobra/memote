@@ -40,10 +40,10 @@ from memote.suite.reporting.report import Report
 
 
 class DummyDict(object):
-    """Expose a fake `__setitem__` interface."""
+    """Expose a fake ``__setitem__`` interface."""
 
     def __setitem__(self, key, value):
-        """Dummy `__setitem__` method."""
+        """Ignore all method input."""
         pass
 
 
@@ -54,6 +54,7 @@ class ResultCollectionPlugin(object):
     The plugin exposes the fixture `store` which can be used in test functions
     to store values in a dictionary. The dictionary is namespaced to the module
     so within a module the same keys should not be re-used (unless intended).
+
     """
 
     _valid_modes = frozenset(["collect", "git-collect", "basic", "html"])
@@ -76,6 +77,7 @@ class ResultCollectionPlugin(object):
             Depending on `mode` the `filename` is the JSON output path in
             "collect" mode, `None` in "basic" mode, or the output path for the
             HTML report in "html" mode.
+
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
@@ -111,7 +113,7 @@ class ResultCollectionPlugin(object):
         return store
 
     def pytest_sessionstart(self):
-        """Hook that runs at pytest session begin."""
+        """Record environment information of the pytest session."""
         if self.mode == "basic":
             return
         self._meta["platform"] = sys.platform
@@ -131,7 +133,7 @@ class ResultCollectionPlugin(object):
             self._meta["commit_hash"] = commit.hexsha
 
     def pytest_sessionfinish(self):
-        """Hook that runs at pytest session end."""
+        """Create output at the end of the session."""
         if self.mode == "basic":
             return
         if self.mode == "html":
