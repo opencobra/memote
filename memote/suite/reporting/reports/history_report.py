@@ -21,8 +21,7 @@ from __future__ import absolute_import
 
 import logging
 from os.path import join
-from builtins import dict
-from uuid import uuid4
+from builtins import dict, str
 
 from memote.suite.reporting.reports.report import Report
 import memote.suite.reporting.plot as plt
@@ -74,34 +73,27 @@ class HistoryReport(Report):
         """Render a rich report for the repository."""
         template = self.env.get_template("history_report.html")
         names = self.bag.get_model_ids()
-        (basic_specs, basic_uuids) = self._collect_basic_specs()
         return template.render(
             names=names,
-            basic_specs=basic_specs,
-            basic_uuids=basic_uuids
+            plots=self._collect_basic_plots()
         )
 
-    def _collect_basic_specs(self):
+    def _collect_basic_plots(self):
         """Collect Vega specs from a data frame."""
         df = self.bag.get_basic_dataframe()
         # Reverse order since git history ranges from latest to oldest but
         # for plotting oldest to newest is preferred.
         df = df.iloc[::-1]
-        specs = dict()
-        uuids = dict()
-        # create gene spec
-        specs["genes"] = plt.scatter_line_chart(
-            df[["x", "num_genes"]], "num_genes:Q", "Number of Genes",
-            **self.bag.axis_description)
-        uuids["genes"] = "uuid_" + uuid4().hex
+        plots = dict()
+        # create genes plot
+        plots["genes"] = plt.scatter_line_chart(
+            df[["x", "num_genes"]], "num_genes", "Number of Genes")
         # reactions
-        specs["reactions"] = plt.scatter_line_chart(
-            df[["x", "num_reactions"]], "num_reactions:Q",
-            "Number of Reactions", **self.bag.axis_description)
-        uuids["reactions"] = "uuid_" + uuid4().hex
+        plots["reactions"] = plt.scatter_line_chart(
+            df[["x", "num_reactions"]], "num_reactions",
+            "Number of Reactions")
         # metabolites
-        specs["metabolites"] = plt.scatter_line_chart(
-            df[["x", "num_metabolites"]], "num_metabolites:Q",
-            "Number of Metabolites", **self.bag.axis_description)
-        uuids["metabolites"] = "uuid_" + uuid4().hex
-        return (specs, uuids)
+        plots["metabolites"] = plt.scatter_line_chart(
+            df[["x", "num_metabolites"]], "num_metabolites",
+            "Number of Metabolites")
+        return plots

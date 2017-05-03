@@ -26,12 +26,19 @@ import plotly.graph_objs as go
 from jinja2 import Markup
 
 LOGGER = logging.getLogger(__name__)
+_DEFAULT_ARGS = {
+    "output_type": "div",
+    "include_plotlyjs": False,
+    "show_link": False,
+    "link_text": ""
+}
 
 
-def scatter_line_chart(df, y_axis, y_title, x_axis="x", x_title="Timestamp"):
-    """Generate the Vega spec for a point and line plot."""
-    {
-        "data": go.Scatter(),
+def scatter_line_chart(df, y_axis, y_title, x_axis="x",
+                       x_title="Timestamp", label=None):
+    """Generate a reproducible plotly scatter and line plot."""
+    figure = {
+        "data": go.Scatter(x=df[x_axis], y=df[y_axis], name=label),
         "layout": {}
     }
-    return Markup(py.iplot())
+    return Markup(py.plot(figure, **_DEFAULT_ARGS))
