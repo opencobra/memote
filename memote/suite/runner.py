@@ -197,7 +197,7 @@ def collect(ctx):
     errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
         ctx.obj["model"], mode=collect, filename=ctx.obj["filename"],
         directory=ctx.obj["directory"], repo=ctx.obj["repo"])])
-    sys.exit(errno)
+    return errno
 
 
 @click.group(invoke_without_command=True,
@@ -243,7 +243,7 @@ def cli(ctx, no_collect, model, filename, directory, pytest_args):
     ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
     ctx.obj["repo"] = probe_git()
     if ctx.invoked_subcommand is None:
-        collect(ctx)
+        sys.exit(collect(ctx))
 
 
 @cli.command()
@@ -324,4 +324,6 @@ def history(ctx, commits):
     3. By giving memote specific commit hashes, it will re-compute test results
        for those only.
     """
-    raise NotImplementedError(u"coming soon™")
+    if len(commits) > 0:
+        raise NotImplementedError(u"Coming soon™.")
+    directory = ctx.obj["directory"]
