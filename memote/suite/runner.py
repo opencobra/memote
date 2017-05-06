@@ -340,7 +340,9 @@ def history(ctx, commits):
     branch = repo.active_branch
     ctx.obj["branch"] = branch
     ctx.obj["commit"] = branch.commit
-    LOGGER.info("Running suite for commit '%s'", branch.commit.hexsha)
+    LOGGER.info(
+        "%sRunning the test suite for commit '%s'.%s",
+        Fore.GREEN, branch.commit.hexsha, Fore.RESET)
     # Need to use a subprocess here such that the pytest plugin can be
     # successfully initialized with new arguments each time. Otherwise the
     # plugin remains immutable.
@@ -350,7 +352,9 @@ def history(ctx, commits):
     for commit in branch.commit.iter_parents():
         repo.git.checkout(commit)
         ctx.obj["commit"] = commit
-        LOGGER.info("Running the test suite for commit '%s'.", commit.hexsha)
+        LOGGER.info(
+            "%sRunning the test suite for commit '%s'.%s",
+            Fore.GREEN, commit.hexsha, Fore.RESET)
         proc = Process(target=collect, args=(ctx,))
         proc.start()
         proc.join()
