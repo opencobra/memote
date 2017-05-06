@@ -27,6 +27,7 @@ import shlex
 import sys
 import logging
 from os.path import join, dirname
+from multiprocessing import Process
 
 import click
 import pytest
@@ -42,7 +43,7 @@ from memote.suite.reporting.reports import HistoryReport
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
-logging.basicConfig(level="DEBUG", format="%(levelname)s - %(message)s")
+LOGGER = logging.getLogger()
 
 
 class ConfigSectionSchema(object):
@@ -179,24 +180,29 @@ def collect(ctx):
     """Act like a collect subcommand."""
     check_model(ctx)
     if ctx.obj["collect"]:
-        collect = "collect"
+        mode = "collect"
         if "--tb" not in ctx.obj["pytest_args"]:
             ctx.obj["pytest_args"].extend(["--tb", "no"])
     else:
-        collect = "basic"
+        mode = "basic"
     if ctx.obj["repo"] is not None and ctx.obj["collect"]:
-        collect = "git-{}".format(collect)
-    if collect == "collect" and ctx.obj["filename"] is None:
+        mode = "git-{}".format(mode)
+    if mode == "collect" and ctx.obj["filename"] is None:
         ctx.obj["filename"] = "result.json"
-    elif collect == "git-collect" and ctx.obj["filename"] is None:
+    elif mode == "git-collect" and ctx.obj["filename"] is None:
         check_directory(ctx)
-        ctx.obj["filename"] = join(
-            ctx.obj["directory"],
-            "{}.json".format(ctx.obj["repo"].active_branch.commit.hexsha)
-        )
-    errno = pytest.main(ctx.obj["pytest_args"], plugins=[ResultCollectionPlugin(
-        ctx.obj["model"], mode=collect, filename=ctx.obj["filename"],
-        directory=ctx.obj["directory"], repo=ctx.obj["repo"])])
+        if "commit" in ctx.obj:
+            sha = ctx.obj["commit"].hexsha
+        elif "branch" in ctx.obj:
+            sha = ctx.obj["branch"].commit.hexsha
+        else:
+            sha = ctx.obj["repo"].active_branch.commit.hexsha
+        ctx.obj["filename"] = join(ctx.obj["directory"], "{}.json".format(sha))
+    plugin = ResultCollectionPlugin(
+        ctx.obj["model"], mode=mode, filename=ctx.obj["filename"],
+        directory=ctx.obj["directory"], repo=ctx.obj["repo"],
+        branch=ctx.obj.get("branch"), commit=ctx.obj.get("commit"))
+    errno = pytest.main(ctx.obj["pytest_args"], plugins=[plugin])
     return errno
 
 
@@ -206,6 +212,9 @@ def collect(ctx):
              ))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
+@click.option("--level", "-l", default="WARN",
+              type=click.Choice(["ERROR", "WARN", "INFO", "DEBUG"]),
+              help="Set the log level (default WARN).")
 @click.option("--no-collect", type=bool, is_flag=True,
               help="Do *not* collect test data needed for generating a report.")
 @click.option("--model", type=click.Path(exists=True, dir_okay=False),
@@ -226,7 +235,7 @@ def collect(ctx):
               help="Any additional arguments you want to pass to pytest."
               "Should be given as one continuous string.")
 @click.pass_context
-def cli(ctx, no_collect, model, filename, directory, pytest_args):
+def cli(ctx, level, no_collect, model, filename, directory, pytest_args):
     """
     Metabolic model testing command line tool.
 
@@ -235,6 +244,7 @@ def cli(ctx, no_collect, model, filename, directory, pytest_args):
     generate a model repository structure for starting a new project, and
     recreate the test result history.
     """
+    logging.basicConfig(level=level, format="%(levelname)s - %(message)s")
     ctx.obj = dict()
     ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
     ctx.obj["model"] = process_model(model, ctx)
@@ -326,4 +336,23 @@ def history(ctx, commits):
     """
     if len(commits) > 0:
         raise NotImplementedError(u"Coming soon™.")
-    directory = ctx.obj["directory"]
+    repo = ctx.obj["repo"]
+    branch = repo.active_branch
+    ctx.obj["branch"] = branch
+    ctx.obj["commit"] = branch.commit
+    LOGGER.info("Running suite for commit '%s'", branch.commit.hexsha)
+    # Need to use a subprocess here such that the pytest plugin can be
+    # successfully initialized with new arguments each time. Otherwise the
+    # plugin remains immutable.
+    proc = Process(target=collect, args=(ctx,))
+    proc.start()
+    proc.join()
+    for commit in branch.commit.iter_parents():
+        repo.git.checkout(commit)
+        ctx.obj["commit"] = commit
+        LOGGER.info("Running the test suite for commit '%s'.", commit.hexsha)
+        proc = Process(target=collect, args=(ctx,))
+        proc.start()
+        proc.join()
+    repo.git.checkout(branch)
+    # repo.head.reset(index=True, working_tree=True)  # superfluous?

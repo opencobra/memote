@@ -27,7 +27,7 @@ try:
 except ImportError:
     import json
 import warnings
-from builtins import dict
+from builtins import dict, str
 from datetime import datetime
 
 import pytest
@@ -63,7 +63,7 @@ class ResultCollectionPlugin(object):
     _valid_modes = frozenset(["collect", "git-collect", "basic", "html"])
 
     def __init__(self, model, mode="collect", filename=None, directory=None,
-                 repo=None, **kwargs):
+                 repo=None, branch=None, commit=None, **kwargs):
         """
         Collect and store values during testing.
 
@@ -97,6 +97,32 @@ class ResultCollectionPlugin(object):
         self.filename = filename
         self.directory = directory
         self.repo = repo
+        self.branch = branch
+        self.commit = commit
+
+    def _git_meta_info(self):
+        """Record repository meta information."""
+        if self.branch is None:
+            try:
+                self.branch = self.repo.active_branch
+            except TypeError:
+                LOGGER.error(
+                    "Detached HEAD mode, please provide the branch name and"
+                    " commit hash.")
+            except AttributeError:
+                LOGGER.error("No git repository found.")
+        if self.branch is not None:
+            self._meta["branch"] = self.branch.name
+        if self.commit is None:
+            try:
+                self.commit = self.branch.commit
+            except AttributeError:
+                LOGGER.error("No git repository found.")
+        if self.commit is not None:
+            self._meta["commit_author"] = self.commit.author.name
+            self._meta["timestamp"] = self.commit.committed_datetime.isoformat(
+                " ")
+            self._meta["commit_hash"] = self.commit.hexsha
 
     @pytest.fixture(scope="session")
     def model(self):
@@ -129,12 +155,7 @@ class ResultCollectionPlugin(object):
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
             return
         if self.mode == "git-collect":
-            branch = self.repo.active_branch
-            self._meta["branch"] = branch.name
-            commit = branch.commit
-            self._meta["commit_author"] = commit.author.name
-            self._meta["timestamp"] = commit.committed_datetime.isoformat(" ")
-            self._meta["commit_hash"] = commit.hexsha
+            self._git_meta_info()
 
     def pytest_sessionfinish(self):
         """Create output at the end of the session."""
