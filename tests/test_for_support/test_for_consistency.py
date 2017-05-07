@@ -176,7 +176,7 @@ def test_find_inconsistent_min_stoichiometry(model, inconsistent):
 ], indirect=["model"])
 def test_production_of_atp_closed_bounds(model, atp_production):
     """Expect that ATP cannot be produced when all the bounds are closed."""
-    production_of_atp = consistency.produce_atp_closed_xchngs(model)
+    production_of_atp = consistency.produce_atp_closed_exchanges(model)
     assert production_of_atp is atp_production
 
 
@@ -185,10 +185,10 @@ def test_production_of_atp_closed_bounds(model, atp_production):
     ("mass_unbalanced", 1),
     ("charge_unbalanced", 1)
 ], indirect=["model"])
-def test_unbalanced_reactions(model, num):
+def test_imbalanced_reactions(model, num):
     """Expect all reactions to be mass and charge balanced."""
-    list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
-    assert len(list_of_unbalanced_rxns) == num
+    reactions = consistency.find_imbalanced_reactions(model)
+    assert len(reactions) == num
 
 
 @pytest.mark.parametrize("model, num", [
