@@ -19,100 +19,75 @@
 
 from __future__ import absolute_import
 
+from builtins import zip
+
+import pytest
 import numpy as np
+from cobra.exceptions import Infeasible
 
 import memote.support.biomass as biomass
-from cobra.exceptions import Infeasible
-import memote.support.helpers as helpers
+from memote.support.helpers import find_biomass_reaction
+
+@pytest.fixture(scope="module")
+def biomass_reactions(read_only_model):
+    return find_biomass_reaction(read_only_model)
 
 
-def test_biomass_consistency(model):
-    """
-    Expect that the sum of total mass of all biomass components equals 1.
-
-    Allow for an absolute tolerance of 1e-03.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    biomass_rxns = helpers.find_biomass_reaction(model)
-    for rxn in biomass_rxns:
-        control_sum = biomass.sum_biomass_weight(rxn)
-        assert np.isclose(1.0, control_sum, atol=1e-03), \
-            "The following biomass reaction does not sum close enough to 1" \
-            " {}".format(
-            ", ".join(rxn.id))
+def test_biomass_presence(biomass_reactions, store):
+    """Expect the model to contain at least one biomass reaction."""
+    store["biomass_reactions"] = [rxn.id for rxn in biomass_reactions]
+    assert len(biomass_reactions) > 0, \
+        "Could not identify any biomass reaction." \
+        " Please change the intended reaction ID(s) to contain 'biomass'."
 
 
-def test_biomass_production(model):
-    """
-    Expect that biomass can be produced when optimizing the model.
+def test_biomass_consistency(biomass_reactions, store):
+    """Expect biomass components to sum up to 1 g / mmol / h."""
+    store["biomass_sum"] = [
+        biomass.sum_biomass_weight(rxn) for rxn in biomass_reactions]
+    for rxn, cntrl_sum in zip(store["biomass_reactions"], store["biomass_sum"]):
+        assert np.isclose(cntrl_sum, 1.0, atol=1e-03), \
+            "{}'s components sum up to {} which is too far from 1 g / mmol / h"\
+            "".format(rxn, cntrl_sum)
 
-    This is without changing the model's default state.
 
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    biomass_rxns = helpers.find_biomass_reaction(model)
-    for rxn in biomass_rxns:
+def test_biomass_default_production(model, biomass_reactions, store):
+    """Expect biomass production in default medium."""
+    store["biomass_default_flux"] = list()
+    for rxn in biomass_reactions:
         model.objective = rxn
         try:
             solution = model.optimize()
-            if solution.objective_value > 0:
-                status = True
-            else:
-                status = False
+            store["biomass_default_flux"].append(solution.fluxes[rxn.id])
         except Infeasible:
-            status = False
-        assert status is True
+            store["biomass_default_flux"].append(np.nan)
+    for flux in store["biomass_default_flux"]:
+        assert flux > 0.0
 
 
-def test_production_biomass_precursors_default(model):
-    """
-    Expect that there are no biomass precursors that cannot be produced.
-
-    This is without changing the model's default state.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    biomass_rxns = helpers.find_biomass_reaction(model)
-    for rxn in biomass_rxns:
-        blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
-        assert len(blocked_mets) == 0, \
-            "The biomass precursors of {} cannot be produced in the " \
-            "default state of the model: {}".format(
-            rxn, ", ".join([met.id for met in blocked_mets]))
+def test_biomass_precursors_default_production(model, biomass_reactions, store):
+    """Expect production of all biomass precursors in default medium."""
+    store["default_blocked_recursors"] = list()
+    for rxn in biomass_reactions:
+        store["default_blocked_recursors"].append(
+            biomass.find_blocked_biomass_precursors(rxn, model))
+    for rxn, blocked in zip(biomass_reactions,
+                            store["default_blocked_recursors"]):
+        assert len(blocked) == 0,\
+            "{}'s following precursors cannot be produced: {}"\
+            "".format(rxn.id, ", ".join([met.id for met in blocked]))
 
 
-def test_production_biomass_precursors_open(model):
-    """
-    Expect that there are no biomass precursors that cannot be produced.
-
-    This is after opening all the model's exchange reactions.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    biomass_rxns = helpers.find_biomass_reaction(model)
-    for rxn in biomass_rxns:
-        with model:
-            for exchange in model.exchanges:
-                exchange.bounds = (-1000, 1000)
-            blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
-            assert len(blocked_mets) == 0, \
-                "The biomass precursors of {} cannot be produced in the " \
-                "model despite all exchanges having been opened: {}".format(
-                rxn, ", ".join([met.id for met in blocked_mets]))
+def test_biomass_precursors_open_production(model, biomass_reactions, store):
+    """Expect precursor production in complete medium."""
+    store["open_blocked_precursors"] = list()
+    for exchange in model.exchanges:
+        exchange.bounds = (-1000, 1000)
+    for rxn in biomass_reactions:
+        store["open_blocked_precursors"].append(
+            biomass.find_blocked_biomass_precursors(rxn, model))
+    for rxn, blocked in zip(biomass_reactions,
+                            store["open_blocked_precursors"]):
+        assert len(blocked) == 0, \
+            "{}'s following precursors cannot be produced: {}" \
+            "".format(rxn.id, ", ".join([met.id for met in blocked]))
