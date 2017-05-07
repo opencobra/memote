@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import io
 import sys
 import logging
+
 try:
     import simplejson as json
 except ImportError:
@@ -37,7 +38,7 @@ with warnings.catch_warnings():
     # ignore Gurobi warning
     from cobra.io import read_sbml_model
 
-from memote.suite.reporting.reports import Report
+from memote.suite.reporting.reports import BasicReport
 
 LOGGER = logging.getLogger(__name__)
 
@@ -162,7 +163,7 @@ class ResultCollectionPlugin(object):
         if self.mode == "basic":
             return
         if self.mode == "html":
-            report = Report(self._store)
+            report = BasicReport(self._store)
             with io.open(self.filename, "w") as file_h:
                 file_h.write(report.render_html())
             return
