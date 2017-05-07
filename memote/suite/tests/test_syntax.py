@@ -19,84 +19,91 @@
 
 from __future__ import absolute_import
 
-from memote.support.syntax import (
-    find_reaction_tag_transporter, find_rxn_id_compartment_suffix,
-    find_abc_tag_transporter, find_upper_case_mets,
-    find_rxn_id_suffix_compartment, find_untagged_demand_rxns,
-    find_untagged_exchange_rxns
-)
+import pytest
+
+import memote.support.syntax as syntax
 
 
-def test_non_transp_rxn_id_compartment_suffix_match(model):
+@pytest.fixture(scope="module")
+def non_cytosolic(read_only_model, store):
+    """Provide all non-cytosolic compartments."""
+    compartments = sorted(read_only_model.compartments)
+    compartments.remove('c')
+    store["non_cytosolic"] = compartments
+    return compartments
+
+
+def test_non_transp_rxn_id_compartment_suffix_match(read_only_model, store,
+                                                    non_cytosolic):
     """Expect all reactions outside of the cytosol to be tagged accordingly."""
-    for compartment in model.compartments:
-        if compartment != 'c':
-            no_match_rxns = find_rxn_id_compartment_suffix(model, compartment)
-            assert \
-                len(no_match_rxns) == 0, \
-                "The following reactions in compartment {} are not tagged" \
-                "correctly: {}".format(compartment,
-                                       ", ".join(
-                                           [rxn.id for rxn in no_match_rxns]
-                                       )
-                                       )
+    store["reaction_compartment_suffix"] = list()
+    for compartment in non_cytosolic:
+        store["reaction_compartment_suffix"].append([
+            rxn.id for rxn in syntax.find_rxn_id_compartment_suffix(
+                read_only_model, compartment)])
+    for compartment, no_match_rxns in zip(non_cytosolic,
+                                          store["reaction_compartment_suffix"]):
+        assert len(no_match_rxns) == 0, \
+            "The following reactions in compartment {} are not tagged " \
+            "correctly: {}".format(compartment, ", ".join(no_match_rxns))
 
 
-def test_non_transp_rxn_id_suffix_compartment_match(model):
+def test_non_transp_rxn_id_suffix_compartment_match(
+        read_only_model, store, non_cytosolic):
     """Expect compartment-tagged reactions to involve fitting metabolites."""
-    for compartment in model.compartments:
-        if compartment != 'c':
-            mislab_rxns = find_rxn_id_suffix_compartment(model, compartment)
-            assert \
-                len(mislab_rxns) == 0, \
-                "The following reactions in compartment {} are tagged to" \
-                "don not contain metabolites from that " \
-                "compartment: {}".format(compartment, ", ".join(
-                                         [rxn.id for rxn in mislab_rxns]
-                                         )
-                                         )
+    store["reaction_metabolite_compartment"] = list()
+    for compartment in non_cytosolic:
+        store["reaction_metabolite_compartment"].append([
+            rxn.id for rxn in syntax.find_rxn_id_suffix_compartment(
+                read_only_model, compartment)])
+    for compartment, mislab_rxns in zip(
+            non_cytosolic, store["reaction_metabolite_compartment"]):
+        assert len(mislab_rxns) == 0, \
+            "The following reactions in compartment {} are tagged to not " \
+            "contain metabolites from that compartment: {}"\
+            "".format(compartment, ", ".join(mislab_rxns))
 
 
-def test_non_abc_transp_rxn_tag_match(model):
+def test_non_abc_transp_rxn_tag_match(read_only_model, store):
     """Expect all non-abc transport reactions to be tagged with a 't'."""
-    untagged_non_atp_transport_rxns = find_reaction_tag_transporter(model)
-    assert len(untagged_non_atp_transport_rxns) == 0, \
-        "The following non-atp transport reactions are not tagged" \
-        "correctly: {}".format(
-        ", ".join([rxn.id for rxn in untagged_non_atp_transport_rxns]))
+    store["untagged_normal_transport"] = [
+        rxn.id for rxn in syntax.find_reaction_tag_transporter(read_only_model)]
+    assert len(store["untagged_normal_transport"]) == 0, \
+        "The following non-atp transport reactions are not tagged " \
+        "correctly: {}".format(", ".join(store["untagged_normal_transport"]))
 
 
-def test_abc_transp_rxn_tag_match(model):
+def test_abc_transp_rxn_tag_match(read_only_model, store):
     """Expect all abc transport reactions to be tagged with 'abc'."""
-    untagged_atp_transport_rxns = find_abc_tag_transporter(model)
-    assert len(untagged_atp_transport_rxns) == 0, \
+    store["untagged_abc_transport"] = [
+        rxn.id for rxn in syntax.find_abc_tag_transporter(read_only_model)]
+    assert len(store["untagged_abc_transport"]) == 0, \
         "The following abc transport reactions are not tagged" \
-        "correctly: {}".format(
-        ", ".join([rxn.id for rxn in untagged_atp_transport_rxns]))
+        "correctly: {}".format(", ".join(store["untagged_abc_transport"]))
 
 
-def test_upper_case_mets(model):
+def test_upper_case_mets(read_only_model, store):
     """Expect all metabolites to be lower case with accepted exceptions."""
-    upper_case_mets = find_upper_case_mets(model)
-    assert len(upper_case_mets) == 0, \
+    store["uppercase_metabolites"] = [
+        met.id for met in syntax.find_upper_case_mets(read_only_model)]
+    assert len(store["uppercase_metabolites"]) == 0, \
         "The IDs of the following metabolites are not written in lower case" \
-        " {}".format(
-        ", ".join([met.id for met in upper_case_mets]))
+        " {}".format(", ".join(store["uppercase_metabolites"]))
 
 
-def test_demand_reaction_tag_match(model):
+def test_demand_reaction_tag_match(read_only_model, store):
     """Expect all demand reaction IDs to be prefixed with 'DM_'."""
-    falsely_tagged_demand_rxns = find_untagged_demand_rxns(model)
-    assert len(falsely_tagged_demand_rxns) == 0, \
+    store["untagged_demand"] = [
+        rxn.id for rxn in syntax.find_untagged_demand_rxns(read_only_model)]
+    assert len(store["untagged_demand"]) == 0, \
         "The IDs of the following demand reactions are not tagged with 'DM_'" \
-        " {}".format(
-        ", ".join([rxn.id for rxn in falsely_tagged_demand_rxns]))
+        " {}".format(", ".join(store["untagged_demand"]))
 
 
-def test_exchange_reaction_tag_match(model):
+def test_exchange_reaction_tag_match(read_only_model, store):
     """Expect all exchange reaction IDs to be prefixed with 'EX_'."""
-    falsely_tagged_exchange_rxns = find_untagged_exchange_rxns(model)
-    assert len(falsely_tagged_exchange_rxns) == 0, \
+    store["untagged_exchange"] = [
+        rxn.id for rxn in syntax.find_untagged_exchange_rxns(read_only_model)]
+    assert len(store["untagged_exchange"]) == 0, \
         "The IDs of the following demand reactions are not tagged with 'EX_'" \
-        " {}".format(
-        ", ".join([rxn.id for rxn in falsely_tagged_exchange_rxns]))
+        " {}".format(", ".join(store["untagged_exchange"]))

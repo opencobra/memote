@@ -235,7 +235,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
         "Coming soon™ if considered useful.")
 
 
-def produce_atp_closed_xchngs(model):
+def produce_atp_closed_exchanges(model):
     """
     Close the model's exchanges and tries to optimize the production of atp_c.
 
@@ -262,7 +262,7 @@ def produce_atp_closed_xchngs(model):
     return state
 
 
-def find_unbalanced_reactions(model):
+def find_imbalanced_reactions(model):
     """
     Find metabolic reactions that not mass and/or charge balanced.
 

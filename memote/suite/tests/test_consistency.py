@@ -19,47 +19,46 @@
 
 from __future__ import absolute_import
 
-import logging
-
 import memote.support.consistency as consistency
 
-LOGGER = logging.getLogger(__name__)
 
-
-def test_stoichiometric_consistency(model, store):
-    """Expect that the metabolic model is mass-balanced."""
-    is_consistent = consistency.check_stoichiometric_consistency(model)
+def test_stoichiometric_consistency(read_only_model, store):
+    """Expect that the stoichiometry is mass-balanced."""
+    is_consistent = consistency.check_stoichiometric_consistency(
+        read_only_model)
     store["is_consistent"] = is_consistent
-    unconserved = [] if is_consistent else\
-        [met.id for met in consistency.find_unconserved_metabolites(model)]
+    unconserved = [] if is_consistent else [
+        met.id for met in consistency.find_unconserved_metabolites(
+            read_only_model)]
     store["unconserved_metabolites"] = unconserved
     assert is_consistent,\
         "The following metabolites are involved in inconsistent reactions:"\
         " {}".format(", ".join(unconserved))
 
 
-def test_production_of_atp_closed_bounds(model):
+def test_production_of_atp_closed_bounds(read_only_model, store):
     """Expect that ATP cannot be produced when all the bounds are closed."""
-    production_of_atp = consistency.produce_atp_closed_xchngs(model)
-    assert production_of_atp is False,\
-        "The model {} was able to produce ATP although all exchanges were"\
-        "closed. This might be because there is an unbalanced reaction or a"\
-        "loop in the model.".format(model.id)
+    store["magic_atp_production"] = consistency.produce_atp_closed_exchanges(
+        read_only_model)
+    assert not store["magic_atp_production"],\
+        "Model can produce ATP with closed exchanges. This might be caused by"\
+        " imbalanced reactions or loops."
 
 
-def test_unbalanced_reactions(model):
+def test_imbalanced_reactions(read_only_model, store):
     """Expect all reactions to be mass and charge balanced."""
-    list_of_unbalanced_rxns = consistency.find_unbalanced_reactions(model)
-    assert len(list_of_unbalanced_rxns) == 0, \
-        "The following reactions are not balanced" \
-        " {}".format(
-        ", ".join([rxn.id for rxn in list_of_unbalanced_rxns]))
+    store["imbalanced_reactions"] = [
+        rxn.id for rxn in consistency.find_imbalanced_reactions(
+            read_only_model)]
+    assert len(store["imbalanced_reactions"]) == 0,\
+        "The following reactions are imbalanced: {}".format(
+        ", ".join(store["imbalanced_reactions"]))
 
 
-def test_blocked_reactions(model):
+def test_blocked_reactions(read_only_model, store):
     """Expect all reactions to be able to carry flux."""
-    dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
-    assert len(dict_of_blocked_rxns) == 0, \
-        "The following reactions are blocked" \
-        " {}".format(
-            ", ".join([rxn_id for rxn_id in dict_of_blocked_rxns.keys()]))
+    store["blocked_reactions"] = [
+        rxn.id for rxn in consistency.find_blocked_reactions(read_only_model)]
+    assert len(store["blocked_reactions"]) == 0,\
+        "The following reactions are blocked: {}".format(
+            ", ".join(store["blocked_reactions"]))
