@@ -31,6 +31,7 @@ from memote.support.helpers import find_biomass_reaction
 
 @pytest.fixture(scope="module")
 def biomass_reactions(read_only_model):
+    """Provide any biomass reactions found in the model."""
     return find_biomass_reaction(read_only_model)
 
 

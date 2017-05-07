@@ -26,6 +26,7 @@ import memote.support.syntax as syntax
 
 @pytest.fixture(scope="module")
 def non_cytosolic(read_only_model, store):
+    """Provide all non-cytosolic compartments."""
     compartments = sorted(read_only_model.compartments)
     compartments.remove('c')
     store["non_cytosolic"] = compartments
