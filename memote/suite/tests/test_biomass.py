@@ -28,6 +28,7 @@ from cobra.exceptions import Infeasible
 import memote.support.biomass as biomass
 from memote.support.helpers import find_biomass_reaction
 
+
 @pytest.fixture(scope="module")
 def biomass_reactions(read_only_model):
     return find_biomass_reaction(read_only_model)
@@ -70,12 +71,13 @@ def test_biomass_precursors_default_production(model, biomass_reactions, store):
     store["default_blocked_recursors"] = list()
     for rxn in biomass_reactions:
         store["default_blocked_recursors"].append(
-            biomass.find_blocked_biomass_precursors(rxn, model))
+            [met.id
+             for met in biomass.find_blocked_biomass_precursors(rxn, model)])
     for rxn, blocked in zip(biomass_reactions,
                             store["default_blocked_recursors"]):
         assert len(blocked) == 0,\
             "{}'s following precursors cannot be produced: {}"\
-            "".format(rxn.id, ", ".join([met.id for met in blocked]))
+            "".format(rxn.id, ", ".join(blocked))
 
 
 def test_biomass_precursors_open_production(model, biomass_reactions, store):
@@ -85,9 +87,10 @@ def test_biomass_precursors_open_production(model, biomass_reactions, store):
         exchange.bounds = (-1000, 1000)
     for rxn in biomass_reactions:
         store["open_blocked_precursors"].append(
-            biomass.find_blocked_biomass_precursors(rxn, model))
+            [met.id
+             for met in biomass.find_blocked_biomass_precursors(rxn, model)])
     for rxn, blocked in zip(biomass_reactions,
                             store["open_blocked_precursors"]):
         assert len(blocked) == 0, \
             "{}'s following precursors cannot be produced: {}" \
-            "".format(rxn.id, ", ".join([met.id for met in blocked]))
+            "".format(rxn.id, ", ".join(blocked))
