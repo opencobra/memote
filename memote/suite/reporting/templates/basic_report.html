@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% from '_basic_helpers.html' import render_basic %}
 {% from '_consistency_helpers.html' import render_consistency %}
+{% from '_biomass_helpers.html' import render_biomass %}
+{% from '_syntax_helpers.html' import render_syntax %}
 
 {% block header -%}
 {{ super() }}
@@ -11,7 +13,16 @@
 <div>
 {{ render_basic(data['report']['test_basic']) }}
 </div>
+
 <div>
 {{ render_consistency(data['report']['test_consistency']) }}
+</div>
+
+<div>
+    {{ render_biomass(data['report']['test_biomass']) }}
+</div>
+
+<div>
+    {{ render_syntax(data['report']['test_syntax']) }}
 </div>
 {%- endblock %}

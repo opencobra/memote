@@ -69,13 +69,13 @@ def test_biomass_default_production(model, biomass_reactions, store):
 
 def test_biomass_precursors_default_production(model, biomass_reactions, store):
     """Expect production of all biomass precursors in default medium."""
-    store["default_blocked_recursors"] = list()
+    store["default_blocked_precursors"] = list()
     for rxn in biomass_reactions:
-        store["default_blocked_recursors"].append(
+        store["default_blocked_precursors"].append(
             [met.id
              for met in biomass.find_blocked_biomass_precursors(rxn, model)])
     for rxn, blocked in zip(biomass_reactions,
-                            store["default_blocked_recursors"]):
+                            store["default_blocked_precursors"]):
         assert len(blocked) == 0,\
             "{}'s following precursors cannot be produced: {}"\
             "".format(rxn.id, ", ".join(blocked))
