@@ -13,11 +13,20 @@
 {%- endblock %}
 
 {% block content -%}
-<h2>Basic Information</h2>
+<h2 class="mdc-typography--display2">Basic Information</h2>
 
 {{ plots["genes"] }}
 
 {{ plots["reactions"] }}
 
 {{ plots["metabolites"] }}
+
+{{ plots["metabolites_no_formula"] }}
+
+<h2 class="mdc-typography--display2">Biomass Production</h2>
+
+
+
+<h2 class="mdc-typography--display2">Stoichiometric Consistency</h2>
+<h2 class="mdc-typography--display2">Syntax Information</h2>
 {%- endblock %}
