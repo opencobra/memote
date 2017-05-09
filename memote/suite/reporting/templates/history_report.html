@@ -13,11 +13,26 @@
 {%- endblock %}
 
 {% block content -%}
-<h2>Basic Information</h2>
+<h2 class="mdc-typography--display2">Basic Information</h2>
 
-{{ plots["genes"] }}
+{{ basics["genes"] }}
 
-{{ plots["reactions"] }}
+{{ basics["reactions"] }}
 
-{{ plots["metabolites"] }}
+{{ basics["metabolites"] }}
+
+{{ basics["metabolites_no_formula"] }}
+
+<h2 class="mdc-typography--display2">Biomass Production</h2>
+
+{{ biomass["biomass_sum"] }}
+
+{{ biomass["biomass_default_flux"] }}
+
+{{ biomass["num_default_blocked_precursors"] }}
+
+{{ biomass["num_open_blocked_precursors"] }}
+
+<h2 class="mdc-typography--display2">Stoichiometric Consistency</h2>
+<h2 class="mdc-typography--display2">Syntax Information</h2>
 {%- endblock %}

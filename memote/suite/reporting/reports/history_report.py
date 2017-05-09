@@ -67,7 +67,13 @@ class HistoryReport(Report):
                 "The given directory '{}' contains no JSON files."
                 " Cannot generate a report.".format(self.directory))
         self.bag = ResultBagWrapper(self.files)
-        self.bag.build_index(index)
+        self.bag.build_index()
+        self.index = {
+            "time": "timestamp",
+            "hash": "commit_hash"
+        }.get(index, ValueError("Unknown index type '{}'.".format(index)))
+        if isinstance(self.index, ValueError):
+            raise self.index
 
     def render_html(self):
         """Render a rich report for the repository."""
@@ -75,25 +81,46 @@ class HistoryReport(Report):
         names = self.bag.get_model_ids()
         return template.render(
             names=names,
-            plots=self._collect_basic_plots()
+            basics=self._collect_basic_plots(),
+            biomass=self._collect_biomass_plots()
         )
 
     def _collect_basic_plots(self):
-        """Collect Vega specs from a data frame."""
+        """Create plots from the basic info data frame."""
         df = self.bag.get_basic_dataframe()
-        # Reverse order since git history ranges from latest to oldest but
-        # for plotting oldest to newest is preferred.
-        df = df.iloc[::-1]
         plots = dict()
         # create genes plot
         plots["genes"] = plt.scatter_line_chart(
-            df[["x", "num_genes"]], "num_genes", "Number of Genes")
+            df[[self.index, "num_genes"]], "Number of Genes")
         # reactions
         plots["reactions"] = plt.scatter_line_chart(
-            df[["x", "num_reactions"]], "num_reactions",
+            df[[self.index, "num_reactions"]],
             "Number of Reactions")
         # metabolites
         plots["metabolites"] = plt.scatter_line_chart(
-            df[["x", "num_metabolites"]], "num_metabolites",
+            df[[self.index, "num_metabolites"]],
             "Number of Metabolites")
+        plots["metabolites_no_formula"] = plt.scatter_line_chart(
+            df[[self.index, "num_metabolites_no_formula"]],
+            "Number of Metabolites Without Formula")
+        return plots
+
+    def _collect_biomass_plots(self):
+        """Create plots from the biomass info data frame."""
+        df = self.bag.get_biomass_dataframe()
+        plots = dict()
+        # components sum
+        factor = "reaction"
+        plots["biomass_sum"] = plt.scatter_line_chart(
+            df[[self.index, "biomass_sum", factor]],
+            "Sum of biomass components")
+        plots["biomass_default_flux"] = plt.scatter_line_chart(
+            df[[self.index, "biomass_default_flux", factor]],
+            "Biomass flux")
+        plots["num_default_blocked_precursors"] = plt.scatter_line_chart(
+            df[[self.index, "num_default_blocked_precursors", factor]],
+            "Number of blocked biomass precursors in default medium.")
+        plots["num_open_blocked_precursors"] = plt.scatter_line_chart(
+            df[[self.index, "num_open_blocked_precursors", factor]],
+            "Number of blocked biomass precursors in complete medium.")
         return plots

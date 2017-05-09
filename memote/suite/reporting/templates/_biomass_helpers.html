@@ -1,0 +1,20 @@
+{% macro render_biomass(data) -%}
+<h2 class="mdc-typography--display2">Biomass Production</h2>
+
+<dl>
+    <dt>Defined biomass reactions</dt>
+    <dd>{{ data['biomass_reactions'] }}</dd>
+    <dt>Sum of biomass components</dt>
+    <dd>{{ data['biomass_sum'] }} g / mmol / h</dd>
+    <dt>Biomass flux in default medium</dt>
+    <dd>{{ data['biomass_default_flux'] }}</dd>
+    {% if data['default_blocked_precursors']|length > 0 %}
+    <dt>Blocked biomass precursors in default medium</dt>
+    <dd>{{ data['default_blocked_precursors'] }}</dd>
+    {% endif %}
+    {% if data['open_blocked_precursors']|length > 0 %}
+    <dt>Blocked biomass precursors in complete medium</dt>
+    <dd>{{ data['open_blocked_precursors'] }}</dd>
+    {% endif %}
+</dl>
+{%- endmacro %}

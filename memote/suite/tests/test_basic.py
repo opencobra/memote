@@ -54,6 +54,6 @@ def test_metabolites_formula_presence(read_only_model, store):
     """Expect all metabolites to have a formula."""
     missing = [
         met.id for met in check_metabolites_formula_presence(read_only_model)]
-    store["num_metabolites_no_formula"] = missing
+    store["metabolites_no_formula"] = missing
     assert len(missing) == 0, "No formula found for the following "\
         "metabolites: {}".format(", ".join(missing))

@@ -1,5 +1,5 @@
 {% macro render_consistency(data) -%}
-<h2>Stoichiometric Consistency</h2>
+<h2 class="mdc-typography--display2">Stoichiometric Consistency</h2>
 
 {% if data['is_consistent'] -%}
 <p>
@@ -11,10 +11,21 @@
     <span class="warn">Inconsistent model stoichiometry</span>
 </p>
 <dl>
+    {% if data['magic_atp_production'] -%}
+    <dt>Model can generate ATP without input!</dt><dd></dd>
+    {% endif -%}
     <dt>Number of unconserved metabolites</dt>
     <dd>{{ data['unconserved_metabolites']|length }}</dd>
     <dt>Unconserved metabolites</dt>
     <dd>{{ data['unconserved_metabolites'] }}</dd>
+    <dt>Number of blocked reactions</dt>
+    <dd>{{ data['blocked_reactions']|length }}</dd>
+    <dt>Blocked reactions</dt>
+    <dd>{{ data['blocked_reactions'] }}</dd>
+    <dt>Number of imbalanced reactions</dt>
+    <dd>{{ data['imbalanced_reactions']|length }}</dd>
+    <dt>Imbalanced reactions</dt>
+    <dd>{{ data['imbalanced_reactions'] }}</dd>
 </dl>
 {% endif -%}
 {%- endmacro %}

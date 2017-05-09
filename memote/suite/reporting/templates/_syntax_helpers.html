@@ -1,0 +1,34 @@
+{% macro render_syntax(data) -%}
+<h2 class="mdc-typography--display2">Syntax Information</h2>
+
+<dl>
+    <dt>Number of non-cytosolic reactions without compartment suffix</dt>
+    <dd>{{ data['reaction_compartment_suffix']|length }}</dd>
+    <dt>Non-cytosolic reactions without compartment suffix</dt>
+    <dd>{{ data['reaction_compartment_suffix'] }}</dd>
+    <dt>Number of reactions with compartment suffix but inconsistent metabolites</dt>
+    <dd>{{ data['reaction_metabolite_compartment']|length }}</dd>
+    <dt>Reactions with compartment suffix but inconsistent metabolites</dt>
+    <dd>{{ data['reaction_metabolite_compartment'] }}</dd>
+    <dt>Number of transports without suffix</dt>
+    <dd>{{ data['untagged_normal_transport']|length }}</dd>
+    <dt>Transports without suffix</dt>
+    <dd>{{ data['untagged_normal_transport'] }}</dd>
+    <dt>Number of ABC transports without suffix</dt>
+    <dd>{{ data['untagged_abc_transport']|length }}</dd>
+    <dt>ABC transports without suffix</dt>
+    <dd>{{ data['untagged_abc_transport'] }}</dd>
+    <dt>Number of demand reactions without prefix 'DM_'</dt>
+    <dd>{{ data['untagged_demand']|length }}</dd>
+    <dt>Demand reactions without prefix 'DM_'</dt>
+    <dd>{{ data['untagged_demand'] }}</dd>
+    <dt>Number of exchange reactions without prefix 'EX_'</dt>
+    <dd>{{ data['untagged_exchange']|length }}</dd>
+    <dt>Exchange reactions without prefix 'EX_'</dt>
+    <dd>{{ data['untagged_exchange'] }}</dd>
+    <dt>Number of metabolites with uppercase letters</dt>
+    <dd>{{ data['uppercase_metabolites']|length }}</dd>
+    <dt>Metabolites with uppercase letters</dt>
+    <dd>{{ data['uppercase_metabolites'] }}</dd>
+</dl>
+{%- endmacro %}

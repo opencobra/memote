@@ -19,8 +19,11 @@
 
 from __future__ import absolute_import
 
+from builtins import dict
+
 import io
 import logging
+
 try:
     import simplejson as json
 except ImportError:
@@ -62,53 +65,74 @@ class ResultBagWrapper(object):
                 continue
             with io.open(filename) as file_h:
                 objects.append(json.load(file_h))
-        self._bag = db.from_sequence(objects)
+        self._bag = db.from_sequence(objects, npartitions=1)
         self._index = None
 
-    def build_index(self, dimension):
-        """Build a data index either from timestamps or commit hashes."""
-        if dimension == "time":
-            self._build_time_index()
-        elif dimension == "hash":
-            self._build_commit_index()
-        else:
-            raise ValueError("Unknown index dimension '{}'".format(dimension))
+    def build_index(self):
+        """Build a data index either from timestamps and commit hashes."""
+        LOGGER.debug("Building index...")
+        expected = pd.DataFrame({
+            "timestamp": pd.Series(dtype="datetime64[ns]"),
+            "commit_hash": pd.Series(dtype="str")
+        })
+        df = self._bag.pluck("meta", dict()).to_dataframe(expected).compute()
+        df.set_index(
+            "commit_hash", drop=False, inplace=True, verify_integrity=True)
+        df.sort_values("timestamp", inplace=True, kind="mergesort")
+        self._index = df
 
-    def _build_time_index(self):
-        """Build an index from timestamps."""
-        LOGGER.debug("Building index based on timestamps.")
-        self._index = pd.Series(
-            list(self._bag.pluck("meta", dict()).pluck("timestamp")),
-            dtype="datetime64[ns]")
-
-    def _build_commit_index(self):
-        """Build an index from commit hashes."""
-        LOGGER.debug("Building index based on commit hashes.")
-        series = pd.Series(
-            list(self._bag.pluck("meta", dict()).pluck("commit_hash")),
-            dtype="str")
-        trunc = 5
-        res = series.str[:trunc]
-        while len(res.unique()) < len(series):
-            trunc += 1
-            res = series.str[:trunc]
-        LOGGER.debug("Hashes truncated to %d characters.", trunc)
-        self._index = res
+    def _assert_index_presence(self):
+        """Ensure that the index was built."""
+        if self._index is None:
+            raise ValueError(
+                "No index present. Please call method `build_index` first.")
 
     def get_model_ids(self):
-        """Get unique model IDs. Should normally be of length one."""
+        """Get unique model IDs. Should typically be of length one."""
         return self._bag.pluck("report").pluck("test_basic").\
             pluck("model_id").distinct().compute()
 
     def get_basic_dataframe(self):
-        """Collect results from `test_basic`."""
+        """Create basic information data frame."""
         LOGGER.debug("Collecting basic information from bag.")
-        columns = ["num_genes", "num_reactions", "num_metabolites"]
-        data_types = ["int", "int", "int"]
-        expected = pd.DataFrame({col: pd.Series(dtype=dt)
-                                 for (col, dt) in zip(columns, data_types)})
-        df = self._bag.pluck("report", dict()).pluck("test_basic", dict()).\
-            to_dataframe(expected).compute()
-        df.index = self._index
-        df["x"] = df.index
-        return df
+        self._assert_index_presence()
+        columns = ("commit", "num_genes", "num_reactions", "num_metabolites",
+                   "num_metabolites_no_formula")
+        data = pd.DataFrame(list(self._bag.map(_get_basics)), columns=columns)
+        data.set_index("commit", inplace=True)
+        return self._index.join(data)
+
+    def get_biomass_dataframe(self):
+        """Create biomass information data frame."""
+        LOGGER.debug("Collecting biomass information from bag.")
+        self._assert_index_presence()
+        columns = ("commit", "reaction", "biomass_sum",
+                   "biomass_default_flux", "num_default_blocked_precursors",
+                   "num_open_blocked_precursors")
+        data = pd.DataFrame(self._bag.map(_get_biomass).fold(
+            list.__iadd__, initial=list()).compute(), columns=columns)
+        data.set_index("commit", inplace=True)
+        return self._index.join(data)
+
+
+def _get_basics(elem):
+    """Collect results from `test_basic`."""
+    tmp = elem["report"]["test_basic"]
+    return (elem["meta"]["commit_hash"],
+            tmp["num_genes"],
+            tmp["num_reactions"],
+            tmp["num_metabolites"],
+            len(tmp["metabolites_no_formula"]))
+
+
+def _get_biomass(elem):
+    """Collect results from `test_biomass`."""
+    tmp = elem["report"]["test_biomass"]
+    commit = elem["meta"]["commit_hash"]
+    res = [
+        (commit, rxn, tmp["biomass_sum"][i], tmp["biomass_default_flux"][i],
+         len(tmp["default_blocked_precursors"][i]),
+         len(tmp["open_blocked_precursors"][i]))
+        for i, rxn in enumerate(tmp["biomass_reactions"])
+    ]
+    return res
