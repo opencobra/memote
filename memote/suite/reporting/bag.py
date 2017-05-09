@@ -19,11 +19,10 @@
 
 from __future__ import absolute_import
 
-from builtins import zip, dict
+from builtins import dict
 
 import io
 import logging
-from operator import attrgetter
 
 try:
     import simplejson as json
