@@ -34,11 +34,17 @@ _DEFAULT_ARGS = {
 }
 
 
-def scatter_line_chart(df, y_axis, y_title, x_axis="x",
-                       x_title="Timestamp", label=None):
+def scatter_line_chart(df, y_title, x_title="Timestamp"):
     """Generate a reproducible plotly scatter and line plot."""
+    if len(df.columns) == 3:
+        x_axis, y_axis, factor = df.columns
+        data = [go.Scatter(x=sub[x_axis], y=sub[y_axis], name=key)
+                for key, sub in df.groupby(factor, as_index=False, sort=False)]
+    else:
+        x_axis, y_axis = df.columns
+        data = [go.Scatter(x=df[x_axis], y=df[y_axis])]
     figure = {
-        "data": [go.Scatter(x=df[x_axis], y=df[y_axis], name=label)],
+        "data": data,
         "layout": {}
     }
     return Markup(py.plot(figure, **_DEFAULT_ARGS))
