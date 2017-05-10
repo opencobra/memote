@@ -34,17 +34,25 @@ _DEFAULT_ARGS = {
 }
 
 
-def scatter_line_chart(df, y_title, x_title="Timestamp"):
+def scatter_line_chart(df, y_title):
     """Generate a reproducible plotly scatter and line plot."""
     if len(df.columns) == 3:
         x_axis, y_axis, factor = df.columns
-        data = [go.Scatter(x=sub[x_axis], y=sub[y_axis], name=key)
-                for key, sub in df.groupby(factor, as_index=False, sort=False)]
+        data = go.Data([
+            go.Scatter(x=sub[x_axis], y=sub[y_axis], name=key)
+            for key, sub in df.groupby(factor, as_index=False, sort=False)])
     else:
         x_axis, y_axis = df.columns
-        data = [go.Scatter(x=df[x_axis], y=df[y_axis])]
-    figure = {
-        "data": data,
-        "layout": {}
-    }
-    return Markup(py.plot(figure, **_DEFAULT_ARGS))
+        data = go.Data([
+            go.Scatter(x=df[x_axis], y=df[y_axis])])
+    layout = go.Layout(
+        xaxis=go.XAxis(
+            title="Commit Hash" if x_axis == "commit_hash" else "Timestamp",
+            zeroline=True,
+            tickangle=-45 if x_axis == "commit_hash" else 0
+        ),
+        yaxis=go.YAxis(
+            title=y_title
+        )
+    )
+    return Markup(py.plot(go.Figure(data=data, layout=layout), **_DEFAULT_ARGS))

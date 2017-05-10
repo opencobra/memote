@@ -77,9 +77,16 @@ class ResultBagWrapper(object):
         })
         df = self._bag.pluck("meta", dict()).to_dataframe(expected).compute()
         df.set_index(
-            "commit_hash", drop=False, inplace=True, verify_integrity=True)
+            "commit_hash", drop=True, inplace=True, verify_integrity=True)
+        trunc = 5
+        res = df.index.str[:trunc]
+        while len(res.unique()) < len(df):
+            trunc += 1
+            res = df.index.str[:trunc]
+        df["commit_hash"] = res.copy()
         df.sort_values("timestamp", inplace=True, kind="mergesort")
         self._index = df
+        LOGGER.debug("%s", str(df))
 
     def _assert_index_presence(self):
         """Ensure that the index was built."""

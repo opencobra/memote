@@ -113,14 +113,16 @@ class HistoryReport(Report):
         factor = "reaction"
         plots["biomass_sum"] = plt.scatter_line_chart(
             df[[self.index, "biomass_sum", factor]],
-            "Sum of biomass components")
+            r"$ \text{Sum of Biomass Components }"
+            r"[ \text{mmol} \text{g}_{\text{DW}}^{-1}  \text{h}^{-1} ] $")
         plots["biomass_default_flux"] = plt.scatter_line_chart(
             df[[self.index, "biomass_default_flux", factor]],
-            "Biomass flux")
+            r"$ \text{Biomass Flux }"
+            r"[ \text{mmol} \text{g}_{\text{DW}}^{-1}  \text{h}^{-1} ] $")
         plots["num_default_blocked_precursors"] = plt.scatter_line_chart(
             df[[self.index, "num_default_blocked_precursors", factor]],
-            "Number of blocked biomass precursors in default medium.")
+            "Number of Blocked Biomass Precursors in Default Medium")
         plots["num_open_blocked_precursors"] = plt.scatter_line_chart(
             df[[self.index, "num_open_blocked_precursors", factor]],
-            "Number of blocked biomass precursors in complete medium.")
+            "Number of Blocked Biomass Precursors in Complete Medium")
         return plots
