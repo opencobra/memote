@@ -1,6 +1,6 @@
-===============================
+======
 memote
-===============================
+======
 
 
 .. image:: https://img.shields.io/pypi/v/memote.svg
@@ -48,23 +48,29 @@ can easily be integrated with Travis CI which means that anytime you push a
 model change to GitHub, the test suite will be run automatically and a report
 will be available for you to look at via GitHub pages for your repository.
 
-* Free software: `Apache Software License 2.0 <LICENSE>`_
 * Documentation: https://memote.readthedocs.io.
 
 
-Features
---------
+Installation
+------------
 
-* TODO
+We highly recommend creating a Python virtualenv for your model tesing purposes. For the time being `memote` is changing
+too quickly and will only be submitted to PyPi at a later stage. We try to keep the ``develop`` branch stable. The
+``master`` branch is often very outdated.
+
+.. code-block:: bash
+
+    pip install https://github.com/biosustain/memote/archive/develop.zip
 
 Copyright
 ---------
 
-Copyright (c) 2017 Novo Nordisk Foundation Center for Biosustainability,
-Technical University of Denmark.
+* Copyright (c) 2017 Novo Nordisk Foundation Center for Biosustainability,
+  Technical University of Denmark.
+* Free software: `Apache Software License 2.0 <LICENSE>`_
 
 Credits
----------
+-------
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
