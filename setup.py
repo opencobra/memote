@@ -50,7 +50,8 @@ requirements = [
     "Jinja2",
     "jinja2-ospath",
     "cookiecutter",
-    "cobra>=0.6.0a7",
+    "python-libsbml",
+    "cobra>=0.6.1",
     "plotly"
 ]
 
