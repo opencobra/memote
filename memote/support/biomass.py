@@ -72,9 +72,9 @@ def find_ngam(model):
     """
     atp_adp_conv_rxns = find_atp_adp_converting_reactions(model)
     return [rxn for rxn in atp_adp_conv_rxns
-            if rxn.build_reaction_string() == 'atp_c + h2o_c --> ,' \
-                                              'adp_c + h_c + pi_c'
-            and not rxn.lower_bound <= 0]
+            if rxn.build_reaction_string() == 'atp_c + h2o_c --> ,'
+                                              'adp_c + h_c + pi_c' and not
+            rxn.lower_bound <= 0]
 
 
 def find_blocked_biomass_precursors(reaction, model):
