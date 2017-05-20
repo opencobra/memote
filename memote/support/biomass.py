@@ -91,6 +91,7 @@ def find_blocked_biomass_precursors(reaction, model):
                 blocked_precursors.append(precursor)
     return blocked_precursors
 
+
 def gam_in_biomass(reaction, model):
     """
     Return boolean if biomass reaction includes growth-associated maintenance.
