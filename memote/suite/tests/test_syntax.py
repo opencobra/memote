@@ -100,6 +100,15 @@ def test_demand_reaction_tag_match(read_only_model, store):
         " {}".format(", ".join(store["untagged_demand"]))
 
 
+def test_sink_reaction_tag_match(read_only_model, store):
+    """Expect all sink reaction IDs to be prefixed with 'SK_'."""
+    store["untagged_demand"] = [
+        rxn.id for rxn in syntax.find_untagged_sink_rxns(read_only_model)]
+    assert len(store["untagged_demand"]) == 0, \
+        "The IDs of the following sink reactions are not tagged with 'SK_'" \
+        " {}".format(", ".join(store["untagged_demand"]))
+
+
 def test_exchange_reaction_tag_match(read_only_model, store):
     """Expect all exchange reaction IDs to be prefixed with 'EX_'."""
     store["untagged_exchange"] = [
