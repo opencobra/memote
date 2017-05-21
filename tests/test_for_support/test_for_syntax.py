@@ -298,6 +298,34 @@ def incorrect_exchange_tag(base):
     return base
 
 
+def correct_sink_tag(base):
+    rxn = cobra.Reaction('SK_abc_c')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_c",
+                          compartment='c'): -1}
+    )
+    rxn.lower_bound = -1000
+    base.add_reactions([rxn])
+    return base
+
+
+def incorrect_sink_tag(base):
+    rxn = cobra.Reaction('EX_abc_c')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_c",
+                          compartment='c'): -1}
+    )
+    rxn.lower_bound = -1000
+    rxn1 = cobra.Reaction('SINK_def_c')
+    rxn1.add_metabolites(
+        {cobra.Metabolite(id="def_c",
+                          compartment='c'): -1}
+    )
+    rxn1.lower_bound = -1000
+    base.add_reactions([rxn, rxn1])
+    return base
+
+
 def model_builder(name):
     choices = {
         "rxn_correct_tags": rxn_correct_tags,
@@ -314,6 +342,8 @@ def model_builder(name):
         "incorrect_demand_tag": incorrect_demand_tag,
         "correct_exchange_tag": correct_exchange_tag,
         "incorrect_exchange_tag": incorrect_exchange_tag,
+        "correct_sink_tag": correct_sink_tag,
+        "incorrect_sink_tag": incorrect_sink_tag,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -389,6 +419,16 @@ def test_demand_reaction_tag_match(model, num):
     """Expect all demand rxn IDs to be prefixed with 'DM_'"""
     falsely_tagged_demand_rxns = syntax.find_untagged_demand_rxns(model)
     assert len(falsely_tagged_demand_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_sink_tag", 0),
+    ("incorrect_sink_tag", 2)
+], indirect=["model"])
+def test_sink_reaction_tag_match(model, num):
+    """Expect all sink rxn IDs to be prefixed with 'SK_'"""
+    falsely_tagged_sink_rxns = syntax.find_untagged_sink_rxns(model)
+    assert len(falsely_tagged_sink_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [
