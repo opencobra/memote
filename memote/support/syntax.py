@@ -271,8 +271,8 @@ def find_untagged_sink_rxns(model):
     """
     demand_and_exchange_rxns = set(model.exchanges)
     sink_rxns = [rxn for rxn in demand_and_exchange_rxns
-                   if rxn.reversibility and
-                   rxn.get_compartments() not in ['e']]
+                 if rxn.reversibility and
+                 rxn.get_compartments() not in ['e']]
 
     comp_pattern = "^SK_\w*?"
     return [rxn for rxn in sink_rxns
