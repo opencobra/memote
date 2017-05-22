@@ -102,3 +102,30 @@ def find_biomass_reaction(model):
 
     """
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
+
+
+def get_difference(subset, model, type):
+    """
+    Return difference between a given subset and the full set.
+
+    Providing that all metabolites or reactions in subset have a certain
+    attribute, this function returns the 'leftover' list of the metabolites or
+    reactions from the total amount of metabolites or reactions, i.e. those
+    that do not have this attribute.
+
+    Parameters
+    ----------
+    subset: list
+        A list of either reactions or metabolites with a certain attribute.
+
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    if type == 'met':
+        diff_subset = set(model.metabolites).difference(set(subset))
+    if type == 'rxn':
+        diff_subset = set(model.reactions).difference(set(subset))
+    else:
+        pass
+    return list(diff_subset)
