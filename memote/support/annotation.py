@@ -25,7 +25,7 @@ import re
 LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
-# common databases that currently included are:
+# common databases that are currently included are:
 # DB    rxn,met,gen url
 # 'MetaNetX'  ['rxn','met'] 'http://www.metanetx.org'
 # 'Kegg'  ['rxn','met'] 'http://www.kegg.jp/'
