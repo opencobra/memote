@@ -106,7 +106,7 @@ def generate_met_annotation_overview(model):
     for met in model.metabolites:
         for key in METABOLITE_ANNOTATIONS:
             if key not in met.annotation:
-                met_annotation_overview[key].append(met.id)
+                met_annotation_overview[key].append(met)
     return met_annotation_overview
 
 
@@ -147,5 +147,5 @@ def generate_rxn_annotation_overview(model):
     for rxn in model.reactions:
         for key in REACTION_ANNOTATIONS:
             if key not in rxn.annotation:
-                rxn_annotation_overview[key].append(rxn.id)
+                rxn_annotation_overview[key].append(rxn)
     return rxn_annotation_overview
