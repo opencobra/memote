@@ -126,3 +126,26 @@ def find_rxn_without_annotations(model):
 
     """
     return [rxn for rxn in model.reactions if rxn.annotation == {}]
+
+
+def generate_rxn_annotation_overview(model):
+    """
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    Returns
+    -------
+    dict
+        Dictionary that contains the database namespaces as keys and a list of
+        reactions without annotation in each namespace as the values.
+
+    """
+    rxn_annotation_overview = {key: [] for key in REACTION_ANNOTATIONS}
+    for rxn in model.reactions:
+        for key in REACTION_ANNOTATIONS:
+            if key not in rxn.annotation:
+                rxn_annotation_overview[key].append(rxm.id)
+    return rxn_annotation_overview
