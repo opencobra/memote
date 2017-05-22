@@ -67,7 +67,7 @@ def model_builder(name):
                           'reactome': [113557, 29398, 389680],
                           'bigg.metabolite': "pyr"}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1, met1: 1})
+        rxn.add_metabolites({met: -1})
         model.add_reactions([rxn])
         return model
     if name == 'met_each_absent':
@@ -75,25 +75,26 @@ def model_builder(name):
         met.annotation = {'METANETX': "MNXM23",
                           'old_database': "broken_identifier"}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1, met1: 1})
+        rxn.add_metabolites({met: -1})
         model.add_reactions([rxn])
         return model
     if name == 'rxn_each_present':
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.annotation = {'metanetx.reaction': "MNXR13125",
-                        'kegg.reaction': "R01068",
-                        'ec-code': "4.1.2.13",
-                        'brenda': "4.1.2.13",
-                        'rhea': [14729, 14730, 14731, 14732],
-                        'biocyc': "ECOLI:F16ALDOLASE-RXN",
-                        'bigg.reaction': "FBA"}
+                          'kegg.reaction': "R01068",
+                          'ec-code': "4.1.2.13",
+                          'brenda': "4.1.2.13",
+                          'rhea': [14729, 14730, 14731, 14732],
+                          'biocyc': "ECOLI:F16ALDOLASE-RXN",
+                          'bigg.reaction': "FBA"}
         model.add_reactions([rxn])
         return model
     if name == 'rxn_each_absent':
-    # Old or unknown databases and keys that don't follow the MIRIAM namespaces
+        # Old or unknown databases and
+        # keys that don't follow the MIRIAM namespaces
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.annotation = {'old_database': "broken_identifier",
-                        'KEGG': "R01068"}
+                          'KEGG': "R01068"}
         model.add_reactions([rxn])
         return model
 
