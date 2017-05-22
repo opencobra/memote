@@ -86,3 +86,21 @@ def find_met_without_annotations(model):
 
     """
     return [met for met in model.metabolites if met.annotation == {}]
+
+
+def find_rxn_without_annotations(model):
+    """
+    Find reactions with empty annotation attributes.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    Returns
+    -------
+    list
+        Reactions that have empty annotation attributes.
+
+    """
+    return [rxn for rxn in model.reactions if rxn.annotation == {}]
