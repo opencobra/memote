@@ -57,9 +57,8 @@ REACTION_ANNOTATIONS = {'metanetx.reaction': re.compile(r"^MNXR\d+$"),
 METABOLITE_ANNOTATIONS = {'metanetx.chemical': re.compile(r"^MNXM\d+$"),
                           'kegg.compound': re.compile(r"^C\d+$"),
                           'seed.compound': re.compile(r"^cpd\d+$"),
-                          'inchikey': re.compile(
-                            r"^[A-Z]{14}\-[A-Z]{10}(\-[A-Z])?"
-                            ),
+                          'inchikey': re.compile(r"^[A-Z]{14}\-"
+                                                 r"[A-Z]{10}(\-[A-Z])?"),
                           'chebi': re.compile(r"^CHEBI:\d+$"),
                           'hmdb': re.compile(r"^HMDB\d{5}$"),
                           'biocyc': re.compile(r"^[A-Z-0-9]+(?<!CHEBI)"
@@ -86,6 +85,29 @@ def find_met_without_annotations(model):
 
     """
     return [met for met in model.metabolites if met.annotation == {}]
+
+
+def generate_met_annotation_overview(model):
+    """
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    Returns
+    -------
+    dict
+        Dictionary that contains the database namespaces as keys and a list of
+        metabolites without annotation in each namespace as the values.
+
+    """
+    met_annotation_overview = {key: [] for key in METABOLITE_ANNOTATIONS}
+    for met in model.metabolites:
+        for key in METABOLITE_ANNOTATIONS:
+            if key not in met.annotation:
+                met_annotation_overview[key].append(met.id)
+    return met_annotation_overview
 
 
 def find_rxn_without_annotations(model):
