@@ -52,6 +52,50 @@ def model_builder(name):
         rxn.annotation = {'brenda': '1.1.1.1'}
         model.add_reactions([rxn])
         return model
+    if name == 'met_each_present':
+        met = cobra.Metabolite(id='met_c', name="Met")
+        met.annotation = {'metanetx.chemical': "MNXM23",
+                          'kegg.compound': "C00022",
+                          'seed.compound': "cpd00020",
+                          'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",
+                          'chebi': ["CHEBI:14987", "CHEBI:15361",
+                                    "CHEBI:26462", "CHEBI:26466",
+                                    "CHEBI:32816", "CHEBI:45253",
+                                    "CHEBI:86354", "CHEBI:8685"],
+                          'hmdb': "HMDB00243",
+                          'biocyc': "META:PYRUVATE",
+                          'reactome': [113557, 29398, 389680],
+                          'bigg.metabolite': "pyr"}
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.add_metabolites({met: -1, met1: 1})
+        model.add_reactions([rxn])
+        return model
+    if name == 'met_each_absent':
+        met = cobra.Metabolite(id='met_c', name="Met")
+        met.annotation = {'METANETX': "MNXM23",
+                          'old_database': "broken_identifier"}
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.add_metabolites({met: -1, met1: 1})
+        model.add_reactions([rxn])
+        return model
+    if name == 'rxn_each_present':
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.annotation = {'metanetx.reaction': "MNXR13125",
+                        'kegg.reaction': "R01068",
+                        'ec-code': "4.1.2.13",
+                        'brenda': "4.1.2.13",
+                        'rhea': [14729, 14730, 14731, 14732],
+                        'biocyc': "ECOLI:F16ALDOLASE-RXN",
+                        'bigg.reaction': "FBA"}
+        model.add_reactions([rxn])
+        return model
+    if name == 'rxn_each_absent':
+    # Old or unknown databases and keys that don't follow the MIRIAM namespaces
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.annotation = {'old_database': "broken_identifier",
+                        'KEGG': "R01068"}
+        model.add_reactions([rxn])
+        return model
 
 
 @pytest.mark.parametrize("model, num", [
@@ -72,3 +116,35 @@ def test_rxns_without_annotation(model, num):
     """Expect all rxns to have a non-empty annotation attribute"""
     rxns_without_annotation = annotation.find_rxn_without_annotations(model)
     assert len(rxns_without_annotation) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("met_each_present", 1),
+    ("met_each_absent", 0)
+], indirect=["model"])
+def test_mets_annotation_overview(model, num):
+    """
+    Expect all mets to have annotations from common databases.
+
+    The required databases are outlined in annotation.py.
+    """
+    met_annotation_overview = \
+        annotation.generate_met_annotation_overview(model)
+    for key in annotation.METABOLITE_ANNOTATIONS:
+        assert met_annotation_overview[key] == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("rxn_each_present", 1),
+    ("rxn_each_absent", 0)
+], indirect=["model"])
+def test_rxns_annotation_overview(model, num):
+    """
+    Expect all rxns to have annotations from common databases.
+
+    The required databases are outlined in annotation.py.
+    """
+    rxn_annotation_overview = \
+        annotation.generate_rxn_annotation_overview(model)
+    for key in annotation.REACTION_ANNOTATIONS:
+        assert rxn_annotation_overview[key] == num
