@@ -147,5 +147,5 @@ def generate_rxn_annotation_overview(model):
     for rxn in model.reactions:
         for key in REACTION_ANNOTATIONS:
             if key not in rxn.annotation:
-                rxn_annotation_overview[key].append(rxm.id)
+                rxn_annotation_overview[key].append(rxn.id)
     return rxn_annotation_overview
