@@ -91,6 +91,7 @@ def find_met_without_annotations(model):
 
 def generate_met_annotation_overview(model):
     """
+    List metabolites which lack annotation for a given database.
 
     Parameters
     ----------
@@ -132,6 +133,7 @@ def find_rxn_without_annotations(model):
 
 def generate_rxn_annotation_overview(model):
     """
+    List reactions which lack annotation for a given database.
 
     Parameters
     ----------
