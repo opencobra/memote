@@ -64,7 +64,9 @@ def model_builder(name):
                                     "CHEBI:86354", "CHEBI:8685"],
                           'hmdb': "HMDB00243",
                           'biocyc': "META:PYRUVATE",
-                          'reactome': [113557, 29398, 389680],
+                          'reactome': ["R-ALL-113557",
+                                       "R-ALL-29398",
+                                       "R-ALL-389680"],
                           'bigg.metabolite': "pyr"}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.add_metabolites({met: -1})
@@ -84,7 +86,7 @@ def model_builder(name):
                           'kegg.reaction': "R01068",
                           'ec-code': "4.1.2.13",
                           'brenda': "4.1.2.13",
-                          'rhea': [14729, 14730, 14731, 14732],
+                          'rhea': ["14729", "14730", "14731", "14732"],
                           'biocyc': "ECOLI:F16ALDOLASE-RXN",
                           'bigg.reaction': "FBA"}
         model.add_reactions([rxn])
@@ -109,7 +111,7 @@ def model_builder(name):
                                     "CHEBI:86354", "CHEBI:8685"],
                           'hmdb': "HMBD00243",
                           'biocyc': "META-PYRUVATE",
-                          'reactome': [57, "29398", 389],
+                          'reactome': ["113557", "29398", "389680"],
                           'bigg.metabolite': "324RSF"}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.add_metabolites({met: -1})
@@ -121,7 +123,7 @@ def model_builder(name):
                           'kegg.reaction': "T1068",
                           'ec-code': "4.1.2..13",
                           'brenda': "4.1.2..13",
-                          'rhea': ["14729", 14730, 14731, 14732],
+                          'rhea': ["14729", "14730", "14731", "ABCD"],
                           'biocyc': "ECOLI_F16ALDOLASE-RXN",
                           'bigg.reaction': "2x_FBA"}
         model.add_reactions([rxn])

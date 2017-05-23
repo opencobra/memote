@@ -199,7 +199,7 @@ def find_wrong_annotation_ids(model, overview_dict, rxn_or_met):
             if type(item.annotation[db_id]) == list:
                 for anno_id in item.annotation[db_id]:
                     if not re.match(
-                        pattern_storage[db_id], anno_id
+                        pattern_storage[db_id], str(anno_id)
                     ):
                         items_anno_wrong_ids[db_id].append(item)
                         break
