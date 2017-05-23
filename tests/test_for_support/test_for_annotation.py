@@ -180,7 +180,7 @@ def test_rxns_annotation_overview(model, num):
         assert len(rxn_annotation_overview[key]) == num
 
 
-@pytest.mark.parametrize("model, num, type", [
+@pytest.mark.parametrize("model, num, rxn_or_met", [
     ("met_each_present", 0, "met"),
     ("met_broken_id", 1, "met"),
     ("rxn_each_present", 0, "rxn"),
