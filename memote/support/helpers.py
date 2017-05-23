@@ -121,6 +121,9 @@ def get_difference(subset, model, type):
     model : cobra.Model
         The metabolic model under investigation.
 
+    type : str
+        Either 'rxn' or 'met'.
+
     """
     if type == 'met':
         diff_subset = set(model.metabolites).difference(set(subset))
