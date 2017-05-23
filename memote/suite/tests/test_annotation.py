@@ -40,3 +40,39 @@ def test_rxns_without_annotation(read_only_model, store):
     assert len(store["reactions_without_annotations"]) == 0, \
         "The following reactions lack any form of annotation: " \
         "{}".format(", ".join(store["reactions_without_annotations"]))
+
+
+def test_mets_annotation_overview(read_only_model, store):
+    """
+    Expect all mets to have annotations from common databases.
+
+    The required databases are outlined in annotation.py.
+    """
+    store['met_annotation_overview'] = \
+        annotation.generate_met_annotation_overview(read_only_model)
+    for db_id in annotation.METABOLITE_ANNOTATIONS:
+        assert \
+            len(store['met_annotation_overview'][db_id]) == \
+            len(read_only_model.metabolites), \
+            "The following metabolites lack annotation for {}: " \
+            "{}".format(
+                db_id, ", ".join(store['met_annotation_overview'][db_id])
+            )
+
+
+def test_rxns_annotation_overview(read_only_model, store):
+    """
+    Expect all rxns to have annotations from common databases.
+
+    The required databases are outlined in annotation.py.
+    """
+    store['rxn_annotation_overview'] = \
+        annotation.generate_rxn_annotation_overview(read_only_model)
+    for db_id in annotation.REACTION_ANNOTATIONS:
+        assert \
+            len(store['rxn_annotation_overview'][db_id]) == \
+            len(read_only_model.metabolites), \
+            "The following reactions lack annotation for {}: " \
+            "{}".format(
+                db_id, ", ".join(store['rxn_annotation_overview'][db_id])
+            )
