@@ -107,12 +107,12 @@ def model_builder(name):
                           'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
                           'chebi': ["CHEBI:487", "CHEBI:15361",
                                     "CHEBI:26462", "CHEBI:26466",
-                                    "CHEBI:32816", "CEBI:45253",
+                                    "CHEBI:32816", "CEBI:O",
                                     "CHEBI:86354", "CHEBI:8685"],
                           'hmdb': "HMBD00243",
-                          'biocyc': "META-PYRUVATE",
+                          'biocyc': "-PYRUVATE",
                           'reactome': ["113557", "29398", "389680"],
-                          'bigg.metabolite': "324RSF"}
+                          'bigg.metabolite': ":324RSF"}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.add_metabolites({met: -1})
         model.add_reactions([rxn])
@@ -123,9 +123,9 @@ def model_builder(name):
                           'kegg.reaction': "T1068",
                           'ec-code': "4.1.2..13",
                           'brenda': "4.1.2..13",
-                          'rhea': ["14729", "14730", "14731", "ABCD"],
-                          'biocyc': "ECOLI_F16ALDOLASE-RXN",
-                          'bigg.reaction': "2x_FBA"}
+                          'rhea': ["1472999", "14730", "14731", "ABCD"],
+                          'biocyc': ":ECOLI_F16ALDOLASE-RXN",
+                          'bigg.reaction': "/:2x_FBA"}
         model.add_reactions([rxn])
         return model
 
