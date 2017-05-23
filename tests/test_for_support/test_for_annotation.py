@@ -112,7 +112,7 @@ def model_builder(name):
                           'hmdb': "HMBD00243",
                           'biocyc': "-PYRUVATE",
                           'reactome': ["113557", "29398", "389680"],
-                          'bigg.metabolite': ":324RSF"}
+                          'bigg.metabolite': ""}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
         rxn.add_metabolites({met: -1})
         model.add_reactions([rxn])
