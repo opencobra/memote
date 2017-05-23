@@ -97,6 +97,35 @@ def model_builder(name):
                           'KEGG': "R01068"}
         model.add_reactions([rxn])
         return model
+    if name == 'met_broken_id':
+        met = cobra.Metabolite(id='met_c', name="Met")
+        met.annotation = {'metanetx.chemical': "MNXR23",
+                          'kegg.compound': "K00022",
+                          'seed.compound': "cdp00020",
+                          'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
+                          'chebi': ["CHEBI:487", "CHEBI:15361",
+                                    "CHEBI:26462", "CHEBI:26466",
+                                    "CHEBI:32816", "CEBI:45253",
+                                    "CHEBI:86354", "CHEBI:8685"],
+                          'hmdb': "HMBD00243",
+                          'biocyc': "META-PYRUVATE",
+                          'reactome': [57, "29398", 389],
+                          'bigg.metabolite': "324RSF"}
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.add_metabolites({met: -1})
+        model.add_reactions([rxn])
+        return model
+    if name == 'rxn_broken_id':
+        rxn = cobra.Reaction(id='RXN', name="Rxn")
+        rxn.annotation = {'metanetx.reaction': "MNXM13125",
+                          'kegg.reaction': "T1068",
+                          'ec-code': "4.1.2..13",
+                          'brenda': "4.1.2..13",
+                          'rhea': ["14729", 14730, 14731, 14732],
+                          'biocyc': "ECOLI_F16ALDOLASE-RXN",
+                          'bigg.reaction': "2x_FBA"}
+        model.add_reactions([rxn])
+        return model
 
 
 @pytest.mark.parametrize("model, num", [
@@ -149,3 +178,30 @@ def test_rxns_annotation_overview(model, num):
         annotation.generate_rxn_annotation_overview(model)
     for key in annotation.REACTION_ANNOTATIONS:
         assert rxn_annotation_overview[key] == num
+
+
+@pytest.mark.parametrize("model, num, type", [
+    ("met_each_present", 1, "met"),
+    ("met_broken_id", 0, "met"),
+    ("rxn_each_present", 1, "rxn"),
+    ("rxn_broken_id", 0, "rxn")
+], indirect=["model"])
+def test_find_wrong_annotation_ids(model, num, type):
+    """
+    Expect all items to have annotations that match MIRIAM patterns.
+
+    The required databases and their patterns are outlined in annotation.py.
+    """
+    if type == "met":
+        item_annotation_overview = \
+            annotation.generate_met_annotation_overview(model)
+    if type == "rxn":
+        item_annotation_overview = \
+            annotation.generate_rxn_annotation_overview(model)
+    wrong_annotation_ids = annotation.find_wrong_annotation_ids(
+        model,
+        item_annotation_overview,
+        type
+    )
+    for key in wrong_annotation_ids:
+        assert wrong_annotation_ids[key] == num
