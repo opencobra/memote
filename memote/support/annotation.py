@@ -190,7 +190,7 @@ def find_wrong_annotation_ids(model, overview_dict, type):
             model,
             type
         )
-        for item in items_with_annotation[db_id]:
+        for item in items_with_annotation:
             if type(item.annotation[db_id]) == str:
                 if not re.match(
                     pattern_storage[db_id], item.annotation[db_id]

@@ -129,8 +129,8 @@ def model_builder(name):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("no_annotations", 0),
-    ("met_annotations", 2)
+    ("no_annotations", 2),
+    ("met_annotations", 0)
 ], indirect=["model"])
 def test_mets_without_annotation(model, num):
     """Expect all mets to have a non-empty annotation attribute"""
@@ -139,8 +139,8 @@ def test_mets_without_annotation(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("no_annotations", 0),
-    ("rxn_annotations", 1)
+    ("no_annotations", 1),
+    ("rxn_annotations", 0)
 ], indirect=["model"])
 def test_rxns_without_annotation(model, num):
     """Expect all rxns to have a non-empty annotation attribute"""
@@ -149,8 +149,8 @@ def test_rxns_without_annotation(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("met_each_present", 1),
-    ("met_each_absent", 0)
+    ("met_each_present", 0),
+    ("met_each_absent", 1)
 ], indirect=["model"])
 def test_mets_annotation_overview(model, num):
     """
@@ -161,12 +161,12 @@ def test_mets_annotation_overview(model, num):
     met_annotation_overview = \
         annotation.generate_met_annotation_overview(model)
     for key in annotation.METABOLITE_ANNOTATIONS:
-        assert met_annotation_overview[key] == num
+        assert len(met_annotation_overview[key]) == num
 
 
 @pytest.mark.parametrize("model, num", [
-    ("rxn_each_present", 1),
-    ("rxn_each_absent", 0)
+    ("rxn_each_present", 0),
+    ("rxn_each_absent", 1)
 ], indirect=["model"])
 def test_rxns_annotation_overview(model, num):
     """
@@ -177,14 +177,14 @@ def test_rxns_annotation_overview(model, num):
     rxn_annotation_overview = \
         annotation.generate_rxn_annotation_overview(model)
     for key in annotation.REACTION_ANNOTATIONS:
-        assert rxn_annotation_overview[key] == num
+        assert len(rxn_annotation_overview[key]) == num
 
 
 @pytest.mark.parametrize("model, num, type", [
-    ("met_each_present", 1, "met"),
-    ("met_broken_id", 0, "met"),
-    ("rxn_each_present", 1, "rxn"),
-    ("rxn_broken_id", 0, "rxn")
+    ("met_each_present", 0, "met"),
+    ("met_broken_id", 1, "met"),
+    ("rxn_each_present", 0, "rxn"),
+    ("rxn_broken_id", 1, "rxn")
 ], indirect=["model"])
 def test_find_wrong_annotation_ids(model, num, type):
     """
@@ -204,4 +204,4 @@ def test_find_wrong_annotation_ids(model, num, type):
         type
     )
     for key in wrong_annotation_ids:
-        assert wrong_annotation_ids[key] == num
+        assert len(wrong_annotation_ids[key]) == num
