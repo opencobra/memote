@@ -188,7 +188,19 @@ def find_wrong_annotation_ids(model, overview_dict, type):
             model,
             type
         )
-        items_anno_wrong_ids[db_id] = \
-            [item for item in items_with_annotation[db_id]
-             if not re.match(pattern_storage[db_id], item.id)]
+        for item in items_with_annotation[db_id]:
+            if type(item.annotation[db_id]) == str:
+                if not re.match(
+                    pattern_storage[db_id], item.annotation[db_id]
+                ):
+                    items_anno_wrong_ids[db_id].append(item)
+            if type(item.annotation[db_id]) == list:
+                for anno_id in item.annotation[db_id]:
+                    if not re.match(
+                        pattern_storage[db_id], anno_id
+                    ):
+                        items_anno_wrong_ids[db_id].append(item)
+                        break
+                    else:
+                        pass
     return items_anno_wrong_ids
