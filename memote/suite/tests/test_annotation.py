@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import memote.support.annotation as annotation
+from memote.support.helpers import get_difference
 
 
 def test_mets_without_annotation(read_only_model, store):
@@ -75,4 +76,60 @@ def test_rxns_annotation_overview(read_only_model, store):
             "The following reactions lack annotation for {}: " \
             "{}".format(
                 db_id, ", ".join(store['rxn_annotation_overview'][db_id])
+            )
+
+
+def test_met_wrong_annotation_ids(read_only_model, store):
+    """
+    Expect all annotations of metabolites to be in the correct format.
+
+    The required formats i.e. regex patterns are outlined in annotation.py.
+    """
+    met_annotation_overview = \
+        annotation.generate_met_annotation_overview(read_only_model)
+    store['met_wrong_annotation_ids'] = annotation.find_wrong_annotation_ids(
+        read_only_model,
+        met_annotation_overview,
+        "met"
+    )
+    for db_id in annotation.METABOLITE_ANNOTATIONS:
+        assert \
+            len(store['met_wrong_annotation_ids'][db_id]) == \
+            len(
+                get_difference(
+                    met_annotation_overview[db_id],
+                    read_only_model,
+                    "met"
+                )
+            ), "The following metabolites use wrong IDs for {}: " \
+            "{}".format(
+                db_id, ", ".join(store['met_wrong_annotation_ids'][db_id])
+            )
+
+
+def test_rxn_wrong_annotation_ids(read_only_model, store):
+    """
+    Expect all annotations of reactions to be in the correct format.
+
+    The required formats i.e. regex patterns are outlined in annotation.py.
+    """
+    rxn_annotation_overview = \
+        annotation.generate_rxn_annotation_overview(read_only_model)
+    store['rxn_wrong_annotation_ids'] = annotation.find_wrong_annotation_ids(
+        read_only_model,
+        rxn_annotation_overview,
+        "rxn"
+    )
+    for db_id in annotation.REACTION_ANNOTATIONS:
+        assert \
+            len(store['rxn_wrong_annotation_ids'][db_id]) == \
+            len(
+                get_difference(
+                    rxn_annotation_overview[db_id],
+                    read_only_model,
+                    "rxn"
+                )
+            ), "The following reactions use wrong IDs for {}: " \
+            "{}".format(
+                db_id, ", ".join(store['rxn_wrong_annotation_ids'][db_id])
             )
