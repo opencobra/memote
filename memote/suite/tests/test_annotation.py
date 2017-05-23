@@ -53,8 +53,7 @@ def test_mets_annotation_overview(read_only_model, store):
         annotation.generate_met_annotation_overview(read_only_model)
     for db_id in annotation.METABOLITE_ANNOTATIONS:
         assert \
-            len(store['met_annotation_overview'][db_id]) == \
-            len(read_only_model.metabolites), \
+            len(store['met_annotation_overview'][db_id]) == 0, \
             "The following metabolites lack annotation for {}: " \
             "{}".format(
                 db_id, ", ".join(store['met_annotation_overview'][db_id])
@@ -71,8 +70,7 @@ def test_rxns_annotation_overview(read_only_model, store):
         annotation.generate_rxn_annotation_overview(read_only_model)
     for db_id in annotation.REACTION_ANNOTATIONS:
         assert \
-            len(store['rxn_annotation_overview'][db_id]) == \
-            len(read_only_model.metabolites), \
+            len(store['rxn_annotation_overview'][db_id]) == 0, \
             "The following reactions lack annotation for {}: " \
             "{}".format(
                 db_id, ", ".join(store['rxn_annotation_overview'][db_id])
