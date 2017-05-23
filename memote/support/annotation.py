@@ -22,6 +22,8 @@ from __future__ import absolute_import
 import logging
 import re
 
+from memote.support.helpers import (get_difference)
+
 LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
@@ -149,3 +151,44 @@ def generate_rxn_annotation_overview(model):
             if key not in rxn.annotation:
                 rxn_annotation_overview[key].append(rxn)
     return rxn_annotation_overview
+
+
+def find_wrong_annotation_ids(model, overview_dict, type):
+    """
+    Check the correctness of the annotations of annotated model components.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    overview_dict
+        Dictionary that contains the database namespaces as keys and a list of
+        mets/rxns without annotation in each namespace as the values.
+
+    type : str
+        Either 'rxn' or 'met'.
+
+    Returns
+    -------
+    dict
+        Dictionary that contains the database namespaces as keys and a list of
+        mets/rxns that have wrong ids of each namespace as the values.
+
+    """
+    if type == 'rxn':
+        items_anno_wrong_ids = {db_id: [] for db_id in REACTION_ANNOTATIONS}
+        pattern_storage = REACTION_ANNOTATIONS
+    if type == 'met':
+        items_anno_wrong_ids = {db_id: [] for db_id in METABOLITE_ANNOTATIONS}
+        pattern_storage = METABOLITE_ANNOTATIONS
+    for db_id in overview_dict:
+        items_with_annotation = get_difference(
+            overview_dict[db_id],
+            model,
+            type
+        )
+        items_anno_wrong_ids[db_id] = \
+            [item for item in items_with_annotation[db_id]
+             if not re.match(pattern_storage[db_id], item.id)]
+    return items_anno_wrong_ids
