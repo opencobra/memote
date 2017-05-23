@@ -110,7 +110,7 @@ def model_builder(name):
                                     "CHEBI:32816", "CEBI:O",
                                     "CHEBI:86354", "CHEBI:8685"],
                           'hmdb': "HMBD00243",
-                          'biocyc': "-PYRUVATE",
+                          'biocyc': "/:PYRUVATE",
                           'reactome': ["113557", "29398", "389680"],
                           'bigg.metabolite': ""}
         rxn = cobra.Reaction(id='RXN', name="Rxn")
