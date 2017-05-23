@@ -186,22 +186,22 @@ def test_rxns_annotation_overview(model, num):
     ("rxn_each_present", 0, "rxn"),
     ("rxn_broken_id", 1, "rxn")
 ], indirect=["model"])
-def test_find_wrong_annotation_ids(model, num, type):
+def test_find_wrong_annotation_ids(model, num, rxn_or_met):
     """
     Expect all items to have annotations that match MIRIAM patterns.
 
     The required databases and their patterns are outlined in annotation.py.
     """
-    if type == "met":
+    if rxn_or_met == "met":
         item_annotation_overview = \
             annotation.generate_met_annotation_overview(model)
-    if type == "rxn":
+    if rxn_or_met == "rxn":
         item_annotation_overview = \
             annotation.generate_rxn_annotation_overview(model)
     wrong_annotation_ids = annotation.find_wrong_annotation_ids(
         model,
         item_annotation_overview,
-        type
+        rxn_or_met
     )
     for key in wrong_annotation_ids:
         assert len(wrong_annotation_ids[key]) == num

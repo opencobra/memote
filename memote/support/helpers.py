@@ -104,7 +104,7 @@ def find_biomass_reaction(model):
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
 
 
-def get_difference(subset, model, type):
+def get_difference(subset, model, rxn_or_met):
     """
     Return difference between a given subset and the full set.
 
@@ -121,13 +121,13 @@ def get_difference(subset, model, type):
     model : cobra.Model
         The metabolic model under investigation.
 
-    type : str
+    rxn_or_met : str
         Either 'rxn' or 'met'.
 
     """
-    if type == 'met':
+    if rxn_or_met == 'met':
         diff_subset = set(model.metabolites).difference(set(subset))
-    if type == 'rxn':
+    if rxn_or_met == 'rxn':
         diff_subset = set(model.reactions).difference(set(subset))
     else:
         pass

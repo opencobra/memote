@@ -155,7 +155,7 @@ def generate_rxn_annotation_overview(model):
     return rxn_annotation_overview
 
 
-def find_wrong_annotation_ids(model, overview_dict, type):
+def find_wrong_annotation_ids(model, overview_dict, rxn_or_met):
     """
     Check the correctness of the annotations of annotated model components.
 
@@ -168,7 +168,7 @@ def find_wrong_annotation_ids(model, overview_dict, type):
         Dictionary that contains the database namespaces as keys and a list of
         mets/rxns without annotation in each namespace as the values.
 
-    type : str
+    rxn_or_met : str
         Either 'rxn' or 'met'.
 
     Returns
@@ -178,17 +178,17 @@ def find_wrong_annotation_ids(model, overview_dict, type):
         mets/rxns that have wrong ids of each namespace as the values.
 
     """
-    if type == 'rxn':
+    if rxn_or_met == 'rxn':
         items_anno_wrong_ids = {db_id: [] for db_id in REACTION_ANNOTATIONS}
         pattern_storage = REACTION_ANNOTATIONS
-    if type == 'met':
+    if rxn_or_met == 'met':
         items_anno_wrong_ids = {db_id: [] for db_id in METABOLITE_ANNOTATIONS}
         pattern_storage = METABOLITE_ANNOTATIONS
     for db_id in overview_dict:
         items_with_annotation = get_difference(
             overview_dict[db_id],
             model,
-            type
+            rxn_or_met
         )
         for item in items_with_annotation:
             if type(item.annotation[db_id]) == str:
