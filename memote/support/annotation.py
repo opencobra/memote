@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 import re
+import pandas as pd
 
 from memote.support.helpers import (get_difference)
 
@@ -206,3 +207,60 @@ def find_wrong_annotation_ids(model, overview_dict, rxn_or_met):
                     else:
                         pass
     return items_anno_wrong_ids
+
+
+def collect_met_id_namespace(model):
+    """
+    Identify to which common database metabolite IDs belong.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    Returns
+    -------
+    dataframe : pandas.core.frame.DataFrame
+        Table with metabolite IDs as rows and database namespaces as the
+        columns. Cell values are boolean.
+
+    """
+    data = {}
+    for db_id in METABOLITE_ANNOTATIONS:
+        data[db_id] = {}
+        for met in model.metabolites:
+            no_compartment_id = met.id.rsplit('_',1)[0]
+            if not re.match(METABOLITE_ANNOTATIONS[db_id],
+                            str(no_compartment_id)):
+                data[db_id][met] = False
+            else:
+                data[db_id][met] = True
+    return pd.DataFrame.from_dict(data)
+
+
+def collect_rxn_id_namespace(model):
+    """
+    Identify to which common database reaction IDs belong.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model.
+
+    Returns
+    -------
+    dataframe : pandas.core.frame.DataFrame
+        Table with reaction IDs as rows and database namespaces as the
+        columns. Cell values are boolean.
+
+    """
+    data = {}
+    for db_id in REACTION_ANNOTATIONS:
+        data[db_id] = {}
+        for rxn in model.reactions:
+            if not re.match(REACTION_ANNOTATIONS[db_id],
+                            str(rxn.id)):
+                data[db_id][rxn] = False
+            else:
+                data[db_id][rxn] = True
+    return pd.DataFrame.from_dict(data)
