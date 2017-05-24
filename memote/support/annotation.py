@@ -229,13 +229,23 @@ def collect_met_id_namespace(model):
     for db_id in METABOLITE_ANNOTATIONS:
         data[db_id] = {}
         for met in model.metabolites:
-            no_compartment_id = met.id.rsplit('_',1)[0]
+            # The compartment suffix needs to be removed as it is not included
+            # in the database identifiers.
+            no_compartment_id = met.id.rsplit('_', 1)[0]
             if not re.match(METABOLITE_ANNOTATIONS[db_id],
-                            str(no_compartment_id)):
+                            str(no_compartment_id)
+                            ):
                 data[db_id][met] = False
             else:
                 data[db_id][met] = True
-    return pd.DataFrame.from_dict(data)
+    # Clean up of the table. Unfortunately the Biocyc patterns match quite
+    # broadly. Hence, whenever a Metabolite ID matches to any DB pattern
+    # AND the Biocyc pattern we have to assume that this is a false
+    # positive.
+    df = pd.DataFrame.from_dict(data)
+    mets_matching_2_ids = df[df['biocyc'] == True].sum(axis=1).index
+    df.set_value(mets_matching_2_ids, 'biocyc', False)
+    return df
 
 
 def collect_rxn_id_namespace(model):
@@ -263,4 +273,11 @@ def collect_rxn_id_namespace(model):
                 data[db_id][rxn] = False
             else:
                 data[db_id][rxn] = True
-    return pd.DataFrame.from_dict(data)
+    # Clean up of the table. Unfortunately the Biocyc patterns match quite
+    # broadly. Hence, whenever a Reaction ID matches to any DB pattern
+    # AND the Biocyc pattern we have to assume that this is a false
+    # positive.
+    df = pd.DataFrame.from_dict(data)
+    rxns_matching_2_ids = df[df['biocyc'] == True].sum(axis=1).index
+    df.set_value(rxns_matching_2_ids, 'biocyc', False)
+    return df
