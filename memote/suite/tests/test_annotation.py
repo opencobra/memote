@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+from warnings import warn
 import memote.support.annotation as annotation
 from memote.support.helpers import get_difference
 
@@ -143,8 +144,13 @@ def test_met_id_namespace_consistency(read_only_model, store):
         {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
          for item in distribution.index}
     store['met_id_namespace_largest_fraction'] = distribution.idxmax()
-    # If largest fraction not bigg
-    # print warning that we prefer BiGG IDs to be used!
+    if store['met_id_namespace_largest_fraction'] != 'bigg.metabolite':
+        warn(
+            'Memote currently only supports syntax checks for BiGG database '
+            'IDs. Please consider mapping your IDs from {} to BiGG'.format(
+                store['met_id_namespace_largest_fraction']
+            )
+        )
     assert \
         len(
             store['met_ids_in_each_namespace']
@@ -160,22 +166,27 @@ def test_met_id_namespace_consistency(read_only_model, store):
 
 def test_rxn_id_namespace_consistency(read_only_model, store):
     """
-    Expect metabolite IDs to be from the same namespace.
+    Expect reaction IDs to be from the same namespace.
     """
     rxn_id_namespace = annotation.collect_rxn_id_namespace(read_only_model)
     distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
     store['rxn_ids_in_each_namespace'] = \
-        {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
+        {item: list(met_id_namespace[rxn_id_namespace[item] == 1].index)
          for item in distribution.index}
     store['rxn_id_namespace_largest_fraction'] = distribution.idxmax()
-    # If largest fraction not bigg
-    # print warning that we prefer BiGG IDs to be used!
+    if store['met_id_namespace_largest_fraction'] != 'bigg.reaction':
+        warn(
+            'Memote currently only supports syntax checks for BiGG database '
+            'IDs. Please consider mapping your IDs from {} to BiGG'.format(
+                store['met_id_namespace_largest_fraction']
+            )
+        )
     assert \
         len(
             store['rxn_ids_in_each_namespace']
             [store['rxn_id_namespace_largest_fraction']]
         ) == len(read_only_model.metabolites), \
-        "Metabolite IDs that don't belong to the largest fraction: {}".format(
+        "Reaction IDs that don't belong to the largest fraction: {}".format(
             [db_id + ":" + ", ".join(store['rxn_ids_in_each_namespace'][db_id])
                 for db_id in store['rxn_ids_in_each_namespace'].keys()
                 if store['rxn_ids_in_each_namespace'][db_id] != [] and
