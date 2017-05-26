@@ -237,7 +237,7 @@ def test_find_wrong_annotation_ids(model, num, rxn_or_met):
     ("consistent_ids", 3),
     ("inconsistent_ids", 2)
 ], indirect=["model"])
-def test_met_id_namespace_consistency(model):
+def test_met_id_namespace_consistency(model, num):
     """
     Expect metabolite IDs to be from the same namespace.
     """
@@ -250,14 +250,14 @@ def test_met_id_namespace_consistency(model):
     assert \
         len(
             met_ids_in_each_namespace[met_id_namespace_largest_fraction]
-        ) == len(model.metabolites)
+        ) == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("consistent_ids", 3),
     ("inconsistent_ids", 2)
 ], indirect=["model"])
-def test_rxn_id_namespace_consistency(model):
+def test_rxn_id_namespace_consistency(model, num):
     """
     Expect metabolite IDs to be from the same namespace.
     """
@@ -270,4 +270,4 @@ def test_rxn_id_namespace_consistency(model):
     assert \
         len(
             rxn_ids_in_each_namespace[rxn_id_namespace_largest_fraction]
-        ) == len(model.reactions)
+        ) == num
