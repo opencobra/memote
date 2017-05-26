@@ -233,9 +233,9 @@ def test_find_wrong_annotation_ids(model, num, rxn_or_met):
         assert len(wrong_annotation_ids[key]) == num
 
 
-@pytest.mark.parametrize("model", [
-    "consistent_ids",
-    "inconsistent_ids"
+@pytest.mark.parametrize("model, num", [
+    ("consistent_ids", 3),
+    ("inconsistent_ids", 2)
 ], indirect=["model"])
 def test_met_id_namespace_consistency(model):
     """
@@ -253,9 +253,9 @@ def test_met_id_namespace_consistency(model):
         ) == len(model.metabolites)
 
 
-@pytest.mark.parametrize("model", [
-    "consistent_ids",
-    "inconsistent_ids"
+@pytest.mark.parametrize("model, num", [
+    ("consistent_ids", 3),
+    ("inconsistent_ids", 2)
 ], indirect=["model"])
 def test_rxn_id_namespace_consistency(model):
     """

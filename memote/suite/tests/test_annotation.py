@@ -171,7 +171,7 @@ def test_rxn_id_namespace_consistency(read_only_model, store):
     rxn_id_namespace = annotation.collect_rxn_id_namespace(read_only_model)
     distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
     store['rxn_ids_in_each_namespace'] = \
-        {item: list(met_id_namespace[rxn_id_namespace[item] == 1].index)
+        {item: list(rxn_id_namespace[rxn_id_namespace[item] == 1].index)
          for item in distribution.index}
     store['rxn_id_namespace_largest_fraction'] = distribution.idxmax()
     if store['met_id_namespace_largest_fraction'] != 'bigg.reaction':
