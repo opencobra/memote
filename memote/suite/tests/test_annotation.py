@@ -139,20 +139,45 @@ def test_met_id_namespace_consistency(read_only_model, store):
     """
     met_id_namespace = annotation.collect_met_id_namespace(read_only_model)
     distribution = met_id_namespace[met_id_namespace == 1].count()
-    store['ids_in_each_namespace'] = \
+    store['met_ids_in_each_namespace'] = \
         {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
          for item in distribution.index}
-    store['id_namespace_largest_fraction'] = distribution.idxmax()
+    store['met_id_namespace_largest_fraction'] = distribution.idxmax()
     # If largest fraction not bigg
     # print warning that we prefer BiGG IDs to be used!
     assert \
         len(
-            store['ids_in_each_namespace']
-            [store['id_namespace_largest_fraction']]
+            store['met_ids_in_each_namespace']
+            [store['met_id_namespace_largest_fraction']]
         ) == len(read_only_model.metabolites), \
         "Metabolite IDs that don't belong to the largest fraction: {}".format(
             [db_id + ":" + ", ".join(store['ids_in_each_namespace'][db_id])
-                for db_id in store['ids_in_each_namespace'].keys()
-                if store['ids_in_each_namespace'][db_id] != [] and
-                db_id != [store['id_namespace_largest_fraction']]]
+                for db_id in store['met_ids_in_each_namespace'].keys()
+                if store['met_ids_in_each_namespace'][db_id] != [] and
+                db_id != [store['met_id_namespace_largest_fraction']]]
+        )
+
+
+def test_rxn_id_namespace_consistency(read_only_model, store):
+    """
+    Expect metabolite IDs to be from the same namespace.
+    """
+    rxn_id_namespace = annotation.collect_rxn_id_namespace(read_only_model)
+    distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
+    store['rxn_ids_in_each_namespace'] = \
+        {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
+         for item in distribution.index}
+    store['rxn_id_namespace_largest_fraction'] = distribution.idxmax()
+    # If largest fraction not bigg
+    # print warning that we prefer BiGG IDs to be used!
+    assert \
+        len(
+            store['rxn_ids_in_each_namespace']
+            [store['rxn_id_namespace_largest_fraction']]
+        ) == len(read_only_model.metabolites), \
+        "Metabolite IDs that don't belong to the largest fraction: {}".format(
+            [db_id + ":" + ", ".join(store['rxn_ids_in_each_namespace'][db_id])
+                for db_id in store['rxn_ids_in_each_namespace'].keys()
+                if store['rxn_ids_in_each_namespace'][db_id] != [] and
+                db_id != [store['rxn_id_namespace_largest_fraction']]]
         )
