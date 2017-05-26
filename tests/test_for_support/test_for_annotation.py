@@ -128,6 +128,30 @@ def model_builder(name):
                           'bigg.reaction': "/:2x_FBA"}
         model.add_reactions([rxn])
         return model
+    if name == 'consistent_ids':
+        met = cobra.Metabolite(id='pyr_c', name="Pyruvate")
+        met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
+        met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
+        rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
+        rxn.add_metabolites({met: -1, met1: 1})
+        rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
+        rxn2.add_metabolites({met1: -1, met2: 1})
+        rxn3 = cobra.Reaction(id='OAADC', name="Oxaloacetate decarboxylase")
+        rxn3.add_metabolites({met2: -1, met: 1})
+        model.add_reactions([rxn, rxn2, rxn3])
+        return model
+    if name == 'inconsistent_ids':
+        met = cobra.Metabolite(id='META:PYRUVATE_c', name="Pyruvate")
+        met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
+        met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
+        rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
+        rxn.add_metabolites({met: -1, met1: 1})
+        rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
+        rxn2.add_metabolites({met1: -1, met2: 1})
+        rxn3 = cobra.Reaction(id='MNXR4112', name="Oxaloacetate decarboxylase")
+        rxn3.add_metabolites({met2: -1, met: 1})
+        model.add_reactions([rxn, rxn2, rxn3])
+        return model
 
 
 @pytest.mark.parametrize("model, num", [
@@ -207,3 +231,43 @@ def test_find_wrong_annotation_ids(model, num, rxn_or_met):
     )
     for key in wrong_annotation_ids:
         assert len(wrong_annotation_ids[key]) == num
+
+
+@pytest.mark.parametrize("model", [
+    "consistent_ids",
+    "inconsistent_ids"
+], indirect=["model"])
+def test_met_id_namespace_consistency(model):
+    """
+    Expect metabolite IDs to be from the same namespace.
+    """
+    met_id_namespace = annotation.collect_met_id_namespace(model)
+    distribution = met_id_namespace[met_id_namespace == 1].count()
+    met_ids_in_each_namespace = \
+        {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
+         for item in distribution.index}
+    met_id_namespace_largest_fraction = distribution.idxmax()
+    assert \
+        len(
+            met_ids_in_each_namespace[met_id_namespace_largest_fraction]
+        ) == len(model.metabolites)
+
+
+@pytest.mark.parametrize("model", [
+    "consistent_ids",
+    "inconsistent_ids"
+], indirect=["model"])
+def test_rxn_id_namespace_consistency(model):
+    """
+    Expect metabolite IDs to be from the same namespace.
+    """
+    rxn_id_namespace = annotation.collect_rxn_id_namespace(model)
+    distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
+    rxn_ids_in_each_namespace = \
+        {item: list(rxn_id_namespace[rxn_id_namespace[item] == 1].index)
+         for item in distribution.index}
+    rxn_id_namespace_largest_fraction = distribution.idxmax()
+    assert \
+        len(
+            rxn_ids_in_each_namespace[rxn_id_namespace_largest_fraction]
+        ) == len(model.reactions)

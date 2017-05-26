@@ -185,7 +185,7 @@ def test_rxn_id_namespace_consistency(read_only_model, store):
         len(
             store['rxn_ids_in_each_namespace']
             [store['rxn_id_namespace_largest_fraction']]
-        ) == len(read_only_model.metabolites), \
+        ) == len(read_only_model.reactions), \
         "Reaction IDs that don't belong to the largest fraction: {}".format(
             [db_id + ":" + ", ".join(store['rxn_ids_in_each_namespace'][db_id])
                 for db_id in store['rxn_ids_in_each_namespace'].keys()
