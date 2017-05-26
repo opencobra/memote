@@ -245,6 +245,16 @@ def collect_met_id_namespace(model):
     df = pd.DataFrame.from_dict(data)
     mets_matching_2_ids = df[df['biocyc'] == True].sum(axis=1).index
     df.set_value(mets_matching_2_ids, 'biocyc', False)
+    # Add a new column for all IDs that couldn't be matched to any of the
+    # specified namespaces.
+    df['unknown'] = False
+    # The value should only be True if the entire column is False i.e. the
+    # Metabolite ID has no hits with any of the other namespaces.
+    df.set_value(
+        df[df.apply(pd.Series.nunique, axis=1) == 1].index,
+        'unknown',
+        True
+    )
     return df
 
 
@@ -278,6 +288,16 @@ def collect_rxn_id_namespace(model):
     # AND the Biocyc pattern we have to assume that this is a false
     # positive.
     df = pd.DataFrame.from_dict(data)
-    rxns_matching_2_ids = df[df['biocyc'] == True].sum(axis=1).index
-    df.set_value(rxns_matching_2_ids, 'biocyc', False)
+    mets_matching_2_ids = df[df['biocyc'] == True].sum(axis=1).index
+    df.set_value(mets_matching_2_ids, 'biocyc', False)
+    # Add a new column for all IDs that couldn't be matched to any of the
+    # specified namespaces.
+    df['unknown'] = False
+    # The value should only be True if the entire column is False i.e. the
+    # Reaction ID has no hits with any of the other namespaces.
+    df.set_value(
+        df[df.apply(pd.Series.nunique, axis=1) == 1].index,
+        'unknown',
+        True
+    )
     return df
