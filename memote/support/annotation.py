@@ -23,6 +23,7 @@ import logging
 import re
 import pandas as pd
 
+from collections import OrderedDict
 from memote.support.helpers import (get_difference)
 
 LOGGER = logging.getLogger(__name__)
@@ -43,33 +44,44 @@ LOGGER = logging.getLogger(__name__)
 # 'Reactome'    ['met'] 'http://www.reactome.org/'
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
 
-REACTION_ANNOTATIONS = {'metanetx.reaction': re.compile(r"^MNXR\d+$"),
-                        'kegg.reaction': re.compile(r"^R\d+$"),
-                        'ec-code': re.compile(r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-                                              r"\d+\.\d+\.\d+\.-|"
-                                              r"\d+\.\d+\.\d+\.(n)?\d+$"),
-                        'brenda': re.compile(r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-                                             r"\d+\.\d+\.\d+\.-|"
-                                             r"\d+\.\d+\.\d+\.(n)?\d+$"),
-                        'rhea': re.compile(r"^\d{5}$"),
-                        'biocyc': re.compile(r"^[A-Z-0-9]+(?<!CHEBI)"
-                                             r"(\:)?[A-Za-z0-9+_.%-]+$"),
-                        'bigg.reaction': re.compile(r"^[a-z_A-Z0-9]+$")}
+REACTION_ANNOTATIONS = [
+                        ('rhea', re.compile(r"^\d{5}$")),
+                        ('kegg.reaction', re.compile(r"^R\d+$")),
+                        ('metanetx.reaction', re.compile(r"^MNXR\d+$")),
+                        ('bigg.reaction', re.compile(r"^[a-z_A-Z0-9]+$")),
+                        ('ec-code', re.compile(
+                             r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                             r"\d+\.\d+\.\d+\.-|"
+                             r"\d+\.\d+\.\d+\.(n)?\d+$")
+                         ),
+                        ('brenda', re.compile(
+                             r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                             r"\d+\.\d+\.\d+\.-|"
+                             r"\d+\.\d+\.\d+\.(n)?\d+$")
+                         ),
+                        ('biocyc', re.compile(
+                             r"^[A-Z-0-9]+(?<!CHEBI)"
+                             r"(\:)?[A-Za-z0-9+_.%-]+$")
+                         )
+                        ]
+REACTION_ANNOTATIONS = OrderedDict(REACTION_ANNOTATIONS)
 
 
-METABOLITE_ANNOTATIONS = {'metanetx.chemical': re.compile(r"^MNXM\d+$"),
-                          'kegg.compound': re.compile(r"^C\d+$"),
-                          'seed.compound': re.compile(r"^cpd\d+$"),
-                          'inchikey': re.compile(r"^[A-Z]{14}\-"
-                                                 r"[A-Z]{10}(\-[A-Z])?"),
-                          'chebi': re.compile(r"^CHEBI:\d+$"),
-                          'hmdb': re.compile(r"^HMDB\d{5}$"),
-                          'biocyc': re.compile(r"^[A-Z-0-9]+(?<!CHEBI)"
-                                               r"(\:)?[A-Za-z0-9+_.%-]+$"),
-                          'reactome': re.compile(r"(^R-[A-Z]{3}-[0-9]+"
-                                                 r"(-[0-9]+)?$)|"
-                                                 r"(^REACT_\d+(\.\d+)?$)"),
-                          'bigg.metabolite': re.compile(r"^[a-z_A-Z0-9]+$")}
+METABOLITE_ANNOTATIONS = [('kegg.compound', re.compile(r"^C\d+$")),
+                          ('seed.compound', re.compile(r"^cpd\d+$")),
+                          ('inchikey', re.compile(r"^[A-Z]{14}\-"
+                                                  r"[A-Z]{10}(\-[A-Z])?")),
+                          ('chebi', re.compile(r"^CHEBI:\d+$")),
+                          ('hmdb', re.compile(r"^HMDB\d{5}$")),
+                          ('reactome', re.compile(r"(^R-[A-Z]{3}-[0-9]+"
+                                                  r"(-[0-9]+)?$)|"
+                                                  r"(^REACT_\d+(\.\d+)?$)")),
+                          ('metanetx.chemical', re.compile(r"^MNXM\d+$")),
+                          ('bigg.metabolite', re.compile(r"^[a-z_A-Z0-9]+$")),
+                          ('biocyc', re.compile(r"^[A-Z-0-9]+(?<!CHEBI)"
+                                                r"(\:)?[A-Za-z0-9+_.%-]+$"))
+                          ]
+METABOLITE_ANNOTATIONS = OrderedDict(METABOLITE_ANNOTATIONS)
 
 
 def find_met_without_annotations(model):
@@ -226,25 +238,18 @@ def collect_met_id_namespace(model):
 
     """
     data = {}
-    for db_id in METABOLITE_ANNOTATIONS:
-        data[db_id] = {}
-        for met in model.metabolites:
-            # The compartment suffix needs to be removed as it is not included
-            # in the database identifiers.
-            no_compartment_id = met.id.rsplit('_', 1)[0]
+    for met in model.metabolites:
+        data[met] = {}
+        no_compartment_id = met.id.rsplit('_', 1)[0]
+        for db_id in METABOLITE_ANNOTATIONS:
             if not re.match(METABOLITE_ANNOTATIONS[db_id],
-                            str(no_compartment_id)
-                            ):
-                data[db_id][met] = False
+                            str(no_compartment_id)):
+                data[met][db_id] = False
             else:
-                data[db_id][met] = True
-    # Clean up of the table. Unfortunately the Biocyc patterns match quite
-    # broadly. Hence, whenever a Metabolite ID matches to any DB pattern
-    # AND the Biocyc pattern we have to assume that this is a false
-    # positive.
+                data[met][db_id] = True
+                break
     df = pd.DataFrame.from_dict(data)
-    mets_matching_2_ids = df[df['biocyc'] == 1].sum(axis=1).index
-    df.set_value(mets_matching_2_ids, 'biocyc', False)
+    df = df.T
     # Add a new column for all IDs that couldn't be matched to any of the
     # specified namespaces.
     df['unknown'] = False
@@ -255,6 +260,7 @@ def collect_met_id_namespace(model):
         'unknown',
         True
     )
+    df.fillna(False)
     return df
 
 
@@ -275,21 +281,17 @@ def collect_rxn_id_namespace(model):
 
     """
     data = {}
-    for db_id in REACTION_ANNOTATIONS:
-        data[db_id] = {}
-        for rxn in model.reactions:
+    for rxn in model.reactions:
+        data[rxn] = {}
+        for db_id in REACTION_ANNOTATIONS:
             if not re.match(REACTION_ANNOTATIONS[db_id],
                             str(rxn.id)):
-                data[db_id][rxn] = False
+                data[rxn][db_id] = False
             else:
-                data[db_id][rxn] = True
-    # Clean up of the table. Unfortunately the Biocyc patterns match quite
-    # broadly. Hence, whenever a Reaction ID matches to any DB pattern
-    # AND the Biocyc pattern we have to assume that this is a false
-    # positive.
+                data[rxn][db_id] = True
+                break
     df = pd.DataFrame.from_dict(data)
-    rxns_matching_2_ids = df[df['biocyc'] == 1].sum(axis=1).index
-    df.set_value(rxns_matching_2_ids, 'biocyc', False)
+    df = df.T
     # Add a new column for all IDs that couldn't be matched to any of the
     # specified namespaces.
     df['unknown'] = False
@@ -300,4 +302,5 @@ def collect_rxn_id_namespace(model):
         'unknown',
         True
     )
+    df.fillna(False)
     return df
