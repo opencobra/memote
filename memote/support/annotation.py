@@ -44,24 +44,23 @@ LOGGER = logging.getLogger(__name__)
 # 'Reactome'    ['met'] 'http://www.reactome.org/'
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
 
-REACTION_ANNOTATIONS = [
-                        ('rhea', re.compile(r"^\d{5}$")),
+REACTION_ANNOTATIONS = [('rhea', re.compile(r"^\d{5}$")),
                         ('kegg.reaction', re.compile(r"^R\d+$")),
                         ('metanetx.reaction', re.compile(r"^MNXR\d+$")),
                         ('bigg.reaction', re.compile(r"^[a-z_A-Z0-9]+$")),
                         ('ec-code', re.compile(
-                             r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-                             r"\d+\.\d+\.\d+\.-|"
-                             r"\d+\.\d+\.\d+\.(n)?\d+$")
+                            r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                            r"\d+\.\d+\.\d+\.-|"
+                            r"\d+\.\d+\.\d+\.(n)?\d+$")
                          ),
                         ('brenda', re.compile(
-                             r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-                             r"\d+\.\d+\.\d+\.-|"
-                             r"\d+\.\d+\.\d+\.(n)?\d+$")
+                            r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                            r"\d+\.\d+\.\d+\.-|"
+                            r"\d+\.\d+\.\d+\.(n)?\d+$")
                          ),
                         ('biocyc', re.compile(
-                             r"^[A-Z-0-9]+(?<!CHEBI)"
-                             r"(\:)?[A-Za-z0-9+_.%-]+$")
+                            r"^[A-Z-0-9]+(?<!CHEBI)"
+                            r"(\:)?[A-Za-z0-9+_.%-]+$")
                          )
                         ]
 REACTION_ANNOTATIONS = OrderedDict(REACTION_ANNOTATIONS)
