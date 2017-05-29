@@ -135,9 +135,7 @@ def test_rxn_wrong_annotation_ids(read_only_model, store):
 
 
 def test_met_id_namespace_consistency(read_only_model, store):
-    """
-    Expect metabolite IDs to be from the same namespace.
-    """
+    """Expect metabolite IDs to be from the same namespace."""
     met_id_namespace = annotation.collect_met_id_namespace(read_only_model)
     distribution = met_id_namespace[met_id_namespace == 1].count()
     store['met_ids_in_each_namespace'] = \
@@ -165,9 +163,7 @@ def test_met_id_namespace_consistency(read_only_model, store):
 
 
 def test_rxn_id_namespace_consistency(read_only_model, store):
-    """
-    Expect reaction IDs to be from the same namespace.
-    """
+    """Expect reaction IDs to be from the same namespace."""
     rxn_id_namespace = annotation.collect_rxn_id_namespace(read_only_model)
     distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
     store['rxn_ids_in_each_namespace'] = \
