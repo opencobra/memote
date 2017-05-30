@@ -1,0 +1,30 @@
+{
+    "fields": [
+        {
+            "name": "gene",
+            "title": "Gene Identifier",
+            "description": "The gene identifier must correspond with the metabolic model identifiers.",
+            "type": "string",
+            "constraints": {
+                "required": true
+            }
+        },
+        {
+            "name": "growth",
+            "title": "Growth Rate",
+            "description": "The measured growth rate of the mutant strain.",
+            "type": "number",
+            "constraints": {
+                "required": true,
+                "minimum": 0,
+                "maximum": 10
+            }
+        },
+        {
+            "name": "comment",
+            "title": "Comment",
+            "description": "Optional comment which is not processed further.",
+            "type": "string"
+        }
+    ]
+}

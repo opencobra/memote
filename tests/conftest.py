@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Configuration and fixtures for the pytest suite."""
+
 from __future__ import absolute_import
 
 from os.path import join, dirname
@@ -23,8 +25,6 @@ import pytest
 from cobra.io import read_sbml_model
 from optlang import available_solvers
 from cobra import Model
-
-"""Configuration and fixtures for the py.test suite."""
 
 # Gurobi MILP is currently not fully supported in optlang.
 # A MOSEK interface still needs to be completed.

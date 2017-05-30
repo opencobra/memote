@@ -23,7 +23,7 @@ import logging
 
 import pytest
 
-import memote.support.syntax as syntax
+import memote.support.core.syntax as syntax
 
 LOGGER = logging.getLogger(__name__)
 

@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import pytest
 
-import memote.support.consistency as consistency
+import memote.support.core.consistency as consistency
 
 
 def test_stoichiometric_consistency(read_only_model, store):

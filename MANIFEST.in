@@ -4,7 +4,7 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
-recursive-include memote *.py *.html
+recursive-include memote *.py *.html *.json
 recursive-include tests *.py
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

@@ -27,7 +27,7 @@ from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.helpers as helpers
-import memote.support.consistency_helpers as con_helpers
+import memote.support.core.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
 

@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-import memote.support.basic as basic
+import memote.support.core.basic as basic
 import memote.support.helpers as helpers
 
 

@@ -54,11 +54,12 @@ requirements = [
     "travispy",
     "pygithub",
     "travis-encrypt",
-    "sympy"
+    "sympy",
+    "tabulator",
+    "goodtables"
 ]
 
 test_requirements = [
-    "pytest>=3.1"
     "pytest-raises"
 ]
 

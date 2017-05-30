@@ -13,3 +13,5 @@ pytest-raises
 pytest-cov
 codecov
 travis-encrypt
+tabulator[ods]
+goodtables

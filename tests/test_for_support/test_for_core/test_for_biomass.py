@@ -22,12 +22,12 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 from __future__ import absolute_import
 
 import cobra
-import pytest
 import numpy as np
+import pytest
 from optlang.interface import OPTIMAL
 
+import memote.support.core.biomass as biomass
 import memote.support.helpers as helpers
-import memote.support.biomass as biomass
 
 
 def sum_within_deviation(base):

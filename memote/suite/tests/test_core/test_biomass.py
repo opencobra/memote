@@ -28,14 +28,15 @@ from __future__ import absolute_import
 import os
 import warnings
 
-import pytest
 import numpy as np
+import pytest
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore", UserWarning)
     # ignore Gurobi warning
     from cobra.exceptions import Infeasible
 
-import memote.support.biomass as biomass
+import memote.support.core.biomass as biomass
 
 
 BIOMASS_IDS = os.environ.get("BIOMASS_REACTIONS", "").split("|")
