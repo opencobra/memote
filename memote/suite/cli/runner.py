@@ -19,16 +19,26 @@
 
 from __future__ import absolute_import
 
+import io
 import os
 import sys
 import logging
+from builtins import input
 from os.path import join
 from multiprocessing import Process
+from getpass import getpass
+from time import sleep
 
 import click
 import git
+import ruamel.yaml as yaml
 from colorama import Fore
 from cookiecutter.main import cookiecutter, get_user_config
+from github import (
+    Github, BadCredentialsException, UnknownObjectException, GithubException)
+from travispy import TravisPy
+from travispy.errors import TravisError
+from travis.encrypt import encrypt_key, retrieve_public_key
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
@@ -196,6 +206,84 @@ def history(context, directory, pytest_args, commits):
         proc.join()
     repo.git.checkout(branch)
     # repo.head.reset(index=True, working_tree=True)  # superfluous?
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.option("--note", default="memote-ci access",
+              help="A note describing a personal access token on GitHub ("
+                   "default 'memote-ci access'). Must be unique!")
+@click.option("--repository",
+              help="The repository name on GitHub. Usually set automatically.")
+@click.pass_context
+def online(ctx, note, repository):
+    """Upload the repository to GitHub and enable testing on Travis CI."""
+    check_repo(ctx)
+    repo_slug = repository if repository is not None else \
+        ctx.obj["github_repository"]
+    username = ctx.obj.get("github_username")
+    name = input("GitHub Username [{}]: ".format(username))
+    if len(name) == 0 and username is not None:
+        name = username
+    password = getpass("GitHub Password: ")
+    gh = Github(name, password)
+    user = gh.get_user()
+    try:
+        when = user.created_at.isoformat(sep=" ")
+        LOGGER.info("Logged in to user '%s' created on '%s'.", user.login, when)
+    except BadCredentialsException:
+        LOGGER.critical(
+            "%sIncorrect username or password!%s", Fore.RED, Fore.RESET)
+        return 1
+    try:
+        repo = user.get_repo(repo_slug)
+        LOGGER.warning(
+            "%sUsing existing repository '%s'. This may override previous "
+            "settings.%s", Fore.YELLOW, repo_slug, Fore.RESET)
+    except UnknownObjectException:
+        repo = user.create_repo(repo_slug)
+        # TODO: Push repo content or leave that to `memote publish`?
+    try:
+        LOGGER.info("Creating token.")
+        auth = user.create_authorization(scopes=["repo"], note=note)
+    except GithubException:
+        LOGGER.critical(
+            "%sA personal access token with the note '%s' already exists. "
+            "Either delete it or choose another note.%s",
+            Fore.RED, note, Fore.RESET)
+        return 1
+    try:
+        LOGGER.info("Authorizing with TravisCI.")
+        travis = TravisPy.github_auth(auth.token)
+        t_user = travis.user()
+    except TravisError:
+        LOGGER.critical(
+            "%sSomething is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'!%s",
+            Fore.RED, Fore.RESET)
+        return 1
+    LOGGER.info("Synchronizing repositories.")
+    while not t_user.sync():
+        sleep(0.1)
+    t_repo = travis.repo(repo.full_name)
+    if t_repo.enable():
+        LOGGER.info(
+            "%sYour repository is now on GitHub and automatic testing has "
+            "been enabled on Travis CI. Congrats!%s", Fore.GREEN, Fore.RESET)
+    else:
+        LOGGER.critical(
+            "%sUnable to enable automatic testing on Travis CI!%s",
+            Fore.RED, Fore.RESET)
+        return 1
+    LOGGER.info("Encrypting GitHub token for repo '%s'.", repo.full_name)
+    key = retrieve_public_key(repo.full_name)
+    secret = encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
+    LOGGER.info("Storing GitHub token in '.travis.yml'.")
+    with io.open(".travis.yml", "r") as file_h:
+        config = yaml.load(file_h, yaml.RoundTripLoader)
+    config["env"]["global"].append({"secure": secret})
+    with io.open(".travis.yml", "w") as file_h:
+        yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
