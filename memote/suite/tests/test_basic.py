@@ -64,13 +64,12 @@ def test_metabolites_formula_presence(read_only_model, store):
 
 def test_gene_protein_reaction_rule_presence(read_only_model, store):
     """Expect all non-exchange reactions to have a GPR."""
-    missing_gpr = [
-        rxn.id for rxn in basic.check_gene_protein_reaction_rule_presence(
-            read_only_model
-        )
-    ]
     missing_gpr_metabolic_rxns = \
-        set(missing_gpr).difference(set(read_only_model.exchanges))
-    store["reactions_no_GPR"] = missing_gpr_metabolic_rxns
-    assert len(missing_gpr_metabolic_rxns) == 0, "No GPR found for the " \
+        set(
+            basic.check_gene_protein_reaction_rule_presence(
+                read_only_model
+            )
+        ).difference(set(read_only_model.exchanges))
+    store["reactions_no_GPR"] = [rxn.id for rxn in missing_gpr_metabolic_rxns]
+    assert len(store["reactions_no_GPR"]) == 0, "No GPR found for the " \
         "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
