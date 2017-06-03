@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-from memote.support.basic import check_metabolites_formula_presence
+import memote.support.basic as basic
 
 
 def test_model_id_presence(read_only_model, store):
@@ -53,7 +53,24 @@ def test_metabolites_presence(read_only_model, store):
 def test_metabolites_formula_presence(read_only_model, store):
     """Expect all metabolites to have a formula."""
     missing = [
-        met.id for met in check_metabolites_formula_presence(read_only_model)]
+        met.id for met in basic.check_metabolites_formula_presence(
+            read_only_model
+        )
+    ]
     store["metabolites_no_formula"] = missing
     assert len(missing) == 0, "No formula found for the following "\
         "metabolites: {}".format(", ".join(missing))
+
+
+def test_gene_protein_reaction_rule_presence(read_only_model, store):
+    """Expect all non-exchange reactions to have a GPR."""
+    missing_gpr = [
+        rxn.id for rxn in basic.check_gene_protein_reaction_rule_presence(
+            read_only_model
+        )
+    ]
+    missing_gpr_metabolic_rxns = \
+        set(missing_gpr).difference(set(read_only_model.exchanges))
+    store["reactions_no_GPR"] = missing_gpr_metabolic_rxns
+    assert len(missing_gpr_metabolic_rxns) == 0, "No GPR found for the " \
+        "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
