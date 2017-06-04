@@ -85,5 +85,6 @@ def calculate_metabolic_coverage(model):
     [1] Monk, J., Nogales, J., & Palsson, B. O. (2014). Optimizing genome-scale
     network reconstructions. Nature Biotechnology, 32(5), 447–452.
     http://doi.org/10.1038/nbt.2870
+    
     """
     return float(len(model.reactions)) / float(len(model.genes))
