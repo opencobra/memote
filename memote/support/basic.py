@@ -40,3 +40,29 @@ def check_metabolites_charge_presence(model):
 def check_gene_protein_reaction_rule_presence(model):
     """Return the list of model reactions that have no associated gene rule."""
     return [rxn for rxn in model.reactions if not rxn.gene_reaction_rule]
+
+
+def find_nonzero_constrained_reactions(model):
+    """Return list of reactions with non-zero, non-maximal bounds."""
+    return [rxn for rxn in model.reactions if
+            0 < rxn.lower_bound > -1000 or
+            0 > rxn.upper_bound < 1000]
+
+
+def find_zero_constrained_reactions(model):
+    """Return list of reactions that are constrained to zero flux."""
+    return [rxn for rxn in model.reactions if
+            rxn.lower_bound == 0 and
+            rxn.upper_bound == 0]
+
+
+def find_irreversible_reactions(model):
+    """Return list of reactions that are irreversible."""
+    return [rxn for rxn in model.reactions if rxn.reversibility == False]
+
+
+def find_unconstrained_reactions(model):
+    """Return list of reactions that are not constrained at all."""
+    return [rxn for rxn in model.reactions if
+            rxn.lower_bound <= -1000 and
+            rxn.upper_bound >= 1000]
