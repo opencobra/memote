@@ -59,7 +59,7 @@ def gpr_present():
     rxn_1.gene_reaction_rule = 'gene1 and gene2'
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
-    rxn_1.add_metabolites({met_1:1,met_2:-1})
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
     model.add_reactions([rxn_1])
     return model
 
@@ -71,7 +71,7 @@ def gpr_missing():
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
-    rxn_1.add_metabolites({met_1:1,met_2:-1})
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
     model.add_reactions([rxn_1])
     return model
 
@@ -86,7 +86,7 @@ def gpr_present_with_exchange():
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
-    rxn_1.add_metabolites({met_1:1,met_2:-1})
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
     rxn_2 = cobra.Reaction("EX_met1_c")
     met_1 = cobra.Metabolite("met1")
     rxn_2.add_metabolites({met_1: 1})
@@ -101,6 +101,15 @@ def gpr_present_with_exchange():
 ], indirect=["model"])
 def test_metabolites_formula_presence(model, num):
     assert len(basic.check_metabolites_formula_presence(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("three-missing", 3),
+    ("three-present", 0)
+], indirect=["model"])
+def test_metabolites_charge_presence(model, num):
+    assert len(basic.check_metabolites_charge_presence(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [

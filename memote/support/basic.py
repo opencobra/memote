@@ -32,6 +32,11 @@ def check_metabolites_formula_presence(model):
     return [met for met in model.metabolites if not met.formula]
 
 
+def check_metabolites_charge_presence(model):
+    """Return the list of model metabolites that have no associated charge."""
+    return [met for met in model.metabolites if not type(met.charge) == int]
+
+
 def check_gene_protein_reaction_rule_presence(model):
     """Return the list of model reactions that have no associated gene rule."""
     return [rxn for rxn in model.reactions if not rxn.gene_reaction_rule]

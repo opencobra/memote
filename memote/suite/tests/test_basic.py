@@ -62,6 +62,18 @@ def test_metabolites_formula_presence(read_only_model, store):
         "metabolites: {}".format(", ".join(missing))
 
 
+def test_metabolites_charge_presence(read_only_model, store):
+    """Expect all metabolites to have a formula."""
+    missing = [
+        met.id for met in basic.check_metabolites_charge_presence(
+            read_only_model
+        )
+    ]
+    store["metabolites_no_charge"] = missing
+    assert len(missing) == 0, "No charge found for the following "\
+        "metabolites: {}".format(", ".join(missing))
+
+
 def test_gene_protein_reaction_rule_presence(read_only_model, store):
     """Expect all non-exchange reactions to have a GPR."""
     missing_gpr_metabolic_rxns = \
