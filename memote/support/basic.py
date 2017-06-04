@@ -70,7 +70,7 @@ def find_unconstrained_reactions(model):
 
 def calculate_metabolic_coverage(model):
     """
-    Return the ratio of reactions and genes included in the model
+    Return the ratio of reactions and genes included in the model.
 
     According to [1] this is a good quality indicator expressing the degree of
     metabolic coverage i.e. modeling detail of a given reconstruction. The
@@ -86,5 +86,4 @@ def calculate_metabolic_coverage(model):
     network reconstructions. Nature Biotechnology, 32(5), 447–452.
     http://doi.org/10.1038/nbt.2870
     """
-
     return float(len(model.reactions)) / float(len(model.genes))
