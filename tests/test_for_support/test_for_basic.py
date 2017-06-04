@@ -56,7 +56,7 @@ def gpr_present():
     """Provide a model with reactions that all have GPR"""
     model = cobra.Model(id_or_model="gpr_present", name="gpr_present")
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'gene1 and gene2'
+    rxn_1.gene_reaction_rule = 'gene1 or gene2'
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
@@ -77,11 +77,11 @@ def gpr_missing():
 
 
 @pytest.fixture(scope="function")
-def gpr_present_with_exchange():
+def gpr_missing_with_exchange():
     """Provide a model reactions that lack GPR"""
     model = cobra.Model(
-        id_or_model="gpr_present_with_exchange",
-        name="gpr_present_with_exchange"
+        id_or_model="gpr_missing_with_exchange",
+        name="gpr_missing_with_exchange"
     )
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
@@ -91,6 +91,19 @@ def gpr_present_with_exchange():
     met_1 = cobra.Metabolite("met1")
     rxn_2.add_metabolites({met_1: 1})
     model.add_reactions([rxn_1, rxn_2])
+    return model
+
+
+@pytest.fixture(scope="function")
+def gpr_present_not_lumped():
+    """Provide a model with reactions that all have GPR"""
+    model = cobra.Model(id_or_model="gpr_present", name="gpr_present")
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'gene1'
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    model.add_reactions([rxn_1])
     return model
 
 
@@ -115,7 +128,7 @@ def test_metabolites_charge_presence(model, num):
 @pytest.mark.parametrize("model, num", [
     (gpr_present(), 0),
     (gpr_missing(), 1),
-    (gpr_present_with_exchange(), 1),
+    (gpr_missing_with_exchange(), 1),
 ])
 def test_gene_protein_reaction_rule_presence(model, num):
     """Expect all non-exchange reactions to have a GPR."""
@@ -126,3 +139,13 @@ def test_gene_protein_reaction_rule_presence(model, num):
             )
         ).difference(set(model.exchanges))
     assert len(missing_gpr_metabolic_rxns) == num
+
+
+@pytest.mark.parametrize("model, coverage", [
+    (gpr_present(), 0.5),
+    (gpr_present_not_lumped(), 1),
+])
+def test_metabolic_coverage(model, coverage):
+    """Expect a model to have high metabolic coverage."""
+    metabolic_coverage = basic.calculate_metabolic_coverage(model)
+    assert metabolic_coverage >= coverage

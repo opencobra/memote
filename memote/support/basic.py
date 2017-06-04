@@ -66,3 +66,25 @@ def find_unconstrained_reactions(model):
     return [rxn for rxn in model.reactions if
             rxn.lower_bound <= -1000 and
             rxn.upper_bound >= 1000]
+
+
+def calculate_metabolic_coverage(model):
+    """
+    Return the ratio of reactions and genes included in the model
+
+    According to [1] this is a good quality indicator expressing the degree of
+    metabolic coverage i.e. modeling detail of a given reconstruction. The
+    authors explain that models with a 'high level of modeling detail have
+    ratios >1, and [models] with low level of detail have ratios <1'. They
+    explain that 'this difference arises because [models] with basic or
+    intermediate levels of detail often include many reactions in which several
+    gene products and their enzymatic transformations are ‘lumped’'.
+
+    References
+    ----------
+    [1] Monk, J., Nogales, J., & Palsson, B. O. (2014). Optimizing genome-scale
+    network reconstructions. Nature Biotechnology, 32(5), 447–452.
+    http://doi.org/10.1038/nbt.2870
+    """
+
+    return float(len(model.reactions)) / float(len(model.genes))

@@ -85,3 +85,9 @@ def test_gene_protein_reaction_rule_presence(read_only_model, store):
     store["reactions_no_GPR"] = [rxn.id for rxn in missing_gpr_metabolic_rxns]
     assert len(store["reactions_no_GPR"]) == 0, "No GPR found for the " \
         "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
+
+
+def test_metabolic_coverage(read_only_model, store):
+    """Expect a model to have high metabolic coverage."""
+    store("metabolic_coverage") = basic.calculate_metabolic_coverage(read_only_model)
+    assert store("metabolic_coverage") >= 1
