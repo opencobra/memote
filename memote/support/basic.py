@@ -58,7 +58,7 @@ def find_zero_constrained_reactions(model):
 
 def find_irreversible_reactions(model):
     """Return list of reactions that are irreversible."""
-    return [rxn for rxn in model.reactions if rxn.reversibility == False]
+    return [rxn for rxn in model.reactions if rxn.reversibility is False]
 
 
 def find_unconstrained_reactions(model):
