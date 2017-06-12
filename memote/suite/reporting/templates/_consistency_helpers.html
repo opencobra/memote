@@ -10,40 +10,29 @@
                 done!
             </p>
         {% else -%}
-            <p>
-                <span class="md-warn">Inconsistent model stoichiometry</span>
-            </p>
-
+            <md-content layout-padding>
+                Inconsistent model stoichiometry
+            </md-content>
+            <md-table-container layout-padding>
+                <table md-table>
+                    <tbody md-body>
+                        <tr md-row>
+                            <td md-cell>Number of unconserved metabolites</td>
+                            <td md-cell>{{ data['unconserved_metabolites']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of blocked reactions</td>
+                            <td md-cell>{{ data['blocked_reactions']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of imbalanced reactions</td>
+                            <td md-cell>{{ data['imbalanced_reactions']|length }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-table-container>
             <md-tabs>
             <md-content>
-                <md-tab id="tab_0">
-                    <md-tab-label>
-                        <md-icon md-font-icon="info">info</md-icon>
-                    </md-tab-label>
-                    <md-tab-body>
-                        <md-content layout-padding>
-                                <span><u>Inconsistent model stoichiometry</u></span>
-                        </md-content>
-                        <md-table-container layout-padding>
-                            <table md-table>
-                                <tbody md-body>
-                                    <tr md-row>
-                                        <td md-cell>Number of unconserved metabolites</td>
-                                        <td md-cell>{{ data['unconserved_metabolites']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of blocked reactions</td>
-                                        <td md-cell>{{ data['blocked_reactions']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of imbalanced reactions</td>
-                                        <td md-cell>{{ data['imbalanced_reactions']|length }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </md-table-container>
-                    </md-tab-body>
-                </md-tab>
 
                 <md-tab id="tab_1">
                     <md-tab-label>

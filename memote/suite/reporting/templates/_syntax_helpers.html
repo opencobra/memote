@@ -3,50 +3,42 @@
             <md-card-title>
                 <span class="md-headline">Syntax Information</span>
             </md-card-title>
+            <md-table-container layout-padding>
+                <table md-table>
+                    <tbody md-body>
+                        <tr md-row>
+                            <td md-cell>Number of non-cytosolic reactions without compartment suffix: </td>
+                            <td md-cell>{{ data['reaction_compartment_suffix']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of reactions with compartment suffix but inconsistent metabolites</td>
+                            <td md-cell>{{ data['reaction_metabolite_compartment']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of transports without suffix</td>
+                            <td md-cell>{{ data['untagged_normal_transport']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of ABC transports without suffix</td>
+                            <td md-cell>{{ data['untagged_abc_transport']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of demand reactions without prefix 'DM_'</td>
+                            <td md-cell>{{ data['untagged_demand']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of exchange reactions without prefix 'EX_'</td>
+                            <td md-cell>{{ data['untagged_exchange']|length }}</td>
+                        </tr>
+                        <tr md-row>
+                            <td md-cell>Number of metabolites with uppercase letters</td>
+                            <td md-cell>{{ data['uppercase_metabolites']|length }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-table-container>
             <md-tabs>
             <md-content>
-                <md-tab id="tab_0">
-                    <md-tab-label>
-                        <md-icon md-font-icon="info">info</md-icon>
-                    </md-tab-label>
-                    <md-tab-body>
-                        <md-table-container layout-padding>
-                            <table md-table>
-                                <tbody md-body>
-                                    <tr md-row>
-                                        <td md-cell>Number of non-cytosolic reactions without compartment suffix: </td>
-                                        <td md-cell>{{ data['reaction_compartment_suffix']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of reactions with compartment suffix but inconsistent metabolites</td>
-                                        <td md-cell>{{ data['reaction_metabolite_compartment']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of transports without suffix</td>
-                                        <td md-cell>{{ data['untagged_normal_transport']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of ABC transports without suffix</td>
-                                        <td md-cell>{{ data['untagged_abc_transport']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of demand reactions without prefix 'DM_'</td>
-                                        <td md-cell>{{ data['untagged_demand']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of exchange reactions without prefix 'EX_'</td>
-                                        <td md-cell>{{ data['untagged_exchange']|length }}</td>
-                                    </tr>
-                                    <tr md-row>
-                                        <td md-cell>Number of metabolites with uppercase letters</td>
-                                        <td md-cell>{{ data['uppercase_metabolites']|length }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </md-table-container>
-                    </md-tab-body>
-                </md-tab>
-
                 <md-tab id="tab_1">
                     <md-tab-label>
                         non-cytosolic w/o suffix
