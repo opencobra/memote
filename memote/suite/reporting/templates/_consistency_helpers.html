@@ -1,31 +1,98 @@
 {% macro render_consistency(data) -%}
-<h2 class="mdc-typography--display2">Stoichiometric Consistency</h2>
+    <md-card>
+        <md-card-title>
+            <span class="md-headline">Stoichiometric Consistency</span>
+        </md-card-title>
 
-{% if data['is_consistent'] -%}
-<p>
-    The model stoichiometry (ignoring exchange reactions) is consistent! Well
-    done!
-</p>
-{% else -%}
-<p>
-    <span class="warn">Inconsistent model stoichiometry</span>
-</p>
-<dl>
-    {% if data['magic_atp_production'] -%}
-    <dt>Model can generate ATP without input!</dt><dd></dd>
-    {% endif -%}
-    <dt>Number of unconserved metabolites</dt>
-    <dd>{{ data['unconserved_metabolites']|length }}</dd>
-    <dt>Unconserved metabolites</dt>
-    <dd>{{ data['unconserved_metabolites'] }}</dd>
-    <dt>Number of blocked reactions</dt>
-    <dd>{{ data['blocked_reactions']|length }}</dd>
-    <dt>Blocked reactions</dt>
-    <dd>{{ data['blocked_reactions'] }}</dd>
-    <dt>Number of imbalanced reactions</dt>
-    <dd>{{ data['imbalanced_reactions']|length }}</dd>
-    <dt>Imbalanced reactions</dt>
-    <dd>{{ data['imbalanced_reactions'] }}</dd>
-</dl>
-{% endif -%}
+        {% if data['is_consistent'] -%}
+            <p>
+                The model stoichiometry (ignoring exchange reactions) is consistent! Well
+                done!
+            </p>
+        {% else -%}
+            <p>
+                <span class="md-warn">Inconsistent model stoichiometry</span>
+            </p>
+
+            <md-tabs>
+            <md-content>
+                <md-tab id="tab_0">
+                    <md-tab-label>
+                        <md-icon md-font-icon="info">info</md-icon>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout-padding>
+                                <span><u>Inconsistent model stoichiometry</u></span>
+                        </md-content>
+                        <md-table-container layout-padding>
+                            <table md-table>
+                                <tbody md-body>
+                                    <tr md-row>
+                                        <td md-cell>Number of unconserved metabolites</td>
+                                        <td md-cell>{{ data['unconserved_metabolites']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of blocked reactions</td>
+                                        <td md-cell>{{ data['blocked_reactions']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of imbalanced reactions</td>
+                                        <td md-cell>{{ data['imbalanced_reactions']|length }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </md-table-container>
+                    </md-tab-body>
+                </md-tab>
+
+                <md-tab id="tab_1">
+                    <md-tab-label>
+                        Unconserved
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['unconserved_metabolites'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+
+                <md-tab id="tab_2">
+                    <md-tab-label>
+                        Blocked
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['blocked_reactions'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_3">
+                    <md-tab-label>
+                        Imbalanced
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['imbalanced_reactions'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+            </md-content>
+        </md-tabs>
+
+        {% endif -%}
+
+
+    </md-card>
 {%- endmacro %}

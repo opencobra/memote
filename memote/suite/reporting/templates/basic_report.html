@@ -5,24 +5,20 @@
 {% from '_syntax_helpers.html' import render_syntax %}
 
 {% block header -%}
-{{ super() }}
-<h2 class="mdc-typography--display2">{{ timestamp }}</h2>
+    <div class="md-toolbar-tools">
+        <h1 class="md-toolbar-tools" flex>{{ super() }} - {{ timestamp }}</h1>
+    </div>
 {%- endblock %}
 
 {% block content -%}
-<div>
-{{ render_basic(data['report']['test_basic']) }}
-</div>
-
-<div>
-{{ render_consistency(data['report']['test_consistency']) }}
-</div>
-
-<div>
-    {{ render_biomass(data['report']['test_biomass']) }}
-</div>
-
-<div>
-    {{ render_syntax(data['report']['test_syntax']) }}
-</div>
+    <md-content layout="row" class="md-padding" layout-xs="column">
+        <div layout="column" flex>
+            {{ render_basic(data['report']['test_basic']) }}
+            {{ render_consistency(data['report']['test_consistency']) }}
+        </div>
+        <div layout="column" flex>
+            {{ render_biomass(data['report']['test_biomass']) }}
+            {{ render_syntax(data['report']['test_syntax']) }}
+        </div>
+    </md-content>
 {%- endblock %}

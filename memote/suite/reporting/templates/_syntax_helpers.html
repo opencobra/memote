@@ -1,34 +1,156 @@
 {% macro render_syntax(data) -%}
-<h2 class="mdc-typography--display2">Syntax Information</h2>
+    <md-card>
+            <md-card-title>
+                <span class="md-headline">Syntax Information</span>
+            </md-card-title>
+            <md-tabs>
+            <md-content>
+                <md-tab id="tab_0">
+                    <md-tab-label>
+                        <md-icon md-font-icon="info">info</md-icon>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-table-container layout-padding>
+                            <table md-table>
+                                <tbody md-body>
+                                    <tr md-row>
+                                        <td md-cell>Number of non-cytosolic reactions without compartment suffix: </td>
+                                        <td md-cell>{{ data['reaction_compartment_suffix']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of reactions with compartment suffix but inconsistent metabolites</td>
+                                        <td md-cell>{{ data['reaction_metabolite_compartment']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of transports without suffix</td>
+                                        <td md-cell>{{ data['untagged_normal_transport']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of ABC transports without suffix</td>
+                                        <td md-cell>{{ data['untagged_abc_transport']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of demand reactions without prefix 'DM_'</td>
+                                        <td md-cell>{{ data['untagged_demand']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of exchange reactions without prefix 'EX_'</td>
+                                        <td md-cell>{{ data['untagged_exchange']|length }}</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Number of metabolites with uppercase letters</td>
+                                        <td md-cell>{{ data['uppercase_metabolites']|length }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </md-table-container>
+                    </md-tab-body>
+                </md-tab>
 
-<dl>
-    <dt>Number of non-cytosolic reactions without compartment suffix</dt>
-    <dd>{{ data['reaction_compartment_suffix']|length }}</dd>
-    <dt>Non-cytosolic reactions without compartment suffix</dt>
-    <dd>{{ data['reaction_compartment_suffix'] }}</dd>
-    <dt>Number of reactions with compartment suffix but inconsistent metabolites</dt>
-    <dd>{{ data['reaction_metabolite_compartment']|length }}</dd>
-    <dt>Reactions with compartment suffix but inconsistent metabolites</dt>
-    <dd>{{ data['reaction_metabolite_compartment'] }}</dd>
-    <dt>Number of transports without suffix</dt>
-    <dd>{{ data['untagged_normal_transport']|length }}</dd>
-    <dt>Transports without suffix</dt>
-    <dd>{{ data['untagged_normal_transport'] }}</dd>
-    <dt>Number of ABC transports without suffix</dt>
-    <dd>{{ data['untagged_abc_transport']|length }}</dd>
-    <dt>ABC transports without suffix</dt>
-    <dd>{{ data['untagged_abc_transport'] }}</dd>
-    <dt>Number of demand reactions without prefix 'DM_'</dt>
-    <dd>{{ data['untagged_demand']|length }}</dd>
-    <dt>Demand reactions without prefix 'DM_'</dt>
-    <dd>{{ data['untagged_demand'] }}</dd>
-    <dt>Number of exchange reactions without prefix 'EX_'</dt>
-    <dd>{{ data['untagged_exchange']|length }}</dd>
-    <dt>Exchange reactions without prefix 'EX_'</dt>
-    <dd>{{ data['untagged_exchange'] }}</dd>
-    <dt>Number of metabolites with uppercase letters</dt>
-    <dd>{{ data['uppercase_metabolites']|length }}</dd>
-    <dt>Metabolites with uppercase letters</dt>
-    <dd>{{ data['uppercase_metabolites'] }}</dd>
-</dl>
+                <md-tab id="tab_1">
+                    <md-tab-label>
+                        non-cytosolic w/o suffix
+                    </md-tab-label>
+                    <md-tab-body>
+                        {% for n in range(data['reaction_compartment_suffix']|length) %}
+                            <md-content layout="row" layout-wrap>
+                                <div ng-repeat="item in {{ data['reaction_compartment_suffix'][n] }}" style="margin: 5px;">
+                                    {% raw %}
+                                        {{ item }}
+                                    {% endraw %}
+                                </div>
+                            </md-content>
+                        {% endfor %}
+                    </md-tab-body>
+                </md-tab>
+
+                <md-tab id="tab_2">
+                    <md-tab-label>
+                        Inconsistent metabolites
+                    </md-tab-label>
+                    <md-tab-body>
+                        {% for n in range(data['reaction_metabolite_compartment']|length) %}
+                            <md-content layout="row" layout-wrap>
+                                <div ng-repeat="item in {{ data['reaction_metabolite_compartment'][n] }}" style="margin: 5px;">
+                                    {% raw %}
+                                        {{ item }}
+                                    {% endraw %}
+                                </div>
+                            </md-content>
+                        {% endfor %}
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_3">
+                    <md-tab-label>
+                        Transport w/o suffix
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['untagged_normal_transport'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_4">
+                    <md-tab-label>
+                        ABC w/o suffix
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['untagged_abc_transport'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_5">
+                    <md-tab-label>
+                        Demand w/o prefix
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['untagged_demand'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_6">
+                    <md-tab-label>
+                        Exchange w/o prefix
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['untagged_exchange'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab id="tab_7">
+                    <md-tab-label>
+                        Uppercase
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content layout="row" layout-wrap>
+                            <div ng-repeat="item in {{ data['uppercase_metabolites'] }}" style="margin: 5px;">
+                                {% raw %}
+                                    {{ item }}
+                                {% endraw %}
+                            </div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+            </md-content>
+        </md-tabs>
+    </md-card>
 {%- endmacro %}

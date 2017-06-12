@@ -1,20 +1,47 @@
 {% macro render_biomass(data) -%}
-<h2 class="mdc-typography--display2">Biomass Production</h2>
 
-<dl>
-    <dt>Defined biomass reactions</dt>
-    <dd>{{ data['biomass_reactions'] }}</dd>
-    <dt>Sum of biomass components</dt>
-    <dd>{{ data['biomass_sum'] }} g / mmol / h</dd>
-    <dt>Biomass flux in default medium</dt>
-    <dd>{{ data['biomass_default_flux'] }}</dd>
-    {% if data['default_blocked_precursors']|length > 0 %}
-    <dt>Blocked biomass precursors in default medium</dt>
-    <dd>{{ data['default_blocked_precursors'] }}</dd>
-    {% endif %}
-    {% if data['open_blocked_precursors']|length > 0 %}
-    <dt>Blocked biomass precursors in complete medium</dt>
-    <dd>{{ data['open_blocked_precursors'] }}</dd>
-    {% endif %}
-</dl>
+    <md-card>
+        <md-card-title>
+            <span class="md-headline">Biomass Production</span>
+        </md-card-title>
+
+        <md-tabs>
+            {% for n in range(data['biomass_reactions']|length) %}
+                <md-tab id="tab_{{n}}">
+                    <md-tab-label>
+                        {{ data['biomass_reactions'][n] }}
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-table-container layout-padding>
+                            <table md-table>
+                                <tbody md-body>
+                                    <tr md-row>
+                                        <td md-cell>Sum of biomass components</td>
+                                        <td md-cell>{{ data['biomass_sum'][n] }} g / mmol / h</td>
+                                    </tr>
+                                    <tr md-row>
+                                        <td md-cell>Biomass flux in default medium</td>
+                                        <td md-cell>{{ data['biomass_default_flux'][n] }}</td>
+                                    </tr>
+
+                                    {% if data['default_blocked_precursors']|length > 0 %}
+                                        <tr md-row>
+                                            <td md-cell>Blocked biomass precursors in default medium</td>
+                                            <td md-cell>{{ data['default_blocked_precursors'][n] }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if data['open_blocked_precursors']|length > 0 %}
+                                        <tr md-row>
+                                            <td md-cell>Blocked biomass precursors in complete medium</td>
+                                            <td md-cell>{{ data['open_blocked_precursors'][n] }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </md-table-container>
+                    </md-tab-body>
+                </md-tab>
+            {% endfor %}
+        </md-tabs>
+    </md-card>
 {%- endmacro %}
