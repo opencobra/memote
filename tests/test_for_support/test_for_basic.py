@@ -210,7 +210,7 @@ def test_metabolic_coverage(model, coverage):
 
 @pytest.mark.parametrize("model, num", [
     (unconstrained_rxn(), 0),
-    (nonzero_constrained_rxn(), 1),
+    (nonzero_constrained_rxn(), 2),
 ])
 def test_find_nonzero_constrained_reactions(model, num):
     """Expect amount of non-zero rxns to be identified correctly."""
