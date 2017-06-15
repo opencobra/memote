@@ -107,12 +107,65 @@ def gpr_present_not_lumped():
     return model
 
 
+@pytest.fixture(scope="function")
+def unconstrained_rxn():
+    """Provide a model with one unconstrained reaction"""
+    model = cobra.Model(id_or_model="model", name="model")
+    rxn_1 = cobra.Reaction("RXN1")
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_1.bounds = -1000, 1000
+    model.add_reactions([rxn_1])
+    return model
+
+
+@pytest.fixture(scope="function")
+def irreversible_rxn():
+    """Provide a model with one irreversible reaction"""
+    model = cobra.Model(id_or_model="model", name="model")
+    rxn_1 = cobra.Reaction("RXN1")
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_1.bounds = 0, 1000
+    model.add_reactions([rxn_1])
+    return model
+
+
+@pytest.fixture(scope="function")
+def zero_constrained_rxn():
+    """Provide a model with one zero-constrained reaction"""
+    model = cobra.Model(id_or_model="model", name="model")
+    rxn_1 = cobra.Reaction("RXN1")
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_1.bounds = 0, 0
+    model.add_reactions([rxn_1])
+    return model
+
+
+@pytest.fixture(scope="function")
+def nonzero_constrained_rxn():
+    """Provide a model with one nonzero-constrained reaction"""
+    model = cobra.Model(id_or_model="model", name="model")
+    rxn_1 = cobra.Reaction("RXN1")
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_1.bounds = 0, 5
+    model.add_reactions([rxn_1])
+    return model
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three-missing", 3),
     ("three-present", 0)
 ], indirect=["model"])
 def test_metabolites_formula_presence(model, num):
+    """Expect all metabolites to have a formula."""
     assert len(basic.check_metabolites_formula_presence(model)) == num
 
 
@@ -122,6 +175,7 @@ def test_metabolites_formula_presence(model, num):
     ("three-present", 0)
 ], indirect=["model"])
 def test_metabolites_charge_presence(model, num):
+    """Expect all metabolites to have a charge."""
     assert len(basic.check_metabolites_charge_presence(model)) == num
 
 
@@ -149,3 +203,43 @@ def test_metabolic_coverage(model, coverage):
     """Expect a model to have high metabolic coverage."""
     metabolic_coverage = basic.calculate_metabolic_coverage(model)
     assert metabolic_coverage >= coverage
+
+
+@pytest.mark.parametrize("model, num", [
+    (unconstrained_rxn(), 0),
+    (nonzero_constrained_rxn(), 1),
+])
+def test_find_nonzero_constrained_reactions(model, num):
+    """Expect amount of non-zero rxns to be identified correctly."""
+    nonzero_constrained_rxns = basic.find_nonzero_constrained_reactions(model)
+    assert len(nonzero_constrained_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    (unconstrained_rxn(), 0),
+    (zero_constrained_rxn(), 1),
+])
+def test_find_zero_constrained_reactions(model, num):
+    """Expect amount of zero-constrained rxns to be identified correctly."""
+    zero_constrained_rxns = basic.find_zero_constrained_reactions(model)
+    assert len(zero_constrained_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    (unconstrained_rxn(), 0),
+    (irreversible_rxn(), 1),
+])
+def test_find_irreversible_reactions(model, num):
+    """Expect amount of irreversible rxns to be identified correctly."""
+    irreversible_rxns = basic.find_irreversible_reactions(model)
+    assert len(irreversible_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    (unconstrained_rxn(), 1),
+    (zero_constrained_rxn(), 0),
+])
+def test_find_unconstrained_reactions(model, num):
+    """Expect amount of unconstrained rxns to be identified correctly."""
+    unconstrained_rxns = basic.find_unconstrained_reactions(model)
+    assert len(unconstrained_rxns) == num
