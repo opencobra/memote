@@ -45,8 +45,8 @@ def check_gene_protein_reaction_rule_presence(model):
 def find_nonzero_constrained_reactions(model):
     """Return list of reactions with non-zero, non-maximal bounds."""
     return [rxn for rxn in model.reactions if
-            0 < rxn.lower_bound > -1000 or
-            0 > rxn.upper_bound < 1000]
+            0 > rxn.lower_bound > -1000 or
+            0 < rxn.upper_bound < 1000]
 
 
 def find_zero_constrained_reactions(model):
