@@ -154,8 +154,11 @@ def nonzero_constrained_rxn():
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2 = cobra.Reaction("RXN2")
+    rxn_2.add_metabolites({met_1: -1, met_2: 1})
     rxn_1.bounds = 0, 5
-    model.add_reactions([rxn_1])
+    rxn_2.bounds = -5, 0
+    model.add_reactions([rxn_1, rxn_2])
     return model
 
 
