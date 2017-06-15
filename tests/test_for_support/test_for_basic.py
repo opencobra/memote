@@ -110,7 +110,7 @@ def gpr_present_not_lumped():
 @pytest.fixture(scope="function")
 def unconstrained_rxn():
     """Provide a model with one unconstrained reaction"""
-    model = cobra.Model(id_or_model="model", name="model")
+    model = cobra.Model(id_or_model="unconstrained", name="unconstrained")
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
@@ -123,7 +123,7 @@ def unconstrained_rxn():
 @pytest.fixture(scope="function")
 def irreversible_rxn():
     """Provide a model with one irreversible reaction"""
-    model = cobra.Model(id_or_model="model", name="model")
+    model = cobra.Model(id_or_model="irreversible", name="irreversible")
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
@@ -136,7 +136,9 @@ def irreversible_rxn():
 @pytest.fixture(scope="function")
 def zero_constrained_rxn():
     """Provide a model with one zero-constrained reaction"""
-    model = cobra.Model(id_or_model="model", name="model")
+    model = cobra.Model(
+        id_or_model="zero_constrained", name="zero_constrained"
+    )
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
@@ -149,7 +151,9 @@ def zero_constrained_rxn():
 @pytest.fixture(scope="function")
 def nonzero_constrained_rxn():
     """Provide a model with one nonzero-constrained reaction"""
-    model = cobra.Model(id_or_model="model", name="model")
+    model = cobra.Model(
+        id_or_model="nonzero_constrained", name="nonzero_constrained"
+    )
     rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
