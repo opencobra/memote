@@ -65,6 +65,8 @@ class ResultBagWrapper(object):
                 continue
             with io.open(filename) as file_h:
                 objects.append(json.load(file_h))
+        if len(objects) == 0:
+            raise RuntimeError("None of the expected JSON files were found!")
         self._bag = db.from_sequence(objects, npartitions=1)
         self._index = None
 
