@@ -5,8 +5,10 @@
 {%- endblock %}
 
 {% block topscript -%}
-<script src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured"></script>
-<script src="https://cdn.plot.ly/plotly-1.26.1.min.js"></script>
+    <script src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured"></script>
+    <script src="https://cdn.plot.ly/plotly-1.26.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.3.5/d3.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 {%- endblock %}
 
 {% block header -%}
@@ -27,7 +29,9 @@
                            Genes
                         </md-tab-label>
                         <md-tab-body>
-                            {{ basics["genes"] }}
+                            <div id="plotDiv" style="width: 500px; height: 500px">
+                                {{ basics["genes"] }}
+                            </div>
                         </md-tab-body>
                     </md-tab>
                     <md-tab id="tab_1">
@@ -76,7 +80,9 @@
                         </md-tab-label>
                         <md-tab-body>
                             <md-content>
-                                {{ biomass["biomass_sum"] }}
+                                <div id="plot">
+                                    {{ biomass["biomass_sum"] }}
+                                </div>
                             </md-content>
                         </md-tab-body>
                     </md-tab>
