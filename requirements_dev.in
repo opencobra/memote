@@ -8,7 +8,8 @@ tox
 coverage
 Sphinx
 PyYAML
-pytest
+pytest>=3.1
+pytest-raises
 pytest-cov
 codecov
 travis-encrypt

@@ -24,8 +24,6 @@ from optlang import available_solvers
 from cobra import Model
 from cobra.io import read_sbml_model
 
-import memote
-
 """
 Configuration and fixtures for the py.test suite.
 """

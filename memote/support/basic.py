@@ -29,12 +29,12 @@ LOGGER = logging.getLogger(__name__)
 
 def check_metabolites_formula_presence(model):
     """Return the list of model metabolites that have no associated formula."""
-    return [met for met in model.metabolites if not met.formula]
+    return [met for met in model.metabolites if met.formula is None]
 
 
 def check_metabolites_charge_presence(model):
     """Return the list of model metabolites that have no associated charge."""
-    return [met for met in model.metabolites if not type(met.charge) == int]
+    return [met for met in model.metabolites if met.charge is None]
 
 
 def check_gene_protein_reaction_rule_presence(model):
@@ -87,4 +87,6 @@ def calculate_metabolic_coverage(model):
     http://doi.org/10.1038/nbt.2870
 
     """
+    if len(model.reactions) == 0 or len(model.genes) == 0:
+        raise ValueError("The model contains no reactions or genes.")
     return float(len(model.reactions)) / float(len(model.genes))
