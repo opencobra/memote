@@ -40,13 +40,14 @@ SUPPORTED_SOLVERS = [solver for solver in ["glpk", "cplex"] if
 def solver(request):
     return request.param
 
+
 @pytest.fixture(scope="function")
 def model(request, solver):
     if request.param == "empty":
         model = Model(id_or_model=request.param, name=request.param)
     elif request.param == "textbook":
-        model = read_sbml_model(join(dirname(memote.__file__), "suite", "examples",
-                               "EcoliCore.xml"))
+        model = read_sbml_model(join(dirname(__file__), "data",
+                                     "EcoliCore.xml.gz"))
     else:
         builder = getattr(request.module, "model_builder")
         model = builder(request.param)

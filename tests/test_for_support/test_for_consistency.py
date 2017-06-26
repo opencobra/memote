@@ -27,114 +27,141 @@ import pytest
 import memote.support.consistency as consistency
 
 
+def figure_1(base):
+    # Example in figure 1 of Gevorgyan et al. (2008) Bioinformatics
+    # Metabolites
+    met_a = cobra.Metabolite("A")
+    met_a_prime = cobra.Metabolite("A'")
+    met_b = cobra.Metabolite("B")
+    met_b_prime = cobra.Metabolite("B'")
+    met_c = cobra.Metabolite("C")
+    met_c_prime = cobra.Metabolite("C'")
+    # Reactions
+    rxn_1 = cobra.Reaction("R1")
+    rxn_1.add_metabolites({met_a: -1, met_a_prime: -1, met_b: 1})
+    rxn_2 = cobra.Reaction("R2")
+    rxn_2.add_metabolites({met_b: -1, met_b_prime: -1, met_c: 1})
+    rxn_3 = cobra.Reaction("R3")
+    rxn_3.add_metabolites({met_c: -1, met_c_prime: -2, met_a: 1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
+def equation_8(base):
+    # Example in equation 8 of Gevorgyan et al. (2008) Bioinformatics
+    # Metabolites
+    met_a = cobra.Metabolite("A")
+    met_b = cobra.Metabolite("B")
+    met_c = cobra.Metabolite("C")
+    # Reactions
+    rxn_1 = cobra.Reaction("R1")
+    rxn_1.add_metabolites({met_a: -1, met_b: 1, met_c: 1})
+    rxn_2 = cobra.Reaction("R2")
+    rxn_2.add_metabolites({met_a: -1, met_b: 1})
+    rxn_3 = cobra.Reaction("R3")
+    rxn_3.add_metabolites({met_a: -1, met_c: 1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
+def figure_2(base):
+    # Example in figure 2 of Gevorgyan et al. (2008) Bioinformatics
+    # Metabolites
+    met_a = cobra.Metabolite("A")
+    met_b = cobra.Metabolite("B")
+    met_x = cobra.Metabolite("X")
+    met_p = cobra.Metabolite("P")
+    met_q = cobra.Metabolite("Q")
+    # Reactions
+    rxn_1 = cobra.Reaction("R1")
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    rxn_2 = cobra.Reaction("R2")
+    rxn_2.add_metabolites({met_a: -1, met_b: 1, met_x: 1})
+    rxn_3 = cobra.Reaction("R3")
+    rxn_3.add_metabolites({met_p: -1, met_q: 1})
+    rxn_4 = cobra.Reaction("R4")
+    rxn_4.add_metabolites({met_p: -1, met_q: 1, met_x: 1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_4])
+    return base
+
+
+def produces_atp(base):
+    met_a = cobra.Metabolite("atp_c")
+    met_b = cobra.Metabolite("A")
+    met_c = cobra.Metabolite("B")
+    rxn1 = cobra.Reaction("Gen")
+    rxn1.add_metabolites({met_b: -1, met_a: 1, met_c: 1})
+    rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_c: -1, met_b: 1})
+    rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_a: -1})
+    rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
+    rxn4.add_metabolites({met_b: -1})
+    rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
+    rxn5.add_metabolites({met_c: -1})
+    base.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
+    return base
+
+
+def no_atp(base):
+    met_a = cobra.Metabolite("atp_c")
+    met_b = cobra.Metabolite("A")
+    met_c = cobra.Metabolite("B")
+    met_d = cobra.Metabolite("adp_c")
+    rxn1 = cobra.Reaction("Gen")
+    rxn1.add_metabolites({met_d: -1, met_b: -1, met_a: 1, met_c: 1})
+    rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_c: -1, met_b: 1})
+    rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_a: -1})
+    rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
+    rxn4.add_metabolites({met_b: -1})
+    rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
+    rxn5.add_metabolites({met_c: -1})
+    base.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
+    return base
+
+
+def all_balanced(base):
+    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    rxn1 = cobra.Reaction("RA1")
+    rxn1.add_metabolites({met_a: -2, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+
+def mass_imbalanced(base):
+    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    rxn1 = cobra.Reaction("RA1")
+    rxn1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+
+def charge_imbalanced(base):
+    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
+    rxn1 = cobra.Reaction("RA1")
+    rxn1.add_metabolites({met_a: -2, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+
 def model_builder(name):
+    choices = {
+        "fig-1": figure_1,
+        "eq-8": equation_8,
+        "fig-2": figure_2,
+        "produces_atp": produces_atp,
+        "no_atp": no_atp,
+        "all_balanced": all_balanced,
+        "mass_imbalanced": mass_imbalanced,
+        "charge_imbalanced": charge_imbalanced,
+    }
     model = cobra.Model(id_or_model=name, name=name)
-    if name == "fig-1":
-        # Example in figure 1 of Gevorgyan et al. (2008) Bioinformatics
-        # Metabolites
-        met_a = cobra.Metabolite("A")
-        met_a_prime = cobra.Metabolite("A'")
-        met_b = cobra.Metabolite("B")
-        met_b_prime = cobra.Metabolite("B'")
-        met_c = cobra.Metabolite("C")
-        met_c_prime = cobra.Metabolite("C'")
-        # Reactions
-        rxn_1 = cobra.Reaction("R1")
-        rxn_1.add_metabolites({met_a: -1, met_a_prime: -1, met_b: 1})
-        rxn_2 = cobra.Reaction("R2")
-        rxn_2.add_metabolites({met_b: -1, met_b_prime: -1, met_c: 1})
-        rxn_3 = cobra.Reaction("R3")
-        rxn_3.add_metabolites({met_c: -1, met_c_prime: -2, met_a: 1})
-        model.add_reactions([rxn_1, rxn_2, rxn_3])
-        return model
-    if name == "eq-8":
-        # Example in equation 8 of Gevorgyan et al. (2008) Bioinformatics
-        # Metabolites
-        met_a = cobra.Metabolite("A")
-        met_b = cobra.Metabolite("B")
-        met_c = cobra.Metabolite("C")
-        # Reactions
-        rxn_1 = cobra.Reaction("R1")
-        rxn_1.add_metabolites({met_a: -1, met_b: 1, met_c: 1})
-        rxn_2 = cobra.Reaction("R2")
-        rxn_2.add_metabolites({met_a: -1, met_b: 1})
-        rxn_3 = cobra.Reaction("R3")
-        rxn_3.add_metabolites({met_a: -1, met_c: 1})
-        model.add_reactions([rxn_1, rxn_2, rxn_3])
-        return model
-    if name == "fig-2":
-        # Example in figure 2 of Gevorgyan et al. (2008) Bioinformatics
-        # Metabolites
-        met_a = cobra.Metabolite("A")
-        met_b = cobra.Metabolite("B")
-        met_x = cobra.Metabolite("X")
-        met_p = cobra.Metabolite("P")
-        met_q = cobra.Metabolite("Q")
-        # Reactions
-        rxn_1 = cobra.Reaction("R1")
-        rxn_1.add_metabolites({met_a: -1, met_b: 1})
-        rxn_2 = cobra.Reaction("R2")
-        rxn_2.add_metabolites({met_a: -1, met_b: 1, met_x: 1})
-        rxn_3 = cobra.Reaction("R3")
-        rxn_3.add_metabolites({met_p: -1, met_q: 1})
-        rxn_4 = cobra.Reaction("R4")
-        rxn_4.add_metabolites({met_p: -1, met_q: 1, met_x: 1})
-        model.add_reactions([rxn_1, rxn_2, rxn_3, rxn_4])
-        return model
-    if name == "produces_atp":
-        met_a = cobra.Metabolite("atp_c")
-        met_b = cobra.Metabolite("A")
-        met_c = cobra.Metabolite("B")
-        rxn1 = cobra.Reaction("Gen")
-        rxn1.add_metabolites({met_b: -1, met_a: 1, met_c: 1})
-        rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
-        rxn2.add_metabolites({met_c: -1, met_b: 1})
-        rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
-        rxn3.add_metabolites({met_a: -1})
-        rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
-        rxn4.add_metabolites({met_b: -1})
-        rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
-        rxn5.add_metabolites({met_c: -1})
-        model.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
-        return model
-    if name == "no_atp":
-        met_a = cobra.Metabolite("atp_c")
-        met_b = cobra.Metabolite("A")
-        met_c = cobra.Metabolite("B")
-        met_d = cobra.Metabolite("adp_c")
-        rxn1 = cobra.Reaction("Gen")
-        rxn1.add_metabolites({met_d: -1, met_b: -1, met_a: 1, met_c: 1})
-        rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
-        rxn2.add_metabolites({met_c: -1, met_b: 1})
-        rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
-        rxn3.add_metabolites({met_a: -1})
-        rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
-        rxn4.add_metabolites({met_b: -1})
-        rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
-        rxn5.add_metabolites({met_c: -1})
-        model.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
-        return model
-    if name == "all_balanced":
-        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
-        rxn1 = cobra.Reaction("RA1")
-        rxn1.add_metabolites({met_a: -2, met_b: 1})
-        model.add_reactions([rxn1])
-        return model
-    if name == "mass_unbalanced":
-        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
-        rxn1 = cobra.Reaction("RA1")
-        rxn1.add_metabolites({met_a: -1, met_b: 1})
-        model.add_reactions([rxn1])
-        return model
-    if name == "charge_unbalanced":
-        met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-        met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
-        rxn1 = cobra.Reaction("RA1")
-        rxn1.add_metabolites({met_a: -2, met_b: 1})
-        model.add_reactions([rxn1])
-        return model
+    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, consistent", [
@@ -182,8 +209,8 @@ def test_production_of_atp_closed_bounds(model, atp_production):
 
 @pytest.mark.parametrize("model, num", [
     ("all_balanced", 0),
-    ("mass_unbalanced", 1),
-    ("charge_unbalanced", 1)
+    ("mass_imbalanced", 1),
+    ("charge_imbalanced", 1)
 ], indirect=["model"])
 def test_imbalanced_reactions(model, num):
     """Expect all reactions to be mass and charge balanced."""

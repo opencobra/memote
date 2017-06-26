@@ -28,18 +28,27 @@ Tests ensuring that the functions in `memote.support.basic` work as expected.
 """
 
 
+def three_missing(base):
+    base.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i))
+                          for i in range(1, 4)])
+    return base
+
+
+def three_present(base):
+    base.add_metabolites(
+        [cobra.Metabolite(id="M{0:d}".format(i), formula="CH4")
+         for i in range(1, 4)]
+    )
+    return base
+
+
 def model_builder(name):
+    choices = {
+        "three-missing": three_missing,
+        "three-present": three_present,
+    }
     model = cobra.Model(id_or_model=name, name=name)
-    if name == "three-missing":
-        model.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i))
-                               for i in range(1, 4)])
-        return model
-    if name == "three-present":
-        model.add_metabolites(
-            [cobra.Metabolite(id="M{0:d}".format(i), formula="CH4")
-             for i in range(1, 4)]
-        )
-        return model
+    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, num", [
