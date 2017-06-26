@@ -46,6 +46,8 @@ def scatter_line_chart(df, y_title):
         data = go.Data([
             go.Scatter(x=df[x_axis], y=df[y_axis])])
     layout = go.Layout(
+        width=650,
+        height=500,
         xaxis=go.XAxis(
             title="Commit Hash" if x_axis == "commit_hash" else "Timestamp",
             zeroline=True,

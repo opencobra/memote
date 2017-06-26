@@ -3,27 +3,53 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Angular Material style sheet -->
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.10/md-data-table.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
         {% block title %}<title>{{ name }} Model Report</title>{% endblock %}
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet"
-              href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         {% block topscript %}{% endblock %}
     </head>
-    <body>
+    <body ng-app="memoteReport" ng-cloak>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+        <!-- Angular Material Library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.10/md-data-table.min.js"></script>
+
+        <!-- Your application bootstrap  -->
+        <script type="text/javascript">
+            /**
+             * You must include the dependency on 'ngMaterial'
+             */
+            angular.module('memoteReport', ['ngMaterial']);
+        </script>
+
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-
-        {% block header -%}
-        <h1 class="mdc-typography--display1">{{ name }} Model Report</h1>
-        {%- endblock %}
+        <md-toolbar layout="row">
+            <div flex layout="column" layout-align="end start" layout-padding>
+                {% block header -%}
+                    MeMoTe - {{ name }} Model Report
+                {%- endblock %}
+            </div>
+            <div flex="15" layout="column" layout-align="center center">
+                <img aria-label="logo" style="width: 10vw;" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE2LjAuNCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHdpZHRoPSI2NzJweCIgaGVpZ2h0PSIxMzcuMDYxcHgiIHZpZXdCb3g9IjAgMCA2NzIgMTM3LjA2MSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNjcyIDEzNy4wNjEiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxnIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgICAgIj4KCQk8cGF0aCBkPSJNMTQuMDYsMTI5LjgzOGMwLDEuODU4LTAuNjYzLDMuNDUxLTEuOTg2LDQuNzc0Yy0xLjMyNCwxLjMyNC0yLjkxNSwxLjk4NS00Ljc3NCwxLjk4NWMtMS44NTksMC0zLjQ1MS0wLjY2MS00Ljc3NC0xLjk4NQoJCQljLTEuMzI1LTEuMzIzLTEuOTg2LTIuOTE2LTEuOTg2LTQuNzc0VjQ4LjcxN2MwLTEuODU5LDAuNjYxLTMuNDUsMS45ODYtNC43NzRjMS4zMjMtMS4zMjMsMi45MTUtMS45ODYsNC43NzQtMS45ODYKCQkJYzEuODU5LDAsMy40NSwwLjY2Myw0Ljc3NCwxLjk4NmMxLjMyMywxLjMyNCwxLjk4NiwyLjkxNSwxLjk4Niw0Ljc3NHYxLjc3NGM2LjcwMy01LjY4OSwxNC41OS04LjUzNSwyMy42Ni04LjUzNQoJCQljMTAuMjUyLDAsMTkuMDEzLDMuNjM0LDI2LjI4LDEwLjkwMWMxLjUyMSwxLjUyMSwyLjkwMSwzLjEyNiw0LjE0MSw0LjgxNmMxLjIzOS0xLjY5LDIuNjItMy4yOTYsNC4xNDEtNC44MTYKCQkJYzcuMjY3LTcuMjY4LDE2LjAyNi0xMC45MDEsMjYuMjgtMTAuOTAxYzEwLjI1MiwwLDE5LjAxMywzLjYzNCwyNi4yOCwxMC45MDFjNy4yNjcsNy4yNjcsMTAuOTAxLDE2LjAyNywxMC45MDEsMjYuMjc5djUwLjcwMQoJCQljMCwxLjg1OC0wLjY2MywzLjQ1MS0xLjk4Niw0Ljc3NGMtMS4zMjQsMS4zMjQtMi45MTYsMS45ODUtNC43NzQsMS45ODVzLTMuNDUxLTAuNjYxLTQuNzc0LTEuOTg1CgkJCWMtMS4zMjQtMS4zMjMtMS45ODYtMi45MTYtMS45ODYtNC43NzRWNzkuMTM3YzAtNi41MzQtMi4zMTEtMTIuMTExLTYuOTI5LTE2LjczMWMtNC42Mi00LjYxOC0xMC4xOTctNi45MjktMTYuNzMxLTYuOTI5CgkJCWMtNi41MzYsMC0xMi4xMTMsMi4zMTEtMTYuNzMxLDYuOTI5Yy00LjYyLDQuNjItNi45MjksMTAuMTk3LTYuOTI5LDE2LjczMXY1MC43MDFjMCwxLjg1OC0wLjY2MywzLjQ1MS0xLjk4Niw0Ljc3NAoJCQljLTEuMzI0LDEuMzI0LTIuOTE2LDEuOTg1LTQuNzc0LDEuOTg1cy0zLjQ1MS0wLjY2MS00Ljc3NC0xLjk4NWMtMS4zMjQtMS4zMjMtMS45ODUtMi45MTYtMS45ODUtNC43NzRWNzkuMTM3CgkJCWMwLTYuNTM0LTIuMzExLTEyLjExMS02LjkyOS0xNi43MzFjLTQuNjItNC42MTgtMTAuMTk3LTYuOTI5LTE2LjczMS02LjkyOWMtNi41MzYsMC0xMi4xMTMsMi4zMTEtMTYuNzMxLDYuOTI5CgkJCWMtNC42Miw0LjYyLTYuOTI5LDEwLjE5Ny02LjkyOSwxNi43MzFWMTI5LjgzOHoiLz4KCQk8cGF0aCBkPSJNMjIyLjYwOSwxMTMuNjE0YzEuODU5LDAsMy40NSwwLjY2Myw0Ljc3NCwxLjk4NmMxLjMyMywxLjMyNCwxLjk4NiwyLjkxNSwxLjk4Niw0Ljc3M2MwLDEuODU5LTAuNjQ4LDMuNDY1LTEuOTQ0LDQuODE3CgkJCWMtOC43MzIsNy42MDQtMTkuMDEzLDExLjQwNy0zMC44NDMsMTEuNDA3Yy0xMy4wNywwLTI0LjIyNC00LjYxOC0zMy40NjItMTMuODU4Yy05LjI0LTkuMjM4LTEzLjg1OC0yMC4zOTMtMTMuODU4LTMzLjQ2MgoJCQlzNC42MTgtMjQuMjIzLDEzLjg1OC0zMy40NjNjOS4yMzgtOS4yMzgsMjAuMzkzLTEzLjg1OCwzMy40NjItMTMuODU4YzEzLjA2OSwwLDI0LjIyMyw0LjYyLDMzLjQ2MiwxMy44NTgKCQkJYzkuMjM4LDkuMjQsMTMuODU4LDIwLjM5NCwxMy44NTgsMzMuNDYzYzAsMS44NTgtMC42NjMsMy40NTEtMS45ODYsNC43NzRjLTEuMzI0LDEuMzI0LTIuOTE2LDEuOTg1LTQuNzc0LDEuOTg1aC03My43NwoJCQljMS4yMzksNi40NzksNC4zMzcsMTIuMTk3LDkuMjk1LDE3LjE1M2M2LjU5MSw2LjU5MiwxNC41NjIsOS44ODcsMjMuOTE0LDkuODg3YzguNDUsMCwxNS43MTctMi42NzUsMjEuODAxLTguMDI3CgkJCUMyMTkuNjIyLDExNC4wOTMsMjIxLjAzMSwxMTMuNjE0LDIyMi42MDksMTEzLjYxNHogTTIyOS43OTEsODIuNTE3Yy0xLjI0LTYuNDc4LTQuMzM4LTEyLjE5NS05LjI5NS0xNy4xNTMKCQkJYy02LjU5MS02LjU5MS0xNC41NjMtOS44ODctMjMuOTE0LTkuODg3Yy05LjM1MiwwLTE3LjMyMywzLjI5Ni0yMy45MTQsOS44ODdjLTQuOTU4LDQuOTU4LTguMDU3LDEwLjY3Ni05LjI5NSwxNy4xNTNIMjI5Ljc5MXoiLz4KCQk8cGF0aCBkPSJNMjcwLjk0NCwxMjkuODM4YzAsMS44NTgtMC42NjMsMy40NTEtMS45ODYsNC43NzRjLTEuMzI0LDEuMzI0LTIuOTE1LDEuOTg1LTQuNzc0LDEuOTg1CgkJCWMtMS44NTksMC0zLjQ1MS0wLjY2MS00Ljc3NC0xLjk4NWMtMS4zMjUtMS4zMjMtMS45ODYtMi45MTYtMS45ODYtNC43NzRWNDguNzE3YzAtMS44NTksMC42NjEtMy40NSwxLjk4Ni00Ljc3NAoJCQljMS4zMjMtMS4zMjMsMi45MTUtMS45ODYsNC43NzQtMS45ODZjMS44NTksMCwzLjQ1LDAuNjYzLDQuNzc0LDEuOTg2YzEuMzIzLDEuMzI0LDEuOTg2LDIuOTE1LDEuOTg2LDQuNzc0djEuNzc0CgkJCWM2LjcwMy01LjY4OSwxNC41OS04LjUzNSwyMy42Ni04LjUzNWMxMC4yNTIsMCwxOS4wMTMsMy42MzQsMjYuMjgsMTAuOTAxYzEuNTIxLDEuNTIxLDIuOTAxLDMuMTI2LDQuMTQxLDQuODE2CgkJCWMxLjIzOS0xLjY5LDIuNjItMy4yOTYsNC4xNDEtNC44MTZjNy4yNjctNy4yNjgsMTYuMDI3LTEwLjkwMSwyNi4yOC0xMC45MDFzMTkuMDEzLDMuNjM0LDI2LjI4LDEwLjkwMQoJCQljNy4yNjcsNy4yNjcsMTAuOSwxNi4wMjcsMTAuOSwyNi4yNzl2NTAuNzAxYzAsMS44NTgtMC42NjMsMy40NTEtMS45ODYsNC43NzRjLTEuMzI0LDEuMzI0LTIuOTE1LDEuOTg1LTQuNzczLDEuOTg1CgkJCWMtMS44NTksMC0zLjQ1MS0wLjY2MS00Ljc3NS0xLjk4NWMtMS4zMjQtMS4zMjMtMS45ODUtMi45MTYtMS45ODUtNC43NzRWNzkuMTM3YzAtNi41MzQtMi4zMTEtMTIuMTExLTYuOTI5LTE2LjczMQoJCQljLTQuNjItNC42MTgtMTAuMTk3LTYuOTI5LTE2LjczMS02LjkyOWMtNi41MzYsMC0xMi4xMTIsMi4zMTEtMTYuNzMxLDYuOTI5Yy00LjYyLDQuNjItNi45MjksMTAuMTk3LTYuOTI5LDE2LjczMXY1MC43MDEKCQkJYzAsMS44NTgtMC42NjMsMy40NTEtMS45ODYsNC43NzRjLTEuMzI0LDEuMzI0LTIuOTE2LDEuOTg1LTQuNzc0LDEuOTg1cy0zLjQ1MS0wLjY2MS00Ljc3NC0xLjk4NQoJCQljLTEuMzI0LTEuMzIzLTEuOTg1LTIuOTE2LTEuOTg1LTQuNzc0Vjc5LjEzN2MwLTYuNTM0LTIuMzExLTEyLjExMS02LjkyOS0xNi43MzFjLTQuNjItNC42MTgtMTAuMTk3LTYuOTI5LTE2LjczMS02LjkyOQoJCQljLTYuNTM2LDAtMTIuMTEzLDIuMzExLTE2LjczMSw2LjkyOWMtNC42Miw0LjYyLTYuOTI5LDEwLjE5Ny02LjkyOSwxNi43MzFWMTI5LjgzOHoiLz4KCTwvZz4KCTxnIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgICAgIj4KCQk8cGF0aCBmaWxsPSIjMDEwMjAyIiBkPSJNNTYxLjYyNywxMjMuMDc3YzEuODU5LDAsMy40NSwwLjY2Myw0Ljc3NCwxLjk4NmMxLjMyMywxLjMyNCwxLjk4NSwyLjkxNSwxLjk4NSw0Ljc3NAoJCQljMCwxLjg1OC0wLjY2MiwzLjQ1MS0xLjk4NSw0Ljc3NGMtMS4zMjQsMS4zMjQtMi45MTUsMS45ODUtNC43NzQsMS45ODVjLTIyLjUzNCwwLTMzLjgwMS0xMS4yNjctMzMuODAxLTMzLjgwMXYtNDcuMzJoLTYuNzYKCQkJYy0xLjg1OSwwLTMuNDUxLTAuNjYxLTQuNzczLTEuOTg1Yy0xLjMyNS0xLjMyMy0xLjk4Ni0yLjkxNi0xLjk4Ni00Ljc3NGMwLTEuODU5LDAuNjYxLTMuNDUsMS45ODYtNC43NzQKCQkJYzEuMzIyLTEuMzIzLDIuOTE0LTEuOTg2LDQuNzczLTEuOTg2aDYuNzZ2LTMzLjhjMC0xLjg1OSwwLjY2Mi0zLjQ1LDEuOTg2LTQuNzc0YzEuMzIyLTEuMzIzLDIuOTE1LTEuOTg2LDQuNzc0LTEuOTg2CgkJCWMxLjg1OCwwLDMuNDUsMC42NjMsNC43NzQsMS45ODZjMS4zMjIsMS4zMjQsMS45ODUsMi45MTUsMS45ODUsNC43NzR2MzMuOGgxMy42MDRjMS44NTksMCwzLjQ1LDAuNjYzLDQuNzc0LDEuOTg2CgkJCWMxLjMyMywxLjMyNCwxLjk4NSwyLjkxNSwxLjk4NSw0Ljc3NGMwLDEuODU4LTAuNjYyLDMuNDUxLTEuOTg1LDQuNzc0Yy0xLjMyNCwxLjMyNC0yLjkxNSwxLjk4NS00Ljc3NCwxLjk4NWgtMTMuNjA0djQ3LjMyCgkJCUM1NDEuMzQ3LDExNi4zMTgsNTQ4LjEwOCwxMjMuMDc3LDU2MS42MjcsMTIzLjA3N3oiLz4KCQk8cGF0aCBmaWxsPSIjMDEwMjAyIiBkPSJNNjUwLjI2OSwxMTMuNjE0YzEuODU4LDAsMy40NSwwLjY2Myw0Ljc3NCwxLjk4NmMxLjMyMiwxLjMyNCwxLjk4NiwyLjkxNSwxLjk4Niw0Ljc3MwoJCQljMCwxLjg1OS0wLjY0OCwzLjQ2NS0xLjk0NCw0LjgxN2MtOC43MzIsNy42MDQtMTkuMDEzLDExLjQwNy0zMC44NDMsMTEuNDA3Yy0xMy4wNywwLTI0LjIyNS00LjYxOC0zMy40NjMtMTMuODU4CgkJCWMtOS4yMzktOS4yMzgtMTMuODU3LTIwLjM5My0xMy44NTctMzMuNDYyczQuNjE4LTI0LjIyMywxMy44NTctMzMuNDYzYzkuMjM4LTkuMjM4LDIwLjM5My0xMy44NTgsMzMuNDYzLTEzLjg1OAoJCQljMTMuMDY4LDAsMjQuMjIzLDQuNjIsMzMuNDYzLDEzLjg1OGM5LjIzOCw5LjI0LDEzLjg1NywyMC4zOTQsMTMuODU3LDMzLjQ2M2MwLDEuODU4LTAuNjYyLDMuNDUxLTEuOTg1LDQuNzc0CgkJCWMtMS4zMjQsMS4zMjQtMi45MTUsMS45ODUtNC43NzQsMS45ODVoLTczLjc3YzEuMjM4LDYuNDc5LDQuMzM4LDEyLjE5Nyw5LjI5NSwxNy4xNTNjNi41OTIsNi41OTIsMTQuNTYyLDkuODg3LDIzLjkxNCw5Ljg4NwoJCQljOC40NSwwLDE1LjcxNy0yLjY3NSwyMS44MDEtOC4wMjdDNjQ3LjI4MiwxMTQuMDkzLDY0OC42OTIsMTEzLjYxNCw2NTAuMjY5LDExMy42MTR6IE02NTcuNDUxLDgyLjUxNwoJCQljLTEuMjQtNi40NzgtNC4zMzgtMTIuMTk1LTkuMjk1LTE3LjE1M2MtNi41OTItNi41OTEtMTQuNTYzLTkuODg3LTIzLjkxNC05Ljg4N2MtOS4zNTIsMC0xNy4zMjIsMy4yOTYtMjMuOTE0LDkuODg3CgkJCWMtNC45NTcsNC45NTgtOC4wNTcsMTAuNjc2LTkuMjk1LDE3LjE1M0g2NTcuNDUxeiIvPgoJPC9nPgoJPHBhdGggZmlsbD0iIzM3QTI1MiIgZD0iTTUwMS4xNTEsODguNzcxYzAsMjYuNjYtMjEuNjIsNDguMjktNDguMjcxLDQ4LjI5Yy0yNi42ODEsMC00OC4zLTIxLjYzLTQ4LjMtNDguMjkKCQlzMjEuNjE5LTQ4LjI3OSw0OC4zLTQ4LjI3OWMxNC4xMywwLDI2Ljg0LDYuMDc5LDM1LjY4LDE1Ljc2bC0zOS43NzksMzkuNzdMNDI5LjYsNzYuODRsLTExLjUsMTEuNTExbDMwLjY4MSwzMC42OTlsNDguNzEtNDguNzIKCQlDNDk5Ljg1LDc2LjAxMSw1MDEuMTUxLDgyLjI0LDUwMS4xNTEsODguNzcxeiIvPgo8L2c+Cjwvc3ZnPg==">
+            </div>
+        </md-toolbar>
 
         <div id="content">{% block content %}{% endblock %}</div>
 
         {% block bottomscript %}
-        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-        <script>window.mdc.autoInit()</script>
         {% endblock %}
     </body>
 </html>
