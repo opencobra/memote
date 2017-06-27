@@ -23,6 +23,7 @@ import logging
 
 from six import iteritems
 from cobra.exceptions import Infeasible
+from memote.support.helpers import find_atp_adp_converting_reactions
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
@@ -89,3 +90,20 @@ def find_blocked_biomass_precursors(reaction, model):
             except Infeasible:
                 blocked_precursors.append(precursor)
     return blocked_precursors
+
+
+def gam_in_biomass(reaction, model):
+    """
+    Return boolean if biomass reaction includes growth-associated maintenance.
+
+    Parameters
+    ----------
+    reaction : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    atp_adp_reactions = find_atp_adp_converting_reactions(model)
+    return reaction in set(atp_adp_reactions)

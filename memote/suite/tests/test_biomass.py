@@ -107,3 +107,15 @@ def test_biomass_precursors_open_production(model, reaction, store):
     assert len(blocked) == 0, \
         "{}'s following precursors cannot be produced: {}" \
         "".format(reaction.id, ", ".join(blocked))
+
+
+@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+def test_gam_in_biomass(model, reaction, store):
+    """Expect the biomass reactions to contain atp and adp."""
+    store["gam_in_biomass"] = store.get(
+        "gam_in_biomass", list())
+    present = biomass.gam_in_biomass(reaction, model)
+    store["gam_in_biomass"].append(present)
+    assert present, \
+        "{} does not contain a term for growth-associated maintenance." \
+        "".format(reaction.id)

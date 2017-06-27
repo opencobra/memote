@@ -164,6 +164,23 @@ def precursors_not_in_medium(base):
     return base
 
 
+def no_gam_in_biomass(base):
+    met_a = cobra.Metabolite("lipid_c", "H744")
+    met_b = cobra.Metabolite("protein_c", "H119")
+    met_c = cobra.Metabolite("rna_c", "H496")
+    met_d = cobra.Metabolite("dna_c", "H483")
+    met_e = cobra.Metabolite("ash_c", "H80")
+    met_f = cobra.Metabolite("cellwall_c", "H177")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    # Reactions
+    rxn_1 = cobra.Reaction("BIOMASS_TEST")
+    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
+                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
+                           met_g: -0.032})
+    base.add_reactions([rxn_1])
+    return base
+
+
 def model_builder(name):
     choices = {
         "sum_within_deviation": sum_within_deviation,
@@ -171,6 +188,7 @@ def model_builder(name):
         "precursors_producing": precursors_producing,
         "precursors_blocked": precursors_blocked,
         "precursors_not_in_medium": precursors_not_in_medium,
+        "no_gam_in_biomass": no_gam_in_biomass,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -241,3 +259,14 @@ def test_production_biomass_precursors_exchange(model, num):
             exchange.bounds = (-1000, 1000)
         blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
         assert len(blocked_mets) == num
+
+
+@pytest.mark.parametrize("model, boolean", [
+    ("sum_within_deviation", True),
+    ("no_gam_in_biomass", False)
+], indirect=["model"])
+def test_gam_in_biomass(model, boolean):
+    """Expect the biomass reactions to contain atp and adp."""
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        assert biomass.gam_in_biomass(rxn, model) is boolean
