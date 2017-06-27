@@ -181,6 +181,34 @@ def no_gam_in_biomass(base):
     return base
 
 
+def ngam_present(base):
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
+    met_i = cobra.Metabolite("h_c", "H")
+    met_j = cobra.Metabolite("h2o_c", "H2O")
+    met_k = cobra.Metabolite("pi_c", "HO4P")
+    rxn_1 = cobra.Reaction("ATPM")
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
+                           met_j: -1, met_k: 1})
+    rxn_1.lower_bound = 8.39
+    base.add_reactions([rxn_1])
+    return base
+
+
+def simple_atp_hydrolysis(base):
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
+    met_i = cobra.Metabolite("h_c", "H")
+    met_j = cobra.Metabolite("h2o_c", "H2O")
+    met_k = cobra.Metabolite("pi_c", "HO4P")
+    rxn_1 = cobra.Reaction("ATPM")
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
+                           met_j: -1, met_k: 1})
+    rxn_1.bounds = 0, 1000
+    base.add_reactions([rxn_1])
+    return base
+
+
 def model_builder(name):
     choices = {
         "sum_within_deviation": sum_within_deviation,
@@ -189,6 +217,8 @@ def model_builder(name):
         "precursors_blocked": precursors_blocked,
         "precursors_not_in_medium": precursors_not_in_medium,
         "no_gam_in_biomass": no_gam_in_biomass,
+        "ngam_present": ngam_present,
+        "simple_atp_hydrolysis": simple_atp_hydrolysis,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -270,3 +300,14 @@ def test_gam_in_biomass(model, boolean):
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         assert biomass.gam_in_biomass(rxn, model) is boolean
+
+
+@pytest.mark.parametrize("model, num", [
+    ("ngam_present", 1),
+    ("simple_atp_hydrolysis", 0),
+    ("sum_within_deviation", 0)
+], indirect=["model"])
+def test_ngam_presence(model, num):
+    """Expect a single non growth-associated maintenance reaction."""
+    ngam_reaction = biomass.find_ngam(model)
+    assert len(ngam_reaction) == num

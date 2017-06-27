@@ -119,3 +119,13 @@ def test_gam_in_biomass(model, reaction, store):
     assert present, \
         "{} does not contain a term for growth-associated maintenance." \
         "".format(reaction.id)
+
+
+def test_ngam_presence(read_only_model, store):
+    """Expect a single non growth-associated maintenance reaction."""
+    ngam_reaction = biomass.find_ngam(read_only_model)
+    store["ngam_reaction"] = [rxn.id for rxn in ngam_reaction]
+    assert len(ngam_reaction) == 1, \
+        "Could not identify a unique non growth-associated maintenance " \
+        "reaction. Please make sure to add only a single ATP-hydrolysis " \
+        "reaction and set the lower bound to a fixed value."
