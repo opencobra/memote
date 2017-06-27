@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-from memote.support.basic import check_metabolites_formula_presence
+import memote.support.basic as basic
 
 
 def test_model_id_presence(read_only_model, store):
@@ -53,7 +53,42 @@ def test_metabolites_presence(read_only_model, store):
 def test_metabolites_formula_presence(read_only_model, store):
     """Expect all metabolites to have a formula."""
     missing = [
-        met.id for met in check_metabolites_formula_presence(read_only_model)]
+        met.id for met in basic.check_metabolites_formula_presence(
+            read_only_model
+        )
+    ]
     store["metabolites_no_formula"] = missing
     assert len(missing) == 0, "No formula found for the following "\
         "metabolites: {}".format(", ".join(missing))
+
+
+def test_metabolites_charge_presence(read_only_model, store):
+    """Expect all metabolites to have a formula."""
+    missing = [
+        met.id for met in basic.check_metabolites_charge_presence(
+            read_only_model
+        )
+    ]
+    store["metabolites_no_charge"] = missing
+    assert len(missing) == 0, "No charge found for the following "\
+        "metabolites: {}".format(", ".join(missing))
+
+
+def test_gene_protein_reaction_rule_presence(read_only_model, store):
+    """Expect all non-exchange reactions to have a GPR."""
+    missing_gpr_metabolic_rxns = \
+        set(
+            basic.check_gene_protein_reaction_rule_presence(
+                read_only_model
+            )
+        ).difference(set(read_only_model.exchanges))
+    store["reactions_no_GPR"] = [rxn.id for rxn in missing_gpr_metabolic_rxns]
+    assert len(store["reactions_no_GPR"]) == 0, "No GPR found for the " \
+        "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
+
+
+def test_metabolic_coverage(read_only_model, store):
+    """Expect a model to have high metabolic coverage."""
+    store["metabolic_coverage"] = \
+        basic.calculate_metabolic_coverage(read_only_model)
+    assert store["metabolic_coverage"] >= 1

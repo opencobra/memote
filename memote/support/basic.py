@@ -29,4 +29,64 @@ LOGGER = logging.getLogger(__name__)
 
 def check_metabolites_formula_presence(model):
     """Return the list of model metabolites that have no associated formula."""
-    return [met for met in model.metabolites if not met.formula]
+    return [met for met in model.metabolites if met.formula is None]
+
+
+def check_metabolites_charge_presence(model):
+    """Return the list of model metabolites that have no associated charge."""
+    return [met for met in model.metabolites if met.charge is None]
+
+
+def check_gene_protein_reaction_rule_presence(model):
+    """Return the list of model reactions that have no associated gene rule."""
+    return [rxn for rxn in model.reactions if not rxn.gene_reaction_rule]
+
+
+def find_nonzero_constrained_reactions(model):
+    """Return list of reactions with non-zero, non-maximal bounds."""
+    return [rxn for rxn in model.reactions if
+            0 > rxn.lower_bound > -1000 or
+            0 < rxn.upper_bound < 1000]
+
+
+def find_zero_constrained_reactions(model):
+    """Return list of reactions that are constrained to zero flux."""
+    return [rxn for rxn in model.reactions if
+            rxn.lower_bound == 0 and
+            rxn.upper_bound == 0]
+
+
+def find_irreversible_reactions(model):
+    """Return list of reactions that are irreversible."""
+    return [rxn for rxn in model.reactions if rxn.reversibility is False]
+
+
+def find_unconstrained_reactions(model):
+    """Return list of reactions that are not constrained at all."""
+    return [rxn for rxn in model.reactions if
+            rxn.lower_bound <= -1000 and
+            rxn.upper_bound >= 1000]
+
+
+def calculate_metabolic_coverage(model):
+    """
+    Return the ratio of reactions and genes included in the model.
+
+    According to [1] this is a good quality indicator expressing the degree of
+    metabolic coverage i.e. modeling detail of a given reconstruction. The
+    authors explain that models with a 'high level of modeling detail have
+    ratios >1, and [models] with low level of detail have ratios <1'. They
+    explain that 'this difference arises because [models] with basic or
+    intermediate levels of detail often include many reactions in which several
+    gene products and their enzymatic transformations are ‘lumped’'.
+
+    References
+    ----------
+    [1] Monk, J., Nogales, J., & Palsson, B. O. (2014). Optimizing genome-scale
+    network reconstructions. Nature Biotechnology, 32(5), 447–452.
+    http://doi.org/10.1038/nbt.2870
+
+    """
+    if len(model.reactions) == 0 or len(model.genes) == 0:
+        raise ValueError("The model contains no reactions or genes.")
+    return float(len(model.reactions)) / float(len(model.genes))

@@ -41,7 +41,7 @@ requirements = [
     "click-configfile",
     "colorama",
     "future",
-    "pytest",
+    "pytest>=3.1",
     "gitpython",
     "pandas>=0.20.1",
     "dask>=0.14.3",
@@ -56,7 +56,8 @@ requirements = [
 ]
 
 test_requirements = [
-    "pytest"
+    "pytest>=3.1"
+    "pytest-raises"
 ]
 
 setup(
