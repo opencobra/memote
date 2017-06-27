@@ -241,6 +241,44 @@ def find_untagged_demand_rxns(model):
             if not re.match(comp_pattern, rxn.id)]
 
 
+def find_untagged_sink_rxns(model):
+    """
+    Find demand reactions whose IDs do not begin with 'SK_'.
+
+    [1] defines sink reactions as:
+    -- 'similar to demand reactions' but reversible, thus able to supply the
+    model with metabolites
+    -- reactions that are chiefly added during the gap-filling process
+    -- as a means of dealing with 'compounds that are produced by nonmetabolic
+    cellular processes but that need to be metabolized'
+    -- reactions with a formula such as: 'met_c <-> '
+
+    Sink reactions differ from exchange reactions in that the metabolites
+    are not removed from the extracellular environment, but from any of the
+    organism's compartments.
+
+    Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    References
+    ----------
+    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
+    a high-quality genome-scale metabolic reconstruction. Nature protocols.
+    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+
+    """
+    demand_and_exchange_rxns = set(model.exchanges)
+    sink_rxns = [rxn for rxn in demand_and_exchange_rxns
+                 if rxn.reversibility and
+                 rxn.get_compartments() not in ['e']]
+
+    comp_pattern = "^SK_\w*?"
+    return [rxn for rxn in sink_rxns
+            if not re.match(comp_pattern, rxn.id)]
+
+
 def find_untagged_exchange_rxns(model):
     """
     Find exchange reactions whose IDs do not begin with 'EX_'.
@@ -254,7 +292,7 @@ def find_untagged_exchange_rxns(model):
 
     Exchange reactions differ from demand reactions in that the metabolites
     are removed from or added to the extracellular environment only. With this
-    the updake or secretion of a metabolite is modeled, respectively.
+    the uptake or secretion of a metabolite is modeled, respectively.
 
     Parameters
     ----------
