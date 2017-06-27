@@ -291,7 +291,6 @@ def test_production_biomass_precursors_exchange(model, num):
         assert len(blocked_mets) == num
 
 
-<<<<<<< 04f710132f856c8eff445fa41dc4faad858c666e
 @pytest.mark.parametrize("model, boolean", [
     ("sum_within_deviation", True),
     ("no_gam_in_biomass", False)
@@ -301,7 +300,8 @@ def test_gam_in_biomass(model, boolean):
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         assert biomass.gam_in_biomass(rxn, model) is boolean
-=======
+
+
 @pytest.mark.parametrize("model, num", [
     ("ngam_present", 1),
     ("simple_atp_hydrolysis", 0),
@@ -311,4 +311,3 @@ def test_ngam_presence(model, num):
     """Expect a single non growth-associated maintenance reaction."""
     ngam_reaction = biomass.find_ngam(model)
     assert len(ngam_reaction) == num
->>>>>>> feat: Add test for the find_ngame function
