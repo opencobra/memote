@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json
 import warnings
-from builtins import dict, str
+from builtins import dict
 from datetime import datetime
 
 import pytest
@@ -155,9 +155,9 @@ class ResultCollectionPlugin(object):
         self._meta["platform"] = platform.system()
         self._meta["release"] = platform.release()
         self._meta["python"] = platform.python_version()
-        self._meta["packages"] = [
+        self._meta["packages"] = dict(
             (dist.project_name, dist.version) for dist in
-            pip.get_installed_distributions()]
+            pip.get_installed_distributions())
         if self.mode == "html":
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
             return

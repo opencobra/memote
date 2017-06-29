@@ -25,9 +25,14 @@ to remain the same as the parametrized test cases.
 
 from __future__ import absolute_import
 
+import warnings
+
 import pytest
 import numpy as np
-from cobra.exceptions import Infeasible
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", UserWarning)
+    # ignore Gurobi warning
+    from cobra.exceptions import Infeasible
 
 import memote.support.biomass as biomass
 from memote.support.helpers import find_biomass_reaction
@@ -55,13 +60,13 @@ def test_biomass_presence(biomass_ids, store):
 
 @pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
 def test_biomass_consistency(reaction, store):
-    """Expect biomass components to sum up to 1 g / mmol / h."""
+    """Expect biomass components to sum up to 1 mmol / g[CDW] / h."""
     store["biomass_sum"] = store.get("biomass_sum", list())
     component_sum = biomass.sum_biomass_weight(reaction)
     store["biomass_sum"].append(component_sum)
     assert np.isclose(component_sum, 1.0, atol=1e-03), \
-        "{}'s components sum up to {} which is too far from 1 mmol / g / h"\
-        "".format(reaction.id, component_sum)
+        "{}'s components sum up to {} which is too far from " \
+        "1 mmol / g[CDW] / h".format(reaction.id, component_sum)
 
 
 @pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
