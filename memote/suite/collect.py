@@ -39,6 +39,7 @@ with warnings.catch_warnings():
     from cobra.io import read_sbml_model
 
 from memote.suite.reporting.reports import BasicReport
+from memote.support.helpers import find_biomass_reaction
 
 LOGGER = logging.getLogger(__name__)
 
@@ -100,6 +101,10 @@ class ResultCollectionPlugin(object):
         self.repo = repo
         self.branch = branch
         self.commit = commit
+        # TODO: record SBML warnings and add them to the report
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            self._sbml_model = read_sbml_model(self._model)
 
     def _git_meta_info(self):
         """Record repository meta information."""
@@ -128,15 +133,19 @@ class ResultCollectionPlugin(object):
     @pytest.fixture(scope="session")
     def read_only_model(self):
         """Provide the model for the complete test session."""
-        # TODO: record SBML warnings and add them to the report
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", UserWarning)
-            return read_sbml_model(self._model)
+        return self._sbml_model
 
     @pytest.fixture(scope="function")
     def model(self, read_only_model):
         """Provide a pristine model for a test unit."""
         return read_only_model.copy()
+
+    def pytest_namespace(self):
+        """Inject global static values into the pytest namespace."""
+        blob = dict()
+        blob["biomass_reactions"] = find_biomass_reaction(self._sbml_model)
+        blob["biomass_ids"] = [rxn.id for rxn in blob["biomass_reactions"]]
+        return blob
 
     @pytest.fixture(scope="module")
     def store(self, request):
