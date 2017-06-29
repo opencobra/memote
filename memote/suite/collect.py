@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import io
-import sys
+import platform
 import logging
 
 try:
@@ -152,10 +152,11 @@ class ResultCollectionPlugin(object):
         """Record environment information of the pytest session."""
         if self.mode == "basic":
             return
-        self._meta["platform"] = sys.platform
-        self._meta["python_version"] = sys.version
-        self._meta["python_environment"] = [
-            str(dist.as_requirement()) for dist in
+        self._meta["platform"] = platform.system()
+        self._meta["release"] = platform.release()
+        self._meta["python"] = platform.python_version()
+        self._meta["packages"] = [
+            (dist.project_name, dist.version) for dist in
             pip.get_installed_distributions()]
         if self.mode == "html":
             self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
