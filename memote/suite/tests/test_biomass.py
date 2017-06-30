@@ -21,50 +21,50 @@ Supporting functions for stoichiometric consistency checks.
 N.B.: We parametrize each function here with the identified biomass reactions.
 In the storage of test results we rely on the order of the biomass fixtures
 to remain the same as the parametrized test cases.
+
+`pytest.biomass_reactions` and `pytest.biomass_ids` are injected into the
+pytest namespace by the plugin. This is done because we cannot simply use a
+fixture using `model` to find the biomass reactions and then inject them into
+`pytest.mark.parametrize` and neither can we use global variables that will use
+the fixture.
 """
 
 from __future__ import absolute_import
 
+import warnings
+
 import pytest
 import numpy as np
-from cobra.exceptions import Infeasible
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", UserWarning)
+    # ignore Gurobi warning
+    from cobra.exceptions import Infeasible
 
 import memote.support.biomass as biomass
-from memote.support.helpers import find_biomass_reaction
 
 
-@pytest.fixture(scope="module")
-def biomass_reactions(read_only_model):
-    """Return any biomass reactions found in the model."""
-    return find_biomass_reaction(read_only_model)
-
-
-@pytest.fixture(scope="module")
-def biomass_ids(biomass_reactions):
-    """Return any biomass reaction IDs found in the model."""
-    return [rxn.id for rxn in biomass_reactions]
-
-
-def test_biomass_presence(biomass_ids, store):
+def test_biomass_presence(store):
     """Expect the model to contain at least one biomass reaction."""
-    store["biomass_ids"] = biomass_ids
-    assert len(biomass_ids) > 0, \
+    store["biomass_ids"] = pytest.biomass_ids
+    assert len(pytest.biomass_ids) > 0, \
         "Could not identify any biomass reaction." \
         " Please change the intended reaction ID(s) to contain 'biomass'."
 
 
-@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
 def test_biomass_consistency(reaction, store):
-    """Expect biomass components to sum up to 1 g / mmol / h."""
+    """Expect biomass components to sum up to 1 mmol / g[CDW] / h."""
     store["biomass_sum"] = store.get("biomass_sum", list())
     component_sum = biomass.sum_biomass_weight(reaction)
     store["biomass_sum"].append(component_sum)
     assert np.isclose(component_sum, 1.0, atol=1e-03), \
-        "{}'s components sum up to {} which is too far from 1 mmol / g / h"\
-        "".format(reaction.id, component_sum)
+        "{}'s components sum up to {} which is too far from " \
+        "1 mmol / g[CDW] / h".format(reaction.id, component_sum)
 
 
-@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
 def test_biomass_default_production(model, reaction, store):
     """Expect biomass production in default medium."""
     store["biomass_default_flux"] = store.get("biomass_default_flux", list())
@@ -78,7 +78,8 @@ def test_biomass_default_production(model, reaction, store):
     assert flux > 0.0
 
 
-@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
 def test_biomass_precursors_default_production(read_only_model, reaction,
                                                store):
     """Expect production of all biomass precursors in default medium."""
@@ -93,7 +94,8 @@ def test_biomass_precursors_default_production(read_only_model, reaction,
         "".format(reaction.id, ", ".join(blocked))
 
 
-@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
 def test_biomass_precursors_open_production(model, reaction, store):
     """Expect precursor production in complete medium."""
     store["open_blocked_precursors"] = store.get(
@@ -109,7 +111,8 @@ def test_biomass_precursors_open_production(model, reaction, store):
         "".format(reaction.id, ", ".join(blocked))
 
 
-@pytest.mark.parametrize("reaction", biomass_reactions, ids=biomass_ids)
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
 def test_gam_in_biomass(model, reaction, store):
     """Expect the biomass reactions to contain atp and adp."""
     store["gam_in_biomass"] = store.get(
