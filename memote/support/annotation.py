@@ -21,10 +21,12 @@ from __future__ import absolute_import
 
 import logging
 import re
+from builtins import str
+
 import pandas as pd
 
 from collections import OrderedDict
-from memote.support.helpers import (get_difference)
+from memote.support.helpers import get_difference
 
 LOGGER = logging.getLogger(__name__)
 
@@ -83,223 +85,124 @@ METABOLITE_ANNOTATIONS = [('kegg.compound', re.compile(r"^C\d+$")),
 METABOLITE_ANNOTATIONS = OrderedDict(METABOLITE_ANNOTATIONS)
 
 
-def find_met_without_annotations(model):
+def find_components_without_annotation(model, components):
     """
-    Find metabolites with empty annotation attributes.
+    Find model components with empty annotation attributes.
 
     Parameters
     ----------
     model : cobra.Model
         A cobrapy metabolic model.
+    components : {"metabolites", "reactions", "genes"}
+        A string denoting `cobra.Model` components.
 
     Returns
     -------
     list
-        Metabolites that have empty annotation attributes.
-
+        The components without any annotation.
     """
-    return [met for met in model.metabolites if met.annotation == {}]
+    return [elem for elem in getattr(model, components) if
+            elem.annotation is None or len(elem.annotation) == 0]
 
 
-def generate_met_annotation_overview(model):
+def generate_component_annotation_overview(model, components):
     """
-    List metabolites which lack annotation for a given database.
+    Tabulate which MIRIAM databases the component's annotation match.
 
     Parameters
     ----------
     model : cobra.Model
         A cobrapy metabolic model.
+    components : {"metabolites", "reactions", "genes"}
+        A string denoting `cobra.Model` components.
 
     Returns
     -------
-    dict
-        Dictionary that contains the database namespaces as keys and a list of
-        metabolites without annotation in each namespace as the values.
-
+    pandas.DataFrame
+        The index of the table is given by the component identifiers. Each
+        column corresponds to one MIRIAM database and a Boolean entry
+        determines whether the annotation matches.
     """
-    met_annotation_overview = {key: [] for key in METABOLITE_ANNOTATIONS}
-    for met in model.metabolites:
-        for key in METABOLITE_ANNOTATIONS:
-            if key not in met.annotation:
-                met_annotation_overview[key].append(met)
-    return met_annotation_overview
+    databases = list({
+        "metabolites": METABOLITE_ANNOTATIONS,
+        "reactions": REACTION_ANNOTATIONS
+    }[components])
+    data = list()
+    index = list()
+    for elem in getattr(model, components):
+        index.append(elem.id)
+        data.append(tuple(db in elem.annotation for db in databases))
+    return pd.DataFrame(data, index=index, columns=databases)
 
 
-def find_rxn_without_annotations(model):
+def generate_component_annotation_miriam_match(model, components):
     """
-    Find reactions with empty annotation attributes.
+    Tabulate which MIRIAM databases the component's annotation match.
 
     Parameters
     ----------
     model : cobra.Model
         A cobrapy metabolic model.
+    components : {"metabolites", "reactions", "genes"}
+        A string denoting `cobra.Model` components.
 
     Returns
     -------
-    list
-        Reactions that have empty annotation attributes.
-
+    pandas.DataFrame
+        The index of the table is given by the component identifiers. Each
+        column corresponds to one MIRIAM database and a Boolean entry
+        determines whether the annotation matches.
     """
-    return [rxn for rxn in model.reactions if rxn.annotation == {}]
+    def check_annotation(key, annotation):
+        if key not in annotation:
+            return False
+        test = annotation[key]
+        pattern = patterns[key]
+        if isinstance(test, str):
+            return pattern.match(test) is not None
+        return all(pattern.match(elem) is not None for elem in test)
+
+    patterns = {
+         "metabolites": METABOLITE_ANNOTATIONS,
+         "reactions": REACTION_ANNOTATIONS
+     }[components]
+    databases = list(patterns)
+    data = list()
+    index = list()
+    for elem in getattr(model, components):
+        index.append(elem.id)
+        data.append(tuple(check_annotation(db, elem.annotation)
+                          for db in databases))
+    return pd.DataFrame(data, index=index, columns=databases)
 
 
-def generate_rxn_annotation_overview(model):
+def generate_component_id_namespace_overview(model, components):
     """
-    List reactions which lack annotation for a given database.
+    Tabulate which MIRIAM databases the component's annotation match.
 
     Parameters
     ----------
     model : cobra.Model
         A cobrapy metabolic model.
+    components : {"metabolites", "reactions", "genes"}
+        A string denoting `cobra.Model` components.
 
     Returns
     -------
-    dict
-        Dictionary that contains the database namespaces as keys and a list of
-        reactions without annotation in each namespace as the values.
-
+    pandas.DataFrame
+        The index of the table is given by the component identifiers. Each
+        column corresponds to one MIRIAM database and a Boolean entry
+        determines whether the annotation matches.
     """
-    rxn_annotation_overview = {key: [] for key in REACTION_ANNOTATIONS}
-    for rxn in model.reactions:
-        for key in REACTION_ANNOTATIONS:
-            if key not in rxn.annotation:
-                rxn_annotation_overview[key].append(rxn)
-    return rxn_annotation_overview
-
-
-def find_wrong_annotation_ids(model, overview_dict, rxn_or_met):
-    """
-    Check the correctness of the annotations of annotated model components.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        A cobrapy metabolic model.
-
-    overview_dict
-        Dictionary that contains the database namespaces as keys and a list of
-        mets/rxns without annotation in each namespace as the values.
-
-    rxn_or_met : str
-        Either 'rxn' or 'met'.
-
-    Returns
-    -------
-    dict
-        Dictionary that contains the database namespaces as keys and a list of
-        mets/rxns that have wrong ids of each namespace as the values.
-
-    """
-    if rxn_or_met == 'rxn':
-        items_anno_wrong_ids = {db_id: [] for db_id in REACTION_ANNOTATIONS}
-        pattern_storage = REACTION_ANNOTATIONS
-    if rxn_or_met == 'met':
-        items_anno_wrong_ids = {db_id: [] for db_id in METABOLITE_ANNOTATIONS}
-        pattern_storage = METABOLITE_ANNOTATIONS
-    for db_id in overview_dict:
-        items_with_annotation = get_difference(
-            overview_dict[db_id],
-            model,
-            rxn_or_met
-        )
-        for item in items_with_annotation:
-            if type(item.annotation[db_id]) == str:
-                if not re.match(
-                    pattern_storage[db_id], item.annotation[db_id]
-                ):
-                    items_anno_wrong_ids[db_id].append(item)
-            if type(item.annotation[db_id]) == list:
-                for anno_id in item.annotation[db_id]:
-                    if not re.match(
-                        pattern_storage[db_id], str(anno_id)
-                    ):
-                        items_anno_wrong_ids[db_id].append(item)
-                        break
-                    else:
-                        pass
-    return items_anno_wrong_ids
-
-
-def collect_met_id_namespace(model):
-    """
-    Identify to which common database metabolite IDs belong.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        A cobrapy metabolic model.
-
-    Returns
-    -------
-    dataframe : pandas.core.frame.DataFrame
-        Table with metabolite IDs as rows and database namespaces as the
-        columns. Cell values are boolean.
-
-    """
-    data = {}
-    for met in model.metabolites:
-        data[met] = {}
-        no_compartment_id = met.id.rsplit('_', 1)[0]
-        for db_id in METABOLITE_ANNOTATIONS:
-            if not re.match(METABOLITE_ANNOTATIONS[db_id],
-                            str(no_compartment_id)):
-                data[met][db_id] = False
-            else:
-                data[met][db_id] = True
-                break
-    df = pd.DataFrame.from_dict(data)
-    df = df.T
-    # Add a new column for all IDs that couldn't be matched to any of the
-    # specified namespaces.
-    df['unknown'] = False
-    # The value should only be True if the entire column is False i.e. the
-    # Metabolite ID has no hits with any of the other namespaces.
-    df.set_value(
-        df[df.apply(pd.Series.nunique, axis=1) == 1].index,
-        'unknown',
-        True
-    )
-    df.fillna(False)
-    return df
-
-
-def collect_rxn_id_namespace(model):
-    """
-    Identify to which common database reaction IDs belong.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        A cobrapy metabolic model.
-
-    Returns
-    -------
-    dataframe : pandas.core.frame.DataFrame
-        Table with reaction IDs as rows and database namespaces as the
-        columns. Cell values are boolean.
-
-    """
-    data = {}
-    for rxn in model.reactions:
-        data[rxn] = {}
-        for db_id in REACTION_ANNOTATIONS:
-            if not re.match(REACTION_ANNOTATIONS[db_id],
-                            str(rxn.id)):
-                data[rxn][db_id] = False
-            else:
-                data[rxn][db_id] = True
-                break
-    df = pd.DataFrame.from_dict(data)
-    df = df.T
-    # Add a new column for all IDs that couldn't be matched to any of the
-    # specified namespaces.
-    df['unknown'] = False
-    # The value should only be True if the entire column is False i.e. the
-    # Reaction ID has no hits with any of the other namespaces.
-    df.set_value(
-        df[df.apply(pd.Series.nunique, axis=1) == 1].index,
-        'unknown',
-        True
-    )
-    df.fillna(False)
-    return df
+    patterns = {
+        "metabolites": METABOLITE_ANNOTATIONS,
+        "reactions": REACTION_ANNOTATIONS
+    }[components]
+    databases = list(patterns)
+    data = list()
+    index = list()
+    for elem in getattr(model, components):
+        index.append(elem.id)
+        data.append(tuple(patterns[db].match(elem.id) is not None
+                          for db in databases))
+    return pd.DataFrame(data, index=index, columns=databases)

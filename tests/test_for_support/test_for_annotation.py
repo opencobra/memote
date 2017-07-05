@@ -148,126 +148,72 @@ def model_builder(name):
         rxn.add_metabolites({met: -1, met1: 1})
         rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
         rxn2.add_metabolites({met1: -1, met2: 1})
-        rxn3 = cobra.Reaction(id='MNXR4112', name="Oxaloacetate decarboxylase")
+        rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
         rxn3.add_metabolites({met2: -1, met: 1})
         model.add_reactions([rxn, rxn2, rxn3])
         return model
 
 
-@pytest.mark.parametrize("model, num", [
-    ("no_annotations", 2),
-    ("met_annotations", 0)
+@pytest.mark.parametrize("model, num, components", [
+    ("no_annotations", 2, "metabolites"),
+    ("met_annotations", 0, "metabolites"),
+    ("no_annotations", 1, "reactions"),
+    ("rxn_annotations", 0, "reactions")
 ], indirect=["model"])
-def test_mets_without_annotation(model, num):
-    """Expect all mets to have a non-empty annotation attribute"""
-    mets_without_annotation = annotation.find_met_without_annotations(model)
-    assert len(mets_without_annotation) == num
+def test_find_components_without_annotation(model, num, components):
+    """Expect `num` components to have no annotation."""
+    without_annotation = annotation.find_components_without_annotation(
+        model, components)
+    assert len(without_annotation) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("no_annotations", 1),
-    ("rxn_annotations", 0)
+@pytest.mark.parametrize("model, num, components", [
+    ("met_each_present", 1, "metabolites"),
+    ("met_each_absent", 0, "metabolites"),
+    ("rxn_each_present", 1, "reactions"),
+    ("rxn_each_absent", 0, "reactions")
 ], indirect=["model"])
-def test_rxns_without_annotation(model, num):
-    """Expect all rxns to have a non-empty annotation attribute"""
-    rxns_without_annotation = annotation.find_rxn_without_annotations(model)
-    assert len(rxns_without_annotation) == num
-
-
-@pytest.mark.parametrize("model, num", [
-    ("met_each_present", 0),
-    ("met_each_absent", 1)
-], indirect=["model"])
-def test_mets_annotation_overview(model, num):
+def test_generate_component_annotation_overview(model, num, components):
     """
-    Expect all mets to have annotations from common databases.
+    Expect all components to have `num` annotations from common databases.
 
-    The required databases are outlined in annotation.py.
+    The required databases are outlined in `annotation.py`.
     """
-    met_annotation_overview = \
-        annotation.generate_met_annotation_overview(model)
-    for key in annotation.METABOLITE_ANNOTATIONS:
-        assert len(met_annotation_overview[key]) == num
+    overview = \
+        annotation.generate_component_annotation_overview(model, components)
+    for key in overview.columns:
+        assert overview[key].sum() == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("rxn_each_present", 0),
-    ("rxn_each_absent", 1)
+@pytest.mark.parametrize("model, num, components", [
+    ("met_each_present", 1, "metabolites"),
+    ("met_broken_id", 0, "metabolites"),
+    ("rxn_each_present", 1, "reactions"),
+    ("rxn_broken_id", 0, "reactions")
 ], indirect=["model"])
-def test_rxns_annotation_overview(model, num):
-    """
-    Expect all rxns to have annotations from common databases.
-
-    The required databases are outlined in annotation.py.
-    """
-    rxn_annotation_overview = \
-        annotation.generate_rxn_annotation_overview(model)
-    for key in annotation.REACTION_ANNOTATIONS:
-        assert len(rxn_annotation_overview[key]) == num
-
-
-@pytest.mark.parametrize("model, num, rxn_or_met", [
-    ("met_each_present", 0, "met"),
-    ("met_broken_id", 1, "met"),
-    ("rxn_each_present", 0, "rxn"),
-    ("rxn_broken_id", 1, "rxn")
-], indirect=["model"])
-def test_find_wrong_annotation_ids(model, num, rxn_or_met):
+def test_generate_component_annotation_miriam_match(
+        model, num, components):
     """
     Expect all items to have annotations that match MIRIAM patterns.
 
-    The required databases and their patterns are outlined in annotation.py.
+    The required databases are outlined in `annotation.py`.
     """
-    if rxn_or_met == "met":
-        item_annotation_overview = \
-            annotation.generate_met_annotation_overview(model)
-    if rxn_or_met == "rxn":
-        item_annotation_overview = \
-            annotation.generate_rxn_annotation_overview(model)
-    wrong_annotation_ids = annotation.find_wrong_annotation_ids(
-        model,
-        item_annotation_overview,
-        rxn_or_met
-    )
-    for key in wrong_annotation_ids:
-        assert len(wrong_annotation_ids[key]) == num
+    annotation_matches = annotation.generate_component_annotation_miriam_match(
+        model, components)
+    for key in annotation_matches.columns:
+        assert annotation_matches[key].sum() == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("consistent_ids", 3),
-    ("inconsistent_ids", 2)
+@pytest.mark.parametrize("model, namespace, num, components", [
+    ("consistent_ids", "bigg.metabolite", 3, "metabolites"),
+    ("inconsistent_ids", "bigg.metabolite", 2, "metabolites"),
+    ("consistent_ids", "bigg.reaction", 3, "reactions"),
+    ("inconsistent_ids", "bigg.reaction", 2, "reactions")
 ], indirect=["model"])
-def test_met_id_namespace_consistency(model, num):
-    """
-    Expect metabolite IDs to be from the same namespace.
-    """
-    met_id_namespace = annotation.collect_met_id_namespace(model)
-    distribution = met_id_namespace[met_id_namespace == 1].count()
-    met_ids_in_each_namespace = \
-        {item: list(met_id_namespace[met_id_namespace[item] == 1].index)
-         for item in distribution.index}
-    met_id_namespace_largest_fraction = distribution.idxmax()
-    assert \
-        len(
-            met_ids_in_each_namespace[met_id_namespace_largest_fraction]
-        ) == num
-
-
-@pytest.mark.parametrize("model, num", [
-    ("consistent_ids", 3),
-    ("inconsistent_ids", 2)
-], indirect=["model"])
-def test_rxn_id_namespace_consistency(model, num):
-    """
-    Expect metabolite IDs to be from the same namespace.
-    """
-    rxn_id_namespace = annotation.collect_rxn_id_namespace(model)
-    distribution = rxn_id_namespace[rxn_id_namespace == 1].count()
-    rxn_ids_in_each_namespace = \
-        {item: list(rxn_id_namespace[rxn_id_namespace[item] == 1].index)
-         for item in distribution.index}
-    rxn_id_namespace_largest_fraction = distribution.idxmax()
-    assert \
-        len(
-            rxn_ids_in_each_namespace[rxn_id_namespace_largest_fraction]
-        ) == num
+def test_generate_component_id_namespace_overview(model, namespace, num,
+                                                  components):
+    """Expect `num` component IDs to be from the same namespace."""
+    overview = annotation.generate_component_id_namespace_overview(
+        model, components)
+    distribution = overview.sum()
+    assert distribution[namespace] == num
