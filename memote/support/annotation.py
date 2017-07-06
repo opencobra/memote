@@ -21,12 +21,11 @@ from __future__ import absolute_import
 
 import logging
 import re
-from builtins import str
+from future.utils import native_str
 
 import pandas as pd
 
 from collections import OrderedDict
-from memote.support.helpers import get_difference
 
 LOGGER = logging.getLogger(__name__)
 
@@ -100,6 +99,7 @@ def find_components_without_annotation(model, components):
     -------
     list
         The components without any annotation.
+
     """
     return [elem for elem in getattr(model, components) if
             elem.annotation is None or len(elem.annotation) == 0]
@@ -122,6 +122,7 @@ def generate_component_annotation_overview(model, components):
         The index of the table is given by the component identifiers. Each
         column corresponds to one MIRIAM database and a Boolean entry
         determines whether the annotation matches.
+
     """
     databases = list({
         "metabolites": METABOLITE_ANNOTATIONS,
@@ -152,20 +153,22 @@ def generate_component_annotation_miriam_match(model, components):
         The index of the table is given by the component identifiers. Each
         column corresponds to one MIRIAM database and a Boolean entry
         determines whether the annotation matches.
+
     """
     def check_annotation(key, annotation):
         if key not in annotation:
             return False
         test = annotation[key]
         pattern = patterns[key]
-        if isinstance(test, str):
+        if isinstance(test, native_str):
+            print("string match!")
             return pattern.match(test) is not None
         return all(pattern.match(elem) is not None for elem in test)
 
     patterns = {
-         "metabolites": METABOLITE_ANNOTATIONS,
-         "reactions": REACTION_ANNOTATIONS
-     }[components]
+        "metabolites": METABOLITE_ANNOTATIONS,
+        "reactions": REACTION_ANNOTATIONS
+    }[components]
     databases = list(patterns)
     data = list()
     index = list()
@@ -193,6 +196,7 @@ def generate_component_id_namespace_overview(model, components):
         The index of the table is given by the component identifiers. Each
         column corresponds to one MIRIAM database and a Boolean entry
         determines whether the annotation matches.
+
     """
     patterns = {
         "metabolites": METABOLITE_ANNOTATIONS,

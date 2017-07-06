@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 import re
+from builtins import dict
 
 LOGGER = logging.getLogger(__name__)
 
@@ -104,31 +105,8 @@ def find_biomass_reaction(model):
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
 
 
-def get_difference(subset, model, rxn_or_met):
-    """
-    Return difference between a given subset and the full set.
-
-    Providing that all metabolites or reactions in subset have a certain
-    attribute, this function returns the 'leftover' list of the metabolites or
-    reactions from the total amount of metabolites or reactions, i.e. those
-    that do not have this attribute.
-
-    Parameters
-    ----------
-    subset: list
-        A list of either reactions or metabolites with a certain attribute.
-
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    rxn_or_met : str
-        Either 'rxn' or 'met'.
-
-    """
-    if rxn_or_met == 'met':
-        diff_subset = set(model.metabolites).difference(set(subset))
-    if rxn_or_met == 'rxn':
-        diff_subset = set(model.reactions).difference(set(subset))
-    else:
-        pass
-    return list(diff_subset)
+def df2dict(df):
+    """Turn a `pandas.DataFrame` into a `dict` of lists."""
+    blob = dict((key, df[key].tolist()) for key in df.columns)
+    blob["index"] = df.index.tolist()
+    return blob

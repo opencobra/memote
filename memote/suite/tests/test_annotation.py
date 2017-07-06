@@ -20,18 +20,19 @@
 from __future__ import absolute_import
 
 from warnings import warn
+from builtins import dict
 
 from pandas import DataFrame
 
 import memote.support.annotation as annotation
-from memote.support.helpers import get_difference
+from memote.support.helpers import df2dict
 
 
 def test_metabolite_annotation_presence(read_only_model, store):
     """Expect all metabolites to have a non-empty annotation attribute."""
     store["metabolites_without_annotation"] = [
         met.id for met in annotation.find_components_without_annotation(
-            read_only_model.metabolites)]
+            read_only_model, "metabolites")]
     assert len(store["metabolites_without_annotation"]) == 0, \
         "The following metabolites lack any form of annotation: " \
         "{}".format(", ".join(store["metabolites_without_annotation"]))
@@ -40,8 +41,8 @@ def test_metabolite_annotation_presence(read_only_model, store):
 def test_reaction_annotation_presence(read_only_model, store):
     """Expect all reactions to have a non-empty annotation attribute."""
     store["reactions_without_annotation"] = [
-        rxn.id for rxn in annotation.find_rxn_without_annotations(
-            read_only_model.reactions)]
+        rxn.id for rxn in annotation.find_components_without_annotation(
+            read_only_model, "reactions")]
     assert len(store["reactions_without_annotation"]) == 0, \
         "The following reactions lack any form of annotation: " \
         "{}".format(", ".join(store["reactions_without_annotation"]))
@@ -55,7 +56,7 @@ def test_metabolite_annotation_overview(read_only_model, store):
     """
     overview = annotation.generate_component_annotation_overview(
         read_only_model, "metabolites")
-    store['met_annotation_overview'] = overview.to_dict()
+    store['met_annotation_overview'] = df2dict(overview)
     for db in annotation.METABOLITE_ANNOTATIONS:
         sub = overview.loc[~overview[db], db]
         assert len(sub) == 0, \
@@ -71,7 +72,7 @@ def test_reaction_annotation_overview(read_only_model, store):
     """
     overview = annotation.generate_component_annotation_overview(
         read_only_model, "reactions")
-    store['rxn_annotation_overview'] = overview.to_dict()
+    store['rxn_annotation_overview'] = df2dict(overview)
     for db in annotation.REACTION_ANNOTATIONS:
         sub = overview.loc[~overview[db], db]
         assert len(sub) == 0, \
@@ -92,7 +93,7 @@ def test_metabolite_annotation_wrong_ids(read_only_model, store):
     wrong = DataFrame(has_annotation.values & (~matches.values),
                       index=has_annotation.index,
                       columns=has_annotation.columns)
-    store['met_wrong_annotation_ids'] = wrong.to_dict()
+    store['met_wrong_annotation_ids'] = df2dict(wrong)
     for db in annotation.METABOLITE_ANNOTATIONS:
         sub = wrong.loc[wrong[db], db]
         assert len(sub) == 0, \
@@ -113,7 +114,7 @@ def test_reaction_annotation_wrong_ids(read_only_model, store):
     wrong = DataFrame(has_annotation.values & (~matches.values),
                       index=has_annotation.index,
                       columns=has_annotation.columns)
-    store["rxn_wrong_annotation_ids"] = wrong.to_dict()
+    store["rxn_wrong_annotation_ids"] = df2dict(wrong)
     for db in annotation.REACTION_ANNOTATIONS:
         sub = wrong.loc[wrong[db], db]
         assert len(sub) == 0, \
@@ -126,7 +127,8 @@ def test_metabolite_id_namespace_consistency(read_only_model, store):
     met_id_ns = annotation.generate_component_id_namespace_overview(
         read_only_model, "metabolites")
     distribution = met_id_ns.sum()
-    store['met_ids_in_each_namespace'] = dict(distribution.iteritems())
+    store['met_ids_in_each_namespace'] = dict(
+        (key, int(val)) for key, val in distribution.iteritems())
     # The BioCyc regex is extremely general, we ignore it here.
     cols = list(distribution.index)
     cols.remove('biocyc')
@@ -149,7 +151,8 @@ def test_reaction_id_namespace_consistency(read_only_model, store):
     rxn_id_ns = annotation.generate_component_id_namespace_overview(
         read_only_model, "reactions")
     distribution = rxn_id_ns.sum()
-    store['rxn_ids_in_each_namespace'] = dict(distribution.iteritems())
+    store['rxn_ids_in_each_namespace'] = dict(
+        (key, int(val)) for key, val in distribution.iteritems())
     # The BioCyc regex is extremely general, we ignore it here.
     cols = list(distribution.index)
     cols.remove('biocyc')
