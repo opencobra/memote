@@ -238,6 +238,7 @@ def model_builder(name):
         "sum_within_deviation": sum_within_deviation,
         "sum_outside_of_deviation": sum_outside_of_deviation,
         "precursors_producing": precursors_producing,
+        "precursors_uptake_limited": precursors_uptake_limited,
         "precursors_blocked": precursors_blocked,
         "precursors_not_in_medium": precursors_not_in_medium,
         "no_gam_in_biomass": no_gam_in_biomass,
