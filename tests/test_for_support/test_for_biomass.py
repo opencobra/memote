@@ -109,9 +109,33 @@ def precursors_producing(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    rxn4 = base.add_boundary(met_a1)
-    rxn5 = base.add_boundary(met_b1)
-    rxn6 = base.add_boundary(met_c1)
+    base.add_boundary(met_a1)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+def precursors_uptake_limited(base):
+    met_a = cobra.Metabolite("lipid_c")
+    met_b = cobra.Metabolite("protein_c")
+    met_c = cobra.Metabolite("rna_c")
+    met_a1 = cobra.Metabolite("lipid_e")
+    met_b1 = cobra.Metabolite("protein_e")
+    met_c1 = cobra.Metabolite("rna_e")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
     base.objective = rxn
     return base
 
@@ -133,9 +157,9 @@ def precursors_blocked(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=0)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    rxn4 = base.add_boundary(met_a1)
-    rxn5 = base.add_boundary(met_b1)
-    rxn6 = base.add_boundary(met_c1)
+    base.add_boundary(met_a1)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
     base.objective = rxn
     return base
 
@@ -157,9 +181,9 @@ def precursors_not_in_medium(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    rxn4 = base.add_boundary(met_a1, ub=0)
-    rxn5 = base.add_boundary(met_b1, ub=0)
-    rxn6 = base.add_boundary(met_c1)
+    base.add_boundary(met_a1, ub=0)
+    base.add_boundary(met_b1, ub=0)
+    base.add_boundary(met_c1)
     base.objective = rxn
     return base
 
@@ -214,6 +238,7 @@ def model_builder(name):
         "sum_within_deviation": sum_within_deviation,
         "sum_outside_of_deviation": sum_outside_of_deviation,
         "precursors_producing": precursors_producing,
+        "precursors_uptake_limited": precursors_uptake_limited,
         "precursors_blocked": precursors_blocked,
         "precursors_not_in_medium": precursors_not_in_medium,
         "no_gam_in_biomass": no_gam_in_biomass,
@@ -311,3 +336,20 @@ def test_ngam_presence(model, num):
     """Expect a single non growth-associated maintenance reaction."""
     ngam_reaction = biomass.find_ngam(model)
     assert len(ngam_reaction) == num
+
+
+@pytest.mark.parametrize("model, boolean", [
+    ("precursors_producing", False),
+    ("precursors_not_in_medium", True),
+    ("precursors_uptake_limited", True)
+], indirect=["model"])
+def test_fast_growth_default(model, boolean):
+    """
+    Expect the predicted growth rate for each BOF to be below 10.3972.
+
+    This is without changing the model"s default state.
+    """
+    solution = model.optimize()
+    assert solution.status == OPTIMAL
+    fast_growth = solution.objective_value <= 10.3972
+    assert fast_growth == boolean

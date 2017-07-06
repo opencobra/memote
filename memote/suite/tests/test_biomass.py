@@ -132,3 +132,20 @@ def test_ngam_presence(read_only_model, store):
         "Could not identify a unique non growth-associated maintenance " \
         "reaction. Please make sure to add only a single ATP-hydrolysis " \
         "reaction and set the lower bound to a fixed value."
+
+
+@pytest.mark.parametrize("reaction", pytest.biomass_reactions,
+                         ids=pytest.biomass_ids)
+def test_fast_growth_default(model, reaction, store):
+    """Expect the predicted growth rate for each BOF to be below 10.3972.
+
+    This is based on lowest doubling time reported here
+    http://www.pnnl.gov/science/highlights/highlight.asp?id=879
+    """
+    model.objective = reaction
+    try:
+        solution = model.optimize()
+        flux = solution.fluxes[reaction.id]
+    except Infeasible:
+        flux = np.nan
+    assert flux <= 10.3972
