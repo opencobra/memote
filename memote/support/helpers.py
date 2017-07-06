@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 import re
+from builtins import dict
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,3 +103,10 @@ def find_biomass_reaction(model):
 
     """
     return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
+
+
+def df2dict(df):
+    """Turn a `pandas.DataFrame` into a `dict` of lists."""
+    blob = dict((key, df[key].tolist()) for key in df.columns)
+    blob["index"] = df.index.tolist()
+    return blob
