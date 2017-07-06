@@ -337,7 +337,7 @@ def test_ngam_presence(model, num):
     assert len(ngam_reaction) == num
 
 
-@pytest.mark.parametrize("model, expected", [
+@pytest.mark.parametrize("model, boolean", [
     ("precursors_producing", False),
     ("precursors_not_in_medium", True),
     ("precursors_uptake_limited", True)
