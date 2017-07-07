@@ -143,8 +143,8 @@ def find_demand_reactions(model):
     """
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if not rxn.reversibility and
-            rxn.get_compartments() not in ['e']]
+            if not rxn.reversibility and not
+            any(c in rxn.get_compartments() for c in ['e'])]
 
 
 def find_sink_reactions(model):
@@ -177,8 +177,8 @@ def find_sink_reactions(model):
     """
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if rxn.reversibility and
-            rxn.get_compartments() not in ['e']]
+            if rxn.reversibility and not
+            any(c in rxn.get_compartments() for c in ['e'])]
 
 
 def find_exchange_rxns(model):
@@ -210,4 +210,4 @@ def find_exchange_rxns(model):
     """
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if rxn.get_compartments() == ['e']]
+            if any(c in rxn.get_compartments() for c in ['e'])]

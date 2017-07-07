@@ -268,7 +268,7 @@ def missing_demand_tag(base):
 
 
 def false_demand_tag(base):
-    rxn = cobra.Reaction('DM_abc_c')
+    rxn = cobra.Reaction('DM_abc_e')
     rxn.add_metabolites(
         {cobra.Metabolite(id="abc_e",
                           compartment='e'): -1}
