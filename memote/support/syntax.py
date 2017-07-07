@@ -230,8 +230,8 @@ def find_false_demand_rxns(model):
     true_demand_rxns = helpers.find_demand_reactions(model)
     comp_pattern = "^DM_\w*?"
     all_rxns_tagged_DM = [rxn for rxn in model.reactions
-            if re.match(comp_pattern, rxn.id)]
-    #false demand reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false demand reactions
     return set(all_rxns_tagged_DM).difference(set(true_demand_rxns))
 
 
@@ -264,8 +264,8 @@ def find_false_sink_rxns(model):
     true_sink_rxns = helpers.find_sink_reactions(model)
     comp_pattern = "^SK_\w*?"
     all_rxns_tagged_SK = [rxn for rxn in model.reactions
-            if re.match(comp_pattern, rxn.id)]
-    #false sink reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false sink reactions
     return set(all_rxns_tagged_SK).difference(set(true_sink_rxns))
 
 
@@ -298,6 +298,6 @@ def find_false_exchange_rxns(model):
     true_exchange_rxns = helpers.find_exchange_rxns(model)
     comp_pattern = "^EX_\w*?"
     all_rxns_tagged_EX = [rxn for rxn in model.reactions
-            if re.match(comp_pattern, rxn.id)]
-    #false exchange reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false exchange reactions
     return set(all_rxns_tagged_EX).difference(set(true_exchange_rxns))
