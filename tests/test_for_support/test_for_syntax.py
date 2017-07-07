@@ -460,7 +460,7 @@ def test_sink_reaction_tag_match(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("correct_sink_tag", 0),
-    ("false_sink_tag", 2)
+    ("false_sink_tag", 1)
 ], indirect=["model"])
 def test_false_sink_reaction(model, num):
     """Expect all rxns that are tagged with 'SK_' to be true sink rxns"""
