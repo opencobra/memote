@@ -296,7 +296,7 @@ def find_false_exchange_rxns(model):
 
     """
     true_exchange_rxns = helpers.find_exchange_reactions(model)
-    comp_pattern = "^SK_\w*?"
+    comp_pattern = "^EX_\w*?"
     all_rxns_tagged_EX = [rxn for rxn in model.reactions
             if re.match(comp_pattern, rxn.id)]
     #false exchange reactions
