@@ -430,7 +430,7 @@ def test_demand_reaction_tag_match(model, num):
     ("false_demand_tag", 1)
 ], indirect=["model"])
 def test_false_demand_reaction(model, num):
-    """Expect all no rxn to be tagged DM that is not a demand reaction"""
+    """Expect all rxns that are tagged with 'DM_' to be true demand rxns"""
     falsely_tagged_demand_rxns = syntax.find_false_demand_rxns(model)
     assert len(falsely_tagged_demand_rxns) == num
 
