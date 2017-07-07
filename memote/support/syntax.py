@@ -42,7 +42,7 @@ SUFFIX_MAP = dict({
 
 def find_rxn_id_compartment_suffix(model, suffix):
     """
-    Find incorrectly tagged IDs.
+    Find un-tagged non-transport reactions.
 
     Find non-transport reactions with metabolites in the given compartment
     whose ID is not tagged accordingly.
@@ -82,7 +82,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
 
 def find_rxn_id_suffix_compartment(model, suffix):
     """
-    Find incorrectly tagged non-transport reactions.
+    Find mis-tagged non-transport reactions.
 
     Find non-transport reactions whose ID bear a compartment tag but which do
     not contain any metabolites in the given compartment.
