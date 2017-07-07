@@ -101,7 +101,7 @@ def test_demand_reaction_tag_match(read_only_model, store):
 
 
 def test_false_demand_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'DM_' to be true demand rxns"""
+    """Expect all rxns that are tagged with 'DM_' to be true demand rxns."""
     store["false_demand"] = [
         rxn.id for rxn in syntax.find_false_demand_rxns(read_only_model)]
     assert len(store["false_demand"]) == 0, \
@@ -119,7 +119,7 @@ def test_sink_reaction_tag_match(read_only_model, store):
 
 
 def test_false_sink_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'SK_' to be true sink rxns"""
+    """Expect all rxns that are tagged with 'SK_' to be true sink rxns."""
     store["false_sink"] = [
         rxn.id for rxn in syntax.find_false_sink_rxns(read_only_model)]
     assert len(store["false_sink"]) == 0, \
@@ -137,7 +137,7 @@ def test_exchange_reaction_tag_match(read_only_model, store):
 
 
 def test_false_exchange_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns"""
+    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns."""
     store["false_exchange"] = [
         rxn.id for rxn in syntax.find_false_exchange_rxns(read_only_model)]
     assert len(store["false_exchange"]) == 0, \

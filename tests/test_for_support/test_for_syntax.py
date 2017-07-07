@@ -370,7 +370,7 @@ def model_builder(name):
     ("rxn_no_tags", 1)
 ], indirect=["model"])
 def test_non_transp_rxn_id_compartment_suffix_match(model, num):
-    """Expect all rxns outside of the cytosol to be tagged accordingly"""
+    """Expect all rxns outside of the cytosol to be tagged accordingly."""
     for compartment in model.compartments:
         if compartment != 'c':
             rxn_lst = syntax.find_rxn_id_compartment_suffix(model, compartment)
@@ -384,7 +384,7 @@ def test_non_transp_rxn_id_compartment_suffix_match(model, num):
 def test_non_transp_rxn_id_suffix_compartment_match(model, num):
     """
     Expect all rxns that are tagged to be in a compartment to at least
-    partially involve mets from that compartment
+    partially involve mets from that compartment.
     """
     for compartment in model.compartments:
         if compartment != 'c':
@@ -402,7 +402,7 @@ def test_non_transp_rxn_id_suffix_compartment_match(model, num):
     ("proton_pump", 0)
 ], indirect=["model"])
 def test_non_abc_transp_rxn_tag_match(model, num):
-    """Expect all non-abc transport rxns to be tagged with a 't'"""
+    """Expect all non-abc transport rxns to be tagged with a 't'."""
     trxn_lst = syntax.find_reaction_tag_transporter(model)
     assert len(trxn_lst) == num
 
@@ -412,7 +412,7 @@ def test_non_abc_transp_rxn_tag_match(model, num):
     ("trxn_no_tag_atp_driven", 1)
 ], indirect=["model"])
 def test_abc_transp_rxn_tag_match(model, num):
-    """Expect all abc transport rxns to be tagged with 'abc'"""
+    """Expect all abc transport rxns to be tagged with 'abc'."""
     untagged_atp_transport_rxns = syntax.find_abc_tag_transporter(model)
     assert len(untagged_atp_transport_rxns) == num
 
@@ -422,7 +422,7 @@ def test_abc_transp_rxn_tag_match(model, num):
     ("upper_case_mets", 5)
 ], indirect=["model"])
 def test_upper_case_mets(model, num):
-    """Expect all metabolites to be lower case within accepted exceptions"""
+    """Expect all metabolites to be lower case within accepted exceptions."""
     upper_case_mets = syntax.find_upper_case_mets(model)
     assert len(upper_case_mets) == num
 
@@ -432,7 +432,7 @@ def test_upper_case_mets(model, num):
     ("missing_demand_tag", 2)
 ], indirect=["model"])
 def test_demand_reaction_tag_match(model, num):
-    """Expect all demand rxn IDs to be prefixed with 'DM_'"""
+    """Expect all demand rxn IDs to be prefixed with 'DM_'."""
     untagged_tagged_demand_rxns = syntax.find_untagged_demand_rxns(model)
     assert len(untagged_tagged_demand_rxns) == num
 
@@ -443,7 +443,7 @@ def test_demand_reaction_tag_match(model, num):
     ("missing_exchange_tag", 1)
 ], indirect=["model"])
 def test_false_demand_reaction(model, num):
-    """Expect all rxns that are tagged with 'DM_' to be true demand rxns"""
+    """Expect all rxns that are tagged with 'DM_' to be true demand rxns."""
     falsely_tagged_demand_rxns = syntax.find_false_demand_rxns(model)
     assert len(falsely_tagged_demand_rxns) == num
 
@@ -453,7 +453,7 @@ def test_false_demand_reaction(model, num):
     ("missing_sink_tag", 2)
 ], indirect=["model"])
 def test_sink_reaction_tag_match(model, num):
-    """Expect all sink rxn IDs to be prefixed with 'SK_'"""
+    """Expect all sink rxn IDs to be prefixed with 'SK_'."""
     untagged_tagged_sink_rxns = syntax.find_untagged_sink_rxns(model)
     assert len(untagged_tagged_sink_rxns) == num
 
@@ -463,7 +463,7 @@ def test_sink_reaction_tag_match(model, num):
     ("false_sink_tag", 1)
 ], indirect=["model"])
 def test_false_sink_reaction(model, num):
-    """Expect all rxns that are tagged with 'SK_' to be true sink rxns"""
+    """Expect all rxns that are tagged with 'SK_' to be true sink rxns."""
     falsely_tagged_sink_rxns = syntax.find_false_sink_rxns(model)
     assert len(falsely_tagged_sink_rxns) == num
 
@@ -473,7 +473,7 @@ def test_false_sink_reaction(model, num):
     ("missing_exchange_tag", 2)
 ], indirect=["model"])
 def test_exchange_reaction_tag_match(model, num):
-    """Expect all exchange rxn IDs to be prefixed with 'EX_'"""
+    """Expect all exchange rxn IDs to be prefixed with 'EX_'."""
     untagged_tagged_exchange_rxns = syntax.find_untagged_exchange_rxns(model)
     assert len(untagged_tagged_exchange_rxns) == num
 
@@ -483,6 +483,6 @@ def test_exchange_reaction_tag_match(model, num):
     ("missing_demand_tag", 1)
 ], indirect=["model"])
 def test_false_exchange_reaction(model, num):
-    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns"""
+    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns."""
     falsely_tagged_exchange_rxns = syntax.find_false_exchange_rxns(model)
     assert len(falsely_tagged_exchange_rxns) == num
