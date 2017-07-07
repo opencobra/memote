@@ -295,7 +295,7 @@ def find_false_exchange_rxns(model):
             A cobrapy metabolic model
 
     """
-    true_exchange_rxns = helpers.find_exchange_reactions(model)
+    true_exchange_rxns = helpers.find_exchange_rxns(model)
     comp_pattern = "^EX_\w*?"
     all_rxns_tagged_EX = [rxn for rxn in model.reactions
             if re.match(comp_pattern, rxn.id)]
