@@ -217,6 +217,24 @@ def find_untagged_demand_rxns(model):
             if not re.match(comp_pattern, rxn.id)]
 
 
+def find_false_demand_rxns(model):
+    """
+    Find reactions which are tagged with 'DM_' but which are not demand rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_demand_rxns = helpers.find_demand_reactions(model)
+    comp_pattern = "^DM_\w*?"
+    all_rxns_tagged_DM = [rxn for rxn in model.reactions
+            if re.match(comp_pattern, rxn.id)]
+    #false demand reactions
+    return set(all_rxns_tagged_DM).difference(set(true_demand_rxns))
+
+
 def find_untagged_sink_rxns(model):
     """
     Find demand reactions whose IDs do not begin with 'SK_'.
@@ -233,6 +251,24 @@ def find_untagged_sink_rxns(model):
             if not re.match(comp_pattern, rxn.id)]
 
 
+def find_false_sink_rxns(model):
+    """
+    Find reactions which are tagged with 'SK_' but which are not sink rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_sink_rxns = helpers.find_sink_reactions(model)
+    comp_pattern = "^SK_\w*?"
+    all_rxns_tagged_SK = [rxn for rxn in model.reactions
+            if re.match(comp_pattern, rxn.id)]
+    #false sink reactions
+    return set(all_rxns_tagged_SK).difference(set(true_sink_rxns))
+
+
 def find_untagged_exchange_rxns(model):
     """
     Find exchange reactions whose IDs do not begin with 'EX_'.
@@ -247,3 +283,21 @@ def find_untagged_exchange_rxns(model):
     comp_pattern = "^EX_\w*?"
     return [rxn for rxn in exchange_rxns
             if not re.match(comp_pattern, rxn.id)]
+
+
+def find_false_exchange_rxns(model):
+    """
+    Find reactions which are tagged with 'EX_' but which are not exchange rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_exchange_rxns = helpers.find_exchange_reactions(model)
+    comp_pattern = "^SK_\w*?"
+    all_rxns_tagged_EX = [rxn for rxn in model.reactions
+            if re.match(comp_pattern, rxn.id)]
+    #false exchange reactions
+    return set(all_rxns_tagged_EX).difference(set(true_exchange_rxns))
