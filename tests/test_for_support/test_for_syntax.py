@@ -343,6 +343,7 @@ def model_builder(name):
         "upper_case_mets": upper_case_mets,
         "correct_demand_tag": correct_demand_tag,
         "missing_demand_tag": missing_demand_tag,
+        "false_demand_tag": false_demand_tag,
         "correct_exchange_tag": correct_exchange_tag,
         "missing_exchange_tag": missing_exchange_tag,
         "correct_sink_tag": correct_sink_tag,
