@@ -329,6 +329,17 @@ def missing_sink_tag(base):
     base.add_reactions([rxn, rxn1])
     return base
 
+
+def false_sink_tag(base):
+    rxn = cobra.Reaction('SK_abc_c')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_c",
+                          compartment='c'): -1}
+    )
+    base.add_reactions([rxn])
+    return base
+
+
 def model_builder(name):
     choices = {
         "rxn_correct_tags": rxn_correct_tags,
@@ -348,6 +359,7 @@ def model_builder(name):
         "missing_exchange_tag": missing_exchange_tag,
         "correct_sink_tag": correct_sink_tag,
         "missing_sink_tag": missing_sink_tag,
+        "false_sink_tag": false_sink_tag
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -427,7 +439,8 @@ def test_demand_reaction_tag_match(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("correct_demand_tag", 0),
-    ("false_demand_tag", 1)
+    ("false_demand_tag", 1),
+    ("missing_exchange_tag", 1)
 ], indirect=["model"])
 def test_false_demand_reaction(model, num):
     """Expect all rxns that are tagged with 'DM_' to be true demand rxns"""
@@ -446,6 +459,16 @@ def test_sink_reaction_tag_match(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
+    ("correct_sink_tag", 0),
+    ("false_sink_tag", 2)
+], indirect=["model"])
+def test_false_sink_reaction(model, num):
+    """Expect all rxns that are tagged with 'SK_' to be true sink rxns"""
+    falsely_tagged_sink_rxns = syntax.find_false_sink_rxns(model)
+    assert len(falsely_tagged_sink_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
     ("correct_exchange_tag", 0),
     ("missing_exchange_tag", 2)
 ], indirect=["model"])
@@ -453,3 +476,13 @@ def test_exchange_reaction_tag_match(model, num):
     """Expect all exchange rxn IDs to be prefixed with 'EX_'"""
     untagged_tagged_exchange_rxns = syntax.find_untagged_exchange_rxns(model)
     assert len(untagged_tagged_exchange_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_exchange_tag", 0),
+    ("missing_demand_tag", 1)
+], indirect=["model"])
+def test_false_exchange_reaction(model, num):
+    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns"""
+    falsely_tagged_exchange_rxns = syntax.find_false_exchange_rxns(model)
+    assert len(falsely_tagged_exchange_rxns) == num
