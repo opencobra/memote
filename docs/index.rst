@@ -13,6 +13,7 @@ Contents:
 
    readme
    installation
+   getting_started
    usage
    contributing
    authors
