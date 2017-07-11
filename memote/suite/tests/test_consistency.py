@@ -62,3 +62,15 @@ def test_blocked_reactions(read_only_model, store):
     assert len(store["blocked_reactions"]) == 0,\
         "The following reactions are blocked: {}".format(
             ", ".join(store["blocked_reactions"]))
+
+
+def test_find_stoichiometrically_balanced_cycles(read_only_model, num):
+    """Expect no stoichiometrically balanced loops to be present."""
+    store["looped_reactions"] = [
+        rxn.id for rxn in consistency.find_stoichiometrically_balanced_cycles(
+            read_only_model
+        )]
+    assert len(store["looped_reactions"]) == 0,\
+        "The following reactions participate in stoichiometrically balanced" \
+        " cycles: {}".format(
+            ", ".join(store["looped_reactions"]))
