@@ -64,7 +64,7 @@ def test_blocked_reactions(read_only_model, store):
             ", ".join(store["blocked_reactions"]))
 
 
-def test_find_stoichiometrically_balanced_cycles(read_only_model, num):
+def test_find_stoichiometrically_balanced_cycles(read_only_model, num, store):
     """Expect no stoichiometrically balanced loops to be present."""
     store["looped_reactions"] = [
         rxn.id for rxn in consistency.find_stoichiometrically_balanced_cycles(
