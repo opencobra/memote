@@ -100,6 +100,15 @@ def test_demand_reaction_tag_match(read_only_model, store):
         " {}".format(", ".join(store["untagged_demand"]))
 
 
+def test_false_demand_reaction(read_only_model, store):
+    """Expect all rxns that are tagged with 'DM_' to be true demand rxns."""
+    store["false_demand"] = [
+        rxn.id for rxn in syntax.find_false_demand_rxns(read_only_model)]
+    assert len(store["false_demand"]) == 0, \
+        "The IDs of the following reactions are falsely tagged with 'DM_'" \
+        " {}".format(", ".join(store["false_demand"]))
+
+
 def test_sink_reaction_tag_match(read_only_model, store):
     """Expect all sink reaction IDs to be prefixed with 'SK_'."""
     store["untagged_demand"] = [
@@ -109,6 +118,15 @@ def test_sink_reaction_tag_match(read_only_model, store):
         " {}".format(", ".join(store["untagged_demand"]))
 
 
+def test_false_sink_reaction(read_only_model, store):
+    """Expect all rxns that are tagged with 'SK_' to be true sink rxns."""
+    store["false_sink"] = [
+        rxn.id for rxn in syntax.find_false_sink_rxns(read_only_model)]
+    assert len(store["false_sink"]) == 0, \
+        "The IDs of the following reactions are falsely tagged with 'SK_'" \
+        " {}".format(", ".join(store["false_sink"]))
+
+
 def test_exchange_reaction_tag_match(read_only_model, store):
     """Expect all exchange reaction IDs to be prefixed with 'EX_'."""
     store["untagged_exchange"] = [
@@ -116,3 +134,12 @@ def test_exchange_reaction_tag_match(read_only_model, store):
     assert len(store["untagged_exchange"]) == 0, \
         "The IDs of the following demand reactions are not tagged with 'EX_'" \
         " {}".format(", ".join(store["untagged_exchange"]))
+
+
+def test_false_exchange_reaction(read_only_model, store):
+    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns."""
+    store["false_exchange"] = [
+        rxn.id for rxn in syntax.find_false_exchange_rxns(read_only_model)]
+    assert len(store["false_exchange"]) == 0, \
+        "The IDs of the following reactions are falsely tagged with 'EX_'" \
+        " {}".format(", ".join(store["false_exchange"]))

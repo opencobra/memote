@@ -23,8 +23,7 @@ import logging
 import re
 from builtins import dict
 
-from memote.support.helpers import (
-    find_atp_adp_converting_reactions, find_transport_reactions)
+import memote.support.helpers as helpers
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ SUFFIX_MAP = dict({
 
 def find_rxn_id_compartment_suffix(model, suffix):
     """
-    Find incorrectly tagged IDs.
+    Find un-tagged non-transport reactions.
 
     Find non-transport reactions with metabolites in the given compartment
     whose ID is not tagged accordingly.
@@ -63,7 +62,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
         the `suffix` appended.
 
     """
-    transport_rxns = set(find_transport_reactions(model))
+    transport_rxns = set(helpers.find_transport_reactions(model))
     exchange_demand_rxns = set(model.exchanges)
 
     comp_pattern = re.compile(
@@ -83,7 +82,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
 
 def find_rxn_id_suffix_compartment(model, suffix):
     """
-    Find incorrectly tagged non-transport reactions.
+    Find mis-tagged non-transport reactions.
 
     Find non-transport reactions whose ID bear a compartment tag but which do
     not contain any metabolites in the given compartment.
@@ -103,7 +102,7 @@ def find_rxn_id_suffix_compartment(model, suffix):
         the `suffix` appended.
 
     """
-    transport_rxns = set(find_transport_reactions(model))
+    transport_rxns = set(helpers.find_transport_reactions(model))
     exchange_demand_rxns = set(model.exchanges)
 
     comp_pattern = re.compile(
@@ -141,8 +140,8 @@ def find_reaction_tag_transporter(model):
             A cobrapy metabolic model
 
     """
-    transport_rxns = find_transport_reactions(model)
-    atp_adp_rxns = find_atp_adp_converting_reactions(model)
+    transport_rxns = helpers.find_transport_reactions(model)
+    atp_adp_rxns = helpers.find_atp_adp_converting_reactions(model)
 
     non_abc_transporters = set(transport_rxns).difference(set(atp_adp_rxns))
 
@@ -171,8 +170,8 @@ def find_abc_tag_transporter(model):
             A cobrapy metabolic model
 
     """
-    transport_rxns = find_transport_reactions(model)
-    atp_adp_rxns = find_atp_adp_converting_reactions(model)
+    transport_rxns = helpers.find_transport_reactions(model)
+    atp_adp_rxns = helpers.find_atp_adp_converting_reactions(model)
 
     abc_transporters = set(transport_rxns).intersection(set(atp_adp_rxns))
 
@@ -206,110 +205,99 @@ def find_untagged_demand_rxns(model):
     """
     Find demand reactions whose IDs do not begin with 'DM_'.
 
-    [1] defines demand reactions as:
-    -- 'unbalanced network reactions that allow the accumulation of a compound'
-    -- reactions that are chiefly added during the gap-filling process
-    -- as a means of dealing with 'compounds that are known to be produced by
-    the organism [..] (i) for which no information is available about their
-    fractional distribution to the biomass or (ii) which may only be produced
-    in some environmental conditions
-    -- reactions with a formula such as: 'met_c -> '
-
-    Demand reactions differ from exchange reactions in that the metabolites
-    are not removed from the extracellular environment, but from any of the
-    organism's compartments.
-
-    Parameters
+        Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
 
-    References
-    ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
-
     """
-    demand_and_exchange_rxns = set(model.exchanges)
-    demand_rxns = [rxn for rxn in demand_and_exchange_rxns
-                   if not rxn.reversibility and
-                   rxn.get_compartments() not in ['e']]
-
+    demand_rxns = helpers.find_demand_reactions(model)
     comp_pattern = "^DM_\w*?"
     return [rxn for rxn in demand_rxns
             if not re.match(comp_pattern, rxn.id)]
+
+
+def find_false_demand_rxns(model):
+    """
+    Find reactions which are tagged with 'DM_' but which are not demand rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_demand_rxns = helpers.find_demand_reactions(model)
+    comp_pattern = "^DM_\w*?"
+    all_rxns_tagged_DM = [rxn for rxn in model.reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false demand reactions
+    return set(all_rxns_tagged_DM).difference(set(true_demand_rxns))
 
 
 def find_untagged_sink_rxns(model):
     """
     Find demand reactions whose IDs do not begin with 'SK_'.
 
-    [1] defines sink reactions as:
-    -- 'similar to demand reactions' but reversible, thus able to supply the
-    model with metabolites
-    -- reactions that are chiefly added during the gap-filling process
-    -- as a means of dealing with 'compounds that are produced by nonmetabolic
-    cellular processes but that need to be metabolized'
-    -- reactions with a formula such as: 'met_c <-> '
-
-    Sink reactions differ from exchange reactions in that the metabolites
-    are not removed from the extracellular environment, but from any of the
-    organism's compartments.
-
     Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
 
-    References
-    ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
-
     """
-    demand_and_exchange_rxns = set(model.exchanges)
-    sink_rxns = [rxn for rxn in demand_and_exchange_rxns
-                 if rxn.reversibility and
-                 rxn.get_compartments() not in ['e']]
-
+    sink_rxns = helpers.find_sink_reactions(model)
     comp_pattern = "^SK_\w*?"
     return [rxn for rxn in sink_rxns
             if not re.match(comp_pattern, rxn.id)]
+
+
+def find_false_sink_rxns(model):
+    """
+    Find reactions which are tagged with 'SK_' but which are not sink rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_sink_rxns = helpers.find_sink_reactions(model)
+    comp_pattern = "^SK_\w*?"
+    all_rxns_tagged_SK = [rxn for rxn in model.reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false sink reactions
+    return set(all_rxns_tagged_SK).difference(set(true_sink_rxns))
 
 
 def find_untagged_exchange_rxns(model):
     """
     Find exchange reactions whose IDs do not begin with 'EX_'.
 
-    [1] defines exchange reactions as:
-    -- reactions that 'define the extracellular environment'
-    -- 'unbalanced, extra-organism reactions that represent the supply to or
-    removal of metabolites from the extra-organism "space"'
-    -- reactions with a formula such as: 'met_e -> ' or ' -> met_e' or
-    'met_e <=> '
-
-    Exchange reactions differ from demand reactions in that the metabolites
-    are removed from or added to the extracellular environment only. With this
-    the uptake or secretion of a metabolite is modeled, respectively.
-
     Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
 
-    References
-    ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
-
     """
-    demand_and_exchange_rxns = set(model.exchanges)
-    exchange_rxns = [rxn for rxn in demand_and_exchange_rxns
-                     if rxn.get_compartments() == ['e']]
-
+    exchange_rxns = helpers.find_exchange_rxns(model)
     comp_pattern = "^EX_\w*?"
     return [rxn for rxn in exchange_rxns
             if not re.match(comp_pattern, rxn.id)]
+
+
+def find_false_exchange_rxns(model):
+    """
+    Find reactions which are tagged with 'EX_' but which are not exchange rxns.
+
+        Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    """
+    true_exchange_rxns = helpers.find_exchange_rxns(model)
+    comp_pattern = "^EX_\w*?"
+    all_rxns_tagged_EX = [rxn for rxn in model.reactions
+                          if re.match(comp_pattern, rxn.id)]
+    # false exchange reactions
+    return set(all_rxns_tagged_EX).difference(set(true_exchange_rxns))

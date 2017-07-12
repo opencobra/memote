@@ -252,7 +252,7 @@ def correct_demand_tag(base):
     return base
 
 
-def incorrect_demand_tag(base):
+def missing_demand_tag(base):
     rxn = cobra.Reaction('EX_abc_c')
     rxn.add_metabolites(
         {cobra.Metabolite(id="abc_c",
@@ -267,6 +267,16 @@ def incorrect_demand_tag(base):
     return base
 
 
+def false_demand_tag(base):
+    rxn = cobra.Reaction('DM_abc_e')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_e",
+                          compartment='e'): -1}
+    )
+    base.add_reaction(rxn)
+    return base
+
+
 def correct_exchange_tag(base):
     rxn = cobra.Reaction('EX_abc_e')
     rxn.add_metabolites(
@@ -277,7 +287,7 @@ def correct_exchange_tag(base):
     return base
 
 
-def incorrect_exchange_tag(base):
+def missing_exchange_tag(base):
     rxn = cobra.Reaction('DM_ghi_e')
     rxn.add_metabolites(
         {cobra.Metabolite(id="ghi_e",
@@ -303,7 +313,7 @@ def correct_sink_tag(base):
     return base
 
 
-def incorrect_sink_tag(base):
+def missing_sink_tag(base):
     rxn = cobra.Reaction('EX_abc_c')
     rxn.add_metabolites(
         {cobra.Metabolite(id="abc_c",
@@ -319,6 +329,17 @@ def incorrect_sink_tag(base):
     base.add_reactions([rxn, rxn1])
     return base
 
+
+def false_sink_tag(base):
+    rxn = cobra.Reaction('SK_abc_c')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_c",
+                          compartment='c'): -1}
+    )
+    base.add_reactions([rxn])
+    return base
+
+
 def model_builder(name):
     choices = {
         "rxn_correct_tags": rxn_correct_tags,
@@ -332,11 +353,13 @@ def model_builder(name):
         "lower_case_mets": lower_case_mets,
         "upper_case_mets": upper_case_mets,
         "correct_demand_tag": correct_demand_tag,
-        "incorrect_demand_tag": incorrect_demand_tag,
+        "missing_demand_tag": missing_demand_tag,
+        "false_demand_tag": false_demand_tag,
         "correct_exchange_tag": correct_exchange_tag,
-        "incorrect_exchange_tag": incorrect_exchange_tag,
+        "missing_exchange_tag": missing_exchange_tag,
         "correct_sink_tag": correct_sink_tag,
-        "incorrect_sink_tag": incorrect_sink_tag,
+        "missing_sink_tag": missing_sink_tag,
+        "false_sink_tag": false_sink_tag
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -347,7 +370,7 @@ def model_builder(name):
     ("rxn_no_tags", 1)
 ], indirect=["model"])
 def test_non_transp_rxn_id_compartment_suffix_match(model, num):
-    """Expect all rxns outside of the cytosol to be tagged accordingly"""
+    """Expect all rxns outside of the cytosol to be tagged accordingly."""
     for compartment in model.compartments:
         if compartment != 'c':
             rxn_lst = syntax.find_rxn_id_compartment_suffix(model, compartment)
@@ -361,7 +384,7 @@ def test_non_transp_rxn_id_compartment_suffix_match(model, num):
 def test_non_transp_rxn_id_suffix_compartment_match(model, num):
     """
     Expect all rxns that are tagged to be in a compartment to at least
-    partially involve mets from that compartment
+    partially involve mets from that compartment.
     """
     for compartment in model.compartments:
         if compartment != 'c':
@@ -379,7 +402,7 @@ def test_non_transp_rxn_id_suffix_compartment_match(model, num):
     ("proton_pump", 0)
 ], indirect=["model"])
 def test_non_abc_transp_rxn_tag_match(model, num):
-    """Expect all non-abc transport rxns to be tagged with a 't'"""
+    """Expect all non-abc transport rxns to be tagged with a 't'."""
     trxn_lst = syntax.find_reaction_tag_transporter(model)
     assert len(trxn_lst) == num
 
@@ -389,7 +412,7 @@ def test_non_abc_transp_rxn_tag_match(model, num):
     ("trxn_no_tag_atp_driven", 1)
 ], indirect=["model"])
 def test_abc_transp_rxn_tag_match(model, num):
-    """Expect all abc transport rxns to be tagged with 'abc'"""
+    """Expect all abc transport rxns to be tagged with 'abc'."""
     untagged_atp_transport_rxns = syntax.find_abc_tag_transporter(model)
     assert len(untagged_atp_transport_rxns) == num
 
@@ -399,36 +422,67 @@ def test_abc_transp_rxn_tag_match(model, num):
     ("upper_case_mets", 5)
 ], indirect=["model"])
 def test_upper_case_mets(model, num):
-    """Expect all metabolites to be lower case within accepted exceptions"""
+    """Expect all metabolites to be lower case within accepted exceptions."""
     upper_case_mets = syntax.find_upper_case_mets(model)
     assert len(upper_case_mets) == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("correct_demand_tag", 0),
-    ("incorrect_demand_tag", 2)
+    ("missing_demand_tag", 2)
 ], indirect=["model"])
 def test_demand_reaction_tag_match(model, num):
-    """Expect all demand rxn IDs to be prefixed with 'DM_'"""
-    falsely_tagged_demand_rxns = syntax.find_untagged_demand_rxns(model)
+    """Expect all demand rxn IDs to be prefixed with 'DM_'."""
+    untagged_tagged_demand_rxns = syntax.find_untagged_demand_rxns(model)
+    assert len(untagged_tagged_demand_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_demand_tag", 0),
+    ("false_demand_tag", 1),
+    ("missing_exchange_tag", 1)
+], indirect=["model"])
+def test_false_demand_reaction(model, num):
+    """Expect all rxns that are tagged with 'DM_' to be true demand rxns."""
+    falsely_tagged_demand_rxns = syntax.find_false_demand_rxns(model)
     assert len(falsely_tagged_demand_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("correct_sink_tag", 0),
-    ("incorrect_sink_tag", 2)
+    ("missing_sink_tag", 2)
 ], indirect=["model"])
 def test_sink_reaction_tag_match(model, num):
-    """Expect all sink rxn IDs to be prefixed with 'SK_'"""
-    falsely_tagged_sink_rxns = syntax.find_untagged_sink_rxns(model)
+    """Expect all sink rxn IDs to be prefixed with 'SK_'."""
+    untagged_tagged_sink_rxns = syntax.find_untagged_sink_rxns(model)
+    assert len(untagged_tagged_sink_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_sink_tag", 0),
+    ("false_sink_tag", 1)
+], indirect=["model"])
+def test_false_sink_reaction(model, num):
+    """Expect all rxns that are tagged with 'SK_' to be true sink rxns."""
+    falsely_tagged_sink_rxns = syntax.find_false_sink_rxns(model)
     assert len(falsely_tagged_sink_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("correct_exchange_tag", 0),
-    ("incorrect_exchange_tag", 2)
+    ("missing_exchange_tag", 2)
 ], indirect=["model"])
 def test_exchange_reaction_tag_match(model, num):
-    """Expect all exchange rxn IDs to be prefixed with 'EX_'"""
-    falsely_tagged_exchange_rxns = syntax.find_untagged_exchange_rxns(model)
+    """Expect all exchange rxn IDs to be prefixed with 'EX_'."""
+    untagged_tagged_exchange_rxns = syntax.find_untagged_exchange_rxns(model)
+    assert len(untagged_tagged_exchange_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("correct_exchange_tag", 0),
+    ("missing_demand_tag", 1)
+], indirect=["model"])
+def test_false_exchange_reaction(model, num):
+    """Expect all rxns that are tagged with 'EX_' to be true exchange rxns."""
+    falsely_tagged_exchange_rxns = syntax.find_false_exchange_rxns(model)
     assert len(falsely_tagged_exchange_rxns) == num
