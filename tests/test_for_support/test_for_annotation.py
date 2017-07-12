@@ -28,130 +28,165 @@ expected.
 """
 
 
+def no_annotations(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met1 = cobra.Metabolite(id='met1_c', name="Met1")
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1, met1: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+def met_annotations(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met1 = cobra.Metabolite(id='met1_c', name="Met1")
+    met.annotation = {'metanetx.chemical': 'MNXM1235'}
+    met1.annotation = {'ec-code': '1.1.2.3'}
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1, met1: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+def rxn_annotations(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.annotation = {'brenda': '1.1.1.1'}
+    base.add_reactions([rxn])
+    return base
+
+
+def met_each_present(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met.annotation = {'metanetx.chemical': "MNXM23",
+                      'kegg.compound': "C00022",
+                      'seed.compound': "cpd00020",
+                      'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",
+                      'chebi': ["CHEBI:14987", "CHEBI:15361",
+                                "CHEBI:26462", "CHEBI:26466",
+                                "CHEBI:32816", "CHEBI:45253",
+                                "CHEBI:86354", "CHEBI:8685"],
+                      'hmdb': "HMDB00243",
+                      'biocyc': "META:PYRUVATE",
+                      'reactome': ["R-ALL-113557",
+                                   "R-ALL-29398",
+                                   "R-ALL-389680"],
+                      'bigg.metabolite': "pyr"}
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1})
+    base.add_reactions([rxn])
+    return base
+
+
+def met_each_absent(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met.annotation = {'METANETX': "MNXM23",
+                      'old_database': "broken_identifier"}
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1})
+    base.add_reactions([rxn])
+    return base
+
+
+def rxn_each_present(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.annotation = {'metanetx.reaction': "MNXR13125",
+                      'kegg.reaction': "R01068",
+                      'ec-code': "4.1.2.13",
+                      'brenda': "4.1.2.13",
+                      'rhea': ["14729", "14730", "14731", "14732"],
+                      'biocyc': "ECOLI:F16ALDOLASE-RXN",
+                      'bigg.reaction': "FBA"}
+    base.add_reactions([rxn])
+    return base
+
+
+def rxn_each_absent(base):
+    # Old or unknown databases and
+    # keys that don't follow the MIRIAM namespaces
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.annotation = {'old_database': "broken_identifier",
+                      'KEGG': "R01068"}
+    base.add_reactions([rxn])
+    return base
+
+
+def met_broken_id(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met.annotation = {'metanetx.chemical': "MNXR23",
+                      'kegg.compound': "K00022",
+                      'seed.compound': "cdp00020",
+                      'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
+                      'chebi': ["CHEBI:487", "CHEBI:15361",
+                                "CHEBI:26462", "CHEBI:26466",
+                                "CHEBI:32816", "CEBI:O",
+                                "CHEBI:86354", "CHEBI:8685"],
+                      'hmdb': "HMBD00243",
+                      'biocyc': "/:PYRUVATE",
+                      'reactome': ["113557", "29398", "389680"],
+                      'bigg.metabolite': ""}
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1})
+    base.add_reactions([rxn])
+    return base
+
+
+def rxn_broken_id(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.annotation = {'metanetx.reaction': "MNXM13125",
+                      'kegg.reaction': "T1068",
+                      'ec-code': "4.1.2..13",
+                      'brenda': "4.1.2..13",
+                      'rhea': ["1472999", "14730", "14731", "ABCD"],
+                      'biocyc': ":ECOLI_F16ALDOLASE-RXN",
+                      'bigg.reaction': "/:2x_FBA"}
+    base.add_reactions([rxn])
+    return base
+
+
+def consistent_ids(base):
+    met = cobra.Metabolite(id='pyr_c', name="Pyruvate")
+    met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
+    met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
+    rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
+    rxn.add_metabolites({met: -1, met1: 1})
+    rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
+    rxn2.add_metabolites({met1: -1, met2: 1})
+    rxn3 = cobra.Reaction(id='OAADC', name="Oxaloacetate decarboxylase")
+    rxn3.add_metabolites({met2: -1, met: 1})
+    base.add_reactions([rxn, rxn2, rxn3])
+    return base
+
+
+def inconsistent_ids(base):
+    met = cobra.Metabolite(id='META:PYRUVATE_c', name="Pyruvate")
+    met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
+    met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
+    rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
+    rxn.add_metabolites({met: -1, met1: 1})
+    rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
+    rxn2.add_metabolites({met1: -1, met2: 1})
+    rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
+    rxn3.add_metabolites({met2: -1, met: 1})
+    base.add_reactions([rxn, rxn2, rxn3])
+    return base
+
+
 def model_builder(name):
-    """Returns a cobra.model built to reflect the required test case"""
+    choices = {
+        'no_annotations': no_annotations,
+        'met_annotations': met_annotations,
+        'rxn_annotations': rxn_annotations,
+        'met_each_present': met_each_present,
+        'met_each_absent': met_each_absent,
+        'rxn_each_present': rxn_each_present,
+        'rxn_each_absent': rxn_each_absent,
+        'met_broken_id': met_broken_id,
+        'rxn_broken_id': rxn_broken_id,
+        'consistent_ids': consistent_ids,
+        'inconsistent_ids': inconsistent_ids,
+    }
     model = cobra.Model(id_or_model=name, name=name)
-    if name == 'no_annotations':
-        met = cobra.Metabolite(id='met_c', name="Met")
-        met1 = cobra.Metabolite(id='met1_c', name="Met1")
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1, met1: 1})
-        model.add_reactions([rxn])
-        return model
-    if name == 'met_annotations':
-        met = cobra.Metabolite(id='met_c', name="Met")
-        met1 = cobra.Metabolite(id='met1_c', name="Met1")
-        met.annotation = {'metanetx.chemical': 'MNXM1235'}
-        met1.annotation = {'ec-code': '1.1.2.3'}
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1, met1: 1})
-        model.add_reactions([rxn])
-        return model
-    if name == 'rxn_annotations':
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.annotation = {'brenda': '1.1.1.1'}
-        model.add_reactions([rxn])
-        return model
-    if name == 'met_each_present':
-        met = cobra.Metabolite(id='met_c', name="Met")
-        met.annotation = {'metanetx.chemical': "MNXM23",
-                          'kegg.compound': "C00022",
-                          'seed.compound': "cpd00020",
-                          'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",
-                          'chebi': ["CHEBI:14987", "CHEBI:15361",
-                                    "CHEBI:26462", "CHEBI:26466",
-                                    "CHEBI:32816", "CHEBI:45253",
-                                    "CHEBI:86354", "CHEBI:8685"],
-                          'hmdb': "HMDB00243",
-                          'biocyc': "META:PYRUVATE",
-                          'reactome': ["R-ALL-113557",
-                                       "R-ALL-29398",
-                                       "R-ALL-389680"],
-                          'bigg.metabolite': "pyr"}
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1})
-        model.add_reactions([rxn])
-        return model
-    if name == 'met_each_absent':
-        met = cobra.Metabolite(id='met_c', name="Met")
-        met.annotation = {'METANETX': "MNXM23",
-                          'old_database': "broken_identifier"}
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1})
-        model.add_reactions([rxn])
-        return model
-    if name == 'rxn_each_present':
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.annotation = {'metanetx.reaction': "MNXR13125",
-                          'kegg.reaction': "R01068",
-                          'ec-code': "4.1.2.13",
-                          'brenda': "4.1.2.13",
-                          'rhea': ["14729", "14730", "14731", "14732"],
-                          'biocyc': "ECOLI:F16ALDOLASE-RXN",
-                          'bigg.reaction': "FBA"}
-        model.add_reactions([rxn])
-        return model
-    if name == 'rxn_each_absent':
-        # Old or unknown databases and
-        # keys that don't follow the MIRIAM namespaces
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.annotation = {'old_database': "broken_identifier",
-                          'KEGG': "R01068"}
-        model.add_reactions([rxn])
-        return model
-    if name == 'met_broken_id':
-        met = cobra.Metabolite(id='met_c', name="Met")
-        met.annotation = {'metanetx.chemical': "MNXR23",
-                          'kegg.compound': "K00022",
-                          'seed.compound': "cdp00020",
-                          'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
-                          'chebi': ["CHEBI:487", "CHEBI:15361",
-                                    "CHEBI:26462", "CHEBI:26466",
-                                    "CHEBI:32816", "CEBI:O",
-                                    "CHEBI:86354", "CHEBI:8685"],
-                          'hmdb': "HMBD00243",
-                          'biocyc': "/:PYRUVATE",
-                          'reactome': ["113557", "29398", "389680"],
-                          'bigg.metabolite': ""}
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.add_metabolites({met: -1})
-        model.add_reactions([rxn])
-        return model
-    if name == 'rxn_broken_id':
-        rxn = cobra.Reaction(id='RXN', name="Rxn")
-        rxn.annotation = {'metanetx.reaction': "MNXM13125",
-                          'kegg.reaction': "T1068",
-                          'ec-code': "4.1.2..13",
-                          'brenda': "4.1.2..13",
-                          'rhea': ["1472999", "14730", "14731", "ABCD"],
-                          'biocyc': ":ECOLI_F16ALDOLASE-RXN",
-                          'bigg.reaction': "/:2x_FBA"}
-        model.add_reactions([rxn])
-        return model
-    if name == 'consistent_ids':
-        met = cobra.Metabolite(id='pyr_c', name="Pyruvate")
-        met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
-        met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
-        rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
-        rxn.add_metabolites({met: -1, met1: 1})
-        rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
-        rxn2.add_metabolites({met1: -1, met2: 1})
-        rxn3 = cobra.Reaction(id='OAADC', name="Oxaloacetate decarboxylase")
-        rxn3.add_metabolites({met2: -1, met: 1})
-        model.add_reactions([rxn, rxn2, rxn3])
-        return model
-    if name == 'inconsistent_ids':
-        met = cobra.Metabolite(id='META:PYRUVATE_c', name="Pyruvate")
-        met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
-        met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
-        rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
-        rxn.add_metabolites({met: -1, met1: 1})
-        rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
-        rxn2.add_metabolites({met1: -1, met2: 1})
-        rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
-        rxn3.add_metabolites({met2: -1, met: 1})
-        model.add_reactions([rxn, rxn2, rxn3])
-        return model
+    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, num, components", [
