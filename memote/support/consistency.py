@@ -303,3 +303,44 @@ def find_blocked_reactions(model):
     blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
                              (fva_result["minimum"] == 0.0)]
     return [model.reactions.get_by_id(name) for name in blocked.index]
+
+
+def find_stoichiometrically_balanced_cycles(model):
+    """
+    Find metabolic rxns in stoichiometrically balanced cycles (SBCs).
+
+    The flux distribution of nominal FVA is compared with loopless FVA
+    (loopless=True) to determine reactions that participate in loops, as
+    participation in loops would increase the flux through a given reactions to
+    the maximal bounds. This function then returns reactions where the flux
+    differs between the two FVA calculations.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Notes
+    -----
+    "SBCs are artifacts of metabolic reconstructions due to insufficient
+    constraints (e.g., thermodynamic constraints and regulatory
+    constraints) [1]_." They are defined by internal reactions that carry flux
+    in spite of closed exchange reactions.
+
+    References
+    ----------
+    .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
+       generating a high-quality genome-scale metabolic reconstruction. Nature
+       protocols. Nature Publishing Group.
+       http://doi.org/10.1038/nprot.2009.203
+
+    """
+    fva_result = flux_variability_analysis(model, loopless=False)
+    fva_result_loopless = flux_variability_analysis(model, loopless=True)
+    row_ids_max = fva_result[
+        fva_result.maximum != fva_result_loopless.maximum].index
+    row_ids_min = fva_result[
+        fva_result.minimum != fva_result_loopless.minimum].index
+    differential_fluxes = set(row_ids_min).union(set(row_ids_max))
+
+    return [model.reactions.get_by_id(id) for id in differential_fluxes]

@@ -149,6 +149,42 @@ def charge_imbalanced(base):
     return base
 
 
+def loopy_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "v1", "v2", "v3"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = -1000, 1000
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
+def constrained_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "v1", "v2", "v3"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = 1, 1
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
 def model_builder(name):
     choices = {
         "fig-1": figure_1,
@@ -159,6 +195,8 @@ def model_builder(name):
         "all_balanced": all_balanced,
         "mass_imbalanced": mass_imbalanced,
         "charge_imbalanced": charge_imbalanced,
+        "loopy_toy_model": loopy_toy_model,
+        "constrained_toy_model": constrained_toy_model,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -226,3 +264,13 @@ def test_blocked_reactions(model, num):
     """Expect all reactions to be able to carry flux."""
     dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
     assert len(dict_of_blocked_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("loopy_toy_model", 3),
+    ("constrained_toy_model", 0),
+], indirect=["model"])
+def test_find_stoichiometrically_balanced_cycles(model, num):
+    """Expect no stoichiometrically balanced loops to be present."""
+    rxns_in_loops = consistency.find_stoichiometrically_balanced_cycles(model)
+    assert len(rxns_in_loops) == num
