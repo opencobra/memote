@@ -19,7 +19,7 @@ Contents:
    contributing
    authors
    history
-   memote
+   memote_tests
 
 
 Indices and tables
