@@ -19,6 +19,8 @@ Contents:
    contributing
    authors
    history
+   memote
+
 
 Indices and tables
 ==================
