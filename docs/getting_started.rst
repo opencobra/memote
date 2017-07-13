@@ -14,7 +14,7 @@ produces a performance report with each incremental change.
 
 Here, we explain step by step the necessary commands to pursue either workflow.
 Users that have already followed this tutorial once may want to refer to the
-cheat-sheet flowchart :doc:`here <flowchart>` to refresh their memory.
+:doc:`cheat-sheet flowchart <flowchart>` to refresh their memory.
 
 Benchmark
 ---------
