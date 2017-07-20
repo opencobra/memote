@@ -10,7 +10,22 @@
                 {% for pair in data | dictsort %}
                     <tr md-row>
                         <td md-cell>{{ pair[0] }}</td>
+                        {% if pair[1] is iterable and pair[1] is not string %}
+                        <td md-cell>{{ pair[1] | length }}</td>
+                        <td md-cell>
+                            <div ng-controller="AppCtrl" ng-cloak>
+                                <md-content>
+                                    <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+                                        <md-button class="md-icon-button md-accent" aria-label="Favorite">
+                                            <md-icon md-svg-icon="https://storage.googleapis.com/material-icons/external-assets/v4/icons/svg/ic_help_outline_black_24px.svg"></md-icon>
+                                        </md-button>
+                                    </section>
+                                </md-content>
+                            </div>
+                        </td>
+                        {% else %}
                         <td md-cell>{{ pair[1] }}</td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
