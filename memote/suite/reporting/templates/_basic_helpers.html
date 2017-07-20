@@ -6,15 +6,11 @@
 
         <md-table-container layout-padding>
             <table md-table>
-                <thead md-head md-order="myOrder">
-                    <th md-column md-order-by="nameToLower"> Test</th>
-                    <th md-cell md-numeric> Result</th>
-                </thead>
                 <tbody md-body>
-                {% for key, value in data.iteritems() %}
+                {% for pair in data | dictsort %}
                     <tr md-row>
-                        <td md-cell>{{ key }}</td>
-                        <td md-cell>{{ value }}</td>
+                        <td md-cell>{{ pair[0] }}</td>
+                        <td md-cell>{{ pair[1] }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
