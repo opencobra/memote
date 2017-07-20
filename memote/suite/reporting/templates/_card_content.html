@@ -1,7 +1,7 @@
-{% macro render_basic(data) -%}
+{% macro render_card_content(name, data) -%}
     <md-card>
         <md-card-title>
-            <span class="md-headline">Basic Information</span>
+            <span class="md-headline">{{ name }}</span>
         </md-card-title>
 
         <md-table-container layout-padding>
