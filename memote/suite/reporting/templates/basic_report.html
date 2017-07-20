@@ -18,6 +18,10 @@
                 'Stoichiometric Consistency',
                 data['report']['test_consistency']
             ) }}
+            {{ render_card_content(
+                'Syntax Information',
+                data['report']['test_syntax']
+            ) }}
         </div>
         <div layout="column" flex>
             {{ render_card_content(
@@ -27,10 +31,6 @@
             {{ render_card_content(
                 'Annotation Information',
                 data['report']['test_annotation']
-            ) }}
-            {{ render_card_content(
-                'Syntax Information',
-                data['report']['test_syntax']
             ) }}
         </div>
     </md-content>
