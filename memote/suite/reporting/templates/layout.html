@@ -32,10 +32,22 @@
              * You must include the dependency on 'ngMaterial'
              */
             angular.module('memoteReport', ['ngMaterial'])
-            .controller('AppCtrl', function($scope) {
+            .controller('AppCtrl', function($scope) {})
+            .config(function($mdThemingProvider) {
+
+              var memoteBlueMap = $mdThemingProvider.extendPalette('blue', {
+                '500': '#2B7BB7'
+              });
 
 
-             });
+  $mdThemingProvider.definePalette('memoteBlue', memoteBlueMap);
+
+  // Use that theme for the primary intentions
+  $mdThemingProvider.theme('default')
+    .primaryPalette('memoteBlue');
+
+});
+
         </script>
 
         <!--[if lt IE 8]>
