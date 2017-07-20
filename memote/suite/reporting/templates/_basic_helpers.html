@@ -1,17 +1,21 @@
 {% macro render_basic(data) -%}
-
+    <script src="sorttable.js"></script>
     <md-card>
         <md-card-title>
             <span class="md-headline">Basic Information</span>
         </md-card-title>
 
         <md-table-container layout-padding>
-            <table md-table>
+            <table md-table class="sortable">
+                <thead md-head>
+                    <th md-cell> Test</th>
+                    <th md-cell> Result</th>
+                </thead>
                 <tbody md-body>
-                {% for key in data|dictsort %}
+                {% for key, value in data.iteritems() %}
                     <tr md-row>
                         <td md-cell>{{ key }}</td>
-                        <td md-cell>{{ dict[key] }}</td>
+                        <td md-cell>{{ value }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
