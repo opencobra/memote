@@ -8,23 +8,12 @@
         <md-table-container layout-padding>
             <table md-table>
                 <tbody md-body>
+                {% for key in data|dictsort %}
                     <tr md-row>
-                        <td md-cell>Number of genes</td>
-                        <td md-cell>{{ data['num_genes'] }}</td>
+                        <td md-cell>{{ key }}</td>
+                        <td md-cell>{{ dict[key] }}</td>
                     </tr>
-                    <tr md-row>
-                        <td md-cell>Number of reactions</td>
-                        <td md-cell>{{ data['num_reactions'] }}</td>
-                    </tr>
-                    <tr md-row>
-                        <td md-cell>Number of metabolites</td>
-                        <td md-cell>{{ data['num_metabolites'] }}</td>
-                    </tr>
-                    <tr md-row>
-                        <td md-cell>Number of metabolites without known formula</td>
-                        <td md-cell>{{ data['metabolites_no_formula']|length }}</td>
-                    </tr>
-
+                {% endfor %}
                 </tbody>
             </table>
         </md-table-container>
