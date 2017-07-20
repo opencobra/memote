@@ -1,15 +1,14 @@
 {% macro render_basic(data) -%}
-    <script src="sorttable.js"></script>
     <md-card>
         <md-card-title>
             <span class="md-headline">Basic Information</span>
         </md-card-title>
 
         <md-table-container layout-padding>
-            <table md-table class="sortable">
-                <thead md-head>
-                    <th md-cell> Test</th>
-                    <th md-cell> Result</th>
+            <table md-table>
+                <thead md-head md-order="myOrder">
+                    <th md-column md-order-by="nameToLower"> Test</th>
+                    <th md-cell md-numeric> Result</th>
                 </thead>
                 <tbody md-body>
                 {% for key, value in data.iteritems() %}
