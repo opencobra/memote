@@ -1,7 +1,7 @@
 {% macro render_list_data(key, list) -%}
     <td md-cell>
         <div ng-controller="AppCtrl" ng-cloak>
-            <md-content>
+            <md-content style=" background-color: rgb(255,255,255);">
                     <md-button onclick="$('tr.{{ key }}').toggle();"
                                class="md-primary">
                         {{ list | length }}
