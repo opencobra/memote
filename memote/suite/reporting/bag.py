@@ -140,7 +140,7 @@ def _get_biomass(elem):
     tmp = elem["report"]["test_biomass"]
     commit = elem["meta"]["commit_hash"]
     columns = itemgetter(
-        "biomass_reactions", "biomass_sum", "biomass_default_flux",
+        "biomass_ids", "biomass_sum", "biomass_default_flux",
         "default_blocked_precursors", "open_blocked_precursors")
     res = [
         (commit, rxn, bio_sum, def_flux, len(def_blocked), len(open_blocked))
