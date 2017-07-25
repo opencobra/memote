@@ -6,24 +6,41 @@
             <span class="md-headline">{{ name }}</span>
         </md-card-title>
 
-        <md-table-container layout-padding>
-            <table md-table>
-                <tbody md-body>
-                {% for pair in data | dictsort %}
-                    <tr md-row>
-                        <td md-cell>{{ pair[0] }}</td>
-                        {% if pair[1] is iterable and pair[1] is not string %}
-                        {{ render_list_data(
-                            pair[0],
-                            pair[1]
-                        ) }}
-                        {% else %}
-                        <td md-cell>{{ pair[1] }}</td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </md-table-container>
+{#        <md-table-container layout-padding>#}
+{#            <table md-table>#}
+{#                <tbody md-body>#}
+{#                {% for pair in data | dictsort %}#}
+{#                    <tr md-row>#}
+{#                        <td md-cell>{{ pair[0] }}</td>#}
+{#                        {% if pair[1] is iterable and pair[1] is not string %}#}
+{#                        {{ render_list_data(#}
+{#                            pair[0],#}
+{#                            pair[1]#}
+{#                        ) }}#}
+{#                        {% else %}#}
+{#                        <td md-cell>{{ pair[1] }}</td>#}
+{#                        {% endif %}#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#                </tbody>#}
+{#            </table>#}
+{#        </md-table-container>#}
+
+        <md-list>
+            {% for pair in data | dictsort %}
+                {% if pair[1] is iterable and pair[1] is not string %}
+                    {{ render_list_data(pair[0], pair[1]) }}
+                {% else %}
+                    <md-list-item class="md-no-proxy">
+                        <span flex>{{ pair[0] }}</span>
+                        <span>{{ pair[1] }}</span>
+                        <md-button class="md-icon-button" aria-label="More" style="visibility: hidden">
+                            <md-icon md-font-icon="expand_more">expand_more</md-icon>
+                        </md-button>
+                    </md-list-item>
+                {% endif %}
+                <md-divider ng-if="!$last"></md-divider>
+            {% endfor %}
+        </md-list>
     </md-card>
 {%- endmacro %}

@@ -1,16 +1,14 @@
 {% macro render_list_data(key, list) -%}
-    <td md-cell>
-        <div ng-controller="AppCtrl" ng-cloak>
-            <md-content style=" background-color: rgb(255,255,255);">
-                    <md-button onclick="$('tr.{{ key }}').toggle();"
-                               class="md-primary">
-                        {{ list | length }}
-                    </md-button>
-            </md-content>
-        </div>
-    </td>
-    </tr>
-    <tr class={{ key }} style=" display: none;">
-        <td colspan="2">{{ list }}</td>
 
+    <md-list-item class="md-no-proxy">
+        <span flex>{{ key }}</span>
+        <span>{{ list | length }}</span>
+        <md-button class="md-icon-button" aria-label="More" onclick="$('md-list-item.{{ key }}').toggle();">
+            <md-icon md-font-icon="expand_more">expand_more</md-icon>
+        </md-button>
+    </md-list-item>
+
+    <md-list-item class="{{ key }}" style="display: none">
+        {{ list }}
+    </md-list-item>
 {%- endmacro %}
