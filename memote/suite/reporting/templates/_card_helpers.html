@@ -22,17 +22,17 @@
     </md-card>
 {%- endmacro %}
 
-{% macro render_list_data(key, list) -%}
+{% macro render_list_content(key, list) -%}
 
     <md-list-item class="md-no-proxy">
         <span flex>{{ key }}</span>
         <span>{{ list | length }}</span>
-        <md-button class="md-icon-button" aria-label="More" onclick="$('md-list-item.{{ key }}').toggle();">
+        <md-button class="md-icon-button" aria-label="More" onclick="$('md-list-item#{{ key }}').toggle();">
             <md-icon md-font-icon="expand_more">expand_more</md-icon>
         </md-button>
     </md-list-item>
 
-    <md-list-item class="{{ key }}" style="display: none">
+    <md-list-item id="{{ key }}" style="display: none">
         {{ list }}
     </md-list-item>
 {%- endmacro %}
