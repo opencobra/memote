@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
-{% from '_basic_helpers.html' import render_basic %}
-{% from '_consistency_helpers.html' import render_consistency %}
-{% from '_biomass_helpers.html' import render_biomass %}
-{% from '_syntax_helpers.html' import render_syntax %}
+{% from '_card_helpers.html' import render_card_content %}
 
 {% block header -%}
     <div class="md-toolbar-tools">
@@ -13,12 +10,28 @@
 {% block content -%}
     <md-content layout="row" class="md-padding" layout-xs="column">
         <div layout="column" flex>
-            {{ render_basic(data['report']['test_basic']) }}
-            {{ render_consistency(data['report']['test_consistency']) }}
+            {{ render_card_content(
+                'Basic Information',
+                data['report']['test_basic']
+            ) }}
+            {{ render_card_content(
+                'Stoichiometric Consistency',
+                data['report']['test_consistency']
+            ) }}
+            {{ render_card_content(
+                'Syntax Information',
+                data['report']['test_syntax']
+            ) }}
         </div>
         <div layout="column" flex>
-            {{ render_biomass(data['report']['test_biomass']) }}
-            {{ render_syntax(data['report']['test_syntax']) }}
+            {{ render_card_content(
+                'Biomass Production',
+                data['report']['test_biomass']
+            ) }}
+            {{ render_card_content(
+                'Annotation Information',
+                data['report']['test_annotation']
+            ) }}
         </div>
     </md-content>
 {%- endblock %}

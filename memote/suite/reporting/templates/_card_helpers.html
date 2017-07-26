@@ -1,0 +1,38 @@
+{% macro render_card_content(name, data) -%}
+    <md-card ng-app>
+        <md-card-title>
+            <span class="md-headline">{{ name }}</span>
+        </md-card-title>
+        <md-list>
+            {% for pair in data | dictsort %}
+                {% if pair[1] is iterable and pair[1] is not string %}
+                    {{ render_list_content(pair[0], pair[1]) }}
+                {% else %}
+                    <md-list-item class="md-no-proxy">
+                        <span flex>{{ pair[0] }}</span>
+                        <span>{{ pair[1] }}</span>
+                        <md-button class="md-icon-button" aria-label="More" style="visibility: hidden">
+                            <md-icon md-font-icon="expand_more">expand_more</md-icon>
+                        </md-button>
+                    </md-list-item>
+                {% endif %}
+                <md-divider ng-if="!$last"></md-divider>
+            {% endfor %}
+        </md-list>
+    </md-card>
+{%- endmacro %}
+
+{% macro render_list_content(key, list) -%}
+
+    <md-list-item class="md-no-proxy">
+        <span flex>{{ key }}</span>
+        <span>{{ list | length }}</span>
+        <md-button class="md-icon-button" aria-label="More" onclick="$('md-list-item#{{ key }}').toggle();">
+            <md-icon md-font-icon="expand_more">expand_more</md-icon>
+        </md-button>
+    </md-list-item>
+
+    <md-list-item id="{{ key }}" style="display: none">
+        {{ list }}
+    </md-list-item>
+{%- endmacro %}
