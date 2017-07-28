@@ -104,6 +104,15 @@ class HistoryReport(Report):
         plots["metabolites_no_formula"] = plt.scatter_line_chart(
             df[[self.index, "num_metabolites_no_formula"]],
             "Number of Metabolites Without Formula")
+        plots["metabolites_no_charge"] = plt.scatter_line_chart(
+            df[[self.index, "metabolites_no_charge"]],
+            "Number of Metabolites Without Charge")
+        plots["reactions_no_GPR"] = plt.scatter_line_chart(
+            df[[self.index, "reactions_no_GPR"]],
+            "Number of Reactions Without GPR Rule")
+#        plots["metabolic_coverage"] = plt.scatter_line_chart(
+#            df[[self.index, "metabolic_coverage"]],
+#            "Metabolic Coverage")
         plots["ngam_reaction"] = plt.scatter_line_chart(
             df[[self.index, "ngam_reaction"]],
             "Number of Non-growth-associated Maintenance Reactions")

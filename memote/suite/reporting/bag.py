@@ -107,7 +107,10 @@ class ResultBagWrapper(object):
         LOGGER.debug("Collecting basic information from bag.")
         self._assert_index_presence()
         columns = ("commit", "num_genes", "num_reactions", "num_metabolites",
-                   "num_metabolites_no_formula", "ngam_reaction")
+                   "num_metabolites_no_formula", "metabolites_no_charge",
+                   "reactions_no_GPR",
+#                   "metabolic_coverage",
+                   "ngam_reaction")
         data = pd.DataFrame(list(self._bag.map(_get_basics)), columns=columns)
         data.set_index("commit", inplace=True)
         return self._index.join(data)
@@ -164,6 +167,9 @@ def _get_basics(elem):
             tmp["num_reactions"],
             tmp["num_metabolites"],
             len(tmp["metabolites_no_formula"]),
+            len(tmp["metabolites_no_charge"]),
+            len(tmp["reactions_no_GPR"]),
+#            tmp["metabolic_coverage"],
             tmp["ngam_reaction"])
 
 
