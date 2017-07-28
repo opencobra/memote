@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from '_card_helpers.html' import render_plot_card %}
 
 {% block title -%}
 <title>{{ names|join(", ") }} Report</title>
@@ -18,103 +19,24 @@
 {% block content -%}
     <md-content layout="row" class="md-padding" layout-xs="column">
         <div layout="column" flex>
-            <md-card flex>
-                <md-card-title>
-                    <span class="md-headline">Basic Information</span>
-                </md-card-title>
+            {{ render_plot_card('Basic Information', basics) }}
 
-                <md-tabs md-dynamic-height>
-                    <md-tab id="tab_0">
-                        <md-tab-label>
-                           Genes
-                        </md-tab-label>
-                        <md-tab-body>
-                            <div id="plotDiv" style="width: 500px; height: 500px">
-                                {{ basics["genes"] }}
-                            </div>
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_1">
-                        <md-tab-label>
-                           Reactions
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ basics["reactions"] }}
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_2">
-                        <md-tab-label>
-                           Metabolites
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ basics["metabolites"] }}
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_3">
-                        <md-tab-label>
-                           Metabolites no formula
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ basics["metabolites_no_formula"] }}
-                        </md-tab-body>
-                    </md-tab>
-                </md-tabs>
-            </md-card>
+            {{ render_plot_card('Stoichiometric Consistency', consistency) }}
 
-            <md-card flex>
+{#             {{ render_plot_card('Syntax Information', basics) }} #}
+            <md-card ng-app>
                 <md-card-title>
                     <span class="md-headline">Syntax Information</span>
                 </md-card-title>
             </md-card>
         </div>
-
         <div layout="column" flex>
-            <md-card flex>
+            {{ render_plot_card('Biomass Production', biomass) }}
+
+{#           {{ render_plot_card('Annotation Information', basics) }} #}
+            <md-card ng-app>
                 <md-card-title>
-                    <span class="md-headline">Biomass Production</span>
-                </md-card-title>
-                <md-tabs md-dynamic-height>
-                    <md-tab id="tab_0">
-                        <md-tab-label>
-                           Biomass Sum
-                        </md-tab-label>
-                        <md-tab-body>
-                            <md-content>
-                                <div id="plot">
-                                    {{ biomass["biomass_sum"] }}
-                                </div>
-                            </md-content>
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_1">
-                        <md-tab-label>
-                           Biomass Default Flux
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ biomass["biomass_default_flux"] }}
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_2">
-                        <md-tab-label>
-                           Num Default Blocked Precursors
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ biomass["num_default_blocked_precursors"] }}
-                        </md-tab-body>
-                    </md-tab>
-                    <md-tab id="tab_3">
-                        <md-tab-label>
-                           Num Open Blocked Precursors
-                        </md-tab-label>
-                        <md-tab-body>
-                            {{ biomass["num_open_blocked_precursors"] }}
-                        </md-tab-body>
-                    </md-tab>
-                </md-tabs>
-            </md-card>
-            <md-card flex>
-                <md-card-title>
-                    <span class="md-headline">Stoichiometric Consistency</span>
+                    <span class="md-headline">Annotation Information</span>
                 </md-card-title>
             </md-card>
         </div>

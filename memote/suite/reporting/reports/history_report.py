@@ -80,7 +80,10 @@ class HistoryReport(Report):
         return template.render(
             names=names,
             basics=self._collect_basic_plots(),
-            biomass=self._collect_biomass_plots()
+            consistency=self._collect_consistency_plots(),
+            # FIXME: Syntax tests and result retrieval are broken.
+#            syntax=self._collect_syntax_plots(),
+            biomass=self._collect_biomass_plots(),
         )
 
     def _collect_basic_plots(self):
@@ -101,6 +104,70 @@ class HistoryReport(Report):
         plots["metabolites_no_formula"] = plt.scatter_line_chart(
             df[[self.index, "num_metabolites_no_formula"]],
             "Number of Metabolites Without Formula")
+        plots["ngam_reaction"] = plt.scatter_line_chart(
+            df[[self.index, "ngam_reaction"]],
+            "Number of Non-growth-associated Maintenance Reactions")
+        return plots
+
+    def _collect_consistency_plots(self):
+        """Create plots from the consistency info data frame."""
+        df = self.bag.get_consistency_dataframe()
+        plots = dict()
+        plots["is_consistent"] = plt.boolean_chart(
+            df[[self.index, "is_consistent"]],
+            "Is Stoichiometrically Consistent")
+        plots["unconserved_metabolites"] = plt.scatter_line_chart(
+            df[[self.index, "unconserved_metabolites"]],
+            "Number of Unconserved Metabolites")
+        plots["magic_atp_production"] = plt.boolean_chart(
+            df[[self.index, "magic_atp_production"]],
+            "Has Magic ATP Production")
+        plots["imbalanced_reactions"] = plt.scatter_line_chart(
+            df[[self.index, "imbalanced_reactions"]],
+            "Number of Imbalanced Reactions")
+        plots["blocked_reactions"] = plt.scatter_line_chart(
+            df[[self.index, "blocked_reactions"]],
+            "Number of Blocked Reactions")
+        # TODO: Fix looped in tests.
+#        plots["looped_reactions"] = plt.scatter_line_chart(
+#            df[[self.index, "looped_reactions"]],
+#            "Number of Looped Reactions")
+        return plots
+
+    def _collect_syntax_plots(self):
+        """Create plots from the syntax info data frame."""
+        df = self.bag.get_consistency_dataframe()
+        plots = dict()
+#        plots["reaction_compartment_suffix"] = plt.scatter_line_chart(
+#            df[[self.index, "reaction_compartment_suffix"]],
+#            "Number of Reactions with Wrong Compartment Tag")
+#        plots["untagged_normal_transport"] = plt.scatter_line_chart(
+#            df[[self.index, "untagged_normal_transport"]],
+#            "Number of Transport Reactions with Wrong Tag")
+#        plots["untagged_abc_transport"] = plt.scatter_line_chart(
+#            df[[self.index, "untagged_abc_transport"]],
+#            "Number of ABC Transport Reactions with Wrong Tag")
+#        plots["uppercase_metabolites"] = plt.scatter_line_chart(
+#            df[[self.index, "uppercase_metabolites"]],
+#            "Number of Uppercase Metabolite Identifiers")
+        plots["untagged_demand"] = plt.scatter_line_chart(
+            df[[self.index, "untagged_demand"]],
+            "Number of Wrongly Labelled Demand Reactions")
+        plots["false_demand"] = plt.scatter_line_chart(
+            df[[self.index, "false_demand"]],
+            "Number of Falsely Labelled Demand Reactions")
+        plots["untagged_sink"] = plt.scatter_line_chart(
+            df[[self.index, "untagged_sink"]],
+            "Number of Wrongly Labelled Sink Reactions")
+        plots["false_sink"] = plt.scatter_line_chart(
+            df[[self.index, "false_sink"]],
+            "Number of Falsely Labelled Sink Reactions")
+        plots["untagged_exchange"] = plt.scatter_line_chart(
+            df[[self.index, "untagged_exchange"]],
+            "Number of Wrongly Labelled Exchange Reactions")
+        plots["false_exchange"] = plt.scatter_line_chart(
+            df[[self.index, "false_exchange"]],
+            "Number of Falsely Labelled Exchange Reactions")
         return plots
 
     def _collect_biomass_plots(self):
@@ -108,7 +175,7 @@ class HistoryReport(Report):
         df = self.bag.get_biomass_dataframe()
         plots = dict()
         # components sum
-        factor = "reaction"
+        factor = "biomass_ids"
         plots["biomass_sum"] = plt.scatter_line_chart(
             df[[self.index, "biomass_sum", factor]],
             r"$ \text{Sum of Biomass Components }"
@@ -123,4 +190,11 @@ class HistoryReport(Report):
         plots["num_open_blocked_precursors"] = plt.scatter_line_chart(
             df[[self.index, "num_open_blocked_precursors", factor]],
             "Number of Blocked Biomass Precursors in Complete Medium")
+        plots["gam_in_biomass"] = plt.boolean_chart(
+            df[[self.index, "gam_in_biomass"]],
+            "Biomass Contains Growth-associated Maintenance")
         return plots
+
+    def _collect_annotation_plots(self):
+        """Create plots from the annotation info data frame."""
+        pass

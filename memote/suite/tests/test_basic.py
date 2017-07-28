@@ -87,6 +87,16 @@ def test_gene_protein_reaction_rule_presence(read_only_model, store):
         "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
 
 
+def test_ngam_presence(read_only_model, store):
+    """Expect a single non growth-associated maintenance reaction."""
+    ngam_reaction = basic.find_ngam(read_only_model)
+    store["ngam_reaction"] = [rxn.id for rxn in ngam_reaction]
+    assert len(ngam_reaction) == 1, \
+        "Could not identify a unique non growth-associated maintenance " \
+        "reaction. Please make sure to add only a single ATP-hydrolysis " \
+        "reaction and set the lower bound to a fixed value."
+
+
 def test_metabolic_coverage(read_only_model, store):
     """Expect a model to have high metabolic coverage."""
     store["metabolic_coverage"] = \

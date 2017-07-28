@@ -21,6 +21,8 @@ from __future__ import absolute_import
 
 import logging
 
+from memote.support.biomass import find_atp_adp_converting_reactions
+
 __all__ = ("check_metabolites_formula_presence",)
 
 
@@ -66,6 +68,23 @@ def find_unconstrained_reactions(model):
     return [rxn for rxn in model.reactions if
             rxn.lower_bound <= -1000 and
             rxn.upper_bound >= 1000]
+
+
+def find_ngam(model):
+    """
+    Return a the non growth-associated maintenance reaction.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    atp_adp_conv_rxns = find_atp_adp_converting_reactions(model)
+    return [rxn for rxn in atp_adp_conv_rxns
+            if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
+                                              'adp_c + h_c + pi_c' and not
+            rxn.lower_bound <= 0]
 
 
 def calculate_metabolic_coverage(model):
