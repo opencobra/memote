@@ -82,8 +82,8 @@ def process_addargs(args, context):
     if args is not None:
         return shlex.split(args) + [tests_dir]
     elif "addargs" in context.default_map:
-        return shlex.split(context.default_map["addargs"]) +\
-            [tests_dir]
+        return shlex.split(context.default_map["addargs"]) + \
+               [tests_dir]
     else:
         return [tests_dir]
 
@@ -200,36 +200,22 @@ def collect(ctx):
     return code
 
 
-@click.group(invoke_without_command=True,
-             context_settings=dict(
-                 default_map=ConfigFileProcessor.read_config()
-             ))
+@click.group(context_settings=dict(
+    default_map=ConfigFileProcessor.read_config()))
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--level", "-l", default="WARN",
-              type=click.Choice(["ERROR", "WARN", "INFO", "DEBUG"]),
+              type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
               help="Set the log level (default WARN).")
-@click.option("--no-collect", type=bool, is_flag=True,
-              help="Do *not* collect test data needed for generating a report.")
 @click.option("--model", type=click.Path(exists=True, dir_okay=False),
               help="Path to model file. Can also be given via the environment"
-              " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
-              " 'memote.ini'.")
-@click.option("--filename", type=click.Path(exists=False, writable=True),
-              help="Path for either the collected results as JSON or the"
-              " HTML report. In the former case the default is 'result.json'."
-              " In the latter case the default is 'index.html'.")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False,
-                                             writable=True),
-              help="Depending on the invoked subcommand:"
-              " Either create a report from JSON files in the given"
-              " directory, write test results to the directory using the"
-              " git commit hash, or create a new model repository inside it.")
+                   " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
+                   " 'memote.ini'.")
 @click.option("--pytest-args", "-a",
               help="Any additional arguments you want to pass to pytest."
-              "Should be given as one continuous string.")
+                   "Should be given as one continuous string.")
 @click.pass_context
-def cli(ctx, level, no_collect, model, filename, directory, pytest_args):
+def cli(ctx, level, model, pytest_args):
     """
     Metabolic model testing command line tool.
 
@@ -246,18 +232,40 @@ def cli(ctx, level, no_collect, model, filename, directory, pytest_args):
     ctx.obj["directory"] = process_directory(directory, ctx)
     ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
     ctx.obj["repo"] = probe_git()
-    if ctx.invoked_subcommand is None:
-        sys.exit(collect(ctx))
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.pass_context
+@click.option("--no-collect", type=bool, is_flag=True,
+              help="Do *not* collect test data needed for generating a report.")
+@click.option("--filename", type=click.Path(exists=False, writable=True),
+              default="result.json", help="Path for the collected results as "
+              "JSON (default 'result.json').")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="If invoked inside a git repository, write the test results "
+              "to this directory using the commit hash as the filename.")
+def run(ctx, no_collect, filename, directory):
+    """Run the test suite and collect results."""
+    sys.exit(collect(ctx))
 
 
 @cli.command()
 @click.help_option("--help", "-h")
 @click.option("--one-time", is_flag=True,
               help="Generate a one-time report.")
+@click.option("--filename", type=click.Path(exists=False, writable=True),
+              help="Path for the HTML report output (default 'index.html').")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False),
+              help="If invoked inside a git repository, the report will look "
+              "for JSON files corresponding to the branch's commit history in "
+              "that directory and generate a report from them.")
 @click.option("--index", type=click.Choice(["time", "hash"]), default="time",
-              help="Use either time (default) or commit hashes as the index.")
+              help="Use either time (default) or commit hashes as the index. "
+              "Only valid with a history report.")
 @click.pass_context
-def report(ctx, one_time, index):
+def report(ctx, one_time, filename, directory, index):
     """
     Generate a one-time or feature rich report.
 
@@ -270,8 +278,8 @@ def report(ctx, one_time, index):
         warnings.simplefilter("ignore", UserWarning)
         ctx.obj["model"] = read_sbml_model(ctx.obj["model"])
     check_model(ctx)
-    if ctx.obj["filename"] is None:
-        ctx.obj["filename"] = "index.html"
+    if filename is None:
+        filename = "index.html"
     if one_time:
         if "--tb" not in ctx.obj["pytest_args"]:
             ctx.obj["pytest_args"].extend(["--tb", "no"])
@@ -293,8 +301,11 @@ def report(ctx, one_time, index):
               "you want to adjust the answers, edit the template "
               "'{}'.".format(join(get_user_config()["replay_dir"],
                                   "cookiecutter-memote.json")))
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="Create a new model repository in the given directory.")
 @click.pass_context
-def new(ctx, replay):
+def new(ctx, directory, replay):
     """
     Create a suitable model repository structure from a template.
 
@@ -313,13 +324,17 @@ def new(ctx, replay):
 @cli.command()
 @click.help_option("--help", "-h")
 @click.option("--yes", "-y", is_flag=True, callback=abort_if_false,
-              expose_value=False,
+              expose_value=False, help="Confirm overwriting previous results.",
               prompt="Are you sure that you want to change history?")
+@click.option("--directory", type=click.Path(exists=True, file_okay=False,
+                                             writable=True),
+              help="Generated JSON files from the commit history will be "
+                   "written to this directory.")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 @click.pass_context
-def history(ctx, commits):
+def history(ctx, directory, commits):
     """
-    Re-compute test results for the complete git branch history.
+    Re-compute test results for the git branch history.
 
     There are three distinct modes:
 
@@ -359,3 +374,16 @@ def history(ctx, commits):
         proc.join()
     repo.git.checkout(branch)
     # repo.head.reset(index=True, working_tree=True)  # superfluous?
+
+
+@cli.command()
+@click.help_option("--help", "-h")
+@click.pass_context
+@click.argument("message", nargs=1)
+def save(ctx, message):
+    """
+    Save current model changes with the given message.
+
+    If a remote repository 'origin' exists the changes will also be uploaded.
+    """
+    raise NotImplementedError(u"Coming soon™.")
