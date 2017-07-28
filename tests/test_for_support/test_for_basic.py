@@ -134,6 +134,34 @@ def nonzero_constrained_rxn(base):
     return base
 
 
+def ngam_present(base):
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
+    met_i = cobra.Metabolite("h_c", "H")
+    met_j = cobra.Metabolite("h2o_c", "H2O")
+    met_k = cobra.Metabolite("pi_c", "HO4P")
+    rxn_1 = cobra.Reaction("ATPM")
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
+                           met_j: -1, met_k: 1})
+    rxn_1.lower_bound = 8.39
+    base.add_reactions([rxn_1])
+    return base
+
+
+def simple_atp_hydrolysis(base):
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
+    met_i = cobra.Metabolite("h_c", "H")
+    met_j = cobra.Metabolite("h2o_c", "H2O")
+    met_k = cobra.Metabolite("pi_c", "HO4P")
+    rxn_1 = cobra.Reaction("ATPM")
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
+                           met_j: -1, met_k: 1})
+    rxn_1.bounds = 0, 1000
+    base.add_reactions([rxn_1])
+    return base
+
+
 def model_builder(name):
     choices = {
         "three-missing": three_missing,
@@ -146,6 +174,8 @@ def model_builder(name):
         "irreversible_rxn": irreversible_rxn,
         "zero_constrained_rxn": zero_constrained_rxn,
         "nonzero_constrained_rxn": nonzero_constrained_rxn,
+        "ngam_present": ngam_present,
+        "simple_atp_hydrolysis": simple_atp_hydrolysis,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -242,3 +272,16 @@ def test_find_unconstrained_reactions(model, num):
     """Expect amount of unconstrained rxns to be identified correctly."""
     unconstrained_rxns = basic.find_unconstrained_reactions(model)
     assert len(unconstrained_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("ngam_present", 1),
+    ("simple_atp_hydrolysis", 0),
+    ("empty", 0)
+], indirect=["model"])
+def test_ngam_presence(model, num):
+    """Expect a single non growth-associated maintenance reaction."""
+    ngam_reaction = basic.find_ngam(model)
+    assert len(ngam_reaction) == num
+
+

@@ -50,11 +50,39 @@ def scatter_line_chart(df, y_title):
         height=500,
         xaxis=go.XAxis(
             title="Commit Hash" if x_axis == "commit_hash" else "Timestamp",
-            zeroline=True,
             tickangle=-45 if x_axis == "commit_hash" else 0
         ),
         yaxis=go.YAxis(
             title=y_title
+        )
+    )
+    return Markup(py.plot(go.Figure(data=data, layout=layout), **_DEFAULT_ARGS))
+
+
+def boolean_chart(df, y_title):
+    """Generate a reproducible plotly scatter and line plot."""
+    if len(df.columns) == 3:
+        x_axis, y_axis, factor = df.columns
+        data = go.Data([
+            go.Scatter(x=sub[x_axis], y=sub[y_axis].astype(int), name=key)
+            for key, sub in df.groupby(factor, as_index=False, sort=False)])
+    else:
+        x_axis, y_axis = df.columns
+        data = go.Data([
+            go.Scatter(x=df[x_axis], y=df[y_axis].astype(int))])
+    layout = go.Layout(
+        width=650,
+        height=500,
+        xaxis=go.XAxis(
+            title="Commit Hash" if x_axis == "commit_hash" else "Timestamp",
+            tickangle=-45 if x_axis == "commit_hash" else 0
+        ),
+        yaxis=go.YAxis(
+            title=y_title,
+            zeroline=False,
+            tickmode="array",
+            tickvals=[0, 1],
+            ticktext=["No", "Yes"]
         )
     )
     return Markup(py.plot(go.Figure(data=data, layout=layout), **_DEFAULT_ARGS))

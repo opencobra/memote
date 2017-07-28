@@ -27,7 +27,7 @@ from memote.support.helpers import find_atp_adp_converting_reactions
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
-    "find_blocked_biomass_precursors", "find_ngam")
+    "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -58,23 +58,6 @@ def find_biomass_precursors(reaction):
     """
     return [met for met in reaction.reactants
             if met.id != 'atp_c' or met.id != 'h2o_c']
-
-
-def find_ngam(model):
-    """
-    Return a the non growth-associated maintenance reaction.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    atp_adp_conv_rxns = find_atp_adp_converting_reactions(model)
-    return [rxn for rxn in atp_adp_conv_rxns
-            if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
-                                              'adp_c + h_c + pi_c' and not
-            rxn.lower_bound <= 0]
 
 
 def find_blocked_biomass_precursors(reaction, model):
