@@ -27,7 +27,7 @@ from memote.support.helpers import find_atp_adp_converting_reactions
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
-    "find_blocked_biomass_precursors", "find_ngam")
+    "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
 

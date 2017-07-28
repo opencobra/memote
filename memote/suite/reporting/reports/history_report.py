@@ -82,7 +82,7 @@ class HistoryReport(Report):
             basics=self._collect_basic_plots(),
             consistency=self._collect_consistency_plots(),
             # FIXME: Syntax tests and result retrieval are broken.
-#            syntax=self._collect_syntax_plots(),
+#            syntax=self._collect_syntax_plots(),  # noqa
             biomass=self._collect_biomass_plots(),
         )
 

@@ -109,7 +109,7 @@ class ResultBagWrapper(object):
         columns = ("commit", "num_genes", "num_reactions", "num_metabolites",
                    "num_metabolites_no_formula", "metabolites_no_charge",
                    "reactions_no_GPR",
-#                   "metabolic_coverage",
+#                   "metabolic_coverage",  # noqa
                    "ngam_reaction")
         data = pd.DataFrame(list(self._bag.map(_get_basics)), columns=columns)
         data.set_index("commit", inplace=True)
@@ -132,11 +132,11 @@ class ResultBagWrapper(object):
         LOGGER.debug("Collecting syntax information from bag.")
         self._assert_index_presence()
         columns = ("commit",
-#                   "reaction_compartment_suffix",
+#                   "reaction_compartment_suffix",  # noqa
                    "reaction_metabolite_compartment",
-#                   "untagged_normal_transport",
-#                   "untagged_abc_transport",
-#                   "uppercase_metabolites",
+#                   "untagged_normal_transport",  # noqa
+#                   "untagged_abc_transport",  # noqa
+#                   "uppercase_metabolites",  # noqa
                    "untagged_demand",
                    "false_demand", "untagged_sink", "false_sink",
                    "untagged_exchange", "false_exchange")
@@ -169,14 +169,15 @@ def _get_basics(elem):
             len(tmp["metabolites_no_formula"]),
             len(tmp["metabolites_no_charge"]),
             len(tmp["reactions_no_GPR"]),
-#            tmp["metabolic_coverage"],
+#            tmp["metabolic_coverage"],  # noqa
             tmp["ngam_reaction"])
 
 
 def _get_consistency(elem):
     """Collect results from `test_basic`."""
     tmp = elem["report"]["test_consistency"]
-    looped = tmp["looped_reactions"] if "looped_reactions" in tmp else float("nan")
+    looped = tmp["looped_reactions"] if "looped_reactions" in tmp else \
+        float("nan")
     return (elem["meta"]["commit_hash"],
             tmp["is_consistent"],
             len(tmp["unconserved_metabolites"]),
@@ -190,11 +191,11 @@ def _get_syntax(elem):
     """Collect results from `test_basic`."""
     tmp = elem["report"]["test_consistency"]
     return (elem["meta"]["commit_hash"],
-#            len(tmp["reaction_compartment_suffix"]),
+#            len(tmp["reaction_compartment_suffix"]),  # noqa
             len(tmp["reaction_metabolite_compartment"]),
-#            len(tmp["untagged_normal_transport"]),
-#            len(tmp["untagged_abc_transport"]),
-#            len(tmp["uppercase_metabolites"]),
+#            len(tmp["untagged_normal_transport"]),  # noqa
+#            len(tmp["untagged_abc_transport"]),  # noqa
+#            len(tmp["uppercase_metabolites"]),  # noqa
             len(tmp["untagged_demand"]),
             len(tmp["false_demand"]),
             len(tmp["untagged_sink"]),
