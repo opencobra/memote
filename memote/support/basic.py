@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import logging
 
-from memote.support.biomass import find_atp_adp_converting_reactions
+from memote.support.helpers import find_atp_adp_converting_reactions
 
 __all__ = ("check_metabolites_formula_presence",)
 
