@@ -58,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'memote'
-copyright = u"2017, Moritz E. Beber"
+copyright = u"2017, Novo Nordisk Foundation Center for Biosustainability, # Technical University of Denmark"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
