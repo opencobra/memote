@@ -13,10 +13,14 @@ Contents:
 
    readme
    installation
+   getting_started
+   flowchart
    usage
    contributing
    authors
    history
+   memote_tests
+
 
 Indices and tables
 ==================

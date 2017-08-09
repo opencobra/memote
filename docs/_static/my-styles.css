@@ -1,0 +1,43 @@
+#navbar.navbar.navbar-default.navbar-fixed-top {
+    background-color: #2A7BB8;
+}
+
+.navbar-brand {
+     padding: 10px 15px 15px 15px;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #FFF;
+}
+
+.navbar-default .navbar-text {
+    color: #ACD7E6;
+}
+
+.form-control{
+    color: #FFF;
+}
+
+input.form-control{
+    text-color: #FFF;
+}
+
+.form-control::-webkit-input-placeholder {
+    color: #ACD7E6;
+}  /* WebKit, Blink, Edge */
+
+.form-control:-moz-placeholder {
+    color: #ACD7E6;
+}  /* Mozilla Firefox 4 to 18 */
+
+.form-control::-moz-placeholder {
+    color: #ACD7E6;
+}  /* Mozilla Firefox 19+ */
+
+.form-control:-ms-input-placeholder {
+    color: #ACD7E6;
+}  /* Internet Explorer 10-11 */
+
+.form-control::-ms-input-placeholder {
+    color: #ACD7E6;
+}  /* Microsoft Edge */
