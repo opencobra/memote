@@ -68,10 +68,11 @@ def test_biomass_consistency(reaction, store):
 def test_biomass_default_production(model, reaction, store):
     """Expect biomass production in default medium."""
     store["biomass_default_flux"] = store.get("biomass_default_flux", list())
+    reaction = model.reactions.get_by_id(reaction.id)
     model.objective = reaction
     try:
-        solution = model.optimize()
-        flux = solution.fluxes[reaction.id]
+        model.slim_optimize()
+        flux = reaction.flux
     except Infeasible:
         flux = np.nan
     store["biomass_default_flux"].append(flux)
@@ -132,10 +133,11 @@ def test_fast_growth_default(model, reaction, store):
     This is based on lowest doubling time reported here
     http://www.pnnl.gov/science/highlights/highlight.asp?id=879
     """
+    reaction = model.reactions.get_by_id(reaction.id)
     model.objective = reaction
     try:
-        solution = model.optimize()
-        flux = solution.fluxes[reaction.id]
+        model.slim_optimize()
+        flux = reaction.flux
     except Infeasible:
         flux = np.nan
     assert flux <= 10.3972
