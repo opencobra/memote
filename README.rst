@@ -83,23 +83,23 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/midnighter/memote
+    $ git clone https://github.com/opencobra/memote.git
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/midnighter/memote/tarball/master
+    $ curl  -OL https://github.com/opencobra/memote/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ pip install .
 
 
-.. _Github repo: https://github.com/midnighter/memote
-.. _tarball: https://github.com/midnighter/memote/tarball/master
+.. _Github repo: https://github.com/opencobra/memote
+.. _tarball: https://github.com/opencobra/memote/tarball/master
 
 Copyright
 ---------
@@ -115,4 +115,3 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
-.. _`biosustain/cookiecutter-decaf-python`: https://github.com/biosustain/cookiecutter-decaf-python
