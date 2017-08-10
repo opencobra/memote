@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 2
 
    readme
-   installation
    getting_started
    flowchart
    usage
