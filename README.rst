@@ -57,7 +57,7 @@ Installation
 We highly recommend creating a Python virtualenv for your model tesing purposes.
 
 Stable release
-..............
+^^^^^^^^^^^^^^
 
 To install memote, run this command in your terminal:
 
@@ -75,7 +75,7 @@ you through the process.
 
 
 From sources
-............
+^^^^^^^^^^^^
 
 The sources for memote can be downloaded from the `Github repo`_.
 

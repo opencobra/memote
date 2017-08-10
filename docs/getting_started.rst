@@ -41,6 +41,8 @@ To illustrate here it is changed to 'report.html'.
 Comparative
 ^^^^^^^^^^^
 
+**This functionality is coming soon**
+
 Benchmarking one model against another is done by running the following
 command:
 
@@ -88,6 +90,7 @@ repository has been created under either the user's GitHub or GitLab account.
 To enable continuous integration via Travis CI the following command is
 executed:
 
+**This functionality is coming soon, a manual workaround is outlined in the `cookiecutter-memote readme`_**
 .. code-block:: console
 
     $ memote online
@@ -96,6 +99,7 @@ Now, after each edit to the model in the repository, the user can generate
 an update to the continuous model report shown at the project's gh-pages
 branch by saving the changes with the following command:
 
+**This functionality is coming soon, for now please utilize the steps outlined for advanced users**
 .. code-block:: console
 
     $ memote save
@@ -103,10 +107,12 @@ branch by saving the changes with the following command:
 For advanced users: `memote save` is the equivalent of executing `git add`,
 `git commit` and `git push` in sequence.
 
+.. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
+
 Offline, local or private workflow:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Users that have decided to not to use `GitHub`_ (or `GitLab`_) or those that
+Users that have decided to not to use `GitHub`_ (or `GitLab`_ **Not implemented yet**) or those that
 have decided to set the model repository to private, will need to execute:
 
 .. code-block:: console
