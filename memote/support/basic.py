@@ -74,10 +74,23 @@ def find_ngam(model):
     """
     Return a the non growth-associated maintenance reaction.
 
+    From the list of all reactions that convert atp to adp select the reactions
+    that match a defined reaction string and whose lower bound is constrained
+    to be larger than zero.
+
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
+    Returns
+    -------
+    list
+        Reactions that qualify as non-growth associated maintenance reactions.
+
+    Notes
+    -----
+
 
     """
     atp_adp_conv_rxns = find_atp_adp_converting_reactions(model)
@@ -91,7 +104,27 @@ def calculate_metabolic_coverage(model):
     """
     Return the ratio of reactions and genes included in the model.
 
-    According to [1] this is a good quality indicator expressing the degree of
+    Determine whether the amount of reactions and genes in model not equal to
+    zero, then return the ratio.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns
+    -------
+    float
+        The ratio of reactions to genes also called metabolic coverage.
+
+    Raises
+    ------
+    ValueError
+        If the model does not contain either reactions or genes.
+
+    Notes
+    -----
+    According to [1]_ this is a good quality indicator expressing the degree of
     metabolic coverage i.e. modeling detail of a given reconstruction. The
     authors explain that models with a 'high level of modeling detail have
     ratios >1, and [models] with low level of detail have ratios <1'. They
@@ -101,8 +134,8 @@ def calculate_metabolic_coverage(model):
 
     References
     ----------
-    [1] Monk, J., Nogales, J., & Palsson, B. O. (2014). Optimizing genome-scale
-    network reconstructions. Nature Biotechnology, 32(5), 447–452.
+    ..[1] Monk, J., Nogales, J., & Palsson, B. O. (2014). Optimizing
+    genome-scale network reconstructions. Nature Biotechnology, 32(5), 447–452.
     http://doi.org/10.1038/nbt.2870
 
     """
