@@ -115,3 +115,13 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+Contact
+-------
+
+For comments and questions, please get in touch with us on our `Memote Gitter`_.
+For suggestions on the implementation of novel tests, bugs and issues with the current software,
+please consider :ref:`contributing` or opening an issue_.
+
+.._Memote Gitter: https://gitter.im/biosustain/memote
+.._issue: https://github.com/opencobra/memote/issues
