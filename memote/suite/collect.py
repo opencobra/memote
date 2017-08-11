@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+import os
 import io
 import platform
 import logging
@@ -140,13 +141,6 @@ class ResultCollectionPlugin(object):
         """Provide a pristine model for a test unit."""
         return read_only_model.copy()
 
-    def pytest_namespace(self):
-        """Inject global static values into the pytest namespace."""
-        blob = dict()
-        blob["biomass_reactions"] = find_biomass_reaction(self._sbml_model)
-        blob["biomass_ids"] = [rxn.id for rxn in blob["biomass_reactions"]]
-        return blob
-
     @pytest.fixture(scope="module")
     def store(self, request):
         """Expose a `dict` to store values on."""
@@ -159,6 +153,8 @@ class ResultCollectionPlugin(object):
 
     def pytest_sessionstart(self):
         """Record environment information of the pytest session."""
+        os.environ["BIOMASS_REACTIONS"] = "|".join([
+             rxn.id for rxn in find_biomass_reaction(self._sbml_model)])
         if self.mode == "basic":
             return
         self._meta["platform"] = platform.system()

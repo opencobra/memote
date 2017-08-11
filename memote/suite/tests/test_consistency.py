@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Supporting functions for stoichiometric consistency checks."""
+"""Stoichiometric consistency tests for an instance of ``cobra.Model``."""
 
 from __future__ import absolute_import
 

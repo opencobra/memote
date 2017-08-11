@@ -1,6 +1,6 @@
-================
-Model Test Suite
-================
+==========
+Test Suite
+==========
 
 .. toctree::
    :maxdepth: 2
