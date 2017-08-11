@@ -38,7 +38,7 @@ with warnings.catch_warnings():
 import memote.support.biomass as biomass
 
 
-BIOMASS_IDS = os.environ["BIOMASS_REACTIONS"].split("|")
+BIOMASS_IDS = os.environ.get("BIOMASS_REACTIONS", "").split("|")
 
 
 def test_biomass_presence(store):
