@@ -4,23 +4,76 @@
 Getting Started
 ===============
 
-After installation, memote can be employed in two different ways: As a
-benchmarking tool for ad hoc performance testing, and as a testing suite to aid
-with the reconstruction of metabolic models. When using memote to benchmark a
-model, the tests are run once and a report is generated which depicts the
-status-quo. Opposed to this, memote as a testing suite sets up a
-version-controlled repository, enables continuous integration via Travis CI and
-produces a performance report with each incremental change.
+Installation
+============
 
-Here, we explain step by step the necessary commands to pursue either workflow.
+We highly recommend creating a Python virtualenv for your model tesing purposes.
+
+Stable release
+--------------
+
+To install memote, run this command in your terminal:
+
+.. code-block:: console
+
+    $ pip install memote
+
+This is the preferred method to install memote, as it will always install the most recent stable release.
+
+If you don't have `pip`_ installed, this `Python installation guide`_ can guide
+you through the process.
+
+.. _pip: https://pip.pypa.io
+.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+
+From sources
+------------
+
+The sources for memote can be downloaded from the `Github repo`_.
+
+You can either clone the public repository:
+
+.. code-block:: console
+
+    $ git clone https://github.com/opencobra/memote.git
+
+Or download the `tarball`_ or zip archive:
+
+.. code-block:: console
+
+    $ curl  -OL https://github.com/opencobra/memote/tarball/master
+
+Once you have a copy of the source files, you can install it with:
+
+.. code-block:: console
+
+    $ pip install .
+
+
+.. _Github repo: https://github.com/opencobra/memote
+.. _tarball: https://github.com/opencobra/memote/tarball/master
+
+
+After installation, memote can be employed in two different ways: As a
+benchmarking tool for ad hoc model assessment and as an automated testing
+suite to aid
+with the reconstruction of metabolic models. When using memote to benchmark a
+model, the tests are run once and a report is generated which describes the
+status-quo.
+As an automated testing suite, memote facilitates tracking incremental model
+changes in a
+ version controlled repository and can enable continuous testing and
+ reporting if desired.
+
+Here, we explain step-by-step the necessary commands to pursue either workflow.
 Users that have already followed this tutorial once may want to refer to the
 :doc:`cheat-sheet flowchart <flowchart>` to refresh their memory.
 
 Benchmark
----------
+=========
 
 Single Model
-^^^^^^^^^^^^
+------------
 
 To benchmark the performance of a single model, run this command in your
 terminal:
@@ -29,32 +82,27 @@ terminal:
 
     $ memote --model path/to/model.xml report --one-time
 
-This will generate the performance report as index.html
+This will generate the performance report as ``index.html``.
 
 The output filename can be changed by adding the following option.
-To illustrate here it is changed to 'report.html'.
+To illustrate here it is changed to ``report.html``.
 
 .. code-block:: console
 
     $ memote --model path/to/model.xml report --one-time --filename "report.html"
 
 Comparative
-^^^^^^^^^^^
+-----------
 
-**This functionality is coming soon**
+**This functionality is coming soon.**
 
-Benchmarking one model against another is done by running the following
-command:
-
-.. code-block:: console
-
-    $ memote --model path/to/model.xml report --diff path/to/model2.xml
+Comparing two models against each other and quickly identify the differences.
 
 Reconstruction
---------------
+==============
 
-When starting a memote repository, users need to provide a SBMLv3-FBC formatted
-.xml file. Automatic draft reconstruction tools such as `Pathway Tools`_,
+When starting a memote repository, users need to provide an SBMLv3-FBC formatted
+file. Automatic draft reconstruction tools such as `Pathway Tools`_,
 `Model SEED`_, `The RAVEN Toolbox`_ and `others`_ are able to output files in
 this format. Model repositories such as `BiGG`_ or `BioModels`_ further serve
 as a great resource for models in the correct format.
@@ -74,7 +122,7 @@ simple as running the following command:
     $ memote new
 
 CI tested, online and public workflow:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------
 
 After this, the user will be prompted with a few questions regarding details of
 the project. If the project is to be kept strictly locally, the user does
@@ -110,7 +158,7 @@ For advanced users: `memote save` is the equivalent of executing `git add`,
 .. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
 
 Offline, local or private workflow:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------
 
 Users that have decided to not to use `GitHub`_ (or `GitLab`_ **Not implemented yet**) or those that
 have decided to set the model repository to private, will need to execute:

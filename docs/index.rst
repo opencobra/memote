@@ -3,22 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to memote's documentation!
-======================================
+====================================================
+memote - the genome-scale metabolic model test suite
+====================================================
 
-Contents:
+.. include:: ../README.rst
+    :start-after: summary-start
+    :end-before: summary-end
+
+.. include:: ../README.rst
+    :start-after: who-start
+    :end-before: who-end
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
 
-   readme
    getting_started
    flowchart
-   usage
+   memote_tests
    contributing
    authors
    history
-   memote_tests
 
 
 Indices and tables

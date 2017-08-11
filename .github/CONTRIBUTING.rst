@@ -9,13 +9,10 @@ little bit helps, and credit will always be given.
 
 You can contribute in many ways:
 
-Types of Contributions
-----------------------
-
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/biosustain/memote/issues.
+Report bugs at https://github.com/opencobra/memote/issues.
 
 If you are reporting a bug, please include:
 
@@ -68,27 +65,29 @@ Ready to contribute? Here's how to set up `memote` for local development.
 
     mkvirtualenv memote
     cd memote/
-    python setup.py develop
+    pip install -e .
 
-4. Create a branch for local development::
+4. Create a branch for local development using ``fix`` or ``feat`` as a prefix::
 
-    git checkout -b name-of-your-bugfix-or-feature
+    git checkout -b fix-name-of-your-bugfix
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass flake8 and
+   the tests, including testing other Python versions. This is all included
+   with tox::
 
-    flake8 memote tests
-    python setup.py test or py.test
     tox
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+   You can run all tests in parallel using detox. To get tox and detox, just
+   pip install them into your virtualenv.
 
-6. Commit your changes and push your branch to GitHub::
+6. Commit your changes and push your branch to GitHub. Please use `semantic
+   commit messages <http://>`_::
 
     git add .
-    git commit -m "Your detailed description of your changes."
-    git push origin name-of-your-bugfix-or-feature
+    git commit -m "fix: Your detailed description of your changes."
+    git push origin fix-name-of-your-bugfix
 
 7. Submit a pull request through the GitHub website.
 
@@ -99,8 +98,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
-   your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4 and 3.5. Check
-   https://travis-ci.org/biosustain/memote/pull_requests
+   your new functionality into a function with a docstring.
+3. The pull request should work for Python 2.7, 3.4, 3.5 and 3.6. Check
+   https://travis-ci.org/opencobra/memote/pull_requests
    and make sure that the tests pass for all supported Python versions.
