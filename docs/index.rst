@@ -23,7 +23,7 @@ Contents
 
    getting_started
    flowchart
-   memote_tests
+   test_suite
    contributing
    authors
    history
