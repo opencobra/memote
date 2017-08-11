@@ -7,7 +7,9 @@ Getting Started
 Installation
 ============
 
-We highly recommend creating a Python virtualenv for your model tesing purposes.
+We highly recommend creating a Python `virtualenv`_ for your model tesing purposes.
+
+.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
 Stable release
 --------------
@@ -61,9 +63,8 @@ with the reconstruction of metabolic models. When using memote to benchmark a
 model, the tests are run once and a report is generated which describes the
 status-quo.
 As an automated testing suite, memote facilitates tracking incremental model
-changes in a
- version controlled repository and can enable continuous testing and
- reporting if desired.
+changes in a version controlled repository and can enable continuous testing and
+reporting if desired.
 
 Here, we explain step-by-step the necessary commands to pursue either workflow.
 Users that have already followed this tutorial once may want to refer to the
@@ -138,7 +139,10 @@ repository has been created under either the user's GitHub or GitLab account.
 To enable continuous integration via Travis CI the following command is
 executed:
 
-**This functionality is coming soon, a manual workaround is outlined in the `cookiecutter-memote readme`_**
+**This functionality is coming soon, a manual workaround is outlined in the `cookiecutter-memote readme`_ .**
+
+.. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
+
 .. code-block:: console
 
     $ memote online
@@ -147,15 +151,14 @@ Now, after each edit to the model in the repository, the user can generate
 an update to the continuous model report shown at the project's gh-pages
 branch by saving the changes with the following command:
 
-**This functionality is coming soon, for now please utilize the steps outlined for advanced users**
+**This functionality is coming soon, for now please utilize the steps outlined for advanced users.**
+
 .. code-block:: console
 
     $ memote save
 
-For advanced users: `memote save` is the equivalent of executing `git add`,
+For advanced users: `memote save` is the equivalent of executing `git add .`,
 `git commit` and `git push` in sequence.
-
-.. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
 
 Offline, local or private workflow:
 -----------------------------------
