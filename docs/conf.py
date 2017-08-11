@@ -15,6 +15,7 @@
 
 import os
 import sys
+from os.path import dirname, join
 
 import sphinx_bootstrap_theme
 
@@ -27,13 +28,13 @@ import sphinx_bootstrap_theme
 
 # Get the project root dir, which is the parent dir of this
 cwd = os.getcwd()
-project_root = os.path.dirname(cwd)
+project_root = dirname(cwd)
 
 # Insert the project root dir as the first element in the PYTHONPATH.
 # This lets us ensure that the source package is imported, and that its
 # version is used.
 sys.path.insert(0, project_root)
-
+sys.path.insert(1, join(project_root, "memote", "suite", "tests"))
 
 # -- General configuration ---------------------------------------------
 
@@ -58,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'memote'
-copyright = u"2017, Novo Nordisk Foundation Center for Biosustainability, # Technical University of Denmark"
+copyright = u"2017, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -128,7 +129,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "Memote"
+html_title = "memote"
 
 # A shorter title for the navigation bar.  Default is the same as
 # html_title.
@@ -151,7 +152,7 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page
 # bottom, using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -178,7 +179,7 @@ html_static_path = ['_static']
 
 # If true, "Created using Sphinx" is shown in the HTML footer.
 # Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer.
 # Default is True.

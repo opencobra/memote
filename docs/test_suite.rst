@@ -1,6 +1,6 @@
-============
-Memote Suite
-============
+==========
+Test Suite
+==========
 
 .. toctree::
    :maxdepth: 2

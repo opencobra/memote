@@ -1,7 +1,6 @@
-======
-memote
-======
-
+====================================================
+memote - the genome-scale metabolic model test suite
+====================================================
 
 .. image:: https://img.shields.io/pypi/v/memote.svg
         :target: https://pypi.python.org/pypi/memote
@@ -21,14 +20,14 @@ memote
         :target: https://codecov.io/gh/biosustain/memote
         :alt: Coverage
 
-Genome-scale metabolic model test suite.
+.. summary-start
 
-Our goal in promoting this tool is to achieve to major shifts in the metabolic
+Our goal in promoting this tool is to achieve two major shifts in the metabolic
 model building community:
 
 1. Models should be version-controlled such that changes can be tracked and if
    necessary reverted. Ideally, they should be available through a public
-   repository such as on GitHub. That will allow other researchers to inspect,
+   repository such as GitHub that will allow other researchers to inspect,
    share, and contribute to the model.
 2. Models should, for the benefit of the community and for research gain, live
    up to certain standards and minimal functionality.
@@ -36,44 +35,63 @@ model building community:
 The `memote` tool therefore performs four subfunctions:
 
 1. Create a skeleton git repository for the model.
-2. Run the current model through a test suite which we hope will be the
-   representation of the community standard.
+2. Run the current model through a test suite that represents the community
+   standard.
 3. Generate an informative report which details the results of the test suite in
    a visually appealing manner.
 4. (Re-)compute test statistics for an existing version controlled history of
-   the model at hand.
+   a metabolic model.
 
 And in order to make this process as easy as possible the generated repository
-can easily be integrated with Travis CI which means that anytime you push a
+can easily be integrated with continuous integration testing providers such as
+Travis CI, which means that anytime you push a
 model change to GitHub, the test suite will be run automatically and a report
 will be available for you to look at via GitHub pages for your repository.
 
+.. summary-end
+
 * Documentation: https://memote.readthedocs.io.
 
-
 Installation
-------------
+============
 
-We highly recommend creating a Python virtualenv for your model tesing purposes. For the time being `memote` is changing
-too quickly and will only be submitted to PyPi at a later stage. We try to keep the ``develop`` branch stable. The
-``master`` branch is often very outdated.
+We highly recommend creating a Python virtualenv for your model tesing purposes.
 
-.. code-block:: bash
+To install memote, run this command in your terminal:
 
-    pip install https://github.com/biosustain/memote/archive/develop.zip
+.. code-block:: console
+
+    $ pip install memote
+
+This is the preferred method to install memote, as it will always install the most recent stable release.
+
+.. who-start
+
+Contact
+=======
+
+For comments and questions get in touch via
+
+* our `gitter chatroom <https://gitter.im/opencobra/memote>`_
+* or using the `GitHub issues <https://github.com/opencobra/memote/issues>`_.
+
+Are you excited about this project? Consider :ref:`contributing` by adding
+novel tests, reporting or fixing bugs, and generally help us make this a
+better software for everyone.
 
 Copyright
----------
+=========
 
 * Copyright (c) 2017 Novo Nordisk Foundation Center for Biosustainability,
   Technical University of Denmark.
 * Free software: `Apache Software License 2.0 <LICENSE>`_
 
+.. who-end
+
 Credits
--------
+=======
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
-.. _`biosustain/cookiecutter-decaf-python`: https://github.com/biosustain/cookiecutter-decaf-python

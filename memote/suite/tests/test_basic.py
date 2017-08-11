@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Perform basic tests on an instance of `cobra.Model`."""
+"""Perform basic tests on an instance of ``cobra.Model``."""
 
 from __future__ import absolute_import
 

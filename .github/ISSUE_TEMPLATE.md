@@ -1,6 +1,6 @@
-* memote version:
-* Python version:
 * Operating System:
+* Python version:
+* memote version:
 
 ### Description
 
