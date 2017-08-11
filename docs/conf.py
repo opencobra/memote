@@ -36,9 +36,6 @@ project_root = dirname(cwd)
 sys.path.insert(0, project_root)
 sys.path.insert(1, join(project_root, "memote", "suite", "tests"))
 
-#for root, dirs, files in os.walk(project_root):
-#    sys.path.insert(1, project_root)
-
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
