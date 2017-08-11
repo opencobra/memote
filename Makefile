@@ -51,7 +51,7 @@ lint: ## check style with flake8
 	flake8 memote tests
 
 test: ## run tests quickly with the default Python
-	py.test
+	pytest tests/
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -74,12 +74,10 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: clean ## package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	python setup.py sdist bdist_wheel upload
 
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python setup.py sdist bdist_wheel
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
