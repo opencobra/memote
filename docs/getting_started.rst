@@ -89,7 +89,7 @@ To illustrate here it is changed to ``report.html``.
 
 .. code-block:: console
 
-    $ memote --model path/to/model.xml report --one-time --filename "report.html"
+    $ memote --model path/to/model.xml --filename "report.html" report --one-time
 
 Comparative
 -----------
