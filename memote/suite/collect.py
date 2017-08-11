@@ -154,7 +154,7 @@ class ResultCollectionPlugin(object):
     def pytest_sessionstart(self):
         """Record environment information of the pytest session."""
         os.environ["BIOMASS_REACTIONS"] = "|".join([
-             rxn.id for rxn in find_biomass_reaction(self._sbml_model)])
+            rxn.id for rxn in find_biomass_reaction(self._sbml_model)])
         if self.mode == "basic":
             return
         self._meta["platform"] = platform.system()
