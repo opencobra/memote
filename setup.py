@@ -27,9 +27,6 @@ from setuptools import find_packages, setup
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst") as history_file:
-    history = history_file.read()
-
 setup_requirements = []
 # prevent pytest-runner from being installed on every invocation
 if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
@@ -63,8 +60,8 @@ test_requirements = [
 setup(
     name="memote",
     version="0.3.4",
-    description="Genome-scale metabolic model test suite.",
-    long_description=readme + "\n\n" + history,
+    description="the genome-scale metabolic model test suite",
+    long_description=readme,
     author="Moritz E. Beber",
     author_email="morbeb@biosustain.dtu.dk",
     url="https://github.com/opencobra/memote",
