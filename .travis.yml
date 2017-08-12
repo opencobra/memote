@@ -41,7 +41,7 @@ deploy:
   distributions: sdist bdist_wheel
   on:
     repo: opencobra/memote
-    python: '3.5'
+    python: '3.6'
     tags: true
   user:
     secure: MM0+CQ7jYF3TmWM15UfjJANGb1rRLY+GjEro4G/8teSOxyGxR+PzWeViJn86TJsDD+AaYy7/mvq5lF7QN5q4tcxmr9uVVH9iOzZk/HcT0raD3Lk1GcS0h6N6LxG3sz1XqOOa224hp9VK1U/9ryvaiOzZo4KAh/h1uz0QafNWNPCBZ3CfRV1dCw7NI7TAthpCy8mTMYUZko/uGo86wwT1ks005yOeefuG3zqwvJCRnhpqR2Ky+/GwnxW9it+uVOpc7cHPOOQkNxbA1veLzvfaGdg2x3ceRi0kvRfHhKVudwwzxXWfz/HScEmNYLglkwvf/E34N+JfBxpVkjtvFRDopvTbHb98ctJflKvv1I4UnBZSP9sLiJ012OC+4q9YNy78MFrGQhoSC+aTi9K+teLFMxvoiVvlDattjuvXOAxpxaamJd6eLdj3AfpGqOCB0r6X8ixi1/UcCFjTt8oRyFofb5P5tkUGdWjGjRyh9OqQidpNpM5qyOnaQ7Vz4JuPrRl5/LSThdSvRWV8Q3JBUhf383nHc1z+uCZ4T4uLBmfMcKvZErAOEDuJeB/g8vLvG28SfyUTfGTvFeEVm8E7bCpQWodZ8FKxau+6BZru01kDtASQzPgwdnfUOPPtNVwRW8NMc+X18VNckTf6GVoXbvHu61c+kq6CkOqSOIhHOa+fWWM=
