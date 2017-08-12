@@ -308,7 +308,7 @@ def new(ctx):
     directory = ctx.obj["directory"]
     if directory is None:
         directory = os.getcwd()
-    cookiecutter("gh:biosustain/cookiecutter-memote", output_dir=directory)
+    cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory)
 
 
 @cli.command()
