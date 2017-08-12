@@ -2,6 +2,19 @@
 History
 =======
 
+0.3.0 (2017-08-12)
+------------------
+
+* Greatly extend the core test modules:
+  * basic
+  * consistency
+  * biomass
+  * annotation
+  * syntax
+* Add an Angular-material based report with plotly.
+* Add documentation on readthedocs.io.
+* Make the first release on PyPi.
+
 0.2.0 (2017-02-09)
 ------------------
 
