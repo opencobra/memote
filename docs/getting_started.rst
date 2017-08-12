@@ -142,7 +142,7 @@ To enable continuous integration via Travis CI the following command is
 executed:
 
 **This functionality is coming soon.** A manual workaround is outlined in the
-`cookiecutter-memote readme <https://github.com/opencobra/cookiecutter-memote/README.md>`_.
+`cookiecutter-memote readme <https://github.com/opencobra/cookiecutter-memote/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/README.md>`_.
 
 .. code-block:: console
 

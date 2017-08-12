@@ -271,7 +271,7 @@ def find_false_sink_rxns(model):
 
 def find_untagged_exchange_rxns(model):
     """
-    Find exchange reactions whose IDs do not begin with ``EX_``.
+    Find exchange reactions whose identifiers do not begin with ``EX_``.
 
     Parameters
     ----------
@@ -287,7 +287,7 @@ def find_untagged_exchange_rxns(model):
 
 def find_false_exchange_rxns(model):
     """
-    Find reactions which are tagged with ``EX_`` but which are not exchange rxns.
+    Find reactions that are tagged with ``EX_`` but are not exchange reactions.
 
         Parameters
     ----------
