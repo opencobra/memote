@@ -1,4 +1,5 @@
 .. highlight:: shell
+.. _contributing:
 
 ============
 Contributing
@@ -42,7 +43,8 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/biosustain/memote/issues.
+The best way to send feedback is to file an issue at
+https://github.com/opencobra/memote/issues.
 
 If you are proposing a feature:
 
@@ -83,7 +85,7 @@ Ready to contribute? Here's how to set up `memote` for local development.
    pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub. Please use `semantic
-   commit messages <http://>`_::
+   commit messages <https://seesparkbox.com/foundry/semantic_commit_messages>`_::
 
     git add .
     git commit -m "fix: Your detailed description of your changes."

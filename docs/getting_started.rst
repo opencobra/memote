@@ -25,7 +25,7 @@ This is the preferred method to install memote, as it will always install the mo
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
-.. _pip: https://pip.pypa.io
+.. _pip: https://pip.pypa.io/en/stable/
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
 From sources
@@ -39,11 +39,13 @@ You can either clone the public repository:
 
     $ git clone https://github.com/opencobra/memote.git
 
-Or download the `tarball`_ or zip archive:
+Or download the `tarball
+<https://github.com/opencobra/memote/archive/master.tar.gz>`_ or
+`zip <https://github.com/opencobra/memote/archive/master.zip>`_ archive:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/opencobra/memote/tarball/master
+    $ curl  -OL https://github.com/opencobra/memote/archive/master.zip
 
 Once you have a copy of the source files, you can install it with:
 
@@ -53,7 +55,6 @@ Once you have a copy of the source files, you can install it with:
 
 
 .. _Github repo: https://github.com/opencobra/memote
-.. _tarball: https://github.com/opencobra/memote/tarball/master
 
 
 After installation, memote can be employed in two different ways: As a
