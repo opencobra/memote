@@ -8,8 +8,8 @@ memote - the genome-scale metabolic model test suite
 .. image:: https://img.shields.io/travis/opencobra/memote.svg
         :target: https://travis-ci.org/opencobra/memote
 
-.. image:: https://readthedocs.org/projects/memote/badge/?version=latest
-        :target: https://memote.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/memote/badge/?version=stable
+        :target: https://memote.readthedocs.io/en/stable/?badge=stable
         :alt: Documentation Status
 
 .. image:: https://codecov.io/gh/opencobra/memote/branch/master/graph/badge.svg
