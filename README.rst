@@ -5,19 +5,19 @@ memote - the genome-scale metabolic model test suite
 .. image:: https://img.shields.io/pypi/v/memote.svg
         :target: https://pypi.python.org/pypi/memote
 
-.. image:: https://img.shields.io/travis/biosustain/memote.svg
-        :target: https://travis-ci.org/biosustain/memote
+.. image:: https://img.shields.io/travis/opencobra/memote.svg
+        :target: https://travis-ci.org/opencobra/memote
 
 .. image:: https://readthedocs.org/projects/memote/badge/?version=latest
         :target: https://memote.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/biosustain/memote/shield.svg
-     :target: https://pyup.io/repos/github/biosustain/memote/
+.. image:: https://pyup.io/repos/github/opencobra/memote/shield.svg
+     :target: https://pyup.io/repos/github/opencobra/memote/
      :alt: Updates
 
-.. image:: https://codecov.io/gh/biosustain/memote/branch/master/graph/badge.svg
-        :target: https://codecov.io/gh/biosustain/memote
+.. image:: https://codecov.io/gh/opencobra/memote/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/opencobra/memote
         :alt: Coverage
 
 .. summary-start
@@ -75,7 +75,8 @@ For comments and questions get in touch via
 * our `gitter chatroom <https://gitter.im/opencobra/memote>`_
 * or using the `GitHub issues <https://github.com/opencobra/memote/issues>`_.
 
-Are you excited about this project? Consider :ref:`contributing <contributing>`
+Are you excited about this project? Consider `contributing
+</.github/CONTRIBUTING.rst>`_
 by adding novel tests, reporting or fixing bugs, and generally help us make
 this a better software for everyone.
 

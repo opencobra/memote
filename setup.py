@@ -67,7 +67,7 @@ setup(
     long_description=readme + "\n\n" + history,
     author="Moritz E. Beber",
     author_email="morbeb@biosustain.dtu.dk",
-    url="https://github.com/biosustain/memote",
+    url="https://github.com/opencobra/memote",
     packages=find_packages(),
     include_package_data=True,
     setup_requires=setup_requirements,
