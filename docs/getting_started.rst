@@ -7,7 +7,8 @@ Getting Started
 Installation
 ============
 
-We highly recommend creating a Python `virtualenv`_ for your model tesing purposes.
+We highly recommend creating a Python `virtualenv`_ for your model testing
+purposes.
 
 .. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
@@ -135,14 +136,13 @@ collaboration and community feedback. It is important to note that furthermore
 a public repository is needed to set up automatic testing through continuous
 integration, one of the key features of memote.
 
-Once all the questions following `memote new` have been answered, a public
+Once all the questions following ``memote new`` have been answered, a public
 repository has been created under either the user's GitHub or GitLab account.
 To enable continuous integration via Travis CI the following command is
 executed:
 
-**This functionality is coming soon, a manual workaround is outlined in the `cookiecutter-memote readme`_ .**
-
-.. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
+**This functionality is coming soon.** A manual workaround is outlined in the
+`cookiecutter-memote readme <https://github.com/opencobra/cookiecutter-memote/README.md>`_.
 
 .. code-block:: console
 
@@ -158,8 +158,8 @@ branch by saving the changes with the following command:
 
     $ memote save
 
-For advanced users: `memote save` is the equivalent of executing `git add .`,
-`git commit` and `git push` in sequence.
+For advanced users: ``memote save`` is the equivalent of executing ``git add .``,
+``git commit`` and ``git push`` in sequence.
 
 Offline, local or private workflow:
 -----------------------------------
@@ -179,7 +179,7 @@ to run the testing suite on their commit history followed by:
 
 to generate the same type of report that would be shown automatically with
 continuous integration. After this it is crucial to save the generated test
-results by running `memote save` again.
+results by running ``memote save`` again.
 
 We recommend the public workflow not only to promote open, collaborative
 science but also to benefit from the full functionality of memote.
