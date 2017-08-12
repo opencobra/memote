@@ -30,17 +30,19 @@ def find_transport_reactions(model):
     """
     Return a list of all transport reactions.
 
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Notes
+    -----
     A transport reaction is defined as follows:
     1. It contains metabolites from at least 2 compartments and
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
     the formula stays the same on both sides of the equation.
 
-    Will not identify transport via the PTS System.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
+    This function will not identify transport via the PTS System.
 
     """
     compartment_spanning_rxns = \
@@ -116,6 +118,13 @@ def find_demand_reactions(model):
     """
     Return a list of demand reactions.
 
+    Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    Notes
+    -----
     [1] defines demand reactions as:
     -- 'unbalanced network reactions that allow the accumulation of a compound'
     -- reactions that are chiefly added during the gap-filling process
@@ -129,16 +138,12 @@ def find_demand_reactions(model):
     are not removed from the extracellular environment, but from any of the
     organism's compartments.
 
-    Parameters
-    ----------
-    model : cobra.Model
-            A cobrapy metabolic model
-
     References
     ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+    .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
+           generating a high-quality genome-scale metabolic reconstruction.
+           Nature protocols. Nature Publishing Group.
+           http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
@@ -151,6 +156,13 @@ def find_sink_reactions(model):
     """
     Return a list of sink reactions.
 
+    Parameters
+    ----------
+    model : cobra.Model
+             A cobrapy metabolic model
+
+    Notes
+    -----
     [1] defines sink reactions as:
     -- 'similar to demand reactions' but reversible, thus able to supply the
     model with metabolites
@@ -163,16 +175,12 @@ def find_sink_reactions(model):
     are not removed from the extracellular environment, but from any of the
     organism's compartments.
 
-    Parameters
-    ----------
-    model : cobra.Model
-             A cobrapy metabolic model
-
     References
     ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+    .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
+           generating a high-quality genome-scale metabolic reconstruction.
+           Nature protocols. Nature Publishing Group.
+           http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
@@ -185,6 +193,13 @@ def find_exchange_rxns(model):
     """
     Return a list of exchange reactions.
 
+    Parameters
+    ----------
+    model : cobra.Model
+            A cobrapy metabolic model
+
+    Notes
+    -----
     [1] defines exchange reactions as:
     -- reactions that 'define the extracellular environment'
     -- 'unbalanced, extra-organism reactions that represent the supply to or
@@ -196,16 +211,12 @@ def find_exchange_rxns(model):
     are removed from or added to the extracellular environment only. With this
     the uptake or secretion of a metabolite is modeled, respectively.
 
-    Parameters
-    ----------
-    model : cobra.Model
-            A cobrapy metabolic model
-
     References
     ----------
-    [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for generating
-    a high-quality genome-scale metabolic reconstruction. Nature protocols.
-    Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
+    .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
+           generating a high-quality genome-scale metabolic reconstruction.
+           Nature protocols. Nature Publishing Group.
+           http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
