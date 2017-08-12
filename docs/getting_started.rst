@@ -7,7 +7,10 @@ Getting Started
 Installation
 ============
 
-We highly recommend creating a Python virtualenv for your model tesing purposes.
+We highly recommend creating a Python `virtualenv`_ for your model testing
+purposes.
+
+.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
 Stable release
 --------------
@@ -23,7 +26,7 @@ This is the preferred method to install memote, as it will always install the mo
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
-.. _pip: https://pip.pypa.io
+.. _pip: https://pip.pypa.io/en/stable/
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
 From sources
@@ -37,11 +40,13 @@ You can either clone the public repository:
 
     $ git clone https://github.com/opencobra/memote.git
 
-Or download the `tarball`_ or zip archive:
+Or download the `tarball
+<https://github.com/opencobra/memote/archive/master.tar.gz>`_ or
+`zip <https://github.com/opencobra/memote/archive/master.zip>`_ archive:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/opencobra/memote/tarball/master
+    $ curl  -OL https://github.com/opencobra/memote/archive/master.zip
 
 Once you have a copy of the source files, you can install it with:
 
@@ -51,7 +56,6 @@ Once you have a copy of the source files, you can install it with:
 
 
 .. _Github repo: https://github.com/opencobra/memote
-.. _tarball: https://github.com/opencobra/memote/tarball/master
 
 
 After installation, memote can be employed in two different ways: As a
@@ -61,9 +65,8 @@ with the reconstruction of metabolic models. When using memote to benchmark a
 model, the tests are run once and a report is generated which describes the
 status-quo.
 As an automated testing suite, memote facilitates tracking incremental model
-changes in a
- version controlled repository and can enable continuous testing and
- reporting if desired.
+changes in a version controlled repository and can enable continuous testing and
+reporting if desired.
 
 Here, we explain step-by-step the necessary commands to pursue either workflow.
 Users that have already followed this tutorial once may want to refer to the
@@ -133,12 +136,14 @@ collaboration and community feedback. It is important to note that furthermore
 a public repository is needed to set up automatic testing through continuous
 integration, one of the key features of memote.
 
-Once all the questions following `memote new` have been answered, a public
+Once all the questions following ``memote new`` have been answered, a public
 repository has been created under either the user's GitHub or GitLab account.
 To enable continuous integration via Travis CI the following command is
 executed:
 
-**This functionality is coming soon, a manual workaround is outlined in the `cookiecutter-memote readme`_**
+**This functionality is coming soon.** A manual workaround is outlined in the
+`cookiecutter-memote readme <https://github.com/opencobra/cookiecutter-memote/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/README.md>`_.
+
 .. code-block:: console
 
     $ memote online
@@ -147,15 +152,14 @@ Now, after each edit to the model in the repository, the user can generate
 an update to the continuous model report shown at the project's gh-pages
 branch by saving the changes with the following command:
 
-**This functionality is coming soon, for now please utilize the steps outlined for advanced users**
+**This functionality is coming soon, for now please utilize the steps outlined for advanced users.**
+
 .. code-block:: console
 
     $ memote save
 
-For advanced users: `memote save` is the equivalent of executing `git add`,
-`git commit` and `git push` in sequence.
-
-.. _cookiecutter-memote readme: https://github.com/opencobra/cookiecutter-memote
+For advanced users: ``memote save`` is the equivalent of executing ``git add .``,
+``git commit`` and ``git push`` in sequence.
 
 Offline, local or private workflow:
 -----------------------------------
@@ -175,7 +179,7 @@ to run the testing suite on their commit history followed by:
 
 to generate the same type of report that would be shown automatically with
 continuous integration. After this it is crucial to save the generated test
-results by running `memote save` again.
+results by running ``memote save`` again.
 
 We recommend the public workflow not only to promote open, collaborative
 science but also to benefit from the full functionality of memote.

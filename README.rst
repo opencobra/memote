@@ -75,9 +75,9 @@ For comments and questions get in touch via
 * our `gitter chatroom <https://gitter.im/opencobra/memote>`_
 * or using the `GitHub issues <https://github.com/opencobra/memote/issues>`_.
 
-Are you excited about this project? Consider :ref:`contributing` by adding
-novel tests, reporting or fixing bugs, and generally help us make this a
-better software for everyone.
+Are you excited about this project? Consider :ref:`contributing <contributing>`
+by adding novel tests, reporting or fixing bugs, and generally help us make
+this a better software for everyone.
 
 Copyright
 =========
