@@ -62,7 +62,7 @@ test_requirements = [
 
 setup(
     name="memote",
-    version="0.3.2",
+    version="0.3.3",
     description="Genome-scale metabolic model test suite.",
     long_description=readme + "\n\n" + history,
     author="Moritz E. Beber",
