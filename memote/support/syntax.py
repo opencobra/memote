@@ -126,9 +126,9 @@ def find_reaction_tag_transporter(model):
     Return incorrectly tagged transport reactions.
 
     A transport reaction is defined as follows:
-       -- It contains metabolites from at least 2 compartments
-       -- At least 1 metabolite undergoes no chemical reaction
-          i.e. the formula stays the same on both sides of the equation
+    1. It contains metabolites from at least 2 compartments and
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
+    the formula stays the same on both sides of the equation.
 
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
@@ -154,11 +154,11 @@ def find_abc_tag_transporter(model):
     Find Atp-binding cassette transport rxns without 'abc' tag.
 
     An ABC transport reaction is defined as follows:
-       -- It contains metabolites from at least 2 compartments
-       -- At least 1 metabolite undergoes no chemical reaction
-          i.e. the formula stays the same on both sides of the equation
-       -- ATP is converted to ADP (+ Pi + H,
-          yet this isn't checked for explicitly)
+    1. It contains metabolites from at least 2 compartments,
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
+    the formula stays the same on both sides of the equation, and
+    3. ATP is converted to ADP (+ Pi + H, yet this isn't checked for
+    explicitly).
 
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
@@ -203,7 +203,7 @@ def find_upper_case_mets(model):
 
 def find_untagged_demand_rxns(model):
     """
-    Find demand reactions whose IDs do not begin with 'DM_'.
+    Find demand reactions whose IDs do not begin with ``DM_``.
 
         Parameters
     ----------
@@ -219,7 +219,7 @@ def find_untagged_demand_rxns(model):
 
 def find_false_demand_rxns(model):
     """
-    Find reactions which are tagged with 'DM_' but which are not demand rxns.
+    Find reactions which are tagged with ``DM_`` but which are not demand rxns.
 
         Parameters
     ----------
@@ -237,7 +237,7 @@ def find_false_demand_rxns(model):
 
 def find_untagged_sink_rxns(model):
     """
-    Find demand reactions whose IDs do not begin with 'SK_'.
+    Find demand reactions whose IDs do not begin with ``SK_``.
 
     Parameters
     ----------
@@ -253,7 +253,7 @@ def find_untagged_sink_rxns(model):
 
 def find_false_sink_rxns(model):
     """
-    Find reactions which are tagged with 'SK_' but which are not sink rxns.
+    Find reactions which are tagged with ``SK_`` but which are not sink rxns.
 
         Parameters
     ----------
@@ -271,7 +271,7 @@ def find_false_sink_rxns(model):
 
 def find_untagged_exchange_rxns(model):
     """
-    Find exchange reactions whose IDs do not begin with 'EX_'.
+    Find exchange reactions whose IDs do not begin with ``EX_``.
 
     Parameters
     ----------
@@ -287,7 +287,7 @@ def find_untagged_exchange_rxns(model):
 
 def find_false_exchange_rxns(model):
     """
-    Find reactions which are tagged with 'EX_' but which are not exchange rxns.
+    Find reactions which are tagged with ``EX_`` but which are not exchange rxns.
 
         Parameters
     ----------

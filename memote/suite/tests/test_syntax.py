@@ -65,7 +65,7 @@ def test_non_transp_rxn_id_suffix_compartment_match(
 
 
 def test_non_abc_transp_rxn_tag_match(read_only_model, store):
-    """Expect all non-abc transport reactions to be tagged with a 't'."""
+    """Expect all non-abc transport reactions to be tagged with a ``t``."""
     store["untagged_normal_transport"] = [
         rxn.id for rxn in syntax.find_reaction_tag_transporter(
             read_only_model
@@ -76,7 +76,7 @@ def test_non_abc_transp_rxn_tag_match(read_only_model, store):
 
 
 def test_abc_transp_rxn_tag_match(read_only_model, store):
-    """Expect all abc transport reactions to be tagged with 'abc'."""
+    """Expect all abc transport reactions to be tagged with ``abc``."""
     store["untagged_abc_transport"] = [
         rxn.id for rxn in syntax.find_abc_tag_transporter(read_only_model)]
     assert len(store["untagged_abc_transport"]) == 0, \
@@ -94,7 +94,7 @@ def test_upper_case_mets(read_only_model, store):
 
 
 def test_demand_reaction_tag_match(read_only_model, store):
-    """Expect all demand reaction IDs to be prefixed with 'DM\_'."""
+    """Expect all demand reaction IDs to be prefixed with ``DM_``."""
     store["untagged_demand"] = [
         rxn.id for rxn in syntax.find_untagged_demand_rxns(read_only_model)]
     assert len(store["untagged_demand"]) == 0, \
@@ -103,7 +103,7 @@ def test_demand_reaction_tag_match(read_only_model, store):
 
 
 def test_false_demand_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'DM\_' to be true demand rxns."""
+    """Expect all rxns that are tagged with ``DM_`` to be true demand rxns."""
     store["false_demand"] = [
         rxn.id for rxn in syntax.find_false_demand_rxns(read_only_model)]
     assert len(store["false_demand"]) == 0, \
@@ -112,7 +112,7 @@ def test_false_demand_reaction(read_only_model, store):
 
 
 def test_sink_reaction_tag_match(read_only_model, store):
-    """Expect all sink reaction IDs to be prefixed with 'SK\_'."""
+    """Expect all sink reaction IDs to be prefixed with ``SK_``."""
     store["untagged_sink"] = [
         rxn.id for rxn in syntax.find_untagged_sink_rxns(read_only_model)]
     assert len(store["untagged_sink"]) == 0, \
@@ -121,7 +121,7 @@ def test_sink_reaction_tag_match(read_only_model, store):
 
 
 def test_false_sink_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'SK\_' to be true sink rxns."""
+    """Expect all rxns that are tagged with ``SK_`` to be true sink rxns."""
     store["false_sink"] = [
         rxn.id for rxn in syntax.find_false_sink_rxns(read_only_model)]
     assert len(store["false_sink"]) == 0, \
@@ -130,7 +130,7 @@ def test_false_sink_reaction(read_only_model, store):
 
 
 def test_exchange_reaction_tag_match(read_only_model, store):
-    """Expect all exchange reaction IDs to be prefixed with 'EX\_'."""
+    """Expect all exchange reaction IDs to be prefixed with ``EX_``."""
     store["untagged_exchange"] = [
         rxn.id for rxn in syntax.find_untagged_exchange_rxns(read_only_model)]
     assert len(store["untagged_exchange"]) == 0, \
@@ -139,7 +139,7 @@ def test_exchange_reaction_tag_match(read_only_model, store):
 
 
 def test_false_exchange_reaction(read_only_model, store):
-    """Expect all rxns that are tagged with 'EX\_' to be true exchange rxns."""
+    """Expect all rxns that are tagged with ``EX_`` to be true exchange rxns."""
     store["false_exchange"] = [
         rxn.id for rxn in syntax.find_false_exchange_rxns(read_only_model)]
     assert len(store["false_exchange"]) == 0, \

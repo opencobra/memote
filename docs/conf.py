@@ -43,7 +43,10 @@ sys.path.insert(1, join(project_root, "memote", "suite", "tests"))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc',
+              'sphinx.ext.autosummary']
+
+numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

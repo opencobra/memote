@@ -30,12 +30,12 @@ def find_transport_reactions(model):
     """
     Return a list of all transport reactions.
 
-       A transport reaction is defined as follows:
-       -- It contains metabolites from at least 2 compartments
-       -- At least 1 metabolite undergoes no chemical reaction
-          i.e. the formula stays the same on both sides of the equation
+    A transport reaction is defined as follows:
+    1. It contains metabolites from at least 2 compartments and
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
+    the formula stays the same on both sides of the equation.
 
-       Will not identify transport via the PTS System.
+    Will not identify transport via the PTS System.
 
     Parameters
     ----------
