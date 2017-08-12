@@ -12,13 +12,13 @@ memote - the genome-scale metabolic model test suite
         :target: https://memote.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/opencobra/memote/shield.svg
-     :target: https://pyup.io/repos/github/opencobra/memote/
-     :alt: Updates
-
 .. image:: https://codecov.io/gh/opencobra/memote/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/opencobra/memote
         :alt: Coverage
+
+.. image:: https://badges.gitter.im/opencobra/memote.svg
+        :target: https://gitter.im/opencobra/memote
+        :alt: Gitter
 
 .. summary-start
 
@@ -44,9 +44,9 @@ The `memote` tool therefore performs four subfunctions:
 
 And in order to make this process as easy as possible the generated repository
 can easily be integrated with continuous integration testing providers such as
-Travis CI, which means that anytime you push a
-model change to GitHub, the test suite will be run automatically and a report
-will be available for you to look at via GitHub pages for your repository.
+Travis CI, which means that anytime you push a model change to GitHub, the test
+suite will be run automatically and a report will be available for you to look
+at via GitHub pages for your repository.
 
 .. summary-end
 
@@ -63,7 +63,8 @@ To install memote, run this command in your terminal:
 
     $ pip install memote
 
-This is the preferred method to install memote, as it will always install the most recent stable release.
+This is the preferred method to install memote, as it will always install the
+most recent stable release.
 
 .. who-start
 
@@ -73,17 +74,17 @@ Contact
 For comments and questions get in touch via
 
 * our `gitter chatroom <https://gitter.im/opencobra/memote>`_
-* or using the `GitHub issues <https://github.com/opencobra/memote/issues>`_.
+* or our `mailing list <https://groups.google.com/forum/#!forum/memote>`_.
 
 Are you excited about this project? Consider `contributing
-</.github/CONTRIBUTING.rst>`_
-by adding novel tests, reporting or fixing bugs, and generally help us make
-this a better software for everyone.
+<https://memote.readthedocs.io/en/stable/contributing.html>`_ by adding novel
+tests, reporting or fixing bugs, and generally help us make this a better
+software for everyone.
 
 Copyright
 =========
 
-* Copyright (c) 2017 Novo Nordisk Foundation Center for Biosustainability,
+* Copyright (c) 2017, Novo Nordisk Foundation Center for Biosustainability,
   Technical University of Denmark.
 * Free software: `Apache Software License 2.0 <LICENSE>`_
 
@@ -92,7 +93,8 @@ Copyright
 Credits
 =======
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+This package was created with Cookiecutter_ and the
+`audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
