@@ -211,7 +211,7 @@ def find_untagged_demand_rxns(model):
     """
     Find demand reactions whose IDs do not begin with ``DM_``.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
@@ -227,7 +227,7 @@ def find_false_demand_rxns(model):
     """
     Find reactions which are tagged with ``DM_`` but which are not demand rxns.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
@@ -261,7 +261,7 @@ def find_false_sink_rxns(model):
     """
     Find reactions which are tagged with ``SK_`` but which are not sink rxns.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
@@ -295,7 +295,7 @@ def find_false_exchange_rxns(model):
     """
     Find reactions that are tagged with ``EX_`` but are not exchange reactions.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
             A cobrapy metabolic model
