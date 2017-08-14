@@ -118,6 +118,11 @@ class ResultCollectionPlugin(object):
                 " ")
             self._meta["commit_hash"] = self.commit.hexsha
 
+    @property
+    def results(self):
+        """Return the test results as a nested dictionary."""
+        return self._store
+
     @pytest.fixture(scope="session")
     def read_only_model(self):
         """Provide the model for the complete test session."""
