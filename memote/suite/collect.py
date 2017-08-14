@@ -45,14 +45,6 @@ from memote.support.helpers import find_biomass_reaction
 LOGGER = logging.getLogger(__name__)
 
 
-class DummyDict(object):
-    """Expose a fake ``__setitem__`` interface."""
-
-    def __setitem__(self, key, value):
-        """Ignore all method input."""
-        pass
-
-
 class ResultCollectionPlugin(object):
     """
     Local pytest plugin that exposes a fixture for result collection.
@@ -89,14 +81,9 @@ class ResultCollectionPlugin(object):
         self._model = model
         self.mode = mode.lower()
         assert self.mode in self._valid_modes
-        if self.mode in ("collect", "git-collect", "html"):
-            self._store = dict()
-            self._store["meta"] = self._meta = dict()
-            self._store["report"] = self._data = dict()
-        else:
-            self._store = DummyDict()
-            self._meta = DummyDict()
-            self._data = DummyDict()
+        self._store = dict()
+        self._store["meta"] = self._meta = dict()
+        self._store["report"] = self._data = dict()
         self.filename = filename
         self.directory = directory
         self.repo = repo

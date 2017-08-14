@@ -185,6 +185,8 @@ def collect(ctx):
             ctx.obj["pytest_args"].extend(["--tb", "no"])
     else:
         mode = "basic"
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "line"])
     if ctx.obj["repo"] is not None and ctx.obj["collect"]:
         mode = "git-{}".format(mode)
     if mode == "collect" and ctx.obj["filename"] is None:
