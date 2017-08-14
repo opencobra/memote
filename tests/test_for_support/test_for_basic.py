@@ -135,6 +135,7 @@ def nonzero_constrained_rxn(base):
 
 
 def ngam_present(base):
+    """Provide a model with a correct NGAM reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
     met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
     met_i = cobra.Metabolite("h_c", "H")
@@ -149,6 +150,7 @@ def ngam_present(base):
 
 
 def simple_atp_hydrolysis(base):
+    """Provide a model with an ATP hydrolysis reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
     met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
     met_i = cobra.Metabolite("h_c", "H")
@@ -159,6 +161,32 @@ def simple_atp_hydrolysis(base):
                            met_j: -1, met_k: 1})
     rxn_1.bounds = 0, 1000
     base.add_reactions([rxn_1])
+    return base
+
+
+def sufficient_compartments(base):
+    """Provide a model with the minimal amount of compartments"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("a_p", compartment="p")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_b = cobra.Reaction("AB")
+    rxn_a_b.add_metabolites({met_a: 1,
+                             met_b: -1})
+    rxn_b_c = cobra.Reaction("BC")
+    rxn_b_c.add_metabolites({met_b: 1,
+                             met_c: -1})
+    base.add_reactions([rxn_b_c, rxn_a_b])
+    return base
+
+
+def insufficient_compartments(base):
+    """Provide a model with less than the minimal amount of compartments"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_c = cobra.Reaction("AC")
+    rxn_a_c.add_metabolites({met_a: 1,
+                             met_c: -1})
+    base.add_reactions([rxn_a_c])
     return base
 
 
@@ -176,6 +204,8 @@ def model_builder(name):
         "nonzero_constrained_rxn": nonzero_constrained_rxn,
         "ngam_present": ngam_present,
         "simple_atp_hydrolysis": simple_atp_hydrolysis,
+        "sufficient_compartments": sufficient_compartments,
+        "insufficient_compartments": insufficient_compartments,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -285,3 +315,10 @@ def test_ngam_presence(model, num):
     assert len(ngam_reaction) == num
 
 
+@pytest.mark.parametrize("model, boolean", [
+    ("sufficient_compartments", True),
+    ("insufficient_compartments", False)
+], indirect=["model"])
+def test_compartments_presence(model, boolean):
+    """Expect amount of compartments to be identified correctly."""
+    assert (len(model.get_metabolite_compartments()) >= 3) == boolean

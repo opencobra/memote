@@ -102,3 +102,15 @@ def test_metabolic_coverage(read_only_model, store):
     store["metabolic_coverage"] = \
         basic.calculate_metabolic_coverage(read_only_model)
     assert store["metabolic_coverage"] >= 1
+
+
+def test_compartments_presence(read_only_model, store):
+    """Expect that >= 3 compartments are defined in the read_only_model."""
+    assert hasattr(read_only_model, "compartments")
+    store["num_compartments"] = len(
+        read_only_model.get_metabolite_compartments()
+    )
+    store["compartments"] = read_only_model.get_metabolite_compartments
+    assert store["num_compartments"] >= 3
+
+
