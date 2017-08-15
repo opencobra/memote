@@ -30,7 +30,5 @@ memote.show_versions()
 ```
 
 <details>
-```
-# output of memote.show_versions()
-```
+
 </details>
