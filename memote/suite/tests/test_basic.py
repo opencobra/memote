@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import memote.support.basic as basic
+import memote.support.helpers as helpers
 
 
 def test_model_id_presence(read_only_model, store):
@@ -48,6 +49,18 @@ def test_metabolites_presence(read_only_model, store):
     assert hasattr(read_only_model, "metabolites")
     store["num_metabolites"] = len(read_only_model.metabolites)
     assert len(read_only_model.metabolites) > 0
+
+
+def test_transport_reaction_presence(read_only_model, store):
+    """
+    Expect that >= 1 transport reactions are present in the read_only_model.
+
+    """
+    store["transporters"] = helpers.find_transport_reactions(read_only_model)
+    store["num_transporters"] = len(
+        helpers.find_transport_reactions(read_only_model)
+    )
+    assert store["num_transporters"] >= 1
 
 
 def test_metabolites_formula_presence(read_only_model, store):
