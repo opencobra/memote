@@ -21,8 +21,16 @@ Create a [minimal, complete, verifiable example
 
 ### Context
 
+Please run the following code and paste the output inside the details
+block.
+
+```python
+import memote
+memote.show_versions()
+```
+
 <details>
-* Operating System:
-* Python version:
-* memote version:
+```
+# output of memote.show_versions()
+```
 </details>
