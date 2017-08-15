@@ -21,7 +21,8 @@ from __future__ import absolute_import
 
 import logging
 
-from memote.support.helpers import find_atp_adp_converting_reactions
+from memote.support.helpers import find_atp_adp_converting_reactions, \
+    find_functional_units
 
 __all__ = ("check_metabolites_formula_presence",)
 
@@ -153,3 +154,22 @@ def calculate_metabolic_coverage(model):
     if len(model.reactions) == 0 or len(model.genes) == 0:
         raise ValueError("The model contains no reactions or genes.")
     return float(len(model.reactions)) / float(len(model.genes))
+
+
+def find_enzyme_complexes(model):
+    """
+    Return a set of gene id tuples that constitute a functional enzyme complex.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    enzyme_complexes = set()
+    for rxn in model.reactions:
+        if rxn.gene_reaction_rule:
+            for candidate in find_functional_units(rxn.gene_reaction_rule):
+                if len(candidate) >= 2:
+                    enzyme_complexes.add(tuple(candidate))
+    return enzyme_complexes

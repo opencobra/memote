@@ -114,3 +114,9 @@ def test_compartments_presence(read_only_model, store):
     assert store["num_compartments"] >= 3
 
 
+def test_enzyme_complex_presence(read_only_model, store):
+    """Expect that >= 1 enzyme complexes are present in the read_only_model."""
+    store["num_enzyme_complexes"] = len(
+        basic.find_enzyme_complexes(read_only_model))
+    store["enzyme_complexes"] = basic.find_enzyme_complexes(read_only_model)
+    assert store["num_enzyme_complexes"] >= 1

@@ -53,6 +53,19 @@ def gpr_present(base):
     return base
 
 
+def gpr_present_complex(base):
+    """Provide a model with reactions that all have GPR"""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'gene1 and gene2'
+    rxn_2 = cobra.Reaction("RXN2")
+    rxn_2.gene_reaction_rule = '(gene4 and gene7) or ' \
+                               '(gene9 and (gene10 or gene14))'
+    rxn_3 = cobra.Reaction("RXN3")
+    rxn_3.gene_reaction_rule = 'gene1 and gene2'
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
 def gpr_missing(base):
     """Provide a model reactions that lack GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -195,6 +208,7 @@ def model_builder(name):
         "three-missing": three_missing,
         "three-present": three_present,
         "gpr_present": gpr_present,
+        "gpr_present_complex": gpr_present_complex,
         "gpr_missing": gpr_missing,
         "gpr_missing_with_exchange": gpr_missing_with_exchange,
         "gpr_present_not_lumped": gpr_present_not_lumped,
@@ -322,3 +336,13 @@ def test_ngam_presence(model, num):
 def test_compartments_presence(model, boolean):
     """Expect amount of compartments to be identified correctly."""
     assert (len(model.get_metabolite_compartments()) >= 3) == boolean
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gpr_present", 0),
+    ("gpr_missing", 0),
+    ("gpr_present_complex", 4)
+], indirect=["model"])
+def test_enzyme_complex_presence(model, num):
+    """Expect amount of enzyme complexes to be identified correctly."""
+    assert len(basic.find_enzyme_complexes(model)) == num

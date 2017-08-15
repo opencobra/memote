@@ -53,7 +53,8 @@ requirements = [
     "plotly",
     "travispy",
     "pygithub",
-    "travis-encrypt"
+    "travis-encrypt",
+    "sympy"
 ]
 
 test_requirements = [

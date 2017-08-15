@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import logging
 import re
 from builtins import dict
+from sympy import expand
 
 LOGGER = logging.getLogger(__name__)
 
@@ -222,3 +223,26 @@ def find_exchange_rxns(model):
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if any(c in rxn.get_compartments() for c in ['e'])]
+
+
+def find_functional_units(gpr_str):
+    """
+    Return an iterator of gene IDs grouped by boolean rules from the gpr_str.
+
+    The gpr_str is first transformed into an algebraic expression, replacing
+    the boolean operators 'or' with '+' and 'and' with '*'. Treating the
+    gene IDs as sympy.symbols this allows a mathematical expansion of the
+    algebraic expression. The expanded form is then split again producing sets
+    of gene IDs that in the gpr_str had an 'and' relationship.
+
+    Parameters
+    ----------
+    gpr_str : string
+            A string consisting of gene ids and the boolean expressions 'and'
+            and 'or'
+
+    """
+    algebraic_form = re.sub('[Oo]r', '+', re.sub('[Aa]nd', '*', gpr_str))
+    expanded = str(expand(algebraic_form))
+    for unit in expanded.replace('+', ',').split(' , '):
+        yield unit.split('*')
