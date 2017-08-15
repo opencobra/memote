@@ -1,6 +1,13 @@
 History
 =======
 
+0.3.6 (2017-08-15)
+------------------
+
+* Improve GitHub support.
+* Update the readthedocs and gitter badge.
+* Add a function ``memote.show_versions()`` for easy dependency checking.
+
 0.3.4 (2017-08-12)
 ------------------
 
