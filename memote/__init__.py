@@ -28,4 +28,4 @@ from memote.version_info import show_versions
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.3.5"
+__version__ = "0.3.6"
