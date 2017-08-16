@@ -313,7 +313,6 @@ def new(ctx, replay):
     new directory will be placed in the current directory or respect the given
     --directory option.
     """
-
     directory = ctx.obj["directory"]
     if directory is None:
         directory = os.getcwd()
