@@ -225,9 +225,11 @@ def find_elementary_leakage_modes(model, atol=1e-13):
     -----
     See [1]_ section 3.4 for a complete description of the algorithm.
 
-
+    References
+    ----------
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
@@ -286,13 +288,15 @@ def find_blocked_reactions(model):
     """
     Find metabolic reactions that are blocked.
 
-    Blocked reactions are those reactions that when optimized for cannot carry
-    any flux while all exchanges are open.
-
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+
+    Notes
+    -----
+    Blocked reactions are those reactions that when optimized for cannot carry
+    any flux while all exchanges are open.
 
     """
     with model:
@@ -330,9 +334,9 @@ def find_stoichiometrically_balanced_cycles(model):
     References
     ----------
     .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
-       generating a high-quality genome-scale metabolic reconstruction. Nature
-       protocols. Nature Publishing Group.
-       http://doi.org/10.1038/nprot.2009.203
+           generating a high-quality genome-scale metabolic reconstruction.
+           Nature protocols. Nature Publishing Group.
+           http://doi.org/10.1038/nprot.2009.203
 
     """
     fva_result = flux_variability_analysis(model, loopless=False)

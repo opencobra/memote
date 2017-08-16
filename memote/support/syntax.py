@@ -125,6 +125,13 @@ def find_reaction_tag_transporter(model):
     """
     Return incorrectly tagged transport reactions.
 
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Notes
+    -----
     A transport reaction is defined as follows:
     1. It contains metabolites from at least 2 compartments and
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
@@ -133,11 +140,6 @@ def find_reaction_tag_transporter(model):
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
     either 'X' or 'XH2'
-
-    Parameters
-    ----------
-    model : cobra.Model
-            A cobrapy metabolic model
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
@@ -153,6 +155,13 @@ def find_abc_tag_transporter(model):
     """
     Find Atp-binding cassette transport rxns without 'abc' tag.
 
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Notes
+    -----
     An ABC transport reaction is defined as follows:
     1. It contains metabolites from at least 2 compartments,
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
@@ -163,11 +172,6 @@ def find_abc_tag_transporter(model):
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
     either 'X' or 'XH2'
-
-    Parameters
-    ----------
-    model : cobra.Model
-            A cobrapy metabolic model
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
@@ -183,17 +187,19 @@ def find_upper_case_mets(model):
     """
     Find metabolites whose ID roots contain uppercase characters.
 
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Notes
+    -----
     In metabolite names, individual uppercase exceptions are allowed:
     -- Dextorotary prefix: 'D'
     -- Levorotary prefix: 'L'
     -- Prefixes for the absolute configuration of a stereocenter: 'R' and 'S'
     -- Prefixes for the absolute stereochemistry of double bonds 'E' and 'Z'
     -- Acyl carrier proteins can be labeled as 'ACP'
-
-    Parameters
-    ----------
-    model : cobra.Model
-            A cobrapy metabolic model
 
     """
     comp_pattern = "^([a-z0-9]|Z|E|L|D|ACP|S|R)+_\w+"
@@ -205,10 +211,10 @@ def find_untagged_demand_rxns(model):
     """
     Find demand reactions whose IDs do not begin with ``DM_``.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     demand_rxns = helpers.find_demand_reactions(model)
@@ -221,10 +227,10 @@ def find_false_demand_rxns(model):
     """
     Find reactions which are tagged with ``DM_`` but which are not demand rxns.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     true_demand_rxns = helpers.find_demand_reactions(model)
@@ -242,7 +248,7 @@ def find_untagged_sink_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     sink_rxns = helpers.find_sink_reactions(model)
@@ -255,10 +261,10 @@ def find_false_sink_rxns(model):
     """
     Find reactions which are tagged with ``SK_`` but which are not sink rxns.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     true_sink_rxns = helpers.find_sink_reactions(model)
@@ -276,7 +282,7 @@ def find_untagged_exchange_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     exchange_rxns = helpers.find_exchange_rxns(model)
@@ -289,10 +295,10 @@ def find_false_exchange_rxns(model):
     """
     Find reactions that are tagged with ``EX_`` but are not exchange reactions.
 
-        Parameters
+    Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     """
     true_exchange_rxns = helpers.find_exchange_rxns(model)

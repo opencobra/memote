@@ -171,8 +171,11 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
     Objective : optlang.Objective
         Objective class for a specific optlang interface.
 
+    References
+    ----------
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
@@ -226,8 +229,11 @@ def add_cut(problem, indicators, bound, Constraint):
     Constraint : optlang.Constraint
         Constraint class for a specific optlang interface.
 
+    References
+    ----------
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
