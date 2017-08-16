@@ -35,14 +35,14 @@ class HistoryReport(Report):
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, repo, directory, index="time", **kwargs):
+    def __init__(self, repository, directory, index="time", **kwargs):
         """
         Initialize the git interaction and dask bag.
 
         Paramters
         ---------
-        repo : git.Repo
-            Instance of the working directory git repository.
+        repository : git.Repo
+            An instance of the working directory git repository.
         directory : str or path
             Where previously collected test results can be found.
         index : {'time', 'hash'}, optional
@@ -55,7 +55,7 @@ class HistoryReport(Report):
             raise ValueError(
                 "Given index '{0}' must be one of {1}."
                 "".format(self.index_dim, str(self._valid_indexes)))
-        self.repo = repo
+        self.repo = repository
         self.latest = self.repo.active_branch.commit
         self.history = [commit.hexsha for commit in self.latest.iter_parents()]
         self.history.insert(0, self.latest.hexsha)

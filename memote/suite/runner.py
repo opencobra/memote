@@ -18,14 +18,14 @@
 """Run the test suite on an instance of `cobra.Model`."""
 
 from __future__ import absolute_import
-from builtins import dict
 
 import locale
 import os
-import io
 import shlex
 import sys
 import logging
+import warnings
+from builtins import dict
 from os.path import join, dirname
 from multiprocessing import Process
 
@@ -36,10 +36,10 @@ from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 from colorama import init, Fore
 from cookiecutter.main import cookiecutter, get_user_config
+from cobra.io import read_sbml_model
 
 from memote import __version__
-from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.reporting.reports import HistoryReport
+import memote.suite.api as api
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
@@ -178,34 +178,27 @@ def abort_if_false(ctx, param, value):
 
 def collect(ctx):
     """Act like a collect subcommand."""
+    # TODO: record SBML warnings and add them to the report
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        ctx.obj["model"] = read_sbml_model(ctx.obj["model"])
     check_model(ctx)
     if ctx.obj["collect"]:
-        mode = "collect"
-        if "--tb" not in ctx.obj["pytest_args"]:
-            ctx.obj["pytest_args"].extend(["--tb", "no"])
-    else:
-        mode = "basic"
-        if "--tb" not in ctx.obj["pytest_args"]:
-            ctx.obj["pytest_args"].extend(["--tb", "line"])
-    if ctx.obj["repo"] is not None and ctx.obj["collect"]:
-        mode = "git-{}".format(mode)
-    if mode == "collect" and ctx.obj["filename"] is None:
-        ctx.obj["filename"] = "result.json"
-    elif mode == "git-collect" and ctx.obj["filename"] is None:
-        check_directory(ctx)
-        if "commit" in ctx.obj:
-            sha = ctx.obj["commit"].hexsha
-        elif "branch" in ctx.obj:
-            sha = ctx.obj["branch"].commit.hexsha
-        else:
-            sha = ctx.obj["repo"].active_branch.commit.hexsha
-        ctx.obj["filename"] = join(ctx.obj["directory"], "{}.json".format(sha))
-    plugin = ResultCollectionPlugin(
-        ctx.obj["model"], mode=mode, filename=ctx.obj["filename"],
-        directory=ctx.obj["directory"], repo=ctx.obj["repo"],
-        branch=ctx.obj.get("branch"), commit=ctx.obj.get("commit"))
-    errno = pytest.main(ctx.obj["pytest_args"], plugins=[plugin])
-    return errno
+        if ctx.obj["repo"] is not None and ctx.obj["filename"] is None:
+            check_directory(ctx)
+            if "commit" in ctx.obj:
+                sha = ctx.obj["commit"].hexsha
+            elif "branch" in ctx.obj:
+                sha = ctx.obj["branch"].commit.hexsha
+            else:
+                sha = ctx.obj["repo"].active_branch.commit.hexsha
+            ctx.obj["filename"] = join(
+                ctx.obj["directory"], "{}.json".format(sha))
+        elif ctx.obj["filename"] is None:
+            ctx.obj["filename"] = "result.json"
+    code = api.test_model(ctx.obj["model"], ctx.obj["filename"],
+                          False, ctx.obj["pytest_args"])
+    return code
 
 
 @click.group(invoke_without_command=True,
@@ -248,10 +241,10 @@ def cli(ctx, level, no_collect, model, filename, directory, pytest_args):
     """
     logging.basicConfig(level=level, format="%(levelname)s - %(message)s")
     ctx.obj = dict()
-    ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
     ctx.obj["model"] = process_model(model, ctx)
+    ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
     ctx.obj["filename"] = filename
-    ctx.obj["directory"] = process_model(directory, ctx)
+    ctx.obj["directory"] = process_directory(directory, ctx)
     ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
     ctx.obj["repo"] = probe_git()
     if ctx.invoked_subcommand is None:
@@ -273,26 +266,20 @@ def report(ctx, one_time, index):
     If the model lives in a git repository and there is a history of test
     results, memote can generate a more rich report.
     """
+    # TODO: record SBML warnings and add them to the report
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        ctx.obj["model"] = read_sbml_model(ctx.obj["model"])
     check_model(ctx)
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "index.html"
     if one_time:
-        if "--tb" not in ctx.obj["pytest_args"]:
-            ctx.obj["pytest_args"].extend(["--tb", "no"])
-        errno = pytest.main(
-            ctx.obj["pytest_args"],
-            plugins=[ResultCollectionPlugin(
-                ctx.obj["model"], mode="html", filename=ctx.obj["filename"])
-            ]
-        )
-        sys.exit(errno)
+        return api.basic_report(ctx.obj["model"], ctx.obj["filename"],
+                                pytest_args=ctx.obj["pytest_args"])
     check_directory(ctx)
     check_repo(ctx)
-    report = HistoryReport(ctx.obj["repo"], ctx.obj["directory"],
-                           index=index)
-    click.echo(u"Writing report '{}'".format(ctx.obj["filename"]))
-    with io.open(ctx.obj["filename"], "w") as file_h:
-        file_h.write(report.render_html())
+    api.history_report(ctx.obj["repo"], ctx.obj["directory"],
+                       ctx.obj["filename"], index)
 
 
 @cli.command()
