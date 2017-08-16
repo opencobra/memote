@@ -121,7 +121,7 @@ def find_demand_reactions(model):
     Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     Notes
     -----
@@ -159,7 +159,7 @@ def find_sink_reactions(model):
     Parameters
     ----------
     model : cobra.Model
-             A cobrapy metabolic model
+        A cobrapy metabolic model
 
     Notes
     -----
@@ -196,7 +196,7 @@ def find_exchange_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-            A cobrapy metabolic model
+        A cobrapy metabolic model
 
     Notes
     -----
