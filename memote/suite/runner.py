@@ -297,8 +297,14 @@ def report(ctx, one_time, index):
 
 @cli.command()
 @click.help_option("--help", "-h")
+@click.option("--replay", is_flag=True, default=False,
+              description="Create a memote repository using the same values as "
+              "before by default.")
+@click.option("--overwrite", is_flag=True, default=False,
+              description="Whether to overwrite existing files and "
+              "directories.")
 @click.pass_context
-def new(ctx):
+def new(ctx, replay, overwrite):
     """
     Create a suitable model repository structure from a template.
 
@@ -310,7 +316,8 @@ def new(ctx):
     directory = ctx.obj["directory"]
     if directory is None:
         directory = os.getcwd()
-    cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory)
+    cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory,
+                 replay=replay, overwrite_if_exists=overwrite)
 
 
 @cli.command()
