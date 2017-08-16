@@ -35,7 +35,7 @@ import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
 from colorama import init, Fore
-from cookiecutter.main import cookiecutter
+from cookiecutter.main import cookiecutter, get_user_config
 
 from memote import __version__
 from memote.suite.collect import ResultCollectionPlugin
@@ -297,8 +297,14 @@ def report(ctx, one_time, index):
 
 @cli.command()
 @click.help_option("--help", "-h")
+@click.option("--replay", is_flag=True,
+              help="Create a memote repository using the exact same answers "
+              "as before. This will not overwrite existing directories. If "
+              "you want to adjust the answers, edit the template "
+              "'{}'.".format(join(get_user_config()["replay_dir"],
+                                  "cookiecutter-memote.json")))
 @click.pass_context
-def new(ctx):
+def new(ctx, replay):
     """
     Create a suitable model repository structure from a template.
 
@@ -310,7 +316,8 @@ def new(ctx):
     directory = ctx.obj["directory"]
     if directory is None:
         directory = os.getcwd()
-    cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory)
+    cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory,
+                 replay=replay)
 
 
 @cli.command()
