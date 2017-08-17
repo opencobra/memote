@@ -193,3 +193,8 @@ def find_pure_metabolic_reactions(model):
             if rxn not in exchanges
             if rxn not in transporters
             if rxn not in biomass_rxns]
+
+
+def find_unique_metabolites(model):
+    """Return set of metabolite IDs without duplicates from compartments."""
+    return set([met.id[:-2] for met in model.metabolites])

@@ -157,3 +157,13 @@ def test_find_transport_reactions(read_only_model, store):
         read_only_model
     )
     assert store["transport_reactions"] >= 1
+
+
+def test_find_unique_metabolites(read_only_model, store):
+    """
+    Expect there to be less unique mets in read_only_model than mets.
+    """
+    store["num_unique_metabolites"] = len(
+        basic.find_unique_metabolites(read_only_model)
+    )
+    assert store["num_unique_metabolites"] < len(read_only_model.metabolites)

@@ -371,3 +371,12 @@ def test_enzyme_complex_presence(model, num):
 def test_find_pure_metabolic_reactions(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_pure_metabolic_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("sufficient_compartments", 1)
+], indirect=["model"])
+def test_find_unique_metabolites(model, num):
+    """Expect amount of metabolic reactions to be identified correctly."""
+    assert len(basic.find_unique_metabolites(model)) == num
+
