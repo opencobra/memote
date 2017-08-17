@@ -205,15 +205,15 @@ def insufficient_compartments(base):
 
 def non_metabolic_reactions(base):
     """Provide a model all kinds of reactions that are not purely metabolic"""
-    met_a = cobra.Metabolite("a_c", formula= 'CH4', compartment="c")
-    met_c = cobra.Metabolite("a_e", formula= 'CH4', compartment="e")
+    met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
+    met_c = cobra.Metabolite("a_e", formula='CH4', compartment="e")
     rxn_a_c = cobra.Reaction("AC")
     rxn_a_c.add_metabolites({met_a: 1,
                              met_c: -1})
     biomass = cobra.Reaction("BIOMASS")
     ex_a = cobra.Reaction("EX_a_e")
     ex_a.add_metabolites({met_c: -1})
-    base.add_reactions([rxn_a_c])
+    base.add_reactions([rxn_a_c, biomass, ex_a])
     return base
 
 
