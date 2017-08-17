@@ -33,21 +33,21 @@ def test_model_id_presence(read_only_model, store):
 def test_genes_presence(read_only_model, store):
     """Expect that >= 1 genes are present in the read_only_model."""
     assert hasattr(read_only_model, "genes")
-    store["num_genes"] = len(read_only_model.genes)
+    store["total_num_genes"] = len(read_only_model.genes)
     assert len(read_only_model.genes) > 0
 
 
 def test_reactions_presence(read_only_model, store):
     """Expect that >= 1 reactions are present in the read_only_model."""
     assert hasattr(read_only_model, "reactions")
-    store["num_reactions"] = len(read_only_model.reactions)
+    store["total_num_reactions"] = len(read_only_model.reactions)
     assert len(read_only_model.reactions) > 0
 
 
 def test_metabolites_presence(read_only_model, store):
     """Expect that >= 1 metabolites are present in the read_only_model."""
     assert hasattr(read_only_model, "metabolites")
-    store["num_metabolites"] = len(read_only_model.metabolites)
+    store["total_num_metabolites"] = len(read_only_model.metabolites)
     assert len(read_only_model.metabolites) > 0
 
 
@@ -133,3 +133,27 @@ def test_enzyme_complex_presence(read_only_model, store):
         basic.find_enzyme_complexes(read_only_model))
     store["enzyme_complexes"] = basic.find_enzyme_complexes(read_only_model)
     assert store["num_enzyme_complexes"] >= 1
+
+
+def test_find_pure_metabolic_reactions(read_only_model, store):
+    """
+    Expect that >= 1 pure metabolic rxns are present in the read_only_model.
+    """
+    store["num_metabolic_reactions"] = len(
+        basic.find_pure_metabolic_reactions(read_only_model))
+    store["metabolic_reactions"] = basic.find_pure_metabolic_reactions(
+        read_only_model
+    )
+    assert store["metabolic_reactions"] >= 1
+
+
+def test_find_transport_reactions(read_only_model, store):
+    """
+    Expect that >= 1 transport reactions are present in the read_only_model.
+    """
+    store["num_transport_reactions"] = len(
+        helpers.find_transport_reactions(read_only_model))
+    store["transport_reactions"] = helpers.find_transport_reactions(
+        read_only_model
+    )
+    assert store["transport_reactions"] >= 1

@@ -21,8 +21,7 @@ from __future__ import absolute_import
 
 import logging
 
-from memote.support.helpers import find_atp_adp_converting_reactions, \
-    find_functional_units
+import memote.support.helpers as helpers
 
 __all__ = ("check_metabolites_formula_presence",)
 
@@ -105,7 +104,7 @@ def find_ngam(model):
           http://doi.org/10.1038/nprot.2009.203
 
     """
-    atp_adp_conv_rxns = find_atp_adp_converting_reactions(model)
+    atp_adp_conv_rxns = helpers.find_atp_adp_converting_reactions(model)
     return [rxn for rxn in atp_adp_conv_rxns
             if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
                                               'adp_c + h_c + pi_c' and not
@@ -169,7 +168,9 @@ def find_enzyme_complexes(model):
     enzyme_complexes = set()
     for rxn in model.reactions:
         if rxn.gene_reaction_rule:
-            for candidate in find_functional_units(rxn.gene_reaction_rule):
+            for candidate in helpers.find_functional_units(
+                rxn.gene_reaction_rule
+            ):
                 if len(candidate) >= 2:
                     enzyme_complexes.add(tuple(candidate))
     return enzyme_complexes
@@ -177,7 +178,7 @@ def find_enzyme_complexes(model):
 
 def find_pure_metabolic_reactions(model):
     """
-    Return list of reactions neither transporters, exchanges nor pseudo.
+    Return list of reactions neither transporters, exchanges nor pseudo rxns.
 
     Parameters
     ----------
@@ -185,4 +186,10 @@ def find_pure_metabolic_reactions(model):
         The metabolic model under investigation.
 
     """
-    return model
+    exchanges = set(model.exchanges)
+    transporters = set(helpers.find_transport_reactions(model))
+    biomass_rxns = set(helpers.find_biomass_reaction(model))
+    return [rxn for rxn in model.reactions
+            if rxn not in exchanges
+            if rxn not in transporters
+            if rxn not in biomass_rxns]
