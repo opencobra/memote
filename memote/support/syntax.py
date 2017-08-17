@@ -140,6 +140,8 @@ def find_reaction_tag_transporter(model):
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
     either 'X' or 'XH2'
+    Make an exception for the ATP synthase reaction (ATPS) which a unique
+    case for a transport reaction and thus does not get the tag.
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
@@ -148,7 +150,8 @@ def find_reaction_tag_transporter(model):
     non_abc_transporters = set(transport_rxns).difference(set(atp_adp_rxns))
 
     return [rxn for rxn in non_abc_transporters
-            if not re.match("[A-Z0-9]+\w*?t\w*?", rxn.id)]
+            if not re.match("[A-Z0-9]+\w*?t\w*?", rxn.id)
+            if not rxn.id.startswith('ATPS')]
 
 
 def find_abc_tag_transporter(model):

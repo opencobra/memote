@@ -72,8 +72,22 @@ def proton_pump(base):
     return base
 
 
+def phosphotransferase_system(base):
+    """Provide a model with a PTS transport reaction."""
+    pep = cobra.Metabolite("pep_c", formula='C3H2O6P', compartment="c")
+    pyr = cobra.Metabolite("pyr_c", formula='C3H3O3', compartment="c")
+    malt = cobra.Metabolite(",malt_e", formula='C12H22O11', compartment="e")
+    malt6p = cobra.Metabolite(
+        "malt6p_c", formula='C12H21O14P', compartment="c"
+    )
+    pst = cobra.Reaction("PST")
+    pst.add_metabolites({pep: -1, malt: -1, pyr: 1, malt6p: 1})
+    base.add_reactions([pst])
+    return base
+
+
 def energy_transfer(base):
-    """Provide a model with an electron transfer reaction."""
+    """Provide a model with a membrane-spanning electron transfer reaction."""
     cytaox = cobra.Metabolite("cytaox_c", formula='X', compartment="c")
     cytared = cobra.Metabolite("cytared_c", formula='XH2', compartment="c")
     cytbox = cobra.Metabolite("cytbox_m", formula='X', compartment="m")
@@ -90,7 +104,8 @@ def model_builder(name):
         "uni_anti_symport": uni_anti_symport,
         "abc_pump": abc_pump,
         "proton_pump": proton_pump,
-        "energy_transfer": energy_transfer
+        "energy_transfer": energy_transfer,
+        "phosphotransferase_system": phosphotransferase_system,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -99,8 +114,9 @@ def model_builder(name):
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport", 3),
     ("abc_pump", 1),
-    ("proton_pump", 0),
-    ("energy_transfer", 0)
+    ("proton_pump", 1),
+    ("energy_transfer", 0),
+    ("phosphotransferase_system", 1)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
     """Expect amount of transporters to be identified correctly."""

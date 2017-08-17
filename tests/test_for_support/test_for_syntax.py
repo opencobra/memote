@@ -201,7 +201,7 @@ def trxn_no_tag_atp_driven(base):
 
 def proton_pump(base):
     # Proton pump
-    rxn = cobra.Reaction('Rh')
+    rxn = cobra.Reaction('Ah')
     rxn.add_metabolites(
         {cobra.Metabolite(id="h_c", formula='H',
                           compartment='c'): -2,
@@ -213,6 +213,21 @@ def proton_pump(base):
                           compartment='c'): 1}
     )
     base.add_reaction(rxn)
+    return base
+
+
+def atp_synthase(base):
+    # ATPS
+    atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
+    adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
+    h_c = cobra.Metabolite("h_c", formula='H', compartment="c")
+    pi = cobra.Metabolite("pi_c", formula='HO4P', compartment="c")
+    h2o = cobra.Metabolite("h2o_c", formula='H2O', compartment="c")
+    h_p = cobra.Metabolite("h_p", formula='H', compartment="p")
+    atps = cobra.Reaction("ATPS")
+    atps.add_metabolites({h_c: -4, adp: -1, pi: -1,
+                          atp: 1, h2o: 1, h_p: 3})
+    base.add_reactions([atps])
     return base
 
 
@@ -349,6 +364,7 @@ def model_builder(name):
         "trxn_no_tags": trxn_no_tags,
         "trxn_correct_atp_driven": trxn_correct_atp_driven,
         "trxn_no_tag_atp_driven": trxn_no_tag_atp_driven,
+        "atp_synthase": atp_synthase,
         "proton_pump": proton_pump,
         "lower_case_mets": lower_case_mets,
         "upper_case_mets": upper_case_mets,
@@ -399,7 +415,8 @@ def test_non_transp_rxn_id_suffix_compartment_match(model, num):
     ("trxn_correct_tags", 0),
     ("trxn_correct_atp_driven", 0),
     ("trxn_no_tags", 3),
-    ("proton_pump", 0)
+    ("proton_pump", 1),
+    ("atp_synthase", 0)
 ], indirect=["model"])
 def test_non_abc_transp_rxn_tag_match(model, num):
     """Expect all non-abc transport rxns to be tagged with a 't'."""
