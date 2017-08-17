@@ -23,8 +23,51 @@ import logging
 import re
 from builtins import dict
 from sympy import expand
+from collections import defaultdict
 
 LOGGER = logging.getLogger(__name__)
+
+
+def find_transported_elements(rxn):
+    """
+    Returns a dictionary showing the amount of transported elements of a rxn.
+
+    Collects the elements for each metabolite participating in a reaction,
+    multiplies the amount by the metabolite's stoichiometry in the reaction and
+    bins the result according to the compartment that metabolite is in. This
+    produces a dictionary of dictionaries such as this
+    ``{'p': {'C': -1, 'H': -4}, c: {'C': 1, 'H': 4}}`` which shows the
+    transported entities. This dictionary is then simplified to only include
+    the non-zero elements of one single compartment i.e. showing the precise
+    elements that are transported.
+
+    Parameters
+    ----------
+    rxn : cobra.Reaction
+        Any cobra.Reaction containing metabolites.
+
+    """
+    element_dist_dict = defaultdict()
+    # Collecting elements for each metabolite.
+    for met in rxn.metabolites:
+        if met.compartment not in element_dist_dict:
+            # Multiplication by the metabolite stoichiometry.
+            element_dist_dict[met.compartment] = \
+                {k: v * rxn.metabolites[met]
+                 for k, v in met.elements.iteritems()}
+        else:
+            x = {k: v * rxn.metabolites[met] for k, v in
+                 met.elements.iteritems()}
+            y = element_dist_dict[met.compartment]
+            element_dist_dict[met.compartment] = \
+                {k: x.get(k, 0) + y.get(k, 0) for k in set(x) | set(y)}
+    delta_dict = defaultdict()
+    # Simplification of the resulting dictionary of dictionaries.
+    for _, elements in element_dist_dict.iteritems():
+        delta_dict.update(elements)
+    # Only non-zero values get included in the returned delta-dict.
+    delta_dict = {k: abs(v) for k, v in delta_dict.iteritems() if v != 0}
+    return delta_dict
 
 
 def find_transport_reactions(model):
@@ -46,24 +89,30 @@ def find_transport_reactions(model):
     This function will not identify transport via the PTS System.
 
     """
-    compartment_spanning_rxns = \
-        [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
-
     transport_reactions = []
-    for rxn in compartment_spanning_rxns:
+    for rxn in model.reactions:
+        # Collecting criteria to classify transporters by.
         rxn_reactants = set([met.formula for met in rxn.reactants])
         rxn_products = set([met.formula for met in rxn.products])
-
+        # Looking for formulas that stay the same on both side of the reaction.
         transported_mets = \
             [formula for formula in rxn_reactants if formula in rxn_products]
-        # Excluding H-pumping reactions for now.
-        if set(transported_mets).issubset(set('H')):
+        # Collect information on the elemental differences between
+        # compartments in the reaction.
+        delta_dicts = find_transported_elements(rxn)
+        non_zero_array = [v for k, v in delta_dicts.iteritems() if v != 0]
+        # Weeding out reactions such as oxidoreductases where no net
+        # transport of Hydrogen is occurring, but rather just an exchange of
+        # electrons or charges effecting a change in protonation.
+        if set(transported_mets) != set('H') and delta_dicts.keys() == ['H']:
             pass
-        # Excluding redox-reactions which only transport electrons
-        elif set(transported_mets).issubset(set(['X', 'XH2'])):
-            pass
-
-        elif len(transported_mets) >= 1:
+        # All other reactions for which the amount of transported elements is
+        # not zero, which are not part of the model's exchange nor
+        # biomass reactions, are defined as transport reactions.
+        # This includes reactions where the transported metabolite reacts with
+        # a carrier molecule.
+        elif sum(non_zero_array) and rxn not in model.exchanges and \
+                rxn not in find_biomass_reaction(model):
             transport_reactions.append(rxn)
 
     return transport_reactions

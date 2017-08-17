@@ -73,7 +73,7 @@ def proton_pump(base):
 
 
 def energy_transfer(base):
-    """Provide a model with an ABC proton pump reaction."""
+    """Provide a model with an electron transfer reaction."""
     cytaox = cobra.Metabolite("cytaox_c", formula='X', compartment="c")
     cytared = cobra.Metabolite("cytared_c", formula='XH2', compartment="c")
     cytbox = cobra.Metabolite("cytbox_m", formula='X', compartment="m")

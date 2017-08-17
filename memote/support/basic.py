@@ -173,3 +173,16 @@ def find_enzyme_complexes(model):
                 if len(candidate) >= 2:
                     enzyme_complexes.add(tuple(candidate))
     return enzyme_complexes
+
+
+def find_pure_metabolic_reactions(model):
+    """
+    Return list of reactions neither transporters, exchanges nor pseudo.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return model
