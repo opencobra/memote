@@ -52,10 +52,7 @@ def test_metabolites_presence(read_only_model, store):
 
 
 def test_transport_reaction_presence(read_only_model, store):
-    """
-    Expect that >= 1 transport reactions are present in the read_only_model.
-
-    """
+    """Expect >= 1 transport reactions are present in the read_only_model."""
     store["transporters"] = helpers.find_transport_reactions(read_only_model)
     store["num_transporters"] = len(
         helpers.find_transport_reactions(read_only_model)
@@ -136,9 +133,7 @@ def test_enzyme_complex_presence(read_only_model, store):
 
 
 def test_find_pure_metabolic_reactions(read_only_model, store):
-    """
-    Expect that >= 1 pure metabolic rxns are present in the read_only_model.
-    """
+    """Expect >= 1 pure metabolic rxns are present in the read_only_model."""
     store["num_metabolic_reactions"] = len(
         basic.find_pure_metabolic_reactions(read_only_model))
     store["metabolic_reactions"] = basic.find_pure_metabolic_reactions(
@@ -148,9 +143,7 @@ def test_find_pure_metabolic_reactions(read_only_model, store):
 
 
 def test_find_transport_reactions(read_only_model, store):
-    """
-    Expect that >= 1 transport reactions are present in the read_only_model.
-    """
+    """Expect >= 1 transport reactions are present in the read_only_model."""
     store["num_transport_reactions"] = len(
         helpers.find_transport_reactions(read_only_model))
     store["transport_reactions"] = helpers.find_transport_reactions(
@@ -160,9 +153,7 @@ def test_find_transport_reactions(read_only_model, store):
 
 
 def test_find_unique_metabolites(read_only_model, store):
-    """
-    Expect there to be less unique mets in read_only_model than mets.
-    """
+    """Expect there to be less unique mets in read_only_model than mets."""
     store["num_unique_metabolites"] = len(
         basic.find_unique_metabolites(read_only_model)
     )
