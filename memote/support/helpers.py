@@ -104,8 +104,9 @@ def find_transport_reactions(model):
         # Weeding out reactions such as oxidoreductases where no net
         # transport of Hydrogen is occurring, but rather just an exchange of
         # electrons or charges effecting a change in protonation.
-        if set(transported_mets) != set('H') \
-            and list(delta_dicts.keys()) == ['H']:
+        if set(transported_mets) != set('H') and list(
+            delta_dicts.keys()
+        ) == ['H']:
             pass
         # All other reactions for which the amount of transported elements is
         # not zero, which are not part of the model's exchange nor
