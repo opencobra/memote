@@ -30,7 +30,6 @@ from os.path import join, dirname
 from multiprocessing import Process
 
 import click
-import pytest
 import git
 from click_configfile import (
     ConfigFileReader, Param, SectionSchema, matches_section)
