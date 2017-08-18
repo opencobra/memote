@@ -274,8 +274,12 @@ def report(ctx, one_time, index):
     if ctx.obj["filename"] is None:
         ctx.obj["filename"] = "index.html"
     if one_time:
-        return api.basic_report(ctx.obj["model"], ctx.obj["filename"],
-                                pytest_args=ctx.obj["pytest_args"])
+        if "--tb" not in ctx.obj["pytest_args"]:
+            ctx.obj["pytest_args"].extend(["--tb", "no"])
+        code, result = api.test_model(
+            ctx.obj["model"], None, True, ctx.obj["pytest_args"])
+        api.basic_report(result, ctx.obj["filename"])
+        return code
     check_directory(ctx)
     check_repo(ctx)
     api.history_report(ctx.obj["repo"], ctx.obj["directory"],

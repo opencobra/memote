@@ -80,38 +80,22 @@ def test_model(model, filename=None, results=False, pytest_args=None):
         return code
 
 
-def basic_report(model, filename, result_file=None, pytest_args=None):
+def basic_report(results, filename):
     """
     Test a model and save a basic report.
 
     Parameters
     ----------
-    model : cobra.Model
-        The metabolic model under investigation.
+    results : dict
+        Nested dictionary structure as returned from the test suite.
     filename : str or pathlib.Path
         A filename for the HTML report.
-    result_file : str or pathlib.Path, optional
-        If you want to save the test results as JSON in addition to the report.
-    pytest_args : list, optional
-        Additional arguments for the pytest suite.
-
-    Returns
-    -------
-    int
-        The return code of the pytest suite.
 
     """
-    if pytest_args is None:
-        pytest_args = ["--tb", "no"]
-    elif "--tb" not in pytest_args:
-        pytest_args.extend(["--tb", "no"])
-    code, results = test_model(model, filename=result_file, results=True,
-                               pytest_args=pytest_args)
     report = BasicReport(results)
     LOGGER.info("Writing basic report '%s'.", filename)
     with io.open(filename, "w") as file_h:
         file_h.write(report.render_html())
-    return code
 
 
 def history_report(repository, directory, filename, index="hash"):
