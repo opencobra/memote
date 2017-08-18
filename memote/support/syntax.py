@@ -125,6 +125,9 @@ def find_reaction_tag_transporter(model):
     """
     Return incorrectly tagged transport reactions.
 
+    Make an exception for the ATP synthase reaction (ATPS) which a unique
+    case for a transport reaction and thus does not get the tag.
+
     Parameters
     ----------
     model : cobra.Model
@@ -140,8 +143,6 @@ def find_reaction_tag_transporter(model):
     Reactions that only transport protons ('H') across the membrane are
     excluded, as well as reactions with redox cofactors whose formula is
     either 'X' or 'XH2'
-    Make an exception for the ATP synthase reaction (ATPS) which a unique
-    case for a transport reaction and thus does not get the tag.
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
