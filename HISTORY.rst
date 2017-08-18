@@ -1,6 +1,10 @@
 History
 =======
 
+Next Release
+------------
+* Add a programmatic API in module ``memote.suite.api`` (#162).
+
 0.3.6 (2017-08-15)
 ------------------
 
