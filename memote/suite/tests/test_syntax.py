@@ -28,9 +28,16 @@ import memote.support.syntax as syntax
 def non_cytosolic(read_only_model, store):
     """Provide all non-cytosolic compartments."""
     compartments = sorted(read_only_model.compartments)
-    compartments.remove('c')
-    store["non_cytosolic"] = compartments
-    return compartments
+    try:
+        store["non_cytosolic"] = compartments.remove('c')
+        return compartments
+    except ValueError:
+        print ("The model does not contain a compartment ID "
+               "labeled ``c`` for the cytosol which is an essential"
+               "compartment. Many syntax tests depend on this being labeled"
+               "accordingly.")
+        store["non_cytosolic"] = []
+        return []
 
 
 def test_non_transp_rxn_id_compartment_suffix_match(read_only_model, store,

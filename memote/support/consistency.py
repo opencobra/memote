@@ -339,12 +339,16 @@ def find_stoichiometrically_balanced_cycles(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    fva_result = flux_variability_analysis(model, loopless=False)
-    fva_result_loopless = flux_variability_analysis(model, loopless=True)
-    row_ids_max = fva_result[
-        fva_result.maximum != fva_result_loopless.maximum].index
-    row_ids_min = fva_result[
-        fva_result.minimum != fva_result_loopless.minimum].index
-    differential_fluxes = set(row_ids_min).union(set(row_ids_max))
-
-    return [model.reactions.get_by_id(id) for id in differential_fluxes]
+    try:
+        fva_result = flux_variability_analysis(model, loopless=False)
+        fva_result_loopless = flux_variability_analysis(model, loopless=True)
+        row_ids_max = fva_result[
+            fva_result.maximum != fva_result_loopless.maximum].index
+        row_ids_min = fva_result[
+            fva_result.minimum != fva_result_loopless.minimum].index
+        differential_fluxes = set(row_ids_min).union(set(row_ids_max))
+        return [model.reactions.get_by_id(id) for id in differential_fluxes]
+    except Exception as e:
+        print("The test to find stoichiometrically balances cycles"
+              "failed with the following exception {}. "
+              "This may a bug.".format(e))
