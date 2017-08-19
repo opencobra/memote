@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validations for command line parameters."""
+"""Callbacks for command line parameters."""
 
 from __future__ import absolute_import
 
@@ -24,7 +24,7 @@ import shlex
 import sys
 import logging
 import warnings
-from os.path import join, dirname, isfile, isdir, exists
+from os.path import isfile, isdir, exists
 
 import click
 import git
