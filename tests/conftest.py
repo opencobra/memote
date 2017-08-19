@@ -22,16 +22,13 @@ from os.path import join, dirname
 import pytest
 from optlang import available_solvers
 from cobra import Model
-from cobra.io import read_sbml_model
 
-"""
-Configuration and fixtures for the py.test suite.
-"""
+"""Configuration and fixtures for the py.test suite."""
 
 # Gurobi MILP is currently not fully supported in optlang.
 # A MOSEK interface still needs to be completed.
-SUPPORTED_SOLVERS = [solver for solver in ["glpk", "cplex"] if
-                     available_solvers[solver.upper()]]
+SUPPORTED_SOLVERS = [solver for solver in ["glpk", "cplex"]
+                     if solver.upper() in available_solvers]
 
 
 @pytest.fixture(scope="session", params=SUPPORTED_SOLVERS)
@@ -39,13 +36,16 @@ def solver(request):
     return request.param
 
 
+@pytest.fixture(scope="session", params=["ecoli-core"])
+def small_file(request):
+    if request.param == "ecoli-core":
+        return join(dirname(__file__), "data", "EcoliCore.xml.gz")
+
+
 @pytest.fixture(scope="function")
 def model(request, solver):
     if request.param == "empty":
         model = Model(id_or_model=request.param, name=request.param)
-    elif request.param == "textbook":
-        model = read_sbml_model(join(dirname(__file__), "data",
-                                     "EcoliCore.xml.gz"))
     else:
         builder = getattr(request.module, "model_builder")
         model = builder(request.param)

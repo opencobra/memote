@@ -112,13 +112,12 @@ def validate_collect(context, param, value):
 
 def validate_pytest_args(context, param, value):
     """Handle additional arguments to pytest."""
-    tests_dir = join(dirname(__file__), "tests")
     if value is not None:
-        return shlex.split(value) + [tests_dir]
+        return shlex.split(value)
     elif "addargs" in context.default_map:
-        return shlex.split(context.default_map["addargs"]) + [tests_dir]
+        return shlex.split(context.default_map["addargs"])
     else:
-        return [tests_dir]
+        return list()
 
 
 def probe_git():

@@ -19,46 +19,30 @@
 
 from __future__ import absolute_import
 
-import locale
 import os
 import sys
 import logging
-from builtins import dict
 from os.path import join
 from multiprocessing import Process
 
 import click
 import git
-from colorama import init, Fore
+from colorama import Fore
 from cookiecutter.main import cookiecutter, get_user_config
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
 from memote import __version__
-from memote.suite.cli.config import ConfigFileProcessor
-
-locale.setlocale(locale.LC_ALL, "")  # set to system default
-init()
+from memote.suite.cli import CONTEXT_SETTINGS
+from memote.suite.cli.reports import report
 
 LOGGER = logging.getLogger()
-
-try:
-    CONTEXT_SETTINGS = dict(
-        default_map=ConfigFileProcessor.read_config()
-    )
-except click.BadParameter as err:
-    click.echo(
-        Fore.RED +
-        "Error in configuration file: {}\nAll configured values will "
-        "be ignored!".format(str(err))
-        + Fore.RESET, err=True)  # noqa: W503
-    CONTEXT_SETTINGS = dict()
 
 
 @click.group()
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
-@click.option("--level", "-l", default="WARN",
+@click.option("--level", "-l", default="INFO",
               type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
               help="Set the log level.", show_default=True)
 def cli(level):
@@ -225,8 +209,5 @@ def save(message):
     """
     raise NotImplementedError(u"Coming soon™.")
 
-
-# Has to be at the bottom to allow the reports to import `CONTEXT_SETTINGS`.
-from memote.suite.cli.reports import report
 
 cli.add_command(report)

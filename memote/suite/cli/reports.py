@@ -26,8 +26,8 @@ import git
 from colorama import Fore
 
 import memote.suite.api as api
+from memote.suite.cli import CONTEXT_SETTINGS
 import memote.suite.cli.callbacks as callbacks
-from memote.suite.cli.runner import CONTEXT_SETTINGS
 
 
 @click.group()

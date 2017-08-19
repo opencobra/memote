@@ -15,14 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)st Suite.
-
-Test suite for an instance of `cobra.Model`.
-"""
+"""Test the memote report command line interface."""
 
 from __future__ import absolute_import
 
-from os.path import join, dirname
+from builtins import str
+from os.path import exists
 
-TEST_DIRECTORY = join(dirname(__file__), "tests")
+import pytest
+
+from memote.suite.cli.reports import report
+
+
+def test_report(runner):
+    """Expect a simple memote report invocation to be successful."""
+    result = runner.invoke(report)
+    assert result.exit_code == 0
+    assert result.output.startswith(
+        "Usage: report [OPTIONS] COMMAND [ARGS]...")
+
+
+def test_snapshot(runner, model_file):
+    """Expect the snapshot report to function."""
+    output = model_file.split(".", 1)[0] + ".html"
+    result = runner.invoke(report, [
+        "snapshot", "--filename", output, model_file])
+    assert result.exit_code == 0
+    assert exists(output)

@@ -27,8 +27,8 @@ except ImportError:
     import json
 
 import pytest
-from os.path import join, dirname
 
+from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.reporting.reports import BasicReport, HistoryReport
 
@@ -60,13 +60,12 @@ def test_model(model, filename=None, results=False, pytest_args=None):
         A nested dictionary structure that contains the complete test results.
 
     """
-    tests_dir = join(dirname(__file__), "tests")
     if pytest_args is None:
-        pytest_args = ["--tb", "line", tests_dir]
+        pytest_args = ["--tb", "line", TEST_DIRECTORY]
     elif "--tb" not in pytest_args:
         pytest_args.extend(["--tb", "line"])
-    elif tests_dir not in pytest_args:
-        pytest_args.append(tests_dir)
+    elif TEST_DIRECTORY not in pytest_args:
+        pytest_args.append(TEST_DIRECTORY)
     plugin = ResultCollectionPlugin(model)
     code = pytest.main(pytest_args, plugins=[plugin])
     if filename is not None:
