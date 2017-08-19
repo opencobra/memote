@@ -21,279 +21,176 @@ from __future__ import absolute_import
 
 import locale
 import os
-import shlex
 import sys
 import logging
-import warnings
 from builtins import dict
-from os.path import join, dirname
+from os.path import join
 from multiprocessing import Process
 
 import click
 import git
-from click_configfile import (
-    ConfigFileReader, Param, SectionSchema, matches_section)
 from colorama import init, Fore
 from cookiecutter.main import cookiecutter, get_user_config
-from cobra.io import read_sbml_model
 
-from memote import __version__
 import memote.suite.api as api
+import memote.suite.callbacks as callbacks
+from memote import __version__
+from memote.suite.config import ConfigFileProcessor
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
+
 LOGGER = logging.getLogger()
 
-
-class ConfigSectionSchema(object):
-    """Describes all sections of the memote configuration file."""
-
-    @matches_section("memote")
-    class Memote(SectionSchema):
-        """Describes the memote configuration keys and values."""
-
-        collect = Param(type=bool, default=True)
-        addargs = Param(type=str, default="")
-        model = Param(type=click.Path(exists=True, dir_okay=False))
-        directory = Param(type=click.Path(exists=True, file_okay=False,
-                                          writable=True))
+try:
+    CONTEXT_SETTINGS = dict(
+        default_map=ConfigFileProcessor.read_config()
+    )
+except click.BadParameter as err:
+    click.echo(
+        Fore.RED +
+        "Error in configuration file: {}\nAll configured values will "
+        "be ignored!".format(str(err))
+        + Fore.RESET, err=True)
+    CONTEXT_SETTINGS = dict()
 
 
-class ConfigFileProcessor(ConfigFileReader):
-    """Determine which files to look for and what sections."""
-
-    config_files = ["memote.ini", "setup.cfg"]
-    config_section_schemas = [ConfigSectionSchema.Memote]
-
-
-def process_collect_flag(no_flag, context):
-    """Handle the report collection flag."""
-    if no_flag is not None:
-        return not no_flag
-    elif "collect" in context.default_map:
-        return context.default_map["collect"]
-    else:
-        return True
-
-
-def process_addargs(args, context):
-    """Handle additional args to pytest."""
-    tests_dir = join(dirname(__file__), "tests")
-    if args is not None:
-        return shlex.split(args) + [tests_dir]
-    elif "addargs" in context.default_map:
-        return shlex.split(context.default_map["addargs"]) + \
-               [tests_dir]
-    else:
-        return [tests_dir]
-
-
-def process_model(model, context):
-    """Load model path from different locations."""
-    if model is not None:
-        return model
-    elif "MEMOTE_MODEL" in os.environ:
-        assert os.path.isfile(os.environ["MEMOTE_MODEL"])
-        return os.environ["MEMOTE_MODEL"]
-    elif "model" in context.default_map:
-        return context.default_map["model"]
-
-
-def process_directory(directory, context):
-    """Load directory from different locations."""
-    if directory is not None:
-        return directory
-    elif "MEMOTE_DIRECTORY" in os.environ:
-        assert os.path.isdir(os.environ["MEMOTE_DIRECTORY"])
-        return os.environ["MEMOTE_DIRECTORY"]
-    elif "directory" in context.default_map:
-        return context.default_map["directory"]
-
-
-def probe_git():
-    """Return meta data if in git repository."""
-    try:
-        repo = git.Repo()
-    except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.YELLOW +
-            "We highly recommend keeping your model in a git repository."
-            " It allows you to track changes and easily collaborate with"
-            " others via online platforms such as https://github.com.\n"
-            + Fore.RESET)  # noqa: W503
-        return
-    if repo.is_dirty():
-        click.echo(
-            Fore.RED +
-            "Please git commit or git stash all changes before running"
-            " the memote suite.", err=True)
-        sys.exit(1)
-    return repo
-
-
-def check_model(ctx):
-    """Ensure that the model option is defined."""
-    if ctx.obj["model"] is None:
-        click.echo(
-            Fore.RED +
-            "No metabolic model found. Specify one using the --model"
-            " option, using the environment variable MEMOTE_MODEL, or in"
-            " either the 'memote.ini' or 'setup.cfg' configuration file.",
-            err=True
-        )
-        sys.exit(2)
-
-
-def check_directory(ctx):
-    """Ensure that the directory option is defined."""
-    if ctx.obj["directory"] is None:
-        click.echo(
-            Fore.RED +
-            "No suitable directory found. Specify one using the --directory"
-            " option, using the environment variable MEMOTE_DIRECTORY, or"
-            " in either the 'memote.ini' or 'setup.cfg' configuration file.",
-            err=True
-        )
-        sys.exit(2)
-
-
-def check_repo(ctx):
-    """Ensure that the repository option is defined."""
-    if ctx.obj["repo"] is None:
-        click.echo(
-            Fore.RED +
-            "The feature rich report only works in a git repository."
-            " Please use the --one-time option instead or setup a repository.",
-            err=True
-        )
-        sys.exit(2)
-
-
-def abort_if_false(ctx, param, value):
-    """Require confirmation."""
-    if not value:
-        ctx.abort()
-
-
-def collect(ctx):
-    """Act like a collect subcommand."""
-    # TODO: record SBML warnings and add them to the report
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        ctx.obj["model"] = read_sbml_model(ctx.obj["model"])
-    check_model(ctx)
-    if ctx.obj["collect"]:
-        if ctx.obj["repo"] is not None and ctx.obj["filename"] is None:
-            check_directory(ctx)
-            if "commit" in ctx.obj:
-                sha = ctx.obj["commit"].hexsha
-            elif "branch" in ctx.obj:
-                sha = ctx.obj["branch"].commit.hexsha
-            else:
-                sha = ctx.obj["repo"].active_branch.commit.hexsha
-            ctx.obj["filename"] = join(
-                ctx.obj["directory"], "{}.json".format(sha))
-        elif ctx.obj["filename"] is None:
-            ctx.obj["filename"] = "result.json"
-    code = api.test_model(ctx.obj["model"], ctx.obj["filename"],
-                          False, ctx.obj["pytest_args"])
-    return code
-
-
-@click.group(context_settings=dict(
-    default_map=ConfigFileProcessor.read_config()))
+@click.group()
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
 @click.option("--level", "-l", default="WARN",
               type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
-              help="Set the log level (default WARN).")
-@click.option("--model", type=click.Path(exists=True, dir_okay=False),
-              help="Path to model file. Can also be given via the environment"
-                   " variable MEMOTE_MODEL or configured in 'setup.cfg' or"
-                   " 'memote.ini'.")
-@click.option("--pytest-args", "-a",
-              help="Any additional arguments you want to pass to pytest."
-                   "Should be given as one continuous string.")
-@click.pass_context
-def cli(ctx, level, model, pytest_args):
+              help="Set the log level.", show_default=True)
+def cli(level):
     """
     Metabolic model testing command line tool.
 
-    In its basic invocation memote performs a test suite on a metabolic model.
+    In its basic invocation memote runs a test suite on a metabolic model.
     Through various subcommands it can further generate a pretty HTML report,
     generate a model repository structure for starting a new project, and
     recreate the test result history.
     """
     logging.basicConfig(level=level, format="%(levelname)s - %(message)s")
-    ctx.obj = dict()
-    ctx.obj["model"] = process_model(model, ctx)
-    ctx.obj["collect"] = process_collect_flag(no_collect, ctx)
-    ctx.obj["filename"] = filename
-    ctx.obj["directory"] = process_directory(directory, ctx)
-    ctx.obj["pytest_args"] = process_addargs(pytest_args, ctx)
-    ctx.obj["repo"] = probe_git()
 
 
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.pass_context
-@click.option("--no-collect", type=bool, is_flag=True,
-              help="Do *not* collect test data needed for generating a report.")
+@click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                required=False, callback=callbacks.validate_model)
+@click.option("--collect/--no-collect", default=True, show_default=True,
+              callback=callbacks.validate_collect,
+              help="Whether or not to collect test data needed for "
+                   "generating a report.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
-              default="result.json", help="Path for the collected results as "
-              "JSON (default 'result.json').")
+              default="result.json", show_default=True,
+              help="Path for the collected results as JSON.")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
+              callback=callbacks.validate_directory,
               help="If invoked inside a git repository, write the test results "
               "to this directory using the commit hash as the filename.")
-def run(ctx, no_collect, filename, directory):
-    """Run the test suite and collect results."""
-    sys.exit(collect(ctx))
+@click.option("--ignore-git", is_flag=True,
+              help="Avoid checking the git repository status.")
+@click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
+              help="Any additional arguments you want to pass to pytest. "
+                   "Should be given as one continuous string.")
+def run(model, collect, filename, directory, ignore_git, pytest_args):
+    """
+    Run the test suite and collect results.
+
+    MODEL: Path to model file. Can also be supplied via the environment variable
+    MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
+    """
+    if ignore_git:
+        repo = None
+    else:
+        repo = callbacks.probe_git()
+    if "--tb" not in pytest_args:
+        pytest_args = ["--tb", "line"] + pytest_args
+    if collect:
+        if repo is not None and directory is not None:
+            filename = join(directory,
+                            "{}.json".format(repo.active_branch.commit.hexsha))
+        code = api.test_model(model, filename, pytest_args=pytest_args)
+    else:
+        code = api.test_model(model, pytest_args=pytest_args)
+    sys.exit(code)
 
 
-@cli.command()
+@cli.group()
 @click.help_option("--help", "-h")
-@click.option("--one-time", is_flag=True,
-              help="Generate a one-time report.")
+def report():
+    """Generate one of three different types of reports."""
+    pass
+
+
+@report.command(context_settings=CONTEXT_SETTINGS)
+@click.help_option("--help", "-h")
+@click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                required=False, callback=callbacks.validate_model)
 @click.option("--filename", type=click.Path(exists=False, writable=True),
-              help="Path for the HTML report output (default 'index.html').")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False),
-              help="If invoked inside a git repository, the report will look "
-              "for JSON files corresponding to the branch's commit history in "
-              "that directory and generate a report from them.")
-@click.option("--index", type=click.Choice(["time", "hash"]), default="time",
-              help="Use either time (default) or commit hashes as the index. "
-              "Only valid with a history report.")
-@click.pass_context
-def report(ctx, one_time, filename, directory, index):
+              default="index.html", show_default=True,
+              help="Path for the HTML report output.")
+@click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
+              help="Any additional arguments you want to pass to pytest. "
+                   "Should be given as one continuous string.")
+def snapshot(model, filename, pytest_args):
     """
-    Generate a one-time or feature rich report.
+    Take a snapshot of a model's state and generate a report.
 
-    The one-time report generates a quick overview of the current model state.
-    If the model lives in a git repository and there is a history of test
-    results, memote can generate a more rich report.
+    MODEL: Path to model file. Can also be supplied via the environment variable
+    MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
-    # TODO: record SBML warnings and add them to the report
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        ctx.obj["model"] = read_sbml_model(ctx.obj["model"])
-    check_model(ctx)
-    if filename is None:
-        filename = "index.html"
-    if one_time:
-        if "--tb" not in ctx.obj["pytest_args"]:
-            ctx.obj["pytest_args"].extend(["--tb", "no"])
-        code, result = api.test_model(
-            ctx.obj["model"], None, True, ctx.obj["pytest_args"])
-        api.basic_report(result, ctx.obj["filename"])
-        return code
-    check_directory(ctx)
-    check_repo(ctx)
-    api.history_report(ctx.obj["repo"], ctx.obj["directory"],
-                       ctx.obj["filename"], index)
+    if "--tb" not in pytest_args:
+        pytest_args = ["--tb", "no"] + pytest_args
+    _, results = api.test_model(model, results=True, pytest_args=pytest_args)
+    api.basic_report(results, filename)
 
 
-@cli.command()
+@report.command(context_settings=CONTEXT_SETTINGS)
+@click.help_option("--help", "-h")
+@click.argument("directory", type=click.Path(exists=True, file_okay=False),
+                callback=callbacks.validate_directory)
+@click.option("--filename", type=click.Path(exists=False, writable=True),
+              default="index.html", show_default=True,
+              help="Path for the HTML report output.")
+@click.option("--index", type=click.Choice(["hash", "time"]), default="hash",
+              show_default=True,
+              help="Use either commit hashes or time as the independent "
+                   "variable for plots.")
+def history(directory, filename, index):
+    """
+    Generate a report over a model's git commit history.
+
+    DIRECTORY: Expect JSON files corresponding to the branch's commit history
+    to be found here. Can also be supplied via the environment variable
+    MEMOTE_DIRECTORY or configured in 'setup.cfg' or 'memote.ini'.
+    """
+    try:
+        repo = git.Repo()
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            Fore.RED +
+            "The history report requires a git repository in order to check "
+            "the current branch's commit history."
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    api.history_report(repo, directory, filename, index)
+
+
+@report.command(context_settings=CONTEXT_SETTINGS)
+@click.help_option("--help", "-h")
+@click.argument("model1", type=click.Path(exists=True, dir_okay=False))
+@click.argument("model2", type=click.Path(exists=True, dir_okay=False))
+@click.option("--filename", type=click.Path(exists=False, writable=True),
+              default="index.html", show_default=True,
+              help="Path for the HTML report output.")
+def diff(model1, model2, filename):
+    """Compare two metabolic models against each other."""
+    raise NotImplementedError(u"Coming soon™.")
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.option("--replay", is_flag=True,
               help="Create a memote repository using the exact same answers "
@@ -304,8 +201,7 @@ def report(ctx, one_time, filename, directory, index):
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
               help="Create a new model repository in the given directory.")
-@click.pass_context
-def new(ctx, directory, replay):
+def new(directory, replay):
     """
     Create a suitable model repository structure from a template.
 
@@ -314,73 +210,87 @@ def new(ctx, directory, replay):
     new directory will be placed in the current directory or respect the given
     --directory option.
     """
-    directory = ctx.obj["directory"]
     if directory is None:
         directory = os.getcwd()
     cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory,
                  replay=replay)
 
 
-@cli.command()
+def _test_history(context, filename, pytest_args):
+    model = callbacks.validate_model(context, "model", None)
+    api.test_model(model, filename, pytest_args=pytest_args)
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.pass_context
 @click.help_option("--help", "-h")
-@click.option("--yes", "-y", is_flag=True, callback=abort_if_false,
+@click.option("--yes", "-y", is_flag=True, callback=callbacks.abort_if_false,
               expose_value=False, help="Confirm overwriting previous results.",
               prompt="Are you sure that you want to change history?")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
+              callback=callbacks.validate_directory,
               help="Generated JSON files from the commit history will be "
                    "written to this directory.")
+@click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
+              help="Any additional arguments you want to pass to pytest. "
+                   "Should be given as one continuous string.")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-@click.pass_context
-def history(ctx, directory, commits):
+def history(context, directory, pytest_args, commits):
     """
     Re-compute test results for the git branch history.
 
-    There are three distinct modes:
+    This command requires the model file to be supplied either by the
+    environment variable MEMOTE_MODEL or configured in a 'setup.cfg' or
+    'memote.ini' file.
+
+    There are two distinct modes:
 
     \b
     1. Completely re-compute test results for each commit in the git history.
        This should only be necessary when memote is first used with existing
        model repositories.
-    2. Update mode complements existing test results with metrics that were
-       newly introduced and not available before. It also fills gaps in the
-       history.
-    3. By giving memote specific commit hashes, it will re-compute test results
+    2. By giving memote specific commit hashes, it will re-compute test results
        for those only.
     """
+    if "--tb" not in pytest_args:
+        pytest_args = ["--tb", "no"] + pytest_args
+    try:
+        repo = git.Repo()
+        branch = repo.active_branch
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            Fore.RED +
+            "The history requires a git repository in order to follow "
+            "the current branch's commit history."
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
     if len(commits) > 0:
+        # TODO: Convert hashes to git.Commit instances.
         raise NotImplementedError(u"Coming soon™.")
-    repo = ctx.obj["repo"]
-    branch = repo.active_branch
-    ctx.obj["branch"] = branch
-    ctx.obj["commit"] = branch.commit
-    LOGGER.info(
-        "%sRunning the test suite for commit '%s'.%s",
-        Fore.GREEN, branch.commit.hexsha, Fore.RESET)
-    # Need to use a subprocess here such that the pytest plugin can be
-    # successfully initialized with new arguments each time. Otherwise the
-    # plugin remains immutable.
-    proc = Process(target=collect, args=(ctx,))
-    proc.start()
-    proc.join()
-    for commit in branch.commit.iter_parents():
+    else:
+        commits = list(branch.commit.iter_parents())
+        commits.insert(0, branch.commit)
+    for commit in commits:
         repo.git.checkout(commit)
-        ctx.obj["commit"] = commit
-        LOGGER.info(
-            "%sRunning the test suite for commit '%s'.%s",
-            Fore.GREEN, commit.hexsha, Fore.RESET)
-        proc = Process(target=collect, args=(ctx,))
+        click.echo(
+            Fore.GREEN +
+            "Running the test suite for commit '{}'.".format(
+                branch.commit.hexsha)
+            + Fore.RESET)
+        filename = join(directory, "{}.json".format(commit.hexsha))
+        proc = Process(target=_test_history,
+                       args=(context, filename, pytest_args))
         proc.start()
         proc.join()
     repo.git.checkout(branch)
     # repo.head.reset(index=True, working_tree=True)  # superfluous?
 
 
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.pass_context
-@click.argument("message", nargs=1)
-def save(ctx, message):
+@click.argument("message")
+def save(message):
     """
     Save current model changes with the given message.
 
