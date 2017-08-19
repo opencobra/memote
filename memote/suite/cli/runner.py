@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Run the test suite on an instance of `cobra.Model`."""
+"""Provide commands for running the test suite on a metabolic model."""
 
 from __future__ import absolute_import
 
@@ -33,9 +33,9 @@ from colorama import init, Fore
 from cookiecutter.main import cookiecutter, get_user_config
 
 import memote.suite.api as api
-import memote.suite.callbacks as callbacks
+import memote.suite.cli.callbacks as callbacks
 from memote import __version__
-from memote.suite.config import ConfigFileProcessor
+from memote.suite.cli.config import ConfigFileProcessor
 
 locale.setlocale(locale.LC_ALL, "")  # set to system default
 init()
@@ -51,7 +51,7 @@ except click.BadParameter as err:
         Fore.RED +
         "Error in configuration file: {}\nAll configured values will "
         "be ignored!".format(str(err))
-        + Fore.RESET, err=True)
+        + Fore.RESET, err=True)  # noqa: W503
     CONTEXT_SETTINGS = dict()
 
 
@@ -115,79 +115,6 @@ def run(model, collect, filename, directory, ignore_git, pytest_args):
     else:
         code = api.test_model(model, pytest_args=pytest_args)
     sys.exit(code)
-
-
-@cli.group()
-@click.help_option("--help", "-h")
-def report():
-    """Generate one of three different types of reports."""
-    pass
-
-
-@report.command(context_settings=CONTEXT_SETTINGS)
-@click.help_option("--help", "-h")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                required=False, callback=callbacks.validate_model)
-@click.option("--filename", type=click.Path(exists=False, writable=True),
-              default="index.html", show_default=True,
-              help="Path for the HTML report output.")
-@click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
-              help="Any additional arguments you want to pass to pytest. "
-                   "Should be given as one continuous string.")
-def snapshot(model, filename, pytest_args):
-    """
-    Take a snapshot of a model's state and generate a report.
-
-    MODEL: Path to model file. Can also be supplied via the environment variable
-    MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
-    """
-    if "--tb" not in pytest_args:
-        pytest_args = ["--tb", "no"] + pytest_args
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args)
-    api.basic_report(results, filename)
-
-
-@report.command(context_settings=CONTEXT_SETTINGS)
-@click.help_option("--help", "-h")
-@click.argument("directory", type=click.Path(exists=True, file_okay=False),
-                callback=callbacks.validate_directory)
-@click.option("--filename", type=click.Path(exists=False, writable=True),
-              default="index.html", show_default=True,
-              help="Path for the HTML report output.")
-@click.option("--index", type=click.Choice(["hash", "time"]), default="hash",
-              show_default=True,
-              help="Use either commit hashes or time as the independent "
-                   "variable for plots.")
-def history(directory, filename, index):
-    """
-    Generate a report over a model's git commit history.
-
-    DIRECTORY: Expect JSON files corresponding to the branch's commit history
-    to be found here. Can also be supplied via the environment variable
-    MEMOTE_DIRECTORY or configured in 'setup.cfg' or 'memote.ini'.
-    """
-    try:
-        repo = git.Repo()
-    except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.RED +
-            "The history report requires a git repository in order to check "
-            "the current branch's commit history."
-            + Fore.RESET, err=True)  # noqa: W503
-        sys.exit(1)
-    api.history_report(repo, directory, filename, index)
-
-
-@report.command(context_settings=CONTEXT_SETTINGS)
-@click.help_option("--help", "-h")
-@click.argument("model1", type=click.Path(exists=True, dir_okay=False))
-@click.argument("model2", type=click.Path(exists=True, dir_okay=False))
-@click.option("--filename", type=click.Path(exists=False, writable=True),
-              default="index.html", show_default=True,
-              help="Path for the HTML report output.")
-def diff(model1, model2, filename):
-    """Compare two metabolic models against each other."""
-    raise NotImplementedError(u"Coming soon™.")
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -277,7 +204,7 @@ def history(context, directory, pytest_args, commits):
             Fore.GREEN +
             "Running the test suite for commit '{}'.".format(
                 branch.commit.hexsha)
-            + Fore.RESET)
+            + Fore.RESET)  # noqa: W503
         filename = join(directory, "{}.json".format(commit.hexsha))
         proc = Process(target=_test_history,
                        args=(context, filename, pytest_args))
@@ -297,3 +224,9 @@ def save(message):
     If a remote repository 'origin' exists the changes will also be uploaded.
     """
     raise NotImplementedError(u"Coming soon™.")
+
+
+# Has to be at the bottom to allow the reports to import `CONTEXT_SETTINGS`.
+from memote.suite.cli.reports import report
+
+cli.add_command(report)
