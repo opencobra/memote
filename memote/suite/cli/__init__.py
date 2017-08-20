@@ -15,14 +15,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)st Suite.
-
-Test suite for an instance of `cobra.Model`.
-"""
+"""memote command line interface."""
 
 from __future__ import absolute_import
 
-from os.path import join, dirname
+import locale
+from builtins import dict
 
-TEST_DIRECTORY = join(dirname(__file__), "tests")
+import click
+from colorama import init, Fore
+
+from memote.suite.cli.config import ConfigFileProcessor
+
+locale.setlocale(locale.LC_ALL, "")  # set to system default
+init()
+
+try:
+    CONTEXT_SETTINGS = dict(
+        default_map=ConfigFileProcessor.read_config()
+    )
+except click.BadParameter as err:
+    click.echo(
+        Fore.RED +
+        "Error in configuration file: {}\nAll configured values will "
+        "be ignored!".format(str(err))
+        + Fore.RESET, err=True)  # noqa: W503
+    CONTEXT_SETTINGS = dict()
+
+

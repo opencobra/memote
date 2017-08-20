@@ -73,7 +73,7 @@ setup(
     dependency_links=[],
     entry_points="""
         [console_scripts]
-        memote=memote.suite.runner:cli
+        memote=memote.suite.cli.runner:cli
     """,
     license="Apache Software License 2.0",
     zip_safe=False,

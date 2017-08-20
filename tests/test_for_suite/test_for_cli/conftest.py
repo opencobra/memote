@@ -15,14 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)st Suite.
-
-Test suite for an instance of `cobra.Model`.
-"""
-
 from __future__ import absolute_import
 
-from os.path import join, dirname
+from builtins import str
+from os.path import basename
+from shutil import copyfile
 
-TEST_DIRECTORY = join(dirname(__file__), "tests")
+import pytest
+from click.testing import CliRunner
+
+
+@pytest.fixture(scope="session")
+def runner():
+    return CliRunner()
+
+
+@pytest.fixture(scope="session")
+def model_file(small_file, tmpdir_factory):
+    filename = str(tmpdir_factory.mktemp("small_models").join(
+        basename(small_file)))
+    copyfile(small_file, filename)
+    return filename
