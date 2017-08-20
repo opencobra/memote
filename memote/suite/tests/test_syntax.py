@@ -32,10 +32,10 @@ def non_cytosolic(read_only_model, store):
         store["non_cytosolic"] = compartments.remove('c')
         return compartments
     except ValueError:
-        print ("The model does not contain a compartment ID "
-               "labeled ``c`` for the cytosol which is an essential"
-               "compartment. Many syntax tests depend on this being labeled"
-               "accordingly.")
+        print("The model does not contain a compartment ID "
+              "labeled ``c`` for the cytosol which is an essential"
+              "compartment. Many syntax tests depend on this being labeled"
+              "accordingly.")
         store["non_cytosolic"] = []
         return []
 
