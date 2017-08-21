@@ -208,82 +208,109 @@ def history(context, directory, pytest_args, commits):
     # repo.head.reset(index=True, working_tree=True)  # superfluous?
 
 
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.option("--note", default="memote-ci access",
-              help="A note describing a personal access token on GitHub ("
-                   "default 'memote-ci access'). Must be unique!")
-@click.option("--repository",
-              help="The repository name on GitHub. Usually set automatically.")
+@click.option("--note", default="memote-ci access", show_default=True,
+              help="A note describing a personal access token on GitHub. "
+                   "Must be unique!")
+@click.option("--repository", callback=callbacks.validate_repository,
+              help="The repository name on GitHub. Usually this is configured "
+                   "for you.")
+@click.option("--username", callback=callbacks.validate_username,
+              help="The GitHub username. Usually this is configured for you.")
 @click.pass_context
-def online(ctx, note, repository):
+def online(context, note, repository, username):
     """Upload the repository to GitHub and enable testing on Travis CI."""
-    check_repo(ctx)
-    repo_slug = repository if repository is not None else \
-        ctx.obj["github_repository"]
-    username = ctx.obj.get("github_username")
-    name = input("GitHub Username [{}]: ".format(username))
-    if len(name) == 0 and username is not None:
-        name = username
+    try:
+        repo = git.Repo()
+        branch = repo.active_branch.name
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            Fore.RED +
+            "The history requires a git repository in order to follow "
+            "the current branch's commit history."
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
     password = getpass("GitHub Password: ")
-    gh = Github(name, password)
+    gh = Github(username, password)
     user = gh.get_user()
     try:
         when = user.created_at.isoformat(sep=" ")
-        LOGGER.info("Logged in to user '%s' created on '%s'.", user.login, when)
+        click.echo(
+            "Logged in to user '{}' created on '{}'.".format(user.login, when))
     except BadCredentialsException:
-        LOGGER.critical(
-            "%sIncorrect username or password!%s", Fore.RED, Fore.RESET)
-        return 1
+        click.echo(
+            Fore.RED +
+            "Incorrect username or password!"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
     try:
-        repo = user.get_repo(repo_slug)
-        LOGGER.warning(
-            "%sUsing existing repository '%s'. This may override previous "
-            "settings.%s", Fore.YELLOW, repo_slug, Fore.RESET)
+        gh_repo = user.get_repo(repository)
+        click.echo(
+            Fore.YELLOW +
+            "Using existing repository '{}'. This may override previous "
+            "settings.".format(repository)
+            + Fore.RESET)  # noqa: W503
     except UnknownObjectException:
-        repo = user.create_repo(repo_slug)
-        # TODO: Push repo content or leave that to `memote publish`?
+        gh_repo = user.create_repo(repository)
+        repo.remotes.origin.push(refspec='{}:{}'.format(branch, branch))
     try:
-        LOGGER.info("Creating token.")
+        click.echo("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
     except GithubException:
-        LOGGER.critical(
-            "%sA personal access token with the note '%s' already exists. "
-            "Either delete it or choose another note.%s",
-            Fore.RED, note, Fore.RESET)
-        return 1
+        click.echo(
+            Fore.RED +
+            "A personal access token with the note '{}' already exists. "
+            "Either delete it or choose another note.".format(note)
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
     try:
-        LOGGER.info("Authorizing with TravisCI.")
+        click.echo("Authorizing with TravisCI.")
         travis = TravisPy.github_auth(auth.token)
         t_user = travis.user()
     except TravisError:
-        LOGGER.critical(
-            "%sSomething is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!%s",
-            Fore.RED, Fore.RESET)
-        return 1
-    LOGGER.info("Synchronizing repositories.")
+        click.echo(
+            Fore.RED +
+            "Something is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'!"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    click.echo("Synchronizing repositories.")
     while not t_user.sync():
         sleep(0.1)
-    t_repo = travis.repo(repo.full_name)
+    try:
+        t_repo = travis.repo(gh_repo.full_name)
+    except TravisError:
+        click.echo(
+            Fore.RED +
+            "Repository could not be found. Is it on GitHub already and "
+            "spelled correctly?"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
     if t_repo.enable():
-        LOGGER.info(
-            "%sYour repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!%s", Fore.GREEN, Fore.RESET)
+        click.echo(
+            Fore.GREEN +
+            "Your repository is now on GitHub and automatic testing has "
+            "been enabled on Travis CI. Congrats!" + Fore.RESET)  # noqa: W503
     else:
-        LOGGER.critical(
-            "%sUnable to enable automatic testing on Travis CI!%s",
-            Fore.RED, Fore.RESET)
-        return 1
-    LOGGER.info("Encrypting GitHub token for repo '%s'.", repo.full_name)
-    key = retrieve_public_key(repo.full_name)
+        click.echo(
+            Fore.RED +
+            "Unable to enable automatic testing on Travis CI!",
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    click.echo(
+        "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
+    key = retrieve_public_key(gh_repo.full_name)
     secret = encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
-    LOGGER.info("Storing GitHub token in '.travis.yml'.")
+    click.echo("Storing GitHub token in '.travis.yml'.")
     with io.open(".travis.yml", "r") as file_h:
         config = yaml.load(file_h, yaml.RoundTripLoader)
     config["env"]["global"].append({"secure": secret})
     with io.open(".travis.yml", "w") as file_h:
         yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
+    repo.index.add([".travis.yml"])
+    repo.index.commit("chore: add encrypted GitHub access token")
+    repo.remotes.origin.push(refspec='{}:{}'.format(branch, branch))
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)

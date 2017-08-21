@@ -37,6 +37,8 @@ class ConfigSectionSchema(object):
         model = Param(type=click.Path(exists=True, dir_okay=False))
         directory = Param(type=click.Path(exists=True, file_okay=False,
                                           writable=True))
+        github_repository = Param(type=str)
+        github_username = Param(type=str)
 
 
 class ConfigFileProcessor(ConfigFileReader):
