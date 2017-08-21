@@ -53,6 +53,19 @@ def gpr_present(base):
     return base
 
 
+def gpr_present_complex(base):
+    """Provide a model with reactions that all have GPR"""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'gene1 and gene2'
+    rxn_2 = cobra.Reaction("RXN2")
+    rxn_2.gene_reaction_rule = '(gene4 and gene7) or ' \
+                               '(gene9 and (gene10 or gene14))'
+    rxn_3 = cobra.Reaction("RXN3")
+    rxn_3.gene_reaction_rule = 'gene1 and gene2'
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
 def gpr_missing(base):
     """Provide a model reactions that lack GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -135,6 +148,7 @@ def nonzero_constrained_rxn(base):
 
 
 def ngam_present(base):
+    """Provide a model with a correct NGAM reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
     met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
     met_i = cobra.Metabolite("h_c", "H")
@@ -149,6 +163,7 @@ def ngam_present(base):
 
 
 def simple_atp_hydrolysis(base):
+    """Provide a model with an ATP hydrolysis reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
     met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
     met_i = cobra.Metabolite("h_c", "H")
@@ -162,11 +177,52 @@ def simple_atp_hydrolysis(base):
     return base
 
 
+def sufficient_compartments(base):
+    """Provide a model with the minimal amount of compartments"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("a_p", compartment="p")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_b = cobra.Reaction("AB")
+    rxn_a_b.add_metabolites({met_a: 1,
+                             met_b: -1})
+    rxn_b_c = cobra.Reaction("BC")
+    rxn_b_c.add_metabolites({met_b: 1,
+                             met_c: -1})
+    base.add_reactions([rxn_b_c, rxn_a_b])
+    return base
+
+
+def insufficient_compartments(base):
+    """Provide a model with less than the minimal amount of compartments"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_c = cobra.Reaction("AC")
+    rxn_a_c.add_metabolites({met_a: 1,
+                             met_c: -1})
+    base.add_reactions([rxn_a_c])
+    return base
+
+
+def non_metabolic_reactions(base):
+    """Provide a model all kinds of reactions that are not purely metabolic"""
+    met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
+    met_c = cobra.Metabolite("a_e", formula='CH4', compartment="e")
+    rxn_a_c = cobra.Reaction("AC")
+    rxn_a_c.add_metabolites({met_a: 1,
+                             met_c: -1})
+    biomass = cobra.Reaction("BIOMASS")
+    ex_a = cobra.Reaction("EX_a_e")
+    ex_a.add_metabolites({met_c: -1})
+    base.add_reactions([rxn_a_c, biomass, ex_a])
+    return base
+
+
 def model_builder(name):
     choices = {
         "three-missing": three_missing,
         "three-present": three_present,
         "gpr_present": gpr_present,
+        "gpr_present_complex": gpr_present_complex,
         "gpr_missing": gpr_missing,
         "gpr_missing_with_exchange": gpr_missing_with_exchange,
         "gpr_present_not_lumped": gpr_present_not_lumped,
@@ -176,6 +232,9 @@ def model_builder(name):
         "nonzero_constrained_rxn": nonzero_constrained_rxn,
         "ngam_present": ngam_present,
         "simple_atp_hydrolysis": simple_atp_hydrolysis,
+        "sufficient_compartments": sufficient_compartments,
+        "insufficient_compartments": insufficient_compartments,
+        "non_metabolic_reactions": non_metabolic_reactions
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -284,4 +343,40 @@ def test_ngam_presence(model, num):
     ngam_reaction = basic.find_ngam(model)
     assert len(ngam_reaction) == num
 
+
+@pytest.mark.parametrize("model, boolean", [
+    ("sufficient_compartments", True),
+    ("insufficient_compartments", False)
+], indirect=["model"])
+def test_compartments_presence(model, boolean):
+    """Expect amount of compartments to be identified correctly."""
+    assert (len(model.get_metabolite_compartments()) >= 3) == boolean
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gpr_present", 0),
+    ("gpr_missing", 0),
+    ("gpr_present_complex", 4)
+], indirect=["model"])
+def test_enzyme_complex_presence(model, num):
+    """Expect amount of enzyme complexes to be identified correctly."""
+    assert len(basic.find_enzyme_complexes(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("simple_atp_hydrolysis", 1),
+    ("gpr_missing_with_exchange", 1),
+    ("non_metabolic_reactions", 0)
+], indirect=["model"])
+def test_find_pure_metabolic_reactions(model, num):
+    """Expect amount of metabolic reactions to be identified correctly."""
+    assert len(basic.find_pure_metabolic_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("sufficient_compartments", 1)
+], indirect=["model"])
+def test_find_unique_metabolites(model, num):
+    """Expect amount of metabolic reactions to be identified correctly."""
+    assert len(basic.find_unique_metabolites(model)) == num
 

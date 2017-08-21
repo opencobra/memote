@@ -22,8 +22,54 @@ from __future__ import absolute_import
 import logging
 import re
 from builtins import dict
+from collections import defaultdict
+
+from six import iteritems, itervalues
+from sympy import expand
 
 LOGGER = logging.getLogger(__name__)
+
+
+def find_transported_elements(rxn):
+    """
+    Return a dictionary showing the amount of transported elements of a rxn.
+
+    Collects the elements for each metabolite participating in a reaction,
+    multiplies the amount by the metabolite's stoichiometry in the reaction and
+    bins the result according to the compartment that metabolite is in. This
+    produces a dictionary of dictionaries such as this
+    ``{'p': {'C': -1, 'H': -4}, c: {'C': 1, 'H': 4}}`` which shows the
+    transported entities. This dictionary is then simplified to only include
+    the non-zero elements of one single compartment i.e. showing the precise
+    elements that are transported.
+
+    Parameters
+    ----------
+    rxn : cobra.Reaction
+        Any cobra.Reaction containing metabolites.
+
+    """
+    element_dist = defaultdict()
+    # Collecting elements for each metabolite.
+    for met in rxn.metabolites:
+        if met.compartment not in element_dist:
+            # Multiplication by the metabolite stoichiometry.
+            element_dist[met.compartment] = \
+                {k: v * rxn.metabolites[met]
+                 for (k, v) in iteritems(met.elements)}
+        else:
+            x = {k: v * rxn.metabolites[met] for (k, v) in
+                 iteritems(met.elements)}
+            y = element_dist[met.compartment]
+            element_dist[met.compartment] = \
+                {k: x.get(k, 0) + y.get(k, 0) for k in set(x) | set(y)}
+    delta_dict = defaultdict()
+    # Simplification of the resulting dictionary of dictionaries.
+    for elements in itervalues(element_dist):
+        delta_dict.update(elements)
+    # Only non-zero values get included in the returned delta-dict.
+    delta_dict = {k: abs(v) for (k, v) in iteritems(delta_dict) if v != 0}
+    return delta_dict
 
 
 def find_transport_reactions(model):
@@ -45,24 +91,32 @@ def find_transport_reactions(model):
     This function will not identify transport via the PTS System.
 
     """
-    compartment_spanning_rxns = \
-        [rxn for rxn in model.reactions if len(rxn.get_compartments()) >= 2]
-
     transport_reactions = []
-    for rxn in compartment_spanning_rxns:
+    for rxn in model.reactions:
+        # Collecting criteria to classify transporters by.
         rxn_reactants = set([met.formula for met in rxn.reactants])
         rxn_products = set([met.formula for met in rxn.products])
-
+        # Looking for formulas that stay the same on both side of the reaction.
         transported_mets = \
             [formula for formula in rxn_reactants if formula in rxn_products]
-        # Excluding H-pumping reactions for now.
-        if set(transported_mets).issubset(set('H')):
+        # Collect information on the elemental differences between
+        # compartments in the reaction.
+        delta_dicts = find_transported_elements(rxn)
+        non_zero_array = [v for (k, v) in iteritems(delta_dicts) if v != 0]
+        # Weeding out reactions such as oxidoreductases where no net
+        # transport of Hydrogen is occurring, but rather just an exchange of
+        # electrons or charges effecting a change in protonation.
+        if set(transported_mets) != set('H') and list(
+            delta_dicts.keys()
+        ) == ['H']:
             pass
-        # Excluding redox-reactions which only transport electrons
-        elif set(transported_mets).issubset(set(['X', 'XH2'])):
-            pass
-
-        elif len(transported_mets) >= 1:
+        # All other reactions for which the amount of transported elements is
+        # not zero, which are not part of the model's exchange nor
+        # biomass reactions, are defined as transport reactions.
+        # This includes reactions where the transported metabolite reacts with
+        # a carrier molecule.
+        elif sum(non_zero_array) and rxn not in model.exchanges and \
+                rxn not in find_biomass_reaction(model):
             transport_reactions.append(rxn)
 
     return transport_reactions
@@ -222,3 +276,26 @@ def find_exchange_rxns(model):
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if any(c in rxn.get_compartments() for c in ['e'])]
+
+
+def find_functional_units(gpr_str):
+    """
+    Return an iterator of gene IDs grouped by boolean rules from the gpr_str.
+
+    The gpr_str is first transformed into an algebraic expression, replacing
+    the boolean operators 'or' with '+' and 'and' with '*'. Treating the
+    gene IDs as sympy.symbols this allows a mathematical expansion of the
+    algebraic expression. The expanded form is then split again producing sets
+    of gene IDs that in the gpr_str had an 'and' relationship.
+
+    Parameters
+    ----------
+    gpr_str : string
+            A string consisting of gene ids and the boolean expressions 'and'
+            and 'or'
+
+    """
+    algebraic_form = re.sub('[Oo]r', '+', re.sub('[Aa]nd', '*', gpr_str))
+    expanded = str(expand(algebraic_form))
+    for unit in expanded.replace('+', ',').split(' , '):
+        yield unit.split('*')
