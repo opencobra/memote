@@ -1,11 +1,12 @@
-memote.suite package
-====================
+memote\.suite package
+=====================
 
 Subpackages
 -----------
 
 .. toctree::
 
+    memote.suite.cli
     memote.suite.reporting
 
 Submodules
@@ -13,8 +14,8 @@ Submodules
 
 .. toctree::
 
+   memote.suite.api
    memote.suite.collect
-   memote.suite.runner
 
 Module contents
 ---------------

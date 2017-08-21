@@ -1,7 +1,7 @@
-memote.support.helpers module
+memote\.suite\.collect module
 =============================
 
-.. automodule:: memote.support.helpers
+.. automodule:: memote.suite.collect
     :members:
     :undoc-members:
     :show-inheritance:

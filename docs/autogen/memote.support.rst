@@ -1,5 +1,5 @@
-memote.support package
-======================
+memote\.support package
+=======================
 
 Submodules
 ----------

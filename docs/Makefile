@@ -4,8 +4,10 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
+SPHINXGEN     = sphinx-apidoc
 PAPER         =
 BUILDDIR      = _build
+AUTODIR       = autogen
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
@@ -23,6 +25,7 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  rst        to make auto-generated RST files"
 	@echo "  html       to make standalone HTML files"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
@@ -48,6 +51,10 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -rf $(AUTODIR)/*
+
+rst:
+	$(SPHINXGEN) -f -d 2 -e -o $(AUTODIR) ../memote
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
