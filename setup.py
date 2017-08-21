@@ -49,7 +49,11 @@ requirements = [
     "cookiecutter",
     "python-libsbml",
     "cobra>=0.6.1",
-    "plotly"
+    "ruamel.yaml<0.15",
+    "plotly",
+    "travispy",
+    "pygithub",
+    "travis-encrypt"
 ]
 
 test_requirements = [

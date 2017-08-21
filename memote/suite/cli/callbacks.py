@@ -120,6 +120,28 @@ def validate_pytest_args(context, param, value):
         return list()
 
 
+def validate_repository(context, param, value):
+    """Load repository slug from different locations."""
+    if value is not None:
+        return value
+    elif "github_repository" in context.default_map:
+        return context.default_map["github_repository"]
+    else:
+        raise click.BadParameter(
+            "No GitHub repository slug provided or configured.")
+
+
+def validate_username(context, param, value):
+    """Load username from different locations."""
+    if value is not None:
+        return value
+    elif "github_username" in context.default_map:
+        return context.default_map["github_username"]
+    else:
+        raise click.BadParameter(
+            "No GitHub username provided or configured.")
+
+
 def probe_git():
     """Return a git repository instance if it exists."""
     try:

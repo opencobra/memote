@@ -19,16 +19,25 @@
 
 from __future__ import absolute_import
 
+import io
 import os
 import sys
 import logging
 from os.path import join
 from multiprocessing import Process
+from getpass import getpass
+from time import sleep
 
 import click
 import git
+import ruamel.yaml as yaml
 from colorama import Fore
 from cookiecutter.main import cookiecutter, get_user_config
+from github import (
+    Github, BadCredentialsException, UnknownObjectException, GithubException)
+from travispy import TravisPy
+from travispy.errors import TravisError
+from travis.encrypt import encrypt_key, retrieve_public_key
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
@@ -196,6 +205,110 @@ def history(context, directory, pytest_args, commits):
         proc.join()
     repo.git.checkout(branch)
     # repo.head.reset(index=True, working_tree=True)  # superfluous?
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.help_option("--help", "-h")
+@click.option("--note", default="memote-ci access", show_default=True,
+              help="A note describing a personal access token on GitHub. "
+                   "Must be unique!")
+@click.option("--repository", callback=callbacks.validate_repository,
+              help="The repository name on GitHub. Usually this is configured "
+                   "for you.")
+@click.option("--username", callback=callbacks.validate_username,
+              help="The GitHub username. Usually this is configured for you.")
+@click.pass_context
+def online(context, note, repository, username):
+    """Upload the repository to GitHub and enable testing on Travis CI."""
+    try:
+        repo = git.Repo()
+        branch = repo.active_branch.name
+    except git.InvalidGitRepositoryError:
+        click.echo(
+            Fore.RED +
+            "The history requires a git repository in order to follow "
+            "the current branch's commit history."
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    password = getpass("GitHub Password: ")
+    gh = Github(username, password)
+    user = gh.get_user()
+    try:
+        when = user.created_at.isoformat(sep=" ")
+        click.echo(
+            "Logged in to user '{}' created on '{}'.".format(user.login, when))
+    except BadCredentialsException:
+        click.echo(
+            Fore.RED +
+            "Incorrect username or password!"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    try:
+        gh_repo = user.get_repo(repository)
+        click.echo(
+            Fore.YELLOW +
+            "Using existing repository '{}'. This may override previous "
+            "settings.".format(repository)
+            + Fore.RESET)  # noqa: W503
+    except UnknownObjectException:
+        gh_repo = user.create_repo(repository)
+    try:
+        click.echo("Creating token.")
+        auth = user.create_authorization(scopes=["repo"], note=note)
+    except GithubException:
+        click.echo(
+            Fore.RED +
+            "A personal access token with the note '{}' already exists. "
+            "Either delete it or choose another note.".format(note)
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    try:
+        click.echo("Authorizing with TravisCI.")
+        travis = TravisPy.github_auth(auth.token)
+        t_user = travis.user()
+    except TravisError:
+        click.echo(
+            Fore.RED +
+            "Something is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'!"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    click.echo("Synchronizing repositories.")
+    while not t_user.sync():
+        sleep(0.1)
+    try:
+        t_repo = travis.repo(gh_repo.full_name)
+    except TravisError:
+        click.echo(
+            Fore.RED +
+            "Repository could not be found. Is it on GitHub already and "
+            "spelled correctly?"
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    if t_repo.enable():
+        click.echo(
+            Fore.GREEN +
+            "Your repository is now on GitHub and automatic testing has "
+            "been enabled on Travis CI. Congrats!" + Fore.RESET)  # noqa: W503
+    else:
+        click.echo(
+            Fore.RED +
+            "Unable to enable automatic testing on Travis CI!",
+            + Fore.RESET, err=True)  # noqa: W503
+        sys.exit(1)
+    click.echo(
+        "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
+    key = retrieve_public_key(gh_repo.full_name)
+    secret = encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
+    click.echo("Storing GitHub token in '.travis.yml'.")
+    with io.open(".travis.yml", "r") as file_h:
+        config = yaml.load(file_h, yaml.RoundTripLoader)
+    config["env"]["global"].append({"secure": secret})
+    with io.open(".travis.yml", "w") as file_h:
+        yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
+    repo.index.add([".travis.yml"])
+    repo.index.commit("chore: add encrypted GitHub access token")
+    repo.remotes.origin.push(refspec='{}:{}'.format(branch, branch))
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
