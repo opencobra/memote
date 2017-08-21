@@ -22,7 +22,8 @@ from __future__ import absolute_import
 import os
 import platform
 import logging
-
+import re
+from os.path import basename
 from builtins import dict
 from datetime import datetime
 
@@ -38,9 +39,10 @@ class ResultCollectionPlugin(object):
     """
     Provide functionality for complex test result collection.
 
-    The plugin exposes the fixture ``store`` which can be used in test functions
-    to store values in a dictionary. The dictionary is namespaced to the module
-    so within a module the same keys should not be re-used (unless intended).
+    The plugin exposes the fixture ``store`` which can be used in test
+    functions to store values in a dictionary. The dictionary is namespaced to
+    the module so within a module the same keys should not be re-used
+    (unless intended).
 
     """
 
@@ -70,11 +72,10 @@ class ResultCollectionPlugin(object):
         self.branch = branch
         self.commit = commit
         self._collect_meta_info()
+        self._param = re.compile(r"\[(?P<param>[a-z0-9_.\-]+)\]$")
 
     def _collect_meta_info(self):
         """Record environment information."""
-        os.environ["BIOMASS_REACTIONS"] = "|".join([
-            rxn.id for rxn in find_biomass_reaction(self._model)])
         self._meta["platform"] = platform.system()
         self._meta["release"] = platform.release()
         self._meta["python"] = platform.python_version()
@@ -109,6 +110,70 @@ class ResultCollectionPlugin(object):
                 " ")
             self._meta["commit_hash"] = self.commit.hexsha
 
+    def pytest_namespace(self):
+        """Insert model information into the pytest namespace."""
+        biomass_ids = [rxn.id for rxn in find_biomass_reaction(self._model)]
+        compartment_ids = sorted(self._model.compartments)
+        try:
+            compartment_ids.remove("c")
+        except ValueError:
+            LOGGER.error(
+                "The model does not contain a compartment ID labeled 'c' for the "
+                "cytosol which is an essential compartment. Many syntax tests "
+                "depend on this being labeled accordingly.")
+        return {
+            "memote": {
+                "biomass_ids": biomass_ids,
+                "compartment_ids": compartment_ids
+            }
+        }
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_runtest_teardown(self, item):
+        """Collect the annotation from each test case and store it."""
+        module = self._data.setdefault(item.obj.__module__, dict())
+        case = module.setdefault(item.obj.__name__, dict())
+        if hasattr(item.obj, "annotation"):
+            case.update(item.obj.annotation)
+        else:
+            LOGGER.debug("Test case '%s' has no annotation (%s).",
+                         item.obj.__name__, item.nodeid)
+
+    def pytest_report_teststatus(self, report):
+        """
+        Log pytest results for each test.
+
+        The categories are passed, failed, error, skipped and marked to fail.
+
+        Parameters
+        ----------
+        report : TestReport
+            A test report object from pytest with test case result.
+
+        """
+        if report.when != "call":
+            return
+        module_name = basename(report.location[0]).split(".")[0]
+        item_name = report.location[2]
+
+        # Check for a parametrized test.
+        match = self._param.search(item_name)
+        if match is not None:
+            param = match.group("param")
+            item_name = item_name[:match.start()]
+
+        module = self._data.setdefault(module_name, dict())
+        case = module.setdefault(item_name, dict())
+
+        if match is not None:
+            case["duration"] = case.setdefault("duration", dict())
+            case["duration"][param] = report.duration
+            case["result"] = case.setdefault("result", dict())
+            case["result"][param] = report.outcome
+        else:
+            case["duration"] = report.duration
+            case["result"] = report.outcome
+
     @property
     def results(self):
         """Return the test results as a nested dictionary."""
@@ -123,10 +188,3 @@ class ResultCollectionPlugin(object):
     def model(self, read_only_model):
         """Provide a pristine model for a test unit."""
         return self._model.copy()
-
-    @pytest.fixture(scope="module")
-    def store(self, request):
-        """Expose a `dict` to store values on."""
-        LOGGER.debug("requested in '%s'", request.module.__name__)
-        self._data[request.module.__name__] = dict()
-        return self._data[request.module.__name__]

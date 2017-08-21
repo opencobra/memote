@@ -23,6 +23,12 @@ import logging
 import re
 from builtins import dict
 from collections import defaultdict
+import numpy as np
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", UserWarning)
+    # ignore Gurobi warning
+    from cobra.exceptions import Infeasible
 
 from six import iteritems, itervalues
 from sympy import expand
@@ -308,3 +314,41 @@ def find_functional_units(gpr_str):
     expanded = str(expand(algebraic_form))
     for unit in expanded.replace('+', ',').split(' , '):
         yield unit.split('*')
+
+
+def run_fba(model, rxn_id, direction="max", single_value=True):
+    """
+    Return the solution of an FBA to a set objective function.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    rxn_id : string
+        A string containing the reaction ID of the desired FBA objective
+    direction: string
+        A string containing either "max" or "min" to specify the direction
+        of the desired FBA objective function
+    single_value: boolean
+        Indicates whether the results for all reactions are gathered from the
+        solver, or only the result for the objective value.
+
+    Returns
+    -------
+    cobra.solution
+        The cobra solution object for the corresponding FBA problem
+
+    """
+    model.objective = model.reactions.get_by_id(rxn_id)
+    model.objective_direction = direction
+    if single_value:
+        try:
+            return model.slim_optimize()
+        except Infeasible:
+            return np.nan
+    else:
+        try:
+            solution = model.optimize()
+            return solution
+        except Infeasible:
+            return np.nan

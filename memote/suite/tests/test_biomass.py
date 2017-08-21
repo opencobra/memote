@@ -26,114 +26,131 @@ to remain the same as the parametrized test cases.
 from __future__ import absolute_import
 
 import os
-import warnings
+import logging
 
 import pytest
 import numpy as np
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", UserWarning)
-    # ignore Gurobi warning
-    from cobra.exceptions import Infeasible
 
 import memote.support.biomass as biomass
+import memote.support.helpers as helpers
+from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-BIOMASS_IDS = os.environ.get("BIOMASS_REACTIONS", "").split("|")
+LOGGER = logging.getLogger(__name__)
+BIOMASS_IDS = pytest.memote.biomass_ids
 
 
-def test_biomass_presence(store):
+@annotate(title="Presence of a Biomass Reaction", type="array")
+def test_biomass_presence():
     """Expect the model to contain at least one biomass reaction."""
-    store["biomass_ids"] = BIOMASS_IDS
-    assert len(BIOMASS_IDS) > 0, \
-        "Could not identify any biomass reaction." \
-        " Please change the intended reaction ID(s) to contain 'biomass'."
+    ann = test_biomass_presence.annotation
+    ann["data"] = BIOMASS_IDS
+    ann["message"] = wrapper.fill(
+        """The biomass composition aka biomass formulation aka biomass reaction 
+        is a common pseudo-reaction accounting for biomass synthesis in 
+        constraints-based modelling. It describes the stoichiometry of 
+        intracellular compounds that are required for cell growth. In this 
+        model {} the following biomass reactions were identified: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) > 0, ann["message"]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-def test_biomass_consistency(read_only_model, reaction_id, store):
+@annotate(title="Biomass Consistency", type="object", data=dict(),
+          message=dict())
+def test_biomass_consistency(read_only_model, reaction_id):
     """Expect biomass components to sum up to 1 g[CDW]."""
-    store["biomass_sum"] = store.get("biomass_sum", list())
+    ann = test_biomass_consistency.annotation
     reaction = read_only_model.reactions.get_by_id(reaction_id)
-    component_sum = biomass.sum_biomass_weight(reaction)
-    store["biomass_sum"].append(component_sum)
-    assert np.isclose(component_sum, 1.0, atol=1e-03), \
-        "{}'s components sum up to {} which is too far from " \
-        "1 mmol / g[CDW] / h".format(reaction.id, component_sum)
+    ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
+    ann["message"][reaction_id] = wrapper.fill(
+        """The component molar mass of the biomass reaction {} sums up to {} 
+        which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
+        """.format(reaction_id, ann["data"][reaction_id]))
+    assert np.isclose(
+        ann["data"][reaction_id], 1.0, atol=1e-03), ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-def test_biomass_default_production(model, reaction_id, store):
+@annotate(title="Biomass Production At Default State", type="object",
+          data=dict(), message=dict())
+def test_biomass_default_production(model, reaction_id):
     """Expect biomass production in default medium."""
-    store["biomass_default_flux"] = store.get("biomass_default_flux", list())
-    reaction = model.reactions.get_by_id(reaction_id)
-    model.objective = reaction
-    try:
-        model.slim_optimize()
-        flux = reaction.flux
-    except Infeasible:
-        flux = np.nan
-    store["biomass_default_flux"].append(flux)
-    assert flux > 0.0
+    ann = test_biomass_default_production.annotation
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
+    ann["message"][reaction_id] = wrapper.fill(
+        """Using the biomass reaction {} this is the growth rate that can be 
+        achieved when the model is simulated on the provided default medium: {}
+        """.format(reaction_id, ann["data"][reaction_id]))
+    assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-def test_biomass_precursors_default_production(read_only_model, reaction_id,
-                                               store):
+@annotate(title="Blocked Biomass Precursors At Default State", type="object",
+          data=dict(), message=dict())
+def test_biomass_precursors_default_production(read_only_model, reaction_id):
     """Expect production of all biomass precursors in default medium."""
-    store["default_blocked_precursors"] = store.get(
-        "default_blocked_precursors", list())
+    ann = test_biomass_precursors_default_production.annotation
     reaction = read_only_model.reactions.get_by_id(reaction_id)
-    blocked = [
-        met.id for met in biomass.find_blocked_biomass_precursors(
-            reaction, read_only_model)]
-    store["default_blocked_precursors"].append(blocked)
-    assert len(blocked) == 0, \
-        "{}'s following precursors cannot be produced: {}" \
-        "".format(reaction.id, ", ".join(blocked))
+    ann["data"][reaction_id] = get_ids(
+        biomass.find_blocked_biomass_precursors(reaction, read_only_model)
+    )
+    ann["message"][reaction_id] = wrapper.fill(
+        """Using the biomass reaction {} and when the model is simulated on the 
+        provided default medium a total of {} precursors cannot be produced: {}
+        """.format(reaction_id, len(ann["data"][reaction_id]),
+                   ann["data"][reaction_id]))
+    assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-def test_biomass_precursors_open_production(model, reaction_id, store):
+@annotate(title="Blocked Biomass Precursors In Complete Medium", type="object",
+          data=dict(), message=dict())
+def test_biomass_precursors_open_production(model, reaction_id):
     """Expect precursor production in complete medium."""
-    store["open_blocked_precursors"] = store.get(
-        "open_blocked_precursors", list())
-    reaction = model.reactions.get_by_id(reaction_id)
-    for exchange in model.exchanges:
-        exchange.bounds = (-1000, 1000)
-    blocked = [
-        met.id for met in biomass.find_blocked_biomass_precursors(
-            reaction, model)]
-    store["open_blocked_precursors"].append(blocked)
-    assert len(blocked) == 0, \
-        "{}'s following precursors cannot be produced: {}" \
-        "".format(reaction.id, ", ".join(blocked))
+    ann = test_biomass_precursors_open_production.annotation
+    with model:
+        for exchange in model.exchanges:
+            exchange.bounds = (-1000, 1000)
+        reaction = model.reactions.get_by_id(reaction_id)
+        ann["data"][reaction_id] = get_ids(
+            biomass.find_blocked_biomass_precursors(reaction, model)
+        )
+    ann["message"][reaction_id] = wrapper.fill(
+        """Using the biomass reaction {} and when the model is simulated in 
+        complete medium a total of {} precursors cannot be produced: {}
+        """.format(reaction_id, len(ann["data"][reaction_id]),
+                   ann["data"][reaction_id]))
+    assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-def test_gam_in_biomass(model, reaction_id, store):
+@annotate(title="Growth-associated Maintenance in Biomass Reaction",
+          type="object", data=dict(), message=dict())
+def test_gam_in_biomass(model, reaction_id):
     """Expect the biomass reactions to contain atp and adp."""
-    store["gam_in_biomass"] = store.get(
-        "gam_in_biomass", list())
+    ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
-    present = biomass.gam_in_biomass(reaction)
-    store["gam_in_biomass"].append(present)
-    assert present, \
-        "{} does not contain a term for growth-associated maintenance." \
-        "".format(reaction.id)
+    ann["data"][reaction_id] = biomass.gam_in_biomass(reaction)
+    ann["message"][reaction_id] = wrapper.fill(
+        """{} does not contain a term for growth-associated maintenance.
+        """.format(reaction_id))
+    assert ann["data"][reaction_id], ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
+@annotate(title="Unrealistic Growth Rate In Default Condition", type='object',
+          data=dict(), message=dict())
 def test_fast_growth_default(model, reaction_id):
     """Expect the predicted growth rate for each BOF to be below 10.3972.
 
     This is based on lowest doubling time reported here
     http://www.pnnl.gov/science/highlights/highlight.asp?id=879
     """
-    reaction = model.reactions.get_by_id(reaction_id)
-    model.objective = reaction
-    try:
-        model.slim_optimize()
-        flux = reaction.flux
-    except Infeasible:
-        flux = np.nan
-    assert flux <= 10.3972
+    ann = test_fast_growth_default.annotation
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
+    ann["message"][reaction_id] = wrapper.fill(
+        """Using the biomass reaction {} and when the model is simulated on 
+        the provided default medium the growth rate amounts to {}""".format(
+            reaction_id, ann["data"][reaction_id]))
+    assert ann["data"][reaction_id] <= 10.3972, ann["message"][reaction_id]

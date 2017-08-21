@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "memote Results Schema",
+    "description": "Validate the nested memote result object.",
+    "type": "object",
+    "required": [ "meta", "report" ],
+    "properties": {
+        "meta": {
+            "type": "object",
+            "required": [
+                "platform",
+                "release",
+                "python",
+                "timestamp",
+                "commit_author",
+                "commit_hash",
+                "packages"
+            ],
+            "properties": {
+                "platform": { "type": "string" },
+                "release": { "type": "string" },
+                "python": { "type": "string" },
+                "timestamp": { "type": "timestamp" },
+                "commit_author": { "type": "string" },
+                "commit_hash": { "type": "string" },
+                "packages": { "type": "object" }
+            },
+            "additionalProperties": false
+        },
+        "report": {
+            "type": "object",
+            "patternProperties": {
+                "^test_[a-z_]+$": {
+                    "$ref": "#/definitions/testModule"
+                }
+            }
+        }
+    },
+    "additionalProperties": false,
+
+    "definitions": {
+        "testModule": {
+            "type": "object",
+            "patternProperties": {
+                "^test_[a-z_]+$": {
+                    "$ref": "#/definitions/testCase"
+                }
+            }
+        },
+        "testCase": {
+            "type": "object",
+            "required": [
+                "title",
+                "summary",
+                "message",
+                "data",
+                "type",
+                "score",
+                "result",
+                "duration"
+            ],
+            "properties": {
+                "title": { "type": "string" },
+                "summary": { "type": "string" },
+                "message": { "type": "string" },
+                "data": {
+                    "type": "enum"
+                },
+                "type": { "type": "enum" },
+                "score": { "type": "number" },
+                "result": { "type": "string" },
+                "duration": { "type": "number" }
+            },
+            "additionalProperties": false
+        }
+    }
+}

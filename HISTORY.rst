@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Enable test result and meta-data collection.
 
 0.4.6 (2017-10-31)
 ------------------

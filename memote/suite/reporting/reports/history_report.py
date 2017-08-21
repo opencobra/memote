@@ -39,8 +39,8 @@ class HistoryReport(Report):
         """
         Initialize the git interaction and dask bag.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         repository : git.Repo
             An instance of the working directory git repository.
         directory : str or path
@@ -48,6 +48,7 @@ class HistoryReport(Report):
         index : {'time', 'hash'}, optional
             Whether to use time (the default) or commit hashes as the default
             axis in plots.
+
         """
         super(HistoryReport, self).__init__(**kwargs)
         self.index_dim = index.lower()
