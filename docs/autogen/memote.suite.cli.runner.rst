@@ -1,7 +1,7 @@
-memote.suite.reporting.bag module
+memote\.suite\.cli\.runner module
 =================================
 
-.. automodule:: memote.suite.reporting.bag
+.. automodule:: memote.suite.cli.runner
     :members:
     :undoc-members:
     :show-inheritance:

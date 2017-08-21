@@ -1,5 +1,5 @@
-memote.suite.reporting.reports package
-======================================
+memote\.suite\.reporting\.reports package
+=========================================
 
 Submodules
 ----------

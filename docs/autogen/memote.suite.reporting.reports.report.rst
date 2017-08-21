@@ -1,5 +1,5 @@
-memote.suite.reporting.reports.report module
-============================================
+memote\.suite\.reporting\.reports\.report module
+================================================
 
 .. automodule:: memote.suite.reporting.reports.report
     :members:

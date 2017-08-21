@@ -1,5 +1,5 @@
-memote.support.syntax module
-============================
+memote\.support\.syntax module
+==============================
 
 .. automodule:: memote.support.syntax
     :members:

@@ -24,6 +24,7 @@ Contents
    getting_started
    flowchart
    test_suite
+   api
    contributing
    authors
    history
