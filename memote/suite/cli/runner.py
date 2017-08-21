@@ -23,7 +23,6 @@ import io
 import os
 import sys
 import logging
-from builtins import input
 from os.path import join
 from multiprocessing import Process
 from getpass import getpass
