@@ -24,35 +24,35 @@ import memote.support.helpers as helpers
 
 
 def test_model_id_presence(read_only_model, store):
-    """Expect that the read_only_model has an ID."""
+    """Expect that the model has an identifier."""
     assert hasattr(read_only_model, "id")
     store["model_id"] = read_only_model.id
     assert bool(read_only_model.id)
 
 
 def test_genes_presence(read_only_model, store):
-    """Expect that >= 1 genes are present in the read_only_model."""
+    """Expect that >= 1 genes are present in the model."""
     assert hasattr(read_only_model, "genes")
-    store["total_num_genes"] = len(read_only_model.genes)
+    store["num_genes"] = len(read_only_model.genes)
     assert len(read_only_model.genes) > 0
 
 
 def test_reactions_presence(read_only_model, store):
-    """Expect that >= 1 reactions are present in the read_only_model."""
+    """Expect that >= 1 reactions are present in the model."""
     assert hasattr(read_only_model, "reactions")
-    store["total_num_reactions"] = len(read_only_model.reactions)
+    store["num_reactions"] = len(read_only_model.reactions)
     assert len(read_only_model.reactions) > 0
 
 
 def test_metabolites_presence(read_only_model, store):
-    """Expect that >= 1 metabolites are present in the read_only_model."""
+    """Expect that >= 1 metabolites are present in the model."""
     assert hasattr(read_only_model, "metabolites")
-    store["total_num_metabolites"] = len(read_only_model.metabolites)
+    store["num_metabolites"] = len(read_only_model.metabolites)
     assert len(read_only_model.metabolites) > 0
 
 
 def test_transport_reaction_presence(read_only_model, store):
-    """Expect >= 1 transport reactions are present in the read_only_model."""
+    """Expect >= 1 transport reactions are present in the model."""
     store["transporters"] = helpers.find_transport_reactions(read_only_model)
     store["num_transporters"] = len(
         helpers.find_transport_reactions(read_only_model)
@@ -73,7 +73,7 @@ def test_metabolites_formula_presence(read_only_model, store):
 
 
 def test_metabolites_charge_presence(read_only_model, store):
-    """Expect all metabolites to have a formula."""
+    """Expect all metabolites to have charge information."""
     missing = [
         met.id for met in basic.check_metabolites_charge_presence(
             read_only_model
@@ -85,7 +85,7 @@ def test_metabolites_charge_presence(read_only_model, store):
 
 
 def test_gene_protein_reaction_rule_presence(read_only_model, store):
-    """Expect all non-exchange reactions to have a GPR."""
+    """Expect all non-exchange reactions to have a GPR rule."""
     missing_gpr_metabolic_rxns = \
         set(
             basic.check_gene_protein_reaction_rule_presence(
@@ -115,45 +115,39 @@ def test_metabolic_coverage(read_only_model, store):
 
 
 def test_compartments_presence(read_only_model, store):
-    """Expect that >= 3 compartments are defined in the read_only_model."""
+    """Expect that >= 3 compartments are defined in the model."""
     assert hasattr(read_only_model, "compartments")
-    store["num_compartments"] = len(
-        read_only_model.get_metabolite_compartments()
-    )
-    store["compartments"] = read_only_model.get_metabolite_compartments
+    store["compartments"] = list(read_only_model.get_metabolite_compartments())
+    store["num_compartments"] = len(store["compartments"])
     assert store["num_compartments"] >= 3
 
 
 def test_enzyme_complex_presence(read_only_model, store):
-    """Expect that >= 1 enzyme complexes are present in the read_only_model."""
-    store["num_enzyme_complexes"] = len(
-        basic.find_enzyme_complexes(read_only_model))
-    store["enzyme_complexes"] = basic.find_enzyme_complexes(read_only_model)
+    """Expect that >= 1 enzyme complexes are present in the model."""
+    store["enzyme_complexes"] = list(basic.find_enzyme_complexes(
+        read_only_model))
+    store["num_enzyme_complexes"] = len(store["enzyme_complexes"])
     assert store["num_enzyme_complexes"] >= 1
 
 
 def test_find_pure_metabolic_reactions(read_only_model, store):
-    """Expect >= 1 pure metabolic rxns are present in the read_only_model."""
-    store["num_metabolic_reactions"] = len(
-        basic.find_pure_metabolic_reactions(read_only_model))
-    store["metabolic_reactions"] = basic.find_pure_metabolic_reactions(
-        read_only_model
-    )
+    """Expect >= 1 pure metabolic reactions are present in the model."""
+    store["metabolic_reactions"] = [
+        rxn.id for rxn in basic.find_pure_metabolic_reactions(read_only_model)]
+    store["num_metabolic_reactions"] = len(store["metabolic_reactions"])
     assert store["metabolic_reactions"] >= 1
 
 
 def test_find_transport_reactions(read_only_model, store):
     """Expect >= 1 transport reactions are present in the read_only_model."""
-    store["num_transport_reactions"] = len(
-        helpers.find_transport_reactions(read_only_model))
-    store["transport_reactions"] = helpers.find_transport_reactions(
-        read_only_model
-    )
+    store["transport_reactions"] = [
+        rxn.id for rxn in helpers.find_transport_reactions(read_only_model)]
+    store["num_transport_reactions"] = len(store["transport_reactions"])
     assert store["transport_reactions"] >= 1
 
 
 def test_find_unique_metabolites(read_only_model, store):
-    """Expect there to be less unique mets in read_only_model than mets."""
+    """Expect there to be less metabolites when removing compartment tag."""
     store["num_unique_metabolites"] = len(
         basic.find_unique_metabolites(read_only_model)
     )

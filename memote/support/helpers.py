@@ -22,8 +22,10 @@ from __future__ import absolute_import
 import logging
 import re
 from builtins import dict
-from sympy import expand
 from collections import defaultdict
+
+from six import iteritems, itervalues
+from sympy import expand
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,26 +49,26 @@ def find_transported_elements(rxn):
         Any cobra.Reaction containing metabolites.
 
     """
-    element_dist_dict = defaultdict()
+    element_dist = defaultdict()
     # Collecting elements for each metabolite.
     for met in rxn.metabolites:
-        if met.compartment not in element_dist_dict:
+        if met.compartment not in element_dist:
             # Multiplication by the metabolite stoichiometry.
-            element_dist_dict[met.compartment] = \
+            element_dist[met.compartment] = \
                 {k: v * rxn.metabolites[met]
-                 for (k, v) in met.elements.items()}
+                 for (k, v) in iteritems(met.elements)}
         else:
             x = {k: v * rxn.metabolites[met] for (k, v) in
-                 met.elements.items()}
-            y = element_dist_dict[met.compartment]
-            element_dist_dict[met.compartment] = \
+                 iteritems(met.elements)}
+            y = element_dist[met.compartment]
+            element_dist[met.compartment] = \
                 {k: x.get(k, 0) + y.get(k, 0) for k in set(x) | set(y)}
     delta_dict = defaultdict()
     # Simplification of the resulting dictionary of dictionaries.
-    for _, elements in element_dist_dict.items():
+    for elements in itervalues(element_dist):
         delta_dict.update(elements)
     # Only non-zero values get included in the returned delta-dict.
-    delta_dict = {k: abs(v) for (k, v) in delta_dict.items() if v != 0}
+    delta_dict = {k: abs(v) for (k, v) in iteritems(delta_dict) if v != 0}
     return delta_dict
 
 
@@ -100,7 +102,7 @@ def find_transport_reactions(model):
         # Collect information on the elemental differences between
         # compartments in the reaction.
         delta_dicts = find_transported_elements(rxn)
-        non_zero_array = [v for (k, v) in delta_dicts.items() if v != 0]
+        non_zero_array = [v for (k, v) in iteritems(delta_dicts) if v != 0]
         # Weeding out reactions such as oxidoreductases where no net
         # transport of Hydrogen is occurring, but rather just an exchange of
         # electrons or charges effecting a change in protonation.
