@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.4.0 (2017-08-21)
+------------------
+
 * Add a programmatic API in module ``memote.suite.api`` (#162).
 * Reorganize the structure and build process for auto-documenting ``memote`` (#172).
 * Add a new command ``memote online`` (#95, #153).
