@@ -253,7 +253,6 @@ def online(context, note, repository, username):
             + Fore.RESET)  # noqa: W503
     except UnknownObjectException:
         gh_repo = user.create_repo(repository)
-        repo.remotes.origin.push(refspec='{}:{}'.format(branch, branch))
     try:
         click.echo("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
