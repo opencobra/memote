@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.4.1 (2017-08-22)
+------------------
+
+* Fix JSON serialization of test results.
+
 0.4.0 (2017-08-21)
 ------------------
 
