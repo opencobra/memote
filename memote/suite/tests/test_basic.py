@@ -53,10 +53,9 @@ def test_metabolites_presence(read_only_model, store):
 
 def test_transport_reaction_presence(read_only_model, store):
     """Expect >= 1 transport reactions are present in the model."""
-    store["transporters"] = helpers.find_transport_reactions(read_only_model)
-    store["num_transporters"] = len(
-        helpers.find_transport_reactions(read_only_model)
-    )
+    store["transporters"] = [
+        rxn.id for rxn in helpers.find_transport_reactions(read_only_model)]
+    store["num_transporters"] = len(store["transporters"])
     assert store["num_transporters"] >= 1
 
 
