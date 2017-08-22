@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.4.2 (2017-08-22)
+------------------
+
+* Push all branches with ``memote online``.
+
 0.4.1 (2017-08-22)
 ------------------
 

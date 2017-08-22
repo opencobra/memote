@@ -222,7 +222,6 @@ def online(context, note, repository, username):
     """Upload the repository to GitHub and enable testing on Travis CI."""
     try:
         repo = git.Repo()
-        branch = repo.active_branch.name
     except git.InvalidGitRepositoryError:
         click.echo(
             Fore.RED +
@@ -308,7 +307,7 @@ def online(context, note, repository, username):
         yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
     repo.index.add([".travis.yml"])
     repo.index.commit("chore: add encrypted GitHub access token")
-    repo.remotes.origin.push(refspec='{}:{}'.format(branch, branch))
+    repo.remotes.origin.push(all=True)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
