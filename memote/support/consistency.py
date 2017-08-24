@@ -351,4 +351,5 @@ def find_stoichiometrically_balanced_cycles(model):
     except Exception as e:
         print("The test to find stoichiometrically balances cycles"
               "failed with the following exception {}. "
-              "This may a bug.".format(e))
+              "This may be a bug.".format(e))
+        return []
