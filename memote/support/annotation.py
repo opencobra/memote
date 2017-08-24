@@ -180,7 +180,7 @@ def generate_component_annotation_miriam_match(model, components):
 
 def generate_component_id_namespace_overview(model, components):
     """
-    Tabulate which MIRIAM databases the component's annotation match.
+    Tabulate which MIRIAM databases the component's ID matches.
 
     Parameters
     ----------
@@ -208,4 +208,26 @@ def generate_component_id_namespace_overview(model, components):
         index.append(elem.id)
         data.append(tuple(patterns[db].match(elem.id) is not None
                           for db in databases))
-    return pd.DataFrame(data, index=index, columns=databases)
+    df = pd.DataFrame(data, index=index, columns=databases)
+    if components != "genes":
+        # Clean up of the dataframe. Unfortunately the Biocyc patterns match
+        # broadly. Hence, whenever a Metabolite or Reaction ID matches to any
+        # DB pattern AND the Biocyc pattern we have to assume that this is a
+        # false positive.
+        # First determine all rows in which 'biocyc' and other entries are
+        # True simulatenously and use this boolean series to create another
+        # column temporarily.
+        df['duplicate'] = df[df['biocyc'] == 1].sum(axis=1) >= 2
+        # Replace all nan values with False
+        df = df.fillna(False)
+        # Use the additional column to index the original dataframe to identify
+        # false positive biocyc hits and set them to False.
+        df.set_value(df['duplicate'], 'biocyc', False)
+        # Delete the additional column
+        del df['duplicate']
+        # Return the cleaned up dataframe.
+    return df
+
+
+def calculate_distribution():
+    pass

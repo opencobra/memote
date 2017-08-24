@@ -167,7 +167,11 @@ def inconsistent_ids(base):
     rxn2.add_metabolites({met1: -1, met2: 1})
     rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
     rxn3.add_metabolites({met2: -1, met: 1})
-    base.add_reactions([rxn, rxn2, rxn3])
+    rxn4 = cobra.Reaction(
+        id='KETOGLUCOSE-REDUCTASE-RXN', name="Reaction: 1.1.1.-"
+    )
+    rxn4.add_metabolites({met2: -1, met: 1})
+    base.add_reactions([rxn, rxn2, rxn3, rxn4])
     return base
 
 
