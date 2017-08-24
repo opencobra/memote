@@ -205,7 +205,6 @@ def infeasible_toy_model(base):
     return base
 
 
-
 def model_builder(name):
     choices = {
         "fig-1": figure_1,
