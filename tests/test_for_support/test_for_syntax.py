@@ -174,7 +174,39 @@ def trxn_correct_atp_driven(base):
          cobra.Metabolite(id="m_c", formula='C7H13NO2',
                           compartment='c'): 1}
     )
-    base.add_reaction(rxn)
+    # GTP-driven
+    rxn2 = cobra.Reaction('R2abc')
+    rxn2.add_metabolites(
+        {cobra.Metabolite(id="gtp_c", formula='C10H12N5O14P3',
+                          compartment='c'): -1,
+         cobra.Metabolite(id="gdp_c", formula='C10H12N5O11P2',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="p_c", formula='HO4P',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="h_c", formula='H',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="m_m", formula='C7H13NO2',
+                          compartment='m'): -1,
+         cobra.Metabolite(id="m_c", formula='C7H13NO2',
+                          compartment='c'): 1}
+    )
+    # CTP-driven
+    rxn3 = cobra.Reaction('R3abc')
+    rxn3.add_metabolites(
+        {cobra.Metabolite(id="ctp_c", formula='C9H12N3O14P3',
+                          compartment='c'): -1,
+         cobra.Metabolite(id="cdp_c", formula='C9H12N3O11P2',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="p_c", formula='HO4P',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="h_c", formula='H',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="m_m", formula='C7H13NO2',
+                          compartment='m'): -1,
+         cobra.Metabolite(id="m_c", formula='C7H13NO2',
+                          compartment='c'): 1}
+    )
+    base.add_reactions([rxn, rxn2, rxn3])
     return base
 
 
@@ -195,7 +227,39 @@ def trxn_no_tag_atp_driven(base):
          cobra.Metabolite(id="m_c", formula='C7H13NO2',
                           compartment='c'): 1}
     )
-    base.add_reaction(rxn)
+    # GTP-driven
+    rxn2 = cobra.Reaction('R2')
+    rxn2.add_metabolites(
+        {cobra.Metabolite(id="gtp_c", formula='C10H12N5O14P3',
+                          compartment='c'): -1,
+         cobra.Metabolite(id="gdp_c", formula='C10H12N5O11P2',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="p_c", formula='HO4P',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="h_c", formula='H',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="m_m", formula='C7H13NO2',
+                          compartment='m'): -1,
+         cobra.Metabolite(id="m_c", formula='C7H13NO2',
+                          compartment='c'): 1}
+    )
+    # CTP-driven
+    rxn3 = cobra.Reaction('R3')
+    rxn3.add_metabolites(
+        {cobra.Metabolite(id="ctp_c", formula='C9H12N3O14P3',
+                          compartment='c'): -1,
+         cobra.Metabolite(id="cdp_c", formula='C9H12N3O11P2',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="p_c", formula='HO4P',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="h_c", formula='H',
+                          compartment='c'): 1,
+         cobra.Metabolite(id="m_m", formula='C7H13NO2',
+                          compartment='m'): -1,
+         cobra.Metabolite(id="m_c", formula='C7H13NO2',
+                          compartment='c'): 1}
+    )
+    base.add_reactions([rxn, rxn2, rxn3])
     return base
 
 
@@ -426,7 +490,7 @@ def test_non_abc_transp_rxn_tag_match(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("trxn_correct_atp_driven", 0),
-    ("trxn_no_tag_atp_driven", 1)
+    ("trxn_no_tag_atp_driven", 3)
 ], indirect=["model"])
 def test_abc_transp_rxn_tag_match(model, num):
     """Expect all abc transport rxns to be tagged with 'abc'."""

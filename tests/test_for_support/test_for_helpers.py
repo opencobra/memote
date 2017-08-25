@@ -98,6 +98,23 @@ def energy_transfer(base):
     return base
 
 
+def converting_reactions(base):
+    """Provide a model with a couple of converting reaction."""
+    a = cobra.Metabolite("a_c")
+    b = cobra.Metabolite("b_c")
+    c = cobra.Metabolite("c_c")
+    c2 = cobra.Metabolite("c_e")
+    c3 = cobra.Metabolite("c_p")
+    rxn1 = cobra.Reaction("R1")
+    rxn1.add_metabolites({a: -1, b: 1})
+    rxn2 = cobra.Reaction("R2")
+    rxn2.add_metabolites({a: -1, c: -1, b: 1, c2: 1})
+    rxn3 = cobra.Reaction("R3")
+    rxn3.add_metabolites({a: -1, c3: 1, c2: 1})
+    base.add_reactions([rxn1, rxn2, rxn3])
+    return base
+
+
 def model_builder(name):
     """Return an empty cobra.model object."""
     choices = {
@@ -106,6 +123,7 @@ def model_builder(name):
         "proton_pump": proton_pump,
         "energy_transfer": energy_transfer,
         "phosphotransferase_system": phosphotransferase_system,
+        "converting_reactions": converting_reactions,
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -129,5 +147,15 @@ def test_find_transport_reactions(model, num):
     ("gene1 and (gene2 or gene3)", [["gene1", "gene2"], ["gene1", "gene3"]])
 ])
 def test_find_functional_units(gpr_str, expected):
-    """Expect amount of enzyme complexes to be identified correctly."""
+    """Expect type of enzyme complexes to be identified correctly."""
     assert list(helpers.find_functional_units(gpr_str)) == expected
+
+
+@pytest.mark.parametrize("met_pair, expected", [
+    (["a", "b"], 2),
+    (["c", "c"], 2)
+])
+def test_find_converting_reactions(met_pair, expected):
+    """Expect amount of converting reactions to be identified correctly."""
+    model = model_builder("converting_reactions")
+    assert len(helpers.find_converting_reactions(model, met_pair)) == expected
