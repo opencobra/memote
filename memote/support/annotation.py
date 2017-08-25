@@ -227,7 +227,3 @@ def generate_component_id_namespace_overview(model, components):
         del df['duplicate']
         # Return the cleaned up dataframe.
     return df
-
-
-def calculate_distribution():
-    pass

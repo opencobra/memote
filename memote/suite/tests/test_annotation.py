@@ -124,15 +124,13 @@ def test_reaction_annotation_wrong_ids(read_only_model, store):
 
 def test_metabolite_id_namespace_consistency(read_only_model, store):
     """Expect metabolite IDs to be from the same namespace."""
-    met_id_ns = annotation.generate_component_id_namespace_overview(
+    overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "metabolites")
-    distribution = met_id_ns.sum()
     store['met_ids_in_each_namespace'] = dict(
         (key, int(val)) for key, val in distribution.iteritems())
-    # The BioCyc regex is extremely general, we ignore it here.
+    distribution = overview.sum()
     cols = list(distribution.index)
-    cols.remove('biocyc')
-    largest = distribution[cols].idxmax()
+    largest =  distribution[cols].idxmax()
     if distribution[largest] == 0:
         largest = 'biocyc'
     if largest != 'bigg.metabolite':
@@ -148,17 +146,13 @@ def test_metabolite_id_namespace_consistency(read_only_model, store):
 
 def test_reaction_id_namespace_consistency(read_only_model, store):
     """Expect reaction IDs to be from the same namespace."""
-    rxn_id_ns = annotation.generate_component_id_namespace_overview(
+    overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "reactions")
-    distribution = rxn_id_ns.sum()
     store['rxn_ids_in_each_namespace'] = dict(
         (key, int(val)) for key, val in distribution.iteritems())
-    # The BioCyc regex is extremely general, we ignore it here.
+    distribution = overview.sum()
     cols = list(distribution.index)
-    cols.remove('biocyc')
-    largest = distribution[cols].idxmax()
-    if distribution[largest] == 0:
-        largest = 'biocyc'
+    largest =  distribution[cols].idxmax()
     if largest != 'bigg.reaction':
         warn(
             'memote currently only supports syntax checks for BiGG identifiers.'
