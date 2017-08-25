@@ -92,7 +92,7 @@ def find_blocked_biomass_precursors(reaction, model):
     return blocked_precursors
 
 
-def gam_in_biomass(reaction, model):
+def gam_in_biomass(reaction):
     """
     Return boolean if biomass reaction includes growth-associated maintenance.
 
@@ -101,11 +101,11 @@ def gam_in_biomass(reaction, model):
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
 
-    model : cobra.Model
-        The metabolic model under investigation.
-
     """
-    atp_adp_reactions = helpers.find_converting_reactions(
-        model, ["atp", "adp"]
-    )
-    return reaction in set(atp_adp_reactions)
+    left = set(["atp_c", "h2o_c"])
+    right = set(["adp_c", "pi_c", "h_c"])
+    if left.issubset(set(met.id for met in reaction.reactants))  \
+        and right.issubset(set(met.id for met in reaction.products)):
+        return True
+    else:
+        return False
