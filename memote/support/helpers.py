@@ -122,30 +122,33 @@ def find_transport_reactions(model):
     return transport_reactions
 
 
-def find_atp_adp_converting_reactions(model):
+def find_converting_reactions(model, met_pair):
     """
-    Find reactions which interact with ATP and ADP.
+    Find reactions which convert a given metabolite pair.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    met_pair: list
+        List of metabolite IDs (string) without compartment suffix where one
+        metabolite gets converted into the other by an enzymatic reaction.
 
     """
-    atp_all_comp_rxn_list = []
+    met1_all_comp_rxn_list = []
     for met in model.metabolites:
-        if re.match('^atp_.*', met.id):
-            atp_all_comp_rxn_list.append(met.reactions)
+        if re.match('^{}_.*'.format(met_pair[0]), met.id):
+            met1_all_comp_rxn_list.append(met.reactions)
 
-    adp_all_comp_rxn_list = []
+    met2_all_comp_rxn_list = []
     for met in model.metabolites:
-        if re.match('^adp_.*', met.id):
-            adp_all_comp_rxn_list.append(met.reactions)
+        if re.match('^{}_.*'.format(met_pair[1]), met.id):
+            met2_all_comp_rxn_list.append(met.reactions)
 
-    atp_union = set().union(*atp_all_comp_rxn_list)
-    adp_union = set().union(*adp_all_comp_rxn_list)
+    met1_union = set().union(*met1_all_comp_rxn_list)
+    met2_union = set().union(*met2_all_comp_rxn_list)
 
-    return atp_union.intersection(adp_union)
+    return met1_union.intersection(met2_union)
 
 
 def find_biomass_reaction(model):

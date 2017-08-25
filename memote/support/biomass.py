@@ -23,7 +23,7 @@ import logging
 
 from six import iteritems
 from cobra.exceptions import Infeasible
-from memote.support.helpers import find_atp_adp_converting_reactions
+import memote.support.helpers as helpers
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
@@ -105,5 +105,7 @@ def gam_in_biomass(reaction, model):
         The metabolic model under investigation.
 
     """
-    atp_adp_reactions = find_atp_adp_converting_reactions(model)
+    atp_adp_reactions = helpers.find_converting_reactions(
+        model, ["atp", "adp"]
+    )
     return reaction in set(atp_adp_reactions)

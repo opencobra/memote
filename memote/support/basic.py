@@ -104,7 +104,9 @@ def find_ngam(model):
           http://doi.org/10.1038/nprot.2009.203
 
     """
-    atp_adp_conv_rxns = helpers.find_atp_adp_converting_reactions(model)
+    atp_adp_conv_rxns = helpers.find_converting_reactions(
+        model, ["atp", "adp"]
+    )
     return [rxn for rxn in atp_adp_conv_rxns
             if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
                                               'adp_c + h_c + pi_c' and not
