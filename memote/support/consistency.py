@@ -315,9 +315,9 @@ def find_blocked_reactions(model):
 #
 #     The flux distribution of nominal FVA is compared with loopless FVA
 #     (loopless=True) to determine reactions that participate in loops, as
-#     participation in loops would increase the flux through a given reactions to
-#     the maximal bounds. This function then returns reactions where the flux
-#     differs between the two FVA calculations.
+#     participation in loops would increase the flux through a given reactions
+#     to the maximal bounds. This function then returns reactions where the
+#     flux differs between the two FVA calculations.
 #
 #     Parameters
 #     ----------
@@ -328,8 +328,8 @@ def find_blocked_reactions(model):
 #     -----
 #     "SBCs are artifacts of metabolic reconstructions due to insufficient
 #     constraints (e.g., thermodynamic constraints and regulatory
-#     constraints) [1]_." They are defined by internal reactions that carry flux
-#     in spite of closed exchange reactions.
+#     constraints) [1]_." They are defined by internal reactions that carry
+#     flux in spite of closed exchange reactions.
 #
 #     References
 #     ----------
