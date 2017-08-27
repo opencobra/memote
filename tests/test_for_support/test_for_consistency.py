@@ -266,11 +266,11 @@ def test_blocked_reactions(model, num):
     assert len(dict_of_blocked_rxns) == num
 
 
-# @pytest.mark.parametrize("model, num", [
-#     ("loopy_toy_model", 3),
-#     ("constrained_toy_model", 0),
-# ], indirect=["model"])
-# def test_find_stoichiometrically_balanced_cycles(model, num):
-#     """Expect no stoichiometrically balanced loops to be present."""
-#     rxns_in_loops = consistency.find_stoichiometrically_balanced_cycles(model)
-#     assert len(rxns_in_loops) == num
+@pytest.mark.parametrize("model, num", [
+    ("loopy_toy_model", 3),
+    ("constrained_toy_model", 0),
+], indirect=["model"])
+def test_find_stoichiometrically_balanced_cycles(model, num):
+    """Expect no stoichiometrically balanced loops to be present."""
+    rxns_in_loops = consistency.find_stoichiometrically_balanced_cycles(model)
+    assert len(rxns_in_loops) == num
