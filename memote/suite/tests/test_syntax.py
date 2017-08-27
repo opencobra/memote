@@ -19,9 +19,13 @@
 
 from __future__ import absolute_import
 
+import logging
+
 import pytest
 
 import memote.support.syntax as syntax
+
+LOGGER = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
@@ -32,10 +36,10 @@ def non_cytosolic(read_only_model, store):
         store["non_cytosolic"] = compartments.remove('c')
         return compartments
     except ValueError:
-        print("The model does not contain a compartment ID "
-              "labeled ``c`` for the cytosol which is an essential"
-              "compartment. Many syntax tests depend on this being labeled"
-              "accordingly.")
+        LOGGER.error(
+            "The model does not contain a compartment ID labeled 'c' for the "
+            "cytosol which is an essential compartment. Many syntax tests "
+            "depend on this being labeled accordingly.")
         store["non_cytosolic"] = []
         return []
 
