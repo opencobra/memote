@@ -4,10 +4,8 @@ History
 Next Release
 ------------
 
-0.4.3 (2017-08-26)
-------------------
-
 * Temporarily remove ``test_find_stoichiometrically_balanced_cycles``
+* Catch errors when testing for compartments and loops.
 
 0.4.2 (2017-08-22)
 ------------------

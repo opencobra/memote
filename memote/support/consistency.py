@@ -29,10 +29,6 @@ from cobra.flux_analysis import flux_variability_analysis
 import memote.support.helpers as helpers
 import memote.support.consistency_helpers as con_helpers
 
-__all__ = (
-    "check_stoichiometric_consistency", "find_unconserved_metabolites",
-    "find_inconsistent_min_stoichiometry")
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -339,12 +335,16 @@ def find_stoichiometrically_balanced_cycles(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    fva_result = flux_variability_analysis(model, loopless=False)
-    fva_result_loopless = flux_variability_analysis(model, loopless=True)
+    try:
+        fva_result = flux_variability_analysis(model, loopless=False)
+        fva_result_loopless = flux_variability_analysis(model, loopless=True)
+    except Infeasible as err:
+        LOGGER.error("Failed to find stoichiometrically balanced cycles "
+                     "because '{}'. This may be a bug.".format(err))
+        return []
     row_ids_max = fva_result[
         fva_result.maximum != fva_result_loopless.maximum].index
     row_ids_min = fva_result[
         fva_result.minimum != fva_result_loopless.minimum].index
     differential_fluxes = set(row_ids_min).union(set(row_ids_max))
-
     return [model.reactions.get_by_id(id) for id in differential_fluxes]
