@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.4.3 (2017-08-26)
+------------------
+
+* Temporarily remove ``test_find_stoichiometrically_balanced_cycles``
+
 0.4.2 (2017-08-22)
 ------------------
 
