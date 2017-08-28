@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+* Fix a bunch of bugs:
+    - Remove false positive detection of Biocyc annotation
+    - Allow memote to identify CTP or GTP driven transport reactions
+    - Refactor how memote detects GAM in the biomass reaction
 * Add tests to find deadend, orphan and disconnected metabolites.
 * Extend and improve algorithm to find energy-generating cycles
 * Remove the ``print`` statement from ``memote.support.annotation

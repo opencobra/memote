@@ -23,7 +23,6 @@ import logging
 
 from six import iteritems
 from cobra.exceptions import Infeasible
-import memote.support.helpers as helpers
 
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
@@ -104,8 +103,9 @@ def gam_in_biomass(reaction):
     """
     left = set(["atp_c", "h2o_c"])
     right = set(["adp_c", "pi_c", "h_c"])
-    if left.issubset(set(met.id for met in reaction.reactants))  \
-        and right.issubset(set(met.id for met in reaction.products)):
+    if left.issubset(
+        set(met.id for met in reaction.reactants)
+    ) and right.issubset(set(met.id for met in reaction.products)):
         return True
     else:
         return False

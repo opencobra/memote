@@ -19,10 +19,7 @@
 
 from __future__ import absolute_import
 
-from builtins import str
 from os.path import exists
-
-import pytest
 
 from memote.suite.cli.reports import report
 

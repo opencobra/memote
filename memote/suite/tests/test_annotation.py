@@ -127,12 +127,10 @@ def test_metabolite_id_namespace_consistency(read_only_model, store):
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "metabolites")
     store['met_ids_in_each_namespace'] = dict(
-        (key, int(val)) for key, val in distribution.iteritems())
+        (key, int(val)) for key, val in overview.iteritems())
     distribution = overview.sum()
     cols = list(distribution.index)
-    largest =  distribution[cols].idxmax()
-    if distribution[largest] == 0:
-        largest = 'biocyc'
+    largest = distribution[cols].idxmax()
     if largest != 'bigg.metabolite':
         warn(
             'memote currently only supports syntax checks for BiGG identifiers.'
@@ -141,7 +139,7 @@ def test_metabolite_id_namespace_consistency(read_only_model, store):
         )
     assert distribution[largest] == len(read_only_model.metabolites), \
         "Metabolite IDs that don't belong to the largest fraction: {}"\
-        "".format(met_id_ns.loc[~met_id_ns[largest], largest].index)
+        "".format(overview.loc[~overview[largest], largest].index)
 
 
 def test_reaction_id_namespace_consistency(read_only_model, store):
@@ -149,10 +147,10 @@ def test_reaction_id_namespace_consistency(read_only_model, store):
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "reactions")
     store['rxn_ids_in_each_namespace'] = dict(
-        (key, int(val)) for key, val in distribution.iteritems())
+        (key, int(val)) for key, val in overview.iteritems())
     distribution = overview.sum()
     cols = list(distribution.index)
-    largest =  distribution[cols].idxmax()
+    largest = distribution[cols].idxmax()
     if largest != 'bigg.reaction':
         warn(
             'memote currently only supports syntax checks for BiGG identifiers.'
@@ -161,4 +159,4 @@ def test_reaction_id_namespace_consistency(read_only_model, store):
         )
     assert distribution[largest] == len(read_only_model.metabolites), \
         "Reaction IDs that don't belong to the largest fraction: {}" \
-        "".format(rxn_id_ns.loc[~rxn_id_ns[largest], largest].index)
+        "".format(overview.loc[~overview[largest], largest].index)
