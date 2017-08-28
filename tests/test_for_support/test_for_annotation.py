@@ -57,7 +57,8 @@ def rxn_annotations(base):
 
 def met_each_present(base):
     met = cobra.Metabolite(id='met_c', name="Met")
-    met.annotation = {'metanetx.chemical': "MNXM23",
+    met.annotation = {'pubchem.compound' : "107735",
+                      'metanetx.chemical': "MNXM23",
                       'kegg.compound': "C00022",
                       'seed.compound': "cpd00020",
                       'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",

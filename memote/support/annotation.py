@@ -44,6 +44,7 @@ LOGGER = logging.getLogger(__name__)
 # 'BioCyc'  ['rxn','met'] 'http://biocyc.org'
 # 'Reactome'    ['met'] 'http://www.reactome.org/'
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
+# 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
 
 REACTION_ANNOTATIONS = [('rhea', re.compile(r"^\d{5}$")),
                         ('kegg.reaction', re.compile(r"^R\d+$")),
@@ -67,7 +68,8 @@ REACTION_ANNOTATIONS = [('rhea', re.compile(r"^\d{5}$")),
 REACTION_ANNOTATIONS = OrderedDict(REACTION_ANNOTATIONS)
 
 
-METABOLITE_ANNOTATIONS = [('kegg.compound', re.compile(r"^C\d+$")),
+METABOLITE_ANNOTATIONS = [('pubchem.compound', re.compile(r"^\d+$")),
+                          ('kegg.compound', re.compile(r"^C\d+$")),
                           ('seed.compound', re.compile(r"^cpd\d+$")),
                           ('inchikey', re.compile(r"^[A-Z]{14}\-"
                                                   r"[A-Z]{10}(\-[A-Z])?")),
