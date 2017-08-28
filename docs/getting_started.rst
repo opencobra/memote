@@ -120,7 +120,7 @@ file. Automatic draft reconstruction tools such as `Pathway Tools`_,
 this format. Model repositories such as `BiGG`_ or `BioModels`_ further serve
 as a great resource for models in the correct format.
 
-.. _Pathway Tools: http://bioinformatics.ai.sri.com/ptools/
+.. _Pathway Tools: http://www.pathwaytools.org/
 .. _Model SEED: http://modelseed.org
 .. _The RAVEN Toolbox: https://github.com/SysBioChalmers/RAVEN
 .. _others: http://www.secondarymetabolites.org/sysbio/
