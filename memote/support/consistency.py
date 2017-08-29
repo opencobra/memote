@@ -476,7 +476,7 @@ def find_orphans(model):
         else:
             series = df[met.id].value_counts()
         if -1 in series.keys() and len(series.keys()) == 1:
-            orphans.append(met.id)
+            orphans.append(met)
     return orphans
 
 
@@ -498,7 +498,7 @@ def find_deadends(model):
         else:
             series = df[met.id].value_counts()
         if 1 in series.keys() and len(series.keys()) == 1:
-            deadends.append(met.id)
+            deadends.append(met)
     return deadends
 
 
@@ -513,6 +513,6 @@ def find_disconnected(model):
 
     """
     df = con_helpers.prep_stoich_matrix(model)
-    return [met.id for met in model.metabolites
-            if 0 in df[met.id].value_counts()
-            and df[met.id].value_counts()[0] == len(model.reactions)]
+    return [met for met in model.metabolites
+            if 0 in df[met.id].value_counts() and
+            df[met.id].value_counts()[0] == len(model.reactions)]
