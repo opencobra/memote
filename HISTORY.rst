@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 
+* Add tests to find deadend, orphan and disconnected metabolites.
 * Extend and improve algorithm to find energy-generating cycles
 * Remove the ``print`` statement from ``memote.support.annotation
   .generate_component_annotation_miriam_match``.
