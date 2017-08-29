@@ -456,3 +456,56 @@ def find_stoichiometrically_balanced_cycles(model):
         fva_result.minimum != fva_result_loopless.minimum].index
     differential_fluxes = set(row_ids_min).union(set(row_ids_max))
     return [model.reactions.get_by_id(id) for id in differential_fluxes]
+
+
+def find_orphans(model):
+    """
+    Return list of IDs of metabolites that are only consumed in reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    df = con_helpers.prep_stoich_matrix(model)
+    orphans = list()
+    for met in model.metabolites:
+        series = df[met.id].value_counts().drop(0)
+        if -1 in series.keys() and len(series.keys()) == 1:
+            orphans.append(met.id)
+    return orphans
+
+
+def find_deadends(model):
+    """
+    Return list of IDs of metabolites that are only produced in reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    df = con_helpers.prep_stoich_matrix(model)
+    deadends = list()
+    for met in model.metabolites:
+        series = df[met.id].value_counts().drop(0)
+        if 1 in series.keys() and len(series.keys()) == 1:
+            deadends.append(met.id)
+    return deadends
+
+
+def find_disconnected(model):
+    """
+    Return list of IDs of metabolites that are not in any of the reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    df = con_helpers.prep_stoich_matrix(model)
+    return [met.id for met in model.metabolites
+            if df[met.id].value_counts()[0] == len(model.reactions)]

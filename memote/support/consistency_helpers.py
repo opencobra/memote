@@ -27,6 +27,7 @@ import sympy
 from numpy.linalg import svd
 from six import iteritems, itervalues
 from builtins import zip, dict
+from cobra.util.array import create_stoichiometric_matrix
 
 from memote.support.helpers import find_biomass_reaction
 
@@ -262,3 +263,20 @@ def is_charge_balanced(reaction):
             return False
         charge += coefficient * metabolite.charge
     return charge == 0
+
+
+def prep_stoich_matrix(model):
+    """
+    Return a transposed stoichiometric matrix showing reversible reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    df = create_stoichiometric_matrix(model, array_type="DataFrame")
+    for rxn in model.reactions:
+        if rxn.reversibility:
+            df[rxn.id + "{}".format("_rev")] = df[rxn.id] * -1
+    return df.T
