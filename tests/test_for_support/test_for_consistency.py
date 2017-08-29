@@ -405,6 +405,41 @@ def infeasible_toy_model(base):
     return base
 
 
+def gap_model(base):
+    a_c = cobra.Metabolite("a_c")
+    a_e = cobra.Metabolite("a_e")
+    b_c = cobra.Metabolite("b_c")
+    c_c = cobra.Metabolite("c_c")
+    base.add_metabolites([a_e])
+    rxn1 = cobra.Reaction("R1")
+    rxn1.add_metabolites({a_c: -1, b_c: 1})
+    rxn2 = cobra.Reaction("R2")
+    rxn2.add_metabolites({a_c: -1, c_c: 1})
+    base.add_reactions([rxn1, rxn2])
+    return base
+
+
+def gapfilled_model(base):
+    a_c = cobra.Metabolite("a_c")
+    a_e = cobra.Metabolite("a_e")
+    b_c = cobra.Metabolite("b_c")
+    c_c = cobra.Metabolite("c_c")
+    rxn1 = cobra.Reaction("R1")
+    rxn1.add_metabolites({a_c: -1, b_c: 1})
+    rxn2 = cobra.Reaction("R2")
+    rxn2.add_metabolites({a_c: -1, c_c: 1})
+    rxn3 = cobra.Reaction("R3tec")
+    rxn3.add_metabolites({a_e: -1, a_c: 1})
+    rxn4 = cobra.Reaction("DM_b_c")
+    rxn4.add_metabolites({b_c: -1})
+    rxn5 = cobra.Reaction("DM_c_c")
+    rxn5.add_metabolites({c_c: -1})
+    rxn6 = cobra.Reaction("EX_a_e")
+    rxn6.add_metabolites({a_e: 1})
+    base.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5, rxn6])
+    return base
+
+
 def model_builder(name):
     choices = {
         "fig-1": figure_1,
@@ -429,7 +464,9 @@ def model_builder(name):
         "produces_nadh": produces_nadh,
         "missing_energy_partner": missing_energy_partner,
         "maintenance_present": maintenance_present,
-        "infeasible": infeasible
+        "infeasible": infeasible,
+        "gap_model": gap_model,
+        "gapfilled_model": gapfilled_model
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -546,3 +583,33 @@ def test_find_stoichiometrically_balanced_cycles(model, num):
         model
     )
     assert len(rxns_in_loops) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gap_model", 1),
+    ("gapfilled_model", 0),
+], indirect=["model"])
+def test_find_orphans(model, num):
+    """Expect the appropriate amount of orphans to be found."""
+    orphans = consistency.find_orphans(model)
+    assert len(orphans) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gap_model", 2),
+    ("gapfilled_model", 0),
+], indirect=["model"])
+def test_find_deadends(model, num):
+    """Expect the appropriate amount of deadends to be found."""
+    deadends = consistency.find_deadends(model)
+    assert len(deadends) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gap_model", 1),
+    ("gapfilled_model", 0),
+], indirect=["model"])
+def test_find_disconnected(model, num):
+    """Expect the appropriate amount of disconnected to be found."""
+    disconnected = consistency.find_disconnected(model)
+    assert len(disconnected) == num
