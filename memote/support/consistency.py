@@ -23,12 +23,32 @@ import logging
 from operator import attrgetter
 
 import numpy as np
+from cobra import Reaction
 from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
+
+ENERGY_COUPLES = {'atp_c': 'adp_c',
+                  'ctp_c': 'cdp_c',
+                  'gtp_c': 'gdp_c',
+                  'utp_c': 'udp_c',
+                  'itp_c': 'idp_c',
+                  'nadph_c': 'nadp_c',
+                  'nadh_c': 'nad_c',
+                  'fadh2_c': 'fad_c',
+                  'fmnh2_c': 'fmn_c',
+                  'q8h2_c': 'q8_c',
+                  'mql8_c': 'mqn8_c',
+                  'mql6_c': 'mqn6_c',
+                  'mql7_c': 'mqn7_c',
+                  '2dmmql8_c': '2dmmq8_c',
+                  'accoa_c': 'coa_c',
+                  'glu__L_c': 'akg_c',
+                  'h_p': 'h_c'
+                  }
 
 
 def check_stoichiometric_consistency(model):
@@ -239,31 +259,91 @@ def find_elementary_leakage_modes(model, atol=1e-13):
         "Coming soon™ if considered useful.")
 
 
-def produce_atp_closed_exchanges(model):
+def detect_energy_generating_cycles(model, metabolite_id):
     """
-    Close the model's exchanges and tries to optimize the production of atp_c.
+    Detect erroneous energy-generating cycles for a a single metabolite.
+
+    The function will first build a dissipation reaction corresponding to the
+    input metabolite. This reaction is then set as the objective for
+    optimization, after closing all exchanges. If the reaction was able to
+    carry flux, an erroneous energy-generating cycle must be present. In this
+    case a list of reactions with a flux greater than zero is returned.
+    Otherwise, the function returns False.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    metabolite_id : string
+        The ID of an energy metabolite.
+
+    Notes
+    -----
+    "[...] energy generating cycles (EGC) [...] charge energy metabolites
+    without a source of energy. [...] To efficiently identify the existence of
+    diverse EGCs, we first add a dissipation reaction to the metabolic network
+    for each metabolite used to transmit cellular energy; e.g., for ATP, the
+    irreversible reaction ATP + H2O → ADP + P + H+ is added. These dissipation
+    reactions close any existing energy-generating cycles, thereby converting
+    them to type-III pathways. Fluxes through any of the dissipation reactions
+    at steady state indicate the generation of energy through the metabolic
+    network. Second, all uptake reactions are constrained to zero. The sum of
+    the fluxes through the energy dissipation reactions is now maximized using
+    FBA. For a model without EGCs, these reactions cannot carry any flux
+    without the uptake of nutrients. [1]_."
+
+    References
+    ----------
+    .. [1] Fritzemeier, C. J., Hartleb, D., Szappanos, B., Papp, B., & Lercher,
+     M. J. (2017). Erroneous energy-generating cycles in published genome scale
+     metabolic networks: Identification and removal. PLoS Computational
+     Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 
     """
     try:
-        met = model.metabolites.get_by_id('atp_c')
+        met = model.metabolites.get_by_id(metabolite_id)
     except KeyError:
         return False
+    try:
+        dissipation_product = model.metabolites.get_by_id(
+            ENERGY_COUPLES[met.id]
+        )
+    except KeyError:
+        return False
+
+    dissipation_rxn = Reaction('Dissipation')
     with model:
         for exchange in model.exchanges:
             exchange.bounds = (0, 0)
-        dm_rxn = model.add_boundary(met, type="demand")
-        model.objective = dm_rxn
+        if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
+            # build nucleotide-type dissipation reaction
+            dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
+        elif met.id in ['nadph_c', 'nadh_c']:
+            # build nicotinamide-type dissipation reaction
+            dissipation_rxn.reaction = "--> h_c"
+        elif met.id in ['fadh2', 'fmnh2', 'q8h2_c', 'mql8_c',
+                        'mql6_c', 'mql7_c', 'dmmql8']:
+            # build redox-partner-type dissipation reaction
+            dissipation_rxn.reaction = "--> 2 h_c"
+        elif met.id == 'accoa_c':
+            dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
+        elif met.id == 'glu__L_c':
+            dissipation_rxn.reaction = "h2o_c --> 2h_c + nh3_c"
+        elif met.id == 'h_p':
+            pass
+
+        dissipation_rxn.add_metabolites(
+            {met.id: -1, dissipation_product: 1})
+        model.objective = dissipation_rxn
         try:
             solution = model.optimize()
-            state = solution.objective_value > 0.0
+            if solution.objective_value > 0.0:
+                df = solution.to_frame()
+                return list(df[df["fluxes"] > 0].index)
+            else:
+                return False
         except Infeasible:
-            state = False
-    return state
+            return False
 
 
 def find_mass_imbalanced_reactions(model):
