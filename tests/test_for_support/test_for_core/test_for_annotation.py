@@ -15,17 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Ensure that results from `memote.support.core.annotation` are as expected."""
+
 from __future__ import absolute_import
 
 import cobra
 import pytest
 
-import memote.support.annotation as annotation
-
-"""
-Tests ensuring that the functions in `memote.support.annotation` work as
-expected.
-"""
+import memote.support.core.annotation as annotation
 
 
 def no_annotations(base):

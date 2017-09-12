@@ -195,8 +195,7 @@ def history(context, directory, pytest_args, commits):
         repo.git.checkout(commit)
         click.echo(
             Fore.GREEN +
-            "Running the test suite for commit '{}'.".format(
-                branch.commit.hexsha)
+            "Running the test suite for commit '{}'.".format(commit.hexsha)
             + Fore.RESET)  # noqa: W503
         filename = join(directory, "{}.json".format(commit.hexsha))
         proc = Process(target=_test_history,
