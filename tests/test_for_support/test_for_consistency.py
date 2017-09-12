@@ -489,7 +489,7 @@ def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
     ("produces_nadh", False, "atp_c"),
     ("missing_energy_partner", False, "atp_c"),
     ("no_atp", [], 'atp_c'),
-    ("infeasible", False, 'atp_c')
+    ("infeasible", 'infeasible', 'atp_c')
 ], indirect=["model"])
 def test_detect_energy_generating_cycles_exceptions(
     model, output, metabolite_id

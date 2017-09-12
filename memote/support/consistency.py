@@ -349,7 +349,7 @@ def detect_energy_generating_cycles(model, metabolite_id):
         model.objective = dissipation_rxn
         solution = model.optimize()
         if solution.status == 'infeasible':
-            return False
+            return 'infeasible'
         elif solution.objective_value > 0.0:
             df = solution.to_frame()
             return list(
