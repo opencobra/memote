@@ -44,7 +44,7 @@ def test_stoichiometric_consistency(read_only_model, store):
 def test_detect_energy_generating_cycles(read_only_model, store, met):
     """Expect that no energy metabolite can be produced out of nothing."""
     result = \
-        consistency.produce_atp_closed_exchanges(read_only_model)
+        consistency.detect_energy_generating_cycles(read_only_model, met)
     store["magic_{}_production".format(met)] = result
     if result == 'infeasible':
         assert False,\
