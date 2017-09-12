@@ -43,15 +43,15 @@ def test_stoichiometric_consistency(read_only_model, store):
 ], indirect=["read_only_model", "store"])
 def test_detect_energy_generating_cycles(read_only_model, store, met):
     """Expect that no energy metabolite can be produced out of nothing."""
-    results = \
+    result = \
         consistency.produce_atp_closed_exchanges(read_only_model)
-    store["magic_{}_production".format(met)] = results
-    if results == 'infeasible':
-        assert False ,\
-        "Solving the model is infeasible. Often this is due to missing or " \
-        "disconnected metabolites, or too strict constraints."
-    elif type(results) == list:
-        assert store["magic_{}_production".format(met)] == [],\
+    store["magic_{}_production".format(met)] = result
+    if result == 'infeasible':
+        assert False,\
+            "Solving the model is infeasible. Often this is due to missing " \
+            "or disconnected metabolites, or too strict constraints."
+    elif type(result) == list:
+        assert result == [],\
             "The model can produce {} without requiring resources. This is " \
             "likely caused by improperly constrained reactions leading to " \
             "erroneous energy-generating cycles.".format(met)
