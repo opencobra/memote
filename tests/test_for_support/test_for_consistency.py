@@ -151,7 +151,7 @@ def infeasible(base):
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
     rc.reaction = "atp_c + h2o_c + a <--> pi_c + adp_c + c + h_c"
-    rd.reaction = "h2o_c + b --> c + h_c"
+    rd.reaction = "h2o_c + b --> c + h_c + met_c"
     rd.bounds = 10, 1000
     base.add_boundary(base.metabolites.a, type="sink")
     base.add_boundary(base.metabolites.h2o_c, type="sink")
@@ -468,25 +468,35 @@ def test_find_inconsistent_min_stoichiometry(model, inconsistent):
         assert tuple(met.id for met in unconserved) in set(inconsistent)
 
 
-@pytest.mark.parametrize("model, array, metabolite_id", [
+@pytest.mark.parametrize("model, metabolite_id", [
     # test control flow statements
-    ("produces_atp", ['A', 'B', 'C'], 'atp_c'),
-    ("produces_accoa", ['A', 'B', 'C'], 'accoa_c'),
-    ("produces_fadh2", ['A', 'B', 'C'], "fadh2_c"),
-    ("produces_glu", ['A', 'B', 'C'], "glu__L_c"),
-    ("produces_h", ['A', 'B', 'C'], "h_p"),
-    ("produces_nadh", ['A', 'B', 'C'], "nadh_c"),
-    # test for possible exceptions
-    ("produces_nadh", [], "atp_c"),
-    ("missing_energy_partner", [], "atp_c"),
-    ("maintenance_present", ['A', 'B', 'C'], "atp_c"),
-    ("no_atp", [], 'atp_c'),
-    ("infeasible", [], 'atp_c')
+    ("produces_atp", 'atp_c'),
+    ("produces_accoa", 'accoa_c'),
+    ("produces_fadh2", "fadh2_c"),
+    ("produces_glu", "glu__L_c"),
+    ("produces_h", "h_p"),
+    ("produces_nadh", "nadh_c"),
+    ("maintenance_present", "atp_c"),
 ], indirect=["model"])
-def test_detect_energy_generating_cycles(model, array, metabolite_id):
+def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
     """Expect that energy-generating cycles don't exist for metabolite ID."""
     cycle = consistency.detect_energy_generating_cycles(model, metabolite_id)
-    assert set(cycle) == set(array)
+    assert set(cycle) == {'A', 'B', 'C'}
+
+
+@pytest.mark.parametrize("model, output, metabolite_id", [
+    # test for possible exceptions
+    ("produces_nadh", False, "atp_c"),
+    ("missing_energy_partner", False, "atp_c"),
+    ("no_atp", [], 'atp_c'),
+    ("infeasible", False, 'atp_c')
+], indirect=["model"])
+def test_detect_energy_generating_cycles_exceptions(
+    model, output, metabolite_id
+):
+    """Expect that energy-generating cycles don't exist for metabolite ID."""
+    status = consistency.detect_energy_generating_cycles(model, metabolite_id)
+    assert status == output
 
 
 @pytest.mark.parametrize("model, num", [

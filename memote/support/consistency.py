@@ -31,6 +31,12 @@ import memote.support.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
 
+# The following dictionary is based on the list of energy metabolites chosen
+# as part of the following publication:
+# Fritzemeier, C. J., Hartleb, D., Szappanos, B., Papp, B., & Lercher,
+# M. J. (2017). Erroneous energy-generating cycles in published genome scale
+# metabolic networks: Identification and removal. PLoS Computational
+# Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 ENERGY_COUPLES = {'atp_c': 'adp_c',
                   'ctp_c': 'cdp_c',
                   'gtp_c': 'gdp_c',
@@ -303,13 +309,13 @@ def detect_energy_generating_cycles(model, metabolite_id):
     try:
         met = model.metabolites.get_by_id(metabolite_id)
     except KeyError:
-        return []
+        return False
     try:
         dissipation_product = model.metabolites.get_by_id(
             ENERGY_COUPLES[met.id]
         )
     except KeyError:
-        return []
+        return False
     try:
         maintenance = model.reactions.get_by_id('ATPM')
         maintenance.bounds = 0, 1000
@@ -341,16 +347,15 @@ def detect_energy_generating_cycles(model, metabolite_id):
         dissipation_rxn.add_metabolites(
             {met.id: -1, dissipation_product: 1})
         model.objective = dissipation_rxn
-        try:
-            solution = model.optimize()
-            if solution.objective_value > 0.0:
-                df = solution.to_frame()
-                return list(
-                    df[abs(df["fluxes"]) > 0].index.drop(["Dissipation"])
-                )
-            else:
-                return []
-        except Infeasible:
+        solution = model.optimize()
+        if solution.status == 'infeasible':
+            return False
+        elif solution.objective_value > 0.0:
+            df = solution.to_frame()
+            return list(
+                df[abs(df["fluxes"]) > 0].index.drop(["Dissipation"])
+            )
+        else:
             return []
 
 
