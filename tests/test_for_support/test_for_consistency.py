@@ -85,15 +85,15 @@ def figure_2(base):
     return base
 
 
-def produces_atp(base):
-    met_a = cobra.Metabolite("atp_c")
+def free_reactions(base):
+    met_a = cobra.Metabolite("C")
     met_b = cobra.Metabolite("A")
     met_c = cobra.Metabolite("B")
     rxn1 = cobra.Reaction("Gen")
     rxn1.add_metabolites({met_b: -1, met_a: 1, met_c: 1})
     rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
     rxn2.add_metabolites({met_c: -1, met_b: 1})
-    rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+    rxn3 = cobra.Reaction("EX_C_c", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_a: -1})
     rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
     rxn4.add_metabolites({met_b: -1})
@@ -103,22 +103,204 @@ def produces_atp(base):
     return base
 
 
-def no_atp(base):
-    met_a = cobra.Metabolite("atp_c")
+def blocked_reactions(base):
+    met_a = cobra.Metabolite("C")
     met_b = cobra.Metabolite("A")
     met_c = cobra.Metabolite("B")
-    met_d = cobra.Metabolite("adp_c")
+    met_d = cobra.Metabolite("D")
     rxn1 = cobra.Reaction("Gen")
     rxn1.add_metabolites({met_d: -1, met_b: -1, met_a: 1, met_c: 1})
     rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
     rxn2.add_metabolites({met_c: -1, met_b: 1})
-    rxn3 = cobra.Reaction("EX_atp_c", lower_bound=-1000, upper_bound=1000)
+    rxn3 = cobra.Reaction("EX_C_c", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_a: -1})
     rxn4 = cobra.Reaction("EX_A_c", lower_bound=-1000, upper_bound=1000)
     rxn4.add_metabolites({met_b: -1})
     rxn5 = cobra.Reaction("EX_B_c", lower_bound=-1000, upper_bound=1000)
     rxn5.add_metabolites({met_c: -1})
     base.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
+    return base
+
+
+def produces_atp(base):
+    """Returns a simple model with an EGC producing atp_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "atp_c + h2o_c + a <--> pi_c + adp_c + c + h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.adp_c, type="sink")
+    base.add_boundary(base.metabolites.atp_c, type="sink")
+    base.add_boundary(base.metabolites.pi_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def infeasible(base):
+    """Returns an infeasible model with an EGC producing atp_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    rd = cobra.Reaction('MAINTENANCE')
+    base.add_reactions([ra, rb, rc, rd])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "atp_c + h2o_c + a <--> pi_c + adp_c + c + h_c"
+    rd.reaction = "h2o_c + b --> c + h_c"
+    rd.bounds = 10, 1000
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.adp_c, type="sink")
+    base.add_boundary(base.metabolites.atp_c, type="sink")
+    base.add_boundary(base.metabolites.pi_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def maintenance_present(base):
+    """Returns a model with an ATPM reaction"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    rd = cobra.Reaction('ATPM')
+    base.add_reactions([ra, rb, rc, rd])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "atp_c + h2o_c + a <--> pi_c + adp_c + c + h_c"
+    rd.reaction = "atp_c + h2o_c + a --> pi_c + adp_c + c + h_c"
+    rd.bounds = 7.9, 1000
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.adp_c, type="sink")
+    base.add_boundary(base.metabolites.atp_c, type="sink")
+    base.add_boundary(base.metabolites.pi_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def missing_energy_partner(base):
+    """Returns a broken model with a missing energy partner to atp"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "atp_c + a <--> c "
+    return base
+
+
+def produces_nadh(base):
+    """Returns a simple model with an EGC producing nadh_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "nadh_c + a <--> nad_c + c + h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.nad_c, type="sink")
+    base.add_boundary(base.metabolites.nadh_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def produces_fadh2(base):
+    """Returns a simple model with an EGC producing fadh2_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "fadh2_c + a <--> fad_c + c + 2 h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.fad_c, type="sink")
+    base.add_boundary(base.metabolites.fadh2_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def produces_accoa(base):
+    """Returns a simple model with an EGC producing accoa_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "accoa_c + h2o_c + a <--> coa_c + c + ac_c + h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.ac_c, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.coa_c, type="sink")
+    base.add_boundary(base.metabolites.accoa_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def produces_glu(base):
+    """Returns a simple model with an EGC producing glu__L_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "glu__L_c + h2o_c + a <--> c + akg_c + nh3_c + 2 h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.nh3_c, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.akg_c, type="sink")
+    base.add_boundary(base.metabolites.glu__L_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def produces_h(base):
+    """Returns a simple model with an EGC producing h_p"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "h_p + a <--> c + h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h_p, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
+    return base
+
+
+def no_atp(base):
+    """Returns a simple model without an EGC producing atp_c"""
+    ra = cobra.Reaction('A')
+    rb = cobra.Reaction('B')
+    rc = cobra.Reaction('C')
+    base.add_reactions([ra, rb, rc])
+    ra.reaction = "a <--> b"
+    rb.reaction = "b <--> c"
+    rc.reaction = "atp_c + h2o_c + a --> pi_c + adp_c + c + h_c"
+    base.add_boundary(base.metabolites.a, type="sink")
+    base.add_boundary(base.metabolites.h2o_c, type="sink")
+    base.add_boundary(base.metabolites.h_c, type="sink")
+    base.add_boundary(base.metabolites.adp_c, type="sink")
+    base.add_boundary(base.metabolites.atp_c, type="sink")
+    base.add_boundary(base.metabolites.pi_c, type="sink")
+    base.add_boundary(base.metabolites.c, type="demand")
     return base
 
 
@@ -228,6 +410,8 @@ def model_builder(name):
         "fig-1": figure_1,
         "eq-8": equation_8,
         "fig-2": figure_2,
+        "free_reactions": free_reactions,
+        "blocked_reactions": blocked_reactions,
         "produces_atp": produces_atp,
         "no_atp": no_atp,
         "all_balanced": all_balanced,
@@ -237,7 +421,15 @@ def model_builder(name):
         "met_no_formula": met_no_formula,
         "loopy_toy_model": loopy_toy_model,
         "constrained_toy_model": constrained_toy_model,
-        "infeasible_toy_model": infeasible_toy_model
+        "infeasible_toy_model": infeasible_toy_model,
+        "produces_accoa": produces_accoa,
+        "produces_fadh2": produces_fadh2,
+        "produces_glu": produces_glu,
+        "produces_h": produces_h,
+        "produces_nadh": produces_nadh,
+        "missing_energy_partner": missing_energy_partner,
+        "maintenance_present": maintenance_present,
+        "infeasible": infeasible
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -276,14 +468,25 @@ def test_find_inconsistent_min_stoichiometry(model, inconsistent):
         assert tuple(met.id for met in unconserved) in set(inconsistent)
 
 
-@pytest.mark.parametrize("model, atp_production", [
-    ("produces_atp", True),
-    ("no_atp", False)
+@pytest.mark.parametrize("model, array, metabolite_id", [
+    # test control flow statements
+    ("produces_atp", ['A', 'B', 'C'], 'atp_c'),
+    ("produces_accoa", ['A', 'B', 'C'], 'accoa_c'),
+    ("produces_fadh2", ['A', 'B', 'C'], "fadh2_c"),
+    ("produces_glu", ['A', 'B', 'C'], "glu__L_c"),
+    ("produces_h", ['A', 'B', 'C'], "h_p"),
+    ("produces_nadh", ['A', 'B', 'C'], "nadh_c"),
+    # test for possible exceptions
+    ("produces_nadh", [], "atp_c"),
+    ("missing_energy_partner", [], "atp_c"),
+    ("maintenance_present", ['A', 'B', 'C'], "atp_c"),
+    ("no_atp", [], 'atp_c'),
+    ("infeasible", [], 'atp_c')
 ], indirect=["model"])
-def test_production_of_atp_closed_bounds(model, atp_production):
-    """Expect that ATP cannot be produced when all the bounds are closed."""
-    production_of_atp = consistency.produce_atp_closed_exchanges(model)
-    assert production_of_atp is atp_production
+def test_detect_energy_generating_cycles(model, array, metabolite_id):
+    """Expect that energy-generating cycles don't exist for metabolite ID."""
+    cycle = consistency.detect_energy_generating_cycles(model, metabolite_id)
+    assert set(cycle) == set(array)
 
 
 @pytest.mark.parametrize("model, num", [
@@ -313,8 +516,8 @@ def test_find_mass_imbalanced_reactions(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("produces_atp", 0),
-    ("no_atp", 2),
+    ("free_reactions", 0),
+    ("blocked_reactions", 2),
 ], indirect=["model"])
 def test_blocked_reactions(model, num):
     """Expect all reactions to be able to carry flux."""

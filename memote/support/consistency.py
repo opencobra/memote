@@ -303,32 +303,38 @@ def detect_energy_generating_cycles(model, metabolite_id):
     try:
         met = model.metabolites.get_by_id(metabolite_id)
     except KeyError:
-        return False
+        return []
     try:
         dissipation_product = model.metabolites.get_by_id(
             ENERGY_COUPLES[met.id]
         )
     except KeyError:
-        return False
+        return []
+    try:
+        maintenance = model.reactions.get_by_id('ATPM')
+        maintenance.bounds = 0, 1000
+    except KeyError:
+        pass
 
     dissipation_rxn = Reaction('Dissipation')
     with model:
         for exchange in model.exchanges:
             exchange.bounds = (0, 0)
+        model.add_reactions([dissipation_rxn])
         if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
             # build nucleotide-type dissipation reaction
             dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
         elif met.id in ['nadph_c', 'nadh_c']:
             # build nicotinamide-type dissipation reaction
             dissipation_rxn.reaction = "--> h_c"
-        elif met.id in ['fadh2', 'fmnh2', 'q8h2_c', 'mql8_c',
-                        'mql6_c', 'mql7_c', 'dmmql8']:
+        elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
+                        'mql6_c', 'mql7_c', 'dmmql8_c']:
             # build redox-partner-type dissipation reaction
             dissipation_rxn.reaction = "--> 2 h_c"
         elif met.id == 'accoa_c':
             dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
         elif met.id == 'glu__L_c':
-            dissipation_rxn.reaction = "h2o_c --> 2h_c + nh3_c"
+            dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
         elif met.id == 'h_p':
             pass
 
@@ -339,11 +345,13 @@ def detect_energy_generating_cycles(model, metabolite_id):
             solution = model.optimize()
             if solution.objective_value > 0.0:
                 df = solution.to_frame()
-                return list(df[df["fluxes"] > 0].index)
+                return list(
+                    df[abs(df["fluxes"]) > 0].index.drop(["Dissipation"])
+                )
             else:
-                return False
+                return []
         except Infeasible:
-            return False
+            return []
 
 
 def find_mass_imbalanced_reactions(model):
