@@ -16,8 +16,8 @@
             "type": "number",
             "constraints": {
                 "required": true,
-                "minimum": 0,
-                "maximum": 1000
+                "minimum": -1000,
+                "maximum": 0
             }
         },
         {

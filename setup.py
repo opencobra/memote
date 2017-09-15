@@ -38,6 +38,7 @@ requirements = [
     "click-configfile",
     "colorama",
     "future",
+    "six",
     "pytest>=3.1",
     "gitpython",
     "pandas>=0.20.1",

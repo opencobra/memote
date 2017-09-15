@@ -25,6 +25,7 @@ from goodtables import check
 
 
 def check_partial(func, *args, **kwargs):
+    """Create a partial to be used by goodtables."""
     new_func = partial(func, *args, **kwargs)
     new_func.check = func.check
     return new_func
@@ -32,7 +33,18 @@ def check_partial(func, *args, **kwargs):
 
 @check('gene-not-in-model', type='structure', context='body',
        after='duplicate-row')
-def gene_id_check(genes, errors, columns, row_number, state=None):
+def gene_id_check(genes, errors, columns, row_number):
+    """
+    Validate gene identifiers.
+
+    Parameters
+    ----------
+    genes
+    errors
+    columns
+    row_number
+
+    """
     message = ("Gene '{value}' in column {col} and row {row} does not "
                "appear in the metabolic model.")
     for column in columns:

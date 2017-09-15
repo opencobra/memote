@@ -305,6 +305,7 @@ def find_functional_units(gpr_str):
     for unit in expanded.replace('+', ',').split(' , '):
         yield unit.split('*')
 
+
 def find_objective_function(model):
     """
     Return objective function(s) of the model.

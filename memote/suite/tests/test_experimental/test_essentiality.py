@@ -25,22 +25,18 @@ modulation experiments, etc may be possible extensions in the future.
 
 from __future__ import absolute_import
 
-from io import open
-from os.path import exists, join
-
 import pytest
-import ruamel.yaml as yaml
 
 import memote.support.experimental.essentiality as genome
-from memote.io.configuration import ExperimentConfig
 
 
-#CONFIG = ExperimentConfig.load(join("data", "experiments", "essentiality.yml"))
-#if exists(CONFIG):
-#    with open(CONFIG) as file_h:
-#        CONFIG = yaml.safe_load(file_h)
-#else:
-#    CONFIG = None
+# CONFIG = ExperimentConfiguration.load(join("data", "experiments",
+#  "essentiality.yml"))#
+# if exists(CONFIG):#
+#     with open(CONFIG) as file_h:#
+#         CONFIG = yaml.safe_load(file_h)#
+# else:#
+#     CONFIG = None
 
 EXPERIMENT_PATHS = []
 

@@ -57,6 +57,18 @@ def model(request, solver):
     return model
 
 
+@pytest.fixture(scope='session')
+def read_only_iJR904():
+    """Provides the iJR904 model for read-only operations."""
+    return read_sbml_model(join(dirname(__file__), "data", "iJR904.xml.gz"))
+
+
+@pytest.fixture(scope='function')
+def iJR904(read_only_iJR904):
+    """Provides copies of the iJR904 model."""
+    return read_only_iJR904.copy()
+
+
 @pytest.fixture(scope="session",
                 params=["e", "pp", "c"])
 def compartment_suffix(request):

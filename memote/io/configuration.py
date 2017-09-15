@@ -26,12 +26,9 @@ from os.path import dirname, join, basename
 
 import ruamel.yaml as yaml
 import jsonschema
-from six import iteritems
 from goodtables import validate
 
-from memote.io.checks import gene_id_check, check_partial
-
-__all__ = ("ExperimentConfig",)
+__all__ = ("ExperimentConfiguration",)
 
 
 def name_part(path):
@@ -75,14 +72,13 @@ def extensions_part(path):
     return basename(path).lower().split(".")[1:]
 
 
-class ExperimentConfig(object):
-    """
+class ExperimentConfiguration(object):
+    """Represent an experimental configuration."""
 
-    """
     experiment_types = frozenset(["essentiality", "growth", "production"])
     data_formats = frozenset(["csv", "tsv", "xls", "xlsx", "ods"])
 
-    def __init__(self, filename, model):
+    def __init__(self, filename):
         """
         Load and validate an experiment configuration file.
 
@@ -91,8 +87,6 @@ class ExperimentConfig(object):
         filename : str or pathlib.Path
             The location of the configuration file. The name component must
             be one of {"essentiality", "growth", "production"}.
-        model : cobra.Model
-            The metabolic model under investigation.
 
         """
         self.type = name_part(filename)
@@ -109,23 +103,43 @@ class ExperimentConfig(object):
         self.data_files = frozenset(filter(
             lambda f: self.data_formats.issuperset(extensions_part(f)),
             self.data_files))
-        self.model = model
-        self.validate()
 
     @classmethod
-    def load(cls, filename):
-        return cls(filename)
+    def load(cls, filename, model):
+        """
+        Load a configuration file and validate it.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            The location of the configuration file. The name component must
+            be one of {"essentiality", "growth", "production"}.
+        model : cobra.Model
+            The metabolic model under investigation.
+
+        """
+        config = cls(filename)
+        config.validate(model)
         # TODO: We want to iterate all ValidationErrors and integrate
         # output in pytest.
+        return config
 
-    def validate(self):
-        """Validate the format and content of the configuration file."""
+    def validate(self, model):
+        """
+        Validate the format and content of the configuration file.
+
+        Parameters
+        ----------
+        model : cobra.Model
+            The metabolic model under investigation.
+
+        """
         self.validate_config()
         self.validate_media()
-        self.validate_data()
+        self.validate_data(model)
 
     def validate_config(self):
-        """Validate the presence and format of the configuration file."""
+        """Validate the configuration file."""
         with open(join(
                 dirname(__file__), "schemata", "configuration.json")) as file_h:
             schema = json.load(file_h)
@@ -148,22 +162,4 @@ class ExperimentConfig(object):
             assert filename in self.media_files
             validate(filename, preset='table', schema=schema, order_fields=True)
 
-    def validate_data(self):
-        """Validate the presence of data files."""
-        with open(join(dirname(__file__), "schemata",
-                       "{}.json".format(self.type))) as file_h:
-            schema = json.load(file_h)
-        checks = {
-            "essentiality": [
-                check_partial(gene_id_check, frozenset(self.model.genes))
-            ],
-            "growth": [],
-            "production": [],
-        }[self.type]
-        names = {name_part(f): f for f in self.data_files}
-        for exp, obj in iteritems(self.content["experiments"]):
-            assert exp in names
-            validate(names[exp], preset='table', schema=schema,
-                     order_fields=True, custom_checks=checks)
-            # * check gene IDs or whatever IDs
 

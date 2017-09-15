@@ -20,43 +20,18 @@
 from __future__ import absolute_import
 
 import logging
-import re
-from glob import glob
-from os.path import join
-from os import listdir
 from warnings import warn
 
-import ruamel.yaml as yaml
 import pandas as pd
 import numpy as np
-from cobra.exceptions import Infeasible
+from cobra.flux_analysis import single_gene_deletion
 
 __all__ = ()
 
 LOGGER = logging.getLogger(__name__)
 
 
-def essentiality_file_paths(directory="./"):
-    """Identify all relevant essentiality data files."""
-    return sorted(glob(join(directory, "*.csv")))
-
-
-def load_experiment_data_config(config_filepath="config.yml"):
-    """Import config.yml file."""
-    try:
-        with open(config_filepath, 'r') as config:
-            return yaml.load(config)
-    except IOError:
-        warn(
-            "There is no config.yml in the memote root directory. Calculations"
-            "will proceed using the default configuration of the model."
-        )
-        return None
-
-
-def prepare_model_medium(
-    model, experiment, experiment_id, config
-):
+def configure_model(model, config):
     """
     Return a model which is set up according a specific condition.
 
@@ -65,70 +40,26 @@ def prepare_model_medium(
     objective function, and measured secretion products should be
     listed in the config.
     """
-    working_model = model
-    if config:
-        try:
-            condition = config[experiment][experiment_id]
-        except KeyError:
-            return None
-        else:
-            if 'objective' in condition.keys():
-                working_model.objective = working_model.reactions.get_by_id(
-                    condition['objective'])
-                # Not implemented yet.
-                # if 'medium' in condition.keys():
-                #   working_model.define_medium(condition['medium'])
-            return working_model
+    objective = config['objectives'][0]
+    if isinstance(objective, dict):
+        model.objective = objective
     else:
-        return None
+        model.objective = {model.reactions.get_by_id(objective): 1}
 
 
-def in_silico_essentiality(
-    series, model, experiment_id=None, config_filepath="config.yml"
-):
+def in_silico_essentiality(model, data):
     """
     Perform an in silico gene knockout study on a given model.
 
     Based on experimental data provided by the user. Returns a series with
     identical shape.
     """
-    # TODO: Once cobrapy has a generic and well-tested gene_deletion
-    # function, we should replace this.
-    in_silico_series = series.copy()
-    config = load_experiment_data_config(config_filepath)
-    prepared_model = prepare_model_medium(
-        model, 'essentiality', experiment_id, config
-    )
-    if prepared_model:
-        pass
-    else:
-        warn('Calculations will proceed using the default configuration of '
-             'the model.')
-        prepared_model = model
-    for gene in series.index:
-        with prepared_model:
-            try:
-                prepared_model.genes.get_by_id(gene).knock_out()
-            except KeyError:
-                warn('{} does not exist in {}'.format(gene, model.id))
-                in_silico_series.set_value(
-                    gene,
-                    0
-                )
-            else:
-                try:
-                    solution = model.optimize()
-                    in_silico_series.set_value(
-                        gene,
-                        round(solution.f, 3)
-                    )
-                except Infeasible as e:
-                    print(e)
-                    in_silico_series.set_value(
-                        gene,
-                        0
-                    )
-    return in_silico_series
+    genes = [g for g in data['Gene ID'] if g in model.genes]
+    results = single_gene_deletion(model, gene_list=genes, method='fba')
+    warn("The following genes are not in the model and were ignored: {}."
+         "".format(", ".join(set(data['Gene ID']) - set(genes))))
+    return pd.concat([data[data['Gene ID'].isin(genes)], results], axis=1,
+                     copy=False)
 
 
 def prepare_essentiality_data(filename, model, config_filepath="config.yml"):

@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests for functions in `memote.support.data.genome` to work as expected.
-"""
+"""Test the functions in ``memote.support.experimental.genome``."""
 
 from __future__ import absolute_import
 
@@ -31,38 +29,35 @@ import pytest
 import memote.support.experimental.essentiality as essential
 from memote.support.helpers import find_objective_function
 
-mock_config_dict = {'essentiality': {
-    'glucose': {'objective': 'BIOMASS_TEST'},
-    'mannose': {'objective': 'BIOMASS_TEST'}}
+MOCK_CONFIG = {
+    'version': '0.1',
+    'experiments': {
+        'glucose': {'objectives': ['BIOMASS_TEST']},
+        'mannose': {'objectives': ['BIOMASS_TEST']}
+    }
 }
 
 
 @pytest.fixture(scope='function')
-def input_series():
-    """Provides gene essentiality series adapted from the Keio Collection"""
-    return pd.Series(
-        data=[0.0, 0.0, 0.183, 0.0],
-        index=['b0025', 'b0417', 'b0418', 'b0893']
-    )
+def input_df():
+    """Provides gene essentiality adapted from the Keio collection."""
+    return pd.DataFrame({
+#        'Growth Rate': [0.0, 0.0, 0.183, 0.0],
+#        'Gene ID': ['b0025', 'b0417', 'b0418', 'b0893']
+        'Growth Rate': [0.0, 0.0, 0.183],
+        'Gene ID': ['b0025', 'b0417', 'b0418']
+    })
 
 
 @pytest.fixture(scope='function')
-def expected_series():
-    """Provides expected results series generated using default iJR904"""
-    return pd.Series(
-        data=[0.0, 0.922, 0.922, 0],
-        index=['b0025', 'b0417', 'b0418', 'b0893']
-    )
-
-
-@pytest.fixture(scope='function')
-def combined_dataframe(input_series, expected_series):
-    """Provides expected essentiality dataframe using default iJR904"""
-    essentiality_dataframe = {
-        'data/e_mock_essential_experiment': input_series,
-        'data/e_mock_essential_model': expected_series
-    }
-    return pd.DataFrame(essentiality_dataframe)
+def expected_df():
+    """Provides expected results generated using the default iJR904."""
+    return pd.Series({
+#        'Growth Rate': [0.0, 0.922, 0.922, 0],
+#        'Gene ID': ['b0025', 'b0417', 'b0418', 'b0893']
+        'Growth Rate': [0.0, 0.922, 0.922],
+        'Gene ID': ['b0025', 'b0417', 'b0418']
+    })
 
 
 @pytest.fixture(scope='function')
@@ -91,70 +86,28 @@ def expected_model():
     return model
 
 
-@pytest.fixture(scope='function')
-def ijr904():
-    """Provides iJR904 with an objective function according to the config."""
-    # Growth on glycerol minimal medium was simulated by maximizing flux
-    # through a defined biomass objective function and allowing the uptake of
-    # glycerol, NH4, SO4, O2, and Pi and the free exchange of H+, H2O, and CO2.
-    filename = './tests/data/iJR904.xml.gz'
-    model = cobra.io.read_sbml_model(filename)
-    return model
-
-
-@pytest.mark.parametrize("directory, expected", [
-    (join(dirname(__file__), 'data'), [
-        'glucose.csv',
-        'mannose.csv',
-        'mock_essential.csv'
-    ]),
-    (gettempdir(), [])
+@pytest.mark.parametrize('config', [
+    MOCK_CONFIG['experiments']['glucose'],
+    MOCK_CONFIG['experiments']['mannose'],
+    pytest.mark.raises({}, exception=KeyError)
 ])
-def test_essentiality_file_paths(directory, expected):
-    """Expect that .csv files can be identified."""
-    files = essential.essentiality_file_paths(directory)
-    assert [basename(f) for f in files] == expected
-
-
-@pytest.mark.parametrize("filepath, expected", [
-    (join(dirname(__file__), 'data', 'config.yml'), mock_config_dict),
-    ('/data/', None)
-])
-def test_load_experiment_data_config(filepath, expected):
-    """Expect that config.yml files can be identified."""
-    config = essential.load_experiment_data_config(filepath)
-    assert config == expected
-
-
-def test_prepare_model_medium_objective(raw_model, expected_model):
-    """Expect the objective function to be modified as defined in config."""
-    tested_model = essential.prepare_model_medium(
-        raw_model, 'essentiality', 'glucose', mock_config_dict
-    )
-    assert find_objective_function(tested_model)[0].id \
+def test_prepare_model_medium_objective(raw_model, expected_model, config):
+    """Expect the objective function to be modified as defined."""
+    essential.configure_model(raw_model, config)
+    assert find_objective_function(raw_model)[0].id \
         == find_objective_function(expected_model)[0].id
 
 
-def test_prepare_model_medium_none_config(raw_model):
-    """Expect the objective function to be modified as defined in config."""
-    tested_model = essential.prepare_model_medium(
-        raw_model, 'essentiality', 'glucose', None
-    )
-    assert tested_model is None
-
-
-def test_in_silico_essentiality(input_series, expected_series, ijr904):
+def test_in_silico_essentiality(input_df, expected_df, iJR904):
     """Expect the in silico result series to match the provided series."""
-    tested_in_silico_series = essential.in_silico_essentiality(
-        input_series, ijr904
-    )
-    assert tested_in_silico_series.equals(expected_series)
+    in_silico = essential.in_silico_essentiality(iJR904, input_df)
+    assert in_silico[:2].equals(expected_df)
 
 
 def test_prepare_essentiality_data(ijr904, combined_dataframe):
     """Expect the combined result dataframe to match the provided one."""
     tested_dataframe = essential.prepare_essentiality_data(
-        join(dirname(__file__), 'data', 'mock_essential.csv'),
+        join(dirname(__file__), 'data', 'essentiality', 'mock_essential.csv'),
         ijr904
     )
     assert tested_dataframe.equals(combined_dataframe)
