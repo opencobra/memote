@@ -83,7 +83,7 @@ terminal:
 
 .. code-block:: console
 
-    $ memote --model path/to/model.xml report --one-time
+    $ memote report snapshot path/to/model.xml
 
 This will generate the performance report as ``index.html``.
 
@@ -92,7 +92,32 @@ To illustrate here it is changed to ``report.html``.
 
 .. code-block:: console
 
-    $ memote --model path/to/model.xml --filename "report.html" report --one-time
+    $ memote report snapshot --filename "report.html" path/to/model.xml
+
+Users can tweak the console output by passing additional arguments directly to
+pytest. This can be done by writing the pytest arguments as one continuous
+string.
+
+While the html report is still a work in progress, we recommend using the
+following additional arguments. For a more verbose output showing which test
+failed/ passed exactly:
+
+.. code-block:: console
+
+    $ memote report snapshot -a "-vv" path/to/model.xml
+
+
+For the most detailed console output showing the full traceback of which test
+failed/ passed and why:
+
+.. code-block:: console
+
+    $ memote report snapshot -a "--tb long" path/to/model.xml
+
+For a full list of possible arguments please refer to the `pytest
+documentation`_.
+
+.. _pytest documentation: https://docs.pytest.org/en/latest/usage.html
 
 Comparative
 -----------
@@ -169,13 +194,13 @@ have decided to set the model repository to private, will need to execute:
 
 .. code-block:: console
 
-    $ memote
+    $ memote run
 
 to run the testing suite on their commit history followed by:
 
 .. code-block:: console
 
-    $ memote report
+    $ memote report history
 
 to generate the same type of report that would be shown automatically with
 continuous integration. After this it is crucial to save the generated test
