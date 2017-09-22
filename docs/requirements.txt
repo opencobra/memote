@@ -5,3 +5,7 @@ pytest
 pandas
 click
 plotly
+sympy
+colorama
+dask
+cobra
