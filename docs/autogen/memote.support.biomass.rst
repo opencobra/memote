@@ -1,5 +1,5 @@
-memote\.support\.biomass module
-===============================
+memote.support.biomass module
+=============================
 
 .. automodule:: memote.support.biomass
     :members:

@@ -1,5 +1,5 @@
-memote\.suite\.reporting\.bag module
-====================================
+memote.suite.reporting.bag module
+=================================
 
 .. automodule:: memote.suite.reporting.bag
     :members:

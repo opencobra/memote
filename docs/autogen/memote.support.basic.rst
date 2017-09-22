@@ -1,5 +1,5 @@
-memote\.support\.basic module
-=============================
+memote.support.basic module
+===========================
 
 .. automodule:: memote.support.basic
     :members:

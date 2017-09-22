@@ -1,5 +1,5 @@
-memote\.suite\.reporting\.reports\.diff\_report module
-======================================================
+memote.suite.reporting.reports.diff_report module
+=================================================
 
 .. automodule:: memote.suite.reporting.reports.diff_report
     :members:

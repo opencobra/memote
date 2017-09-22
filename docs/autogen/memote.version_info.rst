@@ -1,5 +1,5 @@
-memote\.version\_info module
-============================
+memote.version_info module
+==========================
 
 .. automodule:: memote.version_info
     :members:

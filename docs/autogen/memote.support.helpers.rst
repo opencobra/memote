@@ -1,5 +1,5 @@
-memote\.support\.helpers module
-===============================
+memote.support.helpers module
+=============================
 
 .. automodule:: memote.support.helpers
     :members:

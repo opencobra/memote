@@ -1,5 +1,5 @@
-memote\.suite\.cli\.reports module
-==================================
+memote.suite.cli.reports module
+===============================
 
 .. automodule:: memote.suite.cli.reports
     :members:

@@ -1,5 +1,5 @@
-memote\.suite\.cli package
-==========================
+memote.suite.cli package
+========================
 
 Submodules
 ----------

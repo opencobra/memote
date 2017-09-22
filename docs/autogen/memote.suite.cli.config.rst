@@ -1,5 +1,5 @@
-memote\.suite\.cli\.config module
-=================================
+memote.suite.cli.config module
+==============================
 
 .. automodule:: memote.suite.cli.config
     :members:

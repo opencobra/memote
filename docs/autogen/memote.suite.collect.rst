@@ -1,5 +1,5 @@
-memote\.suite\.collect module
-=============================
+memote.suite.collect module
+===========================
 
 .. automodule:: memote.suite.collect
     :members:

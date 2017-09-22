@@ -1,5 +1,5 @@
-memote\.support\.annotation module
-==================================
+memote.support.annotation module
+================================
 
 .. automodule:: memote.support.annotation
     :members:

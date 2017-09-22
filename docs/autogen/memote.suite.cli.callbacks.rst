@@ -1,5 +1,5 @@
-memote\.suite\.cli\.callbacks module
-====================================
+memote.suite.cli.callbacks module
+=================================
 
 .. automodule:: memote.suite.cli.callbacks
     :members:

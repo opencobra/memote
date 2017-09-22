@@ -1,5 +1,5 @@
-memote\.suite package
-=====================
+memote.suite package
+====================
 
 Subpackages
 -----------

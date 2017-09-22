@@ -1,5 +1,5 @@
-memote\.suite\.cli\.runner module
-=================================
+memote.suite.cli.runner module
+==============================
 
 .. automodule:: memote.suite.cli.runner
     :members:

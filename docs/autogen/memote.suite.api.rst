@@ -1,5 +1,5 @@
-memote\.suite\.api module
-=========================
+memote.suite.api module
+=======================
 
 .. automodule:: memote.suite.api
     :members:

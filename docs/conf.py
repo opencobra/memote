@@ -282,3 +282,19 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+# This is a snippet I found in
+# https://github.com/rtfd/readthedocs.org/issues/1139
+# The issue is still open so I suppose this is the best workaround for now!
+def run_apidoc(_):
+	from sphinx.apidoc import main
+	import os
+	import sys
+	sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+	cur_dir = os.path.abspath(os.path.dirname(__file__))
+	module = os.path.join(cur_dir,"..","memote")
+	main([None, '-e', '-o', cur_dir, module, '--force'])
+
+def setup(app):
+	app.connect('builder-inited', run_apidoc)

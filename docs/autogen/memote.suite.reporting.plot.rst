@@ -1,5 +1,5 @@
-memote\.suite\.reporting\.plot module
-=====================================
+memote.suite.reporting.plot module
+==================================
 
 .. automodule:: memote.suite.reporting.plot
     :members:

@@ -1,5 +1,5 @@
-memote\.support\.consistency\_helpers module
-============================================
+memote.support.consistency_helpers module
+=========================================
 
 .. automodule:: memote.support.consistency_helpers
     :members:
