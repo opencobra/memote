@@ -1,3 +1,7 @@
 Sphinx
 numpydoc
 sphinx-bootstrap-theme
+pytest
+pandas
+click
+plotly
