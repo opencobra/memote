@@ -54,8 +54,10 @@ def snapshot(model, filename, pytest_args):
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
-    if "--tb" not in pytest_args:
-        pytest_args = ["--tb", "no"] + pytest_args
+    if not any(a.startswith("--tb") for a in pytest_args):
+        pytest_args = ["--tb", "short"] + pytest_args
+    if not any(a.startswith("-v") for a in pytest_args):
+        pytest_args.append("-vv")
     _, results = api.test_model(model, results=True, pytest_args=pytest_args)
     api.basic_report(results, filename)
 

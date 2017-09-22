@@ -98,8 +98,10 @@ def run(model, collect, filename, directory, ignore_git, pytest_args):
         repo = None
     else:
         repo = callbacks.probe_git()
-    if "--tb" not in pytest_args:
-        pytest_args = ["--tb", "line"] + pytest_args
+    if not any(a.startswith("--tb") for a in pytest_args):
+        pytest_args = ["--tb", "short"] + pytest_args
+    if not any(a.startswith("-v") for a in pytest_args):
+        pytest_args.append("-vv")
     if collect:
         if repo is not None and directory is not None:
             filename = join(directory,

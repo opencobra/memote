@@ -4,7 +4,9 @@ History
 Next Release
 ------------
 
-* Temporarily remove ``test_find_stoichiometrically_balanced_cycles``
+* Make the command line output of pytest more verbose until the report is up to
+  speed.
+* Temporarily skip ``test_find_stoichiometrically_balanced_cycles``
 * Catch errors when testing for compartments and loops.
 
 0.4.2 (2017-08-22)

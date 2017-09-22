@@ -61,9 +61,9 @@ def test_model(model, filename=None, results=False, pytest_args=None):
 
     """
     if pytest_args is None:
-        pytest_args = ["--tb", "line", TEST_DIRECTORY]
-    elif "--tb" not in pytest_args:
-        pytest_args.extend(["--tb", "line"])
+        pytest_args = ["--tb", "short", TEST_DIRECTORY]
+    elif not any(a.startswith("--tb") for a in pytest_args):
+        pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
     plugin = ResultCollectionPlugin(model)
