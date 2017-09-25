@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 
+* Fix documentation building and add auto-generation of docs.
 * Make the command line output of pytest more verbose until the report is up to
   speed.
 * Temporarily skip ``test_find_stoichiometrically_balanced_cycles``
