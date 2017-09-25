@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.4.3 (2017-09-25)
+------------------
+
 * Fix documentation building and add auto-generation of docs.
 * Make the command line output of pytest more verbose until the report is up to
   speed.
