@@ -29,4 +29,4 @@ from memote.suite.api import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.4.2"
+__version__ = "0.4.3"
