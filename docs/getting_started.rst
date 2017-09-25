@@ -94,25 +94,10 @@ To illustrate here it is changed to ``report.html``.
 
     $ memote report snapshot --filename "report.html" path/to/model.xml
 
-Users can tweak the console output by passing additional arguments directly to
-pytest. This can be done by writing the pytest arguments as one continuous
-string.
-
-While the html report is still a work in progress, we recommend using the
-following additional arguments. For a more verbose output showing which test
-failed/ passed exactly:
-
-.. code-block:: console
-
-    $ memote report snapshot -a "-vv" path/to/model.xml
-
-
-For the most detailed console output showing the full traceback of which test
-failed/ passed and why:
-
-.. code-block:: console
-
-    $ memote report snapshot -a "--tb long" path/to/model.xml
+While the html report is still a work in progress, we recommend relying on the
+verbose output of the command line tool above. Users can tweak the console
+output by passing additional arguments directly to pytest. This can be done by
+writing the pytest arguments as one continuous string.
 
 For a full list of possible arguments please refer to the `pytest
 documentation`_.
