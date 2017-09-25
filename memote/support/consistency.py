@@ -267,12 +267,13 @@ def produce_atp_closed_exchanges(model):
     return state
 
 
-def find_imbalanced_reactions(model):
+def find_mass_imbalanced_reactions(model):
     """
-    Find metabolic reactions that not mass and/or charge balanced.
+    Find metabolic reactions that are not mass balanced.
 
     This will exclude biomass, exchange and demand reactions as they are
-    unbalanced by definition.
+    unbalanced by definition. It will also fail all reactions where at
+    least one metabolite does not have a formula defined.
 
     Parameters
     ----------
@@ -284,7 +285,50 @@ def find_imbalanced_reactions(model):
     biomass = set(helpers.find_biomass_reaction(model))
     total_rxns = set(model.reactions)
     metab_rxns = total_rxns - (exchanges | biomass)
-    return [rxn for rxn in metab_rxns if len(rxn.check_mass_balance()) > 0]
+    imbalanced_rxns = []
+    for rxn in metab_rxns:
+        balance = rxn.check_mass_balance()
+        met_no_formula = [met for met in rxn.reactants if not met.formula]
+        if met_no_formula:
+            imbalanced_rxns.append(rxn)
+        elif balance.keys() == ["charge"]:
+            pass
+        elif len(balance) > 0:
+            imbalanced_rxns.append(rxn)
+        else:
+            pass
+    return imbalanced_rxns
+
+
+def find_charge_imbalanced_reactions(model):
+    """
+    Find metabolic reactions that are not charge balanced.
+
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition. It will also fail all reactions where at
+    least one metabolite does not have a charge defined.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    exchanges = set(model.exchanges)
+    biomass = set(helpers.find_biomass_reaction(model))
+    total_rxns = set(model.reactions)
+    metab_rxns = total_rxns - (exchanges | biomass)
+    imbalanced_rxns = []
+    for rxn in metab_rxns:
+        balance = rxn.check_mass_balance()
+        met_no_charge = [met for met in rxn.reactants if not met.charge]
+        if met_no_charge:
+            imbalanced_rxns.append(rxn)
+        elif 'charge' in balance:
+            imbalanced_rxns.append(rxn)
+        else:
+            pass
+    return imbalanced_rxns
 
 
 def find_blocked_reactions(model):
