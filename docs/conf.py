@@ -27,14 +27,13 @@ import sphinx_bootstrap_theme
 #sys.path.insert(0, os.path.abspath('.'))
 
 # Get the project root dir, which is the parent dir of this
-cwd = os.getcwd()
-project_root = dirname(cwd)
+PROJECT_ROOT = dirname(dirname(__file__))
 
 # Insert the project root dir as the first element in the PYTHONPATH.
 # This lets us ensure that the source package is imported, and that its
 # version is used.
-sys.path.insert(0, project_root)
-sys.path.insert(1, join(project_root, "memote", "suite", "tests"))
+sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(1, join(PROJECT_ROOT, "memote", "suite", "tests"))
 
 # -- General configuration ---------------------------------------------
 
@@ -282,3 +281,17 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# -- sphinx-apidoc calling ---------------------------------------------
+
+
+def run_apidoc(_):
+    from sphinx.apidoc import main
+
+    mod_path = join(PROJECT_ROOT, 'memote')
+    auto_path = join(dirname(__file__), '_autogen')
+    main([None, '-f', '-d', '2', '-e', '-o', auto_path, mod_path])
+
+
+def setup(app):
+    app.connect('builder-inited', run_apidoc)

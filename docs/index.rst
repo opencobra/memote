@@ -8,12 +8,12 @@ memote - the genome-scale metabolic model test suite
 ====================================================
 
 .. include:: ../README.rst
-    :start-after: summary-start
-    :end-before: summary-end
+   :start-after: summary-start
+   :end-before: summary-end
 
 .. include:: ../README.rst
-    :start-after: who-start
-    :end-before: who-end
+   :start-after: who-start
+   :end-before: who-end
 
 Contents
 ========
