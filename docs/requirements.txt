@@ -9,3 +9,12 @@ sympy
 colorama
 dask
 cobra
+future
+gitpython
+toolz
+click-configfile
+cloudpickle
+cookiecutter
+pygithub
+travispy
+travis-encrypt
