@@ -76,6 +76,13 @@ def find_transport_reactions(model):
     """
     Return a list of all transport reactions.
 
+    A transport reaction is defined as follows:
+    * It contains metabolites from at least 2 compartments
+    * At least 1 metabolite undergoes no chemical reaction
+      i.e. the formula stays the same on both sides of the equation
+
+    Will not identify transport via the PTS System.
+
     Parameters
     ----------
     model : cobra.Model
@@ -175,18 +182,18 @@ def find_demand_reactions(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     Notes
     -----
-    [1] defines demand reactions as:
-    -- 'unbalanced network reactions that allow the accumulation of a compound'
-    -- reactions that are chiefly added during the gap-filling process
-    -- as a means of dealing with 'compounds that are known to be produced by
-    the organism [..] (i) for which no information is available about their
-    fractional distribution to the biomass or (ii) which may only be produced
-    in some environmental conditions
-    -- reactions with a formula such as: 'met_c -> '
+    [1]_ defines demand reactions as:
+    * 'unbalanced network reactions that allow the accumulation of a compound'
+    * reactions that are chiefly added during the gap-filling process
+    * as a means of dealing with 'compounds that are known to be produced by
+      the organism [..] (i) for which no information is available about their
+      fractional distribution to the biomass or (ii) which may only be produced
+      in some environmental conditions
+    * reactions with a formula such as: 'met_c -> '
 
     Demand reactions differ from exchange reactions in that the metabolites
     are not removed from the extracellular environment, but from any of the
@@ -195,9 +202,9 @@ def find_demand_reactions(model):
     References
     ----------
     .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
-           generating a high-quality genome-scale metabolic reconstruction.
-           Nature protocols. Nature Publishing Group.
-           http://doi.org/10.1038/nprot.2009.203
+       generating a high-quality genome-scale metabolic reconstruction.
+       Nature protocols. Nature Publishing Group.
+       http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
@@ -210,31 +217,30 @@ def find_sink_reactions(model):
     """
     Return a list of sink reactions.
 
-    Parameters
-    ----------
-    model : cobra.Model
-        A cobrapy metabolic model
-
-    Notes
-    -----
-    [1] defines sink reactions as:
-    -- 'similar to demand reactions' but reversible, thus able to supply the
-    model with metabolites
-    -- reactions that are chiefly added during the gap-filling process
-    -- as a means of dealing with 'compounds that are produced by nonmetabolic
-    cellular processes but that need to be metabolized'
-    -- reactions with a formula such as: 'met_c <-> '
-
     Sink reactions differ from exchange reactions in that the metabolites
     are not removed from the extracellular environment, but from any of the
     organism's compartments.
 
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Notes
+    -----
+    [1]_ defines sink reactions as:
+    * 'similar to demand reactions' but reversible, thus able to supply the
+      model with metabolites
+    * reactions that are chiefly added during the gap-filling process
+    * as a means of dealing with 'compounds that are produced by nonmetabolic
+      cellular processes but that need to be metabolized'
+    * reactions with a formula such as: 'met_c <-> '
+
     References
     ----------
     .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
-           generating a high-quality genome-scale metabolic reconstruction.
-           Nature protocols. Nature Publishing Group.
-           http://doi.org/10.1038/nprot.2009.203
+       generating a high-quality genome-scale metabolic reconstruction. Nature
+       protocols. Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
@@ -250,16 +256,16 @@ def find_exchange_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     Notes
     -----
-    [1] defines exchange reactions as:
-    -- reactions that 'define the extracellular environment'
-    -- 'unbalanced, extra-organism reactions that represent the supply to or
-    removal of metabolites from the extra-organism "space"'
-    -- reactions with a formula such as: 'met_e -> ' or ' -> met_e' or
-    'met_e <=> '
+    [1]_ defines exchange reactions as:
+    * reactions that 'define the extracellular environment'
+    * 'unbalanced, extra-organism reactions that represent the supply to or
+      removal of metabolites from the extra-organism "space"'
+    * reactions with a formula such as: 'met_e -> ' or ' -> met_e' or
+      'met_e <=> '
 
     Exchange reactions differ from demand reactions in that the metabolites
     are removed from or added to the extracellular environment only. With this
@@ -268,9 +274,8 @@ def find_exchange_rxns(model):
     References
     ----------
     .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
-           generating a high-quality genome-scale metabolic reconstruction.
-           Nature protocols. Nature Publishing Group.
-           http://doi.org/10.1038/nprot.2009.203
+       generating a high-quality genome-scale metabolic reconstruction. Nature
+       protocols. Nature Publishing Group. http://doi.org/10.1038/nprot.2009.203
 
     """
     demand_and_exchange_rxns = set(model.exchanges)
@@ -299,3 +304,16 @@ def find_functional_units(gpr_str):
     expanded = str(expand(algebraic_form))
     for unit in expanded.replace('+', ',').split(' , '):
         yield unit.split('*')
+
+
+def find_objective_function(model):
+    """
+    Return objective function(s) of the model.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return [rxn for rxn in model.reactions if rxn.objective_coefficient == 1]

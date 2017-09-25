@@ -20,8 +20,8 @@
 from __future__ import absolute_import
 
 import os
-import platform
 import logging
+import platform
 
 from builtins import dict
 from datetime import datetime

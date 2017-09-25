@@ -24,7 +24,7 @@ from builtins import dict
 
 from pandas import DataFrame
 
-import memote.support.annotation as annotation
+import memote.support.core.annotation as annotation
 from memote.support.helpers import df2dict
 
 

@@ -38,6 +38,7 @@ requirements = [
     "click-configfile",
     "colorama",
     "future",
+    "six",
     "pytest>=3.1",
     "gitpython",
     "pandas>=0.20.1",
@@ -54,11 +55,12 @@ requirements = [
     "travispy",
     "pygithub",
     "travis-encrypt",
-    "sympy"
+    "sympy",
+    "tabulator",
+    "goodtables"
 ]
 
 test_requirements = [
-    "pytest>=3.1"
     "pytest-raises"
 ]
 

@@ -15,6 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helper functions for the metabolic model test suite."""
+"""Core helper functions for the metabolic model test suite."""
 
 from __future__ import absolute_import

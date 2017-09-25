@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "memote experiments configuration schema",
+    "description": "The following JSON schema is used to validate a configuration file (typically YAML) that describes one or more experiments to be tested by memote.",
+
+    "definitions": {
+        "stringSet": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+        "experiment": {
+            "type": "object",
+            "properties": {
+                "medium": { "type": "string" },
+                "objectives": { "$ref": "#/definitions/stringSet" },
+                "constraints": { "$ref": "#/definitions/stringSet" },
+                "label": { "type": "string" }
+            },
+            "additionalProperties": false
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "enum": ["0.1"]
+        },
+        "experiments": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/definitions/experiment" }
+        }
+    },
+    "required": ["version", "experiments"],
+    "additionalProperties": false
+}

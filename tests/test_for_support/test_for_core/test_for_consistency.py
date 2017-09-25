@@ -15,16 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests ensuring that the functions in `memote.support.basic` work as expected.
-"""
+"""Test functionality in `memote.support.core.basic`."""
 
 from __future__ import absolute_import
 
 import cobra
 import pytest
 
-import memote.support.consistency as consistency
+import memote.support.core.consistency as consistency
 
 
 def figure_1(base):

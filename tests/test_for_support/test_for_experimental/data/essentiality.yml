@@ -1,0 +1,9 @@
+version: "0.1"
+experiments:
+  glucose:
+    objectives:
+     - BIOMASS_TEST
+
+  mannose:
+    objectives:
+     - BIOMASS_TEST

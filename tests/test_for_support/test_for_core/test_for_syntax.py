@@ -20,8 +20,7 @@ from __future__ import absolute_import
 import cobra
 import pytest
 
-import memote.support.syntax as syntax
-
+import memote.support.core.syntax as syntax
 
 """
 Tests ensuring that the functions in `memote.support.syntax` work as expected.
