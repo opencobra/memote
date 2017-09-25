@@ -291,7 +291,7 @@ def find_mass_imbalanced_reactions(model):
         met_no_formula = [met for met in rxn.reactants if not met.formula]
         if met_no_formula:
             imbalanced_rxns.append(rxn)
-        elif balance.keys() == ["charge"]:
+        elif list(balance.keys()) == ["charge"]:
             pass
         elif len(balance) > 0:
             imbalanced_rxns.append(rxn)
