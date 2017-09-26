@@ -115,7 +115,7 @@ def test_find_orphans(read_only_model, store):
     store["orphan_metabolites"] = [
         met.id for met in consistency.find_orphans(read_only_model)]
     assert len(store["orphan_metabolites"]) == 0,\
-        "The metabolites are no produced by any " \
+        "The following metabolites are not produced by any " \
         "reaction of the model: {}".format(
             ", ".join(store["orphan_metabolites"]))
 
@@ -125,7 +125,7 @@ def test_find_deadends(read_only_model, store):
     store["deadend_metabolites"] = [
         met.id for met in consistency.find_deadends(read_only_model)]
     assert len(store["deadend_metabolites"]) == 0,\
-        "The metabolites are no consumed by any " \
+        "The following metabolites are not consumed by any " \
         "reaction of the model: {}".format(
             ", ".join(store["deadend_metabolites"]))
 
@@ -135,6 +135,6 @@ def test_find_disconnected(read_only_model, store):
     store["disconnected_metabolites"] = [
         met.id for met in consistency.find_disconnected(read_only_model)]
     assert len(store["disconnected_metabolites"]) == 0,\
-        "The metabolites are not associated with any " \
+        "The following metabolites are not associated with any " \
         "reaction of the model: {}".format(
             ", ".join(store["disconnected_metabolites"]))
