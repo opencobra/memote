@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+* Fix a bug in ``memote.support.consistency_helpers.get_internals`` that did
+  not exclude the (by definition) imbalanced biomass reactions.
+
 0.4.3 (2017-09-25)
 ------------------
 
