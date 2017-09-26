@@ -38,27 +38,31 @@ def test_stoichiometric_consistency(read_only_model, store):
         " {}".format(", ".join(unconserved))
 
 
-@pytest.mark.parametrize("read_only_model, store, met", [
-    ("read_only_model", "store", x) for x in consistency.ENERGY_COUPLES.keys()
-], indirect=["read_only_model", "store"])
+@pytest.mark.parametrize(
+    "read_only_model, store, met",
+    [("read_only_model", "store", x) for x in consistency.ENERGY_COUPLES],
+    indirect=["read_only_model", "store"])
 def test_detect_energy_generating_cycles(read_only_model, store, met):
     """Expect that no energy metabolite can be produced out of nothing."""
-    result = \
-        consistency.detect_energy_generating_cycles(read_only_model, met)
+    try:
+        result = \
+            consistency.detect_energy_generating_cycles(read_only_model, met)
+    except KeyError as err:
+        result = "not found"
     store["magic_{}_production".format(met)] = result
-    if result == 'infeasible':
+
+    if result == "not found":
+        assert False,\
+            "The metabolite '{}' was not found in the model.".format(met)
+    elif result == "infeasible":
         assert False,\
             "Solving the model is infeasible. Often this is due to missing " \
             "or disconnected metabolites, or too strict constraints."
-    elif type(result) == list:
-        assert result == [],\
-            "The model can produce {} without requiring resources. This is " \
+    else:
+        assert len(result) == 0,\
+            "The model can produce '{}' without requiring resources. This is " \
             "likely caused by improperly constrained reactions leading to " \
             "erroneous energy-generating cycles.".format(met)
-    else:
-        pytest.skip(
-            "The metabolite ID {} was not found in the model".format(met)
-        )
 
 
 def test_reaction_charge_balance(read_only_model, store):

@@ -484,19 +484,19 @@ def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
     assert set(cycle) == {'A', 'B', 'C'}
 
 
-@pytest.mark.parametrize("model, output, metabolite_id", [
+@pytest.mark.parametrize("model, metabolite_id, output", [
     # test for possible exceptions
-    ("produces_nadh", False, "atp_c"),
-    ("missing_energy_partner", False, "atp_c"),
-    ("no_atp", [], 'atp_c'),
-    ("infeasible", 'infeasible', 'atp_c')
+    pytest.mark.raises(("produces_nadh", "atp_c", None), exception=KeyError),
+    pytest.mark.raises(("missing_energy_partner", "atp_c", None),
+                       exception=KeyError),
+    ("no_atp", "atp_c", []),
+    ("infeasible", "atp_c", "infeasible")
 ], indirect=["model"])
-def test_detect_energy_generating_cycles_exceptions(
-    model, output, metabolite_id
-):
+def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
+                                                    output):
     """Expect that energy-generating cycles don't exist for metabolite ID."""
-    status = consistency.detect_energy_generating_cycles(model, metabolite_id)
-    assert status == output
+    result = consistency.detect_energy_generating_cycles(model, metabolite_id)
+    assert set(result) == set(output)
 
 
 @pytest.mark.parametrize("model, num", [

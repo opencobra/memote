@@ -37,24 +37,25 @@ LOGGER = logging.getLogger(__name__)
 # M. J. (2017). Erroneous energy-generating cycles in published genome scale
 # metabolic networks: Identification and removal. PLoS Computational
 # Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
-ENERGY_COUPLES = {'atp_c': 'adp_c',
-                  'ctp_c': 'cdp_c',
-                  'gtp_c': 'gdp_c',
-                  'utp_c': 'udp_c',
-                  'itp_c': 'idp_c',
-                  'nadph_c': 'nadp_c',
-                  'nadh_c': 'nad_c',
-                  'fadh2_c': 'fad_c',
-                  'fmnh2_c': 'fmn_c',
-                  'q8h2_c': 'q8_c',
-                  'mql8_c': 'mqn8_c',
-                  'mql6_c': 'mqn6_c',
-                  'mql7_c': 'mqn7_c',
-                  '2dmmql8_c': '2dmmq8_c',
-                  'accoa_c': 'coa_c',
-                  'glu__L_c': 'akg_c',
-                  'h_p': 'h_c'
-                  }
+ENERGY_COUPLES = {
+    'atp_c': 'adp_c',
+    'ctp_c': 'cdp_c',
+    'gtp_c': 'gdp_c',
+    'utp_c': 'udp_c',
+    'itp_c': 'idp_c',
+    'nadph_c': 'nadp_c',
+    'nadh_c': 'nad_c',
+    'fadh2_c': 'fad_c',
+    'fmnh2_c': 'fmn_c',
+    'q8h2_c': 'q8_c',
+    'mql8_c': 'mqn8_c',
+    'mql6_c': 'mqn6_c',
+    'mql7_c': 'mqn7_c',
+    '2dmmql8_c': '2dmmq8_c',
+    'accoa_c': 'coa_c',
+    'glu__L_c': 'akg_c',
+    'h_p': 'h_c'
+}
 
 
 def check_stoichiometric_consistency(model):
@@ -280,8 +281,8 @@ def detect_energy_generating_cycles(model, metabolite_id):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    metabolite_id : string
-        The ID of an energy metabolite.
+    metabolite_id : str
+        The identifier of an energy metabolite.
 
     Notes
     -----
@@ -306,24 +307,16 @@ def detect_energy_generating_cycles(model, metabolite_id):
      Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 
     """
-    try:
-        met = model.metabolites.get_by_id(metabolite_id)
-    except KeyError:
-        return False
-    try:
-        dissipation_product = model.metabolites.get_by_id(
-            ENERGY_COUPLES[met.id]
-        )
-    except KeyError:
-        return False
-    try:
-        maintenance = model.reactions.get_by_id('ATPM')
-        maintenance.bounds = 0, 1000
-    except KeyError:
-        pass
+    met = model.metabolites.get_by_id(metabolite_id)
+    dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
 
     dissipation_rxn = Reaction('Dissipation')
     with model:
+        try:
+            maintenance = model.reactions.get_by_id('ATPM')
+            maintenance.bounds = 0, 1000
+        except KeyError:
+            pass
         for exchange in model.exchanges:
             exchange.bounds = (0, 0)
         model.add_reactions([dissipation_rxn])
@@ -351,10 +344,8 @@ def detect_energy_generating_cycles(model, metabolite_id):
         if solution.status == 'infeasible':
             return 'infeasible'
         elif solution.objective_value > 0.0:
-            df = solution.to_frame()
-            return list(
-                df[abs(df["fluxes"]) > 0].index.drop(["Dissipation"])
-            )
+            return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
+                drop(["Dissipation"]).tolist()
         else:
             return []
 
