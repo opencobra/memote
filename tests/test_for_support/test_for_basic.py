@@ -379,4 +379,3 @@ def test_find_pure_metabolic_reactions(model, num):
 def test_find_unique_metabolites(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_unique_metabolites(model)) == num
-

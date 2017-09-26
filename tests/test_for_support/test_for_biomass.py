@@ -294,7 +294,7 @@ def test_gam_in_biomass(model, boolean):
     """Expect the biomass reactions to contain atp and adp."""
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        assert biomass.gam_in_biomass(rxn, model) is boolean
+        assert biomass.gam_in_biomass(rxn) is boolean
 
 
 @pytest.mark.parametrize("model, boolean", [

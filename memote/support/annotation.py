@@ -44,6 +44,7 @@ LOGGER = logging.getLogger(__name__)
 # 'BioCyc'  ['rxn','met'] 'http://biocyc.org'
 # 'Reactome'    ['met'] 'http://www.reactome.org/'
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
+# 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
 
 REACTION_ANNOTATIONS = [('rhea', re.compile(r"^\d{5}$")),
                         ('kegg.reaction', re.compile(r"^R\d+$")),
@@ -67,7 +68,8 @@ REACTION_ANNOTATIONS = [('rhea', re.compile(r"^\d{5}$")),
 REACTION_ANNOTATIONS = OrderedDict(REACTION_ANNOTATIONS)
 
 
-METABOLITE_ANNOTATIONS = [('kegg.compound', re.compile(r"^C\d+$")),
+METABOLITE_ANNOTATIONS = [('pubchem.compound', re.compile(r"^\d+$")),
+                          ('kegg.compound', re.compile(r"^C\d+$")),
                           ('seed.compound', re.compile(r"^cpd\d+$")),
                           ('inchikey', re.compile(r"^[A-Z]{14}\-"
                                                   r"[A-Z]{10}(\-[A-Z])?")),
@@ -180,7 +182,7 @@ def generate_component_annotation_miriam_match(model, components):
 
 def generate_component_id_namespace_overview(model, components):
     """
-    Tabulate which MIRIAM databases the component's annotation match.
+    Tabulate which MIRIAM databases the component's identifier matches.
 
     Parameters
     ----------
@@ -208,4 +210,21 @@ def generate_component_id_namespace_overview(model, components):
         index.append(elem.id)
         data.append(tuple(patterns[db].match(elem.id) is not None
                           for db in databases))
-    return pd.DataFrame(data, index=index, columns=databases)
+    df = pd.DataFrame(data, index=index, columns=databases)
+    if components != "genes":
+        # Clean up of the dataframe. Unfortunately the Biocyc patterns match
+        # broadly. Hence, whenever a Metabolite or Reaction ID matches to any
+        # DB pattern AND the Biocyc pattern we have to assume that this is a
+        # false positive.
+        # First determine all rows in which 'biocyc' and other entries are
+        # True simultaneously and use this Boolean series to create another
+        # column temporarily.
+        df['duplicate'] = df[df['biocyc']].sum(axis=1) >= 2
+        # Replace all nan values with False
+        df['duplicate'].fillna(False, inplace=True)
+        # Use the additional column to index the original dataframe to identify
+        # false positive biocyc hits and set them to False.
+        df.loc[df['duplicate'], 'biocyc'] = False
+        # Delete the additional column
+        del df['duplicate']
+    return df

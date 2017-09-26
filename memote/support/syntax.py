@@ -146,9 +146,12 @@ def find_reaction_tag_transporter(model):
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
-    atp_adp_rxns = helpers.find_atp_adp_converting_reactions(model)
+    atp_adp_rxns = helpers.find_converting_reactions(model, ["atp", "adp"])
+    gtp_gdp_rxns = helpers.find_converting_reactions(model, ["gtp", "gdp"])
+    ctp_cdp_rxns = helpers.find_converting_reactions(model, ["ctp", "cdp"])
+    energy_requiring = set().union(atp_adp_rxns, gtp_gdp_rxns, ctp_cdp_rxns)
 
-    non_abc_transporters = set(transport_rxns).difference(set(atp_adp_rxns))
+    non_abc_transporters = set(transport_rxns).difference(energy_requiring)
 
     return [rxn for rxn in non_abc_transporters
             if not re.match("[A-Z0-9]+\w*?t\w*?", rxn.id)
@@ -179,9 +182,12 @@ def find_abc_tag_transporter(model):
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
-    atp_adp_rxns = helpers.find_atp_adp_converting_reactions(model)
+    atp_adp_rxns = helpers.find_converting_reactions(model, ["atp", "adp"])
+    gtp_gdp_rxns = helpers.find_converting_reactions(model, ["gtp", "gdp"])
+    ctp_cdp_rxns = helpers.find_converting_reactions(model, ["ctp", "cdp"])
+    energy_requiring = set().union(atp_adp_rxns, gtp_gdp_rxns, ctp_cdp_rxns)
 
-    abc_transporters = set(transport_rxns).intersection(set(atp_adp_rxns))
+    abc_transporters = set(transport_rxns).intersection(energy_requiring)
 
     return [rxn for rxn in abc_transporters
             if not re.match("[A-Z0-9]+\w*?abc\w*?", rxn.id)]

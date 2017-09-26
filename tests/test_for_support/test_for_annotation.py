@@ -57,7 +57,8 @@ def rxn_annotations(base):
 
 def met_each_present(base):
     met = cobra.Metabolite(id='met_c', name="Met")
-    met.annotation = {'metanetx.chemical': "MNXM23",
+    met.annotation = {'pubchem.compound' : "107735",
+                      'metanetx.chemical': "MNXM23",
                       'kegg.compound': "C00022",
                       'seed.compound': "cpd00020",
                       'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",
@@ -167,7 +168,11 @@ def inconsistent_ids(base):
     rxn2.add_metabolites({met1: -1, met2: 1})
     rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
     rxn3.add_metabolites({met2: -1, met: 1})
-    base.add_reactions([rxn, rxn2, rxn3])
+    rxn4 = cobra.Reaction(
+        id='KETOGLUCOSE-REDUCTASE-RXN', name="Reaction: 1.1.1.-"
+    )
+    rxn4.add_metabolites({met2: -1, met: 1})
+    base.add_reactions([rxn, rxn2, rxn3, rxn4])
     return base
 
 

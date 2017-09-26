@@ -122,30 +122,39 @@ def find_transport_reactions(model):
     return transport_reactions
 
 
-def find_atp_adp_converting_reactions(model):
+def find_converting_reactions(model, pair):
     """
-    Find reactions which interact with ATP and ADP.
+    Find reactions which convert a given metabolite pair.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    pair: tuple or list
+        A pair of metabolite identifiers without compartment suffix.
+
+    Returns
+    -------
+    frozenset
+        The set of reactions that have one of the pair on their left-hand
+        side and the other on the right-hand side.
 
     """
-    atp_all_comp_rxn_list = []
-    for met in model.metabolites:
-        if re.match('^atp_.*', met.id):
-            atp_all_comp_rxn_list.append(met.reactions)
+    met_ids = [m.id for m in model.metabolites]
+    first = set(model.metabolites.get_by_id(m)
+                for m in met_ids if m.startswith(pair[0]))
+    second = set(model.metabolites.get_by_id(m)
+                 for m in met_ids if m.startswith(pair[1]))
 
-    adp_all_comp_rxn_list = []
-    for met in model.metabolites:
-        if re.match('^adp_.*', met.id):
-            adp_all_comp_rxn_list.append(met.reactions)
-
-    atp_union = set().union(*atp_all_comp_rxn_list)
-    adp_union = set().union(*adp_all_comp_rxn_list)
-
-    return atp_union.intersection(adp_union)
+    hits = list()
+    for rxn in model.reactions:
+        if len(first & set(rxn.reactants)) > 0 and len(
+                second & set(rxn.products)) > 0:
+            hits.append(rxn)
+        elif len(first & set(rxn.products)) > 0 and len(
+                second & set(rxn.reactants)) > 0:
+            hits.append(rxn)
+    return frozenset(hits)
 
 
 def find_biomass_reaction(model):

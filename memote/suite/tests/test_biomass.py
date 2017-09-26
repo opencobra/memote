@@ -115,7 +115,7 @@ def test_gam_in_biomass(model, reaction_id, store):
     store["gam_in_biomass"] = store.get(
         "gam_in_biomass", list())
     reaction = model.reactions.get_by_id(reaction_id)
-    present = biomass.gam_in_biomass(reaction, model)
+    present = biomass.gam_in_biomass(reaction)
     store["gam_in_biomass"].append(present)
     assert present, \
         "{} does not contain a term for growth-associated maintenance." \

@@ -104,7 +104,7 @@ def find_ngam(model):
           http://doi.org/10.1038/nprot.2009.203
 
     """
-    atp_adp_conv_rxns = helpers.find_atp_adp_converting_reactions(model)
+    atp_adp_conv_rxns = helpers.find_converting_reactions(model, ("atp", "adp"))
     return [rxn for rxn in atp_adp_conv_rxns
             if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
                                               'adp_c + h_c + pi_c' and not
@@ -169,8 +169,7 @@ def find_enzyme_complexes(model):
     for rxn in model.reactions:
         if rxn.gene_reaction_rule:
             for candidate in helpers.find_functional_units(
-                rxn.gene_reaction_rule
-            ):
+                    rxn.gene_reaction_rule):
                 if len(candidate) >= 2:
                     enzyme_complexes.add(tuple(candidate))
     return enzyme_complexes
@@ -178,7 +177,7 @@ def find_enzyme_complexes(model):
 
 def find_pure_metabolic_reactions(model):
     """
-    Return list of reactions neither transporters, exchanges nor pseudo rxns.
+    Return reactions that are neither transporters, exchanges, nor pseudo.
 
     Parameters
     ----------
@@ -188,13 +187,10 @@ def find_pure_metabolic_reactions(model):
     """
     exchanges = set(model.exchanges)
     transporters = set(helpers.find_transport_reactions(model))
-    biomass_rxns = set(helpers.find_biomass_reaction(model))
-    return [rxn for rxn in model.reactions
-            if rxn not in exchanges
-            if rxn not in transporters
-            if rxn not in biomass_rxns]
+    biomass = set(helpers.find_biomass_reaction(model))
+    return set(model.reactions) - (exchanges | transporters | biomass)
 
 
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
-    return set([met.id[:-2] for met in model.metabolites])
+    return set(met.id.split("_", 1)[0] for met in model.metabolites)
