@@ -38,13 +38,31 @@ def test_stoichiometric_consistency(read_only_model, store):
         " {}".format(", ".join(unconserved))
 
 
-def test_production_of_atp_closed_bounds(read_only_model, store):
-    """Expect that ATP cannot be produced when all the bounds are closed."""
-    store["magic_atp_production"] = consistency.produce_atp_closed_exchanges(
-        read_only_model)
-    assert not store["magic_atp_production"],\
-        "Model can produce ATP with closed exchanges. This might be caused by"\
-        " imbalanced reactions or loops."
+@pytest.mark.parametrize(
+    "read_only_model, store, met",
+    [("read_only_model", "store", x) for x in consistency.ENERGY_COUPLES],
+    indirect=["read_only_model", "store"])
+def test_detect_energy_generating_cycles(read_only_model, store, met):
+    """Expect that no energy metabolite can be produced out of nothing."""
+    try:
+        result = \
+            consistency.detect_energy_generating_cycles(read_only_model, met)
+    except KeyError as err:
+        result = "not found"
+    store["magic_{}_production".format(met)] = result
+
+    if result == "not found":
+        assert False,\
+            "The metabolite '{}' was not found in the model.".format(met)
+    elif result == "infeasible":
+        assert False,\
+            "Solving the model is infeasible. Often this is due to missing " \
+            "or disconnected metabolites, or too strict constraints."
+    else:
+        assert len(result) == 0,\
+            "The model can produce '{}' without requiring resources. This is " \
+            "likely caused by improperly constrained reactions leading to " \
+            "erroneous energy-generating cycles.".format(met)
 
 
 def test_reaction_charge_balance(read_only_model, store):
