@@ -460,7 +460,7 @@ def find_stoichiometrically_balanced_cycles(model):
 
 def find_orphans(model):
     """
-    Return list of IDs of metabolites that are only consumed in reactions.
+    Return metabolites that are only consumed in reactions.
 
     Parameters
     ----------
@@ -468,21 +468,14 @@ def find_orphans(model):
         The metabolic model under investigation.
 
     """
-    df = con_helpers.prep_stoich_matrix(model)
-    orphans = list()
-    for met in model.metabolites:
-        if 0 in df[met.id].value_counts():
-            series = df[met.id].value_counts().drop(0)
-        else:
-            series = df[met.id].value_counts()
-        if -1 in series.keys() and len(series.keys()) == 1:
-            orphans.append(met)
-    return orphans
+    return [met for met in model.metabolites
+            if (len(met.reactions) > 0) and all(
+                rxn.metabolites[met] < 0 for rxn in met.reactions)]
 
 
 def find_deadends(model):
     """
-    Return list of IDs of metabolites that are only produced in reactions.
+    Return metabolites that are only produced in reactions.
 
     Parameters
     ----------
@@ -490,21 +483,14 @@ def find_deadends(model):
         The metabolic model under investigation.
 
     """
-    df = con_helpers.prep_stoich_matrix(model)
-    deadends = list()
-    for met in model.metabolites:
-        if 0 in df[met.id].value_counts():
-            series = df[met.id].value_counts().drop(0)
-        else:
-            series = df[met.id].value_counts()
-        if 1 in series.keys() and len(series.keys()) == 1:
-            deadends.append(met)
-    return deadends
+    return [met for met in model.metabolites
+            if (len(met.reactions) > 0) and all(
+                rxn.metabolites[met] > 0 for rxn in met.reactions)]
 
 
 def find_disconnected(model):
     """
-    Return list of IDs of metabolites that are not in any of the reactions.
+    Return metabolites that are not in any of the reactions.
 
     Parameters
     ----------
@@ -512,7 +498,4 @@ def find_disconnected(model):
         The metabolic model under investigation.
 
     """
-    df = con_helpers.prep_stoich_matrix(model)
-    return [met for met in model.metabolites
-            if 0 in df[met.id].value_counts() and
-            df[met.id].value_counts()[0] == len(model.reactions)]
+    return [met for met in model.metabolites if len(met.reactions) == 0]
