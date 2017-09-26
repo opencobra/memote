@@ -161,7 +161,6 @@ def generate_component_annotation_miriam_match(model, components):
         test = annotation[key]
         pattern = patterns[key]
         if isinstance(test, native_str):
-            print("string match!")
             return pattern.match(test) is not None
         return all(pattern.match(elem) is not None for elem in test)
 
