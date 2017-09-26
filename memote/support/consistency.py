@@ -53,7 +53,12 @@ def check_stoichiometric_consistency(model):
     Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
     # The transpose of the stoichiometric matrix N.T in the paper.
     stoich_trans = Model()
-    internal_rxns, metabolites = con_helpers.get_internals(model)
+    internal_rxns = con_helpers.get_internals(model)
+    metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
+    LOGGER.info("model '%s' has %d internal reactions", model.id,
+                len(internal_rxns))
+    LOGGER.info("model '%s' has %d internal metabolites", model.id,
+                len(metabolites))
     for metabolite in metabolites:
         stoich_trans.add(Variable(metabolite.id, lb=1))
     stoich_trans.update()
@@ -97,7 +102,8 @@ def find_unconserved_metabolites(model):
     """
     Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
     stoich_trans = Model()
-    internal_rxns, metabolites = con_helpers.get_internals(model)
+    internal_rxns = con_helpers.get_internals(model)
+    metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     # The binary variables k[i] in the paper.
     k_vars = list()
     for met in metabolites:
@@ -157,7 +163,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
     unconserved_mets = find_unconserved_metabolites(model)
     LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
-    internal_rxns, internal_mets = con_helpers.get_internals(model)
+    internal_rxns = con_helpers.get_internals(model)
+    internal_mets = set(met for rxn in internal_rxns for met in rxn.metabolites)
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
