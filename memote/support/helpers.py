@@ -122,7 +122,7 @@ def find_transport_reactions(model):
     return transport_reactions
 
 
-def find_converting_reactions(model, met_pair):
+def find_converting_reactions(model, pair):
     """
     Find reactions which convert a given metabolite pair.
 
@@ -130,25 +130,31 @@ def find_converting_reactions(model, met_pair):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    met_pair: list
-        List of metabolite IDs (string) without compartment suffix where one
-        metabolite gets converted into the other by an enzymatic reaction.
+    pair: tuple or list
+        A pair of metabolite identifiers without compartment suffix.
+
+    Returns
+    -------
+    frozenset
+        The set of reactions that have one of the pair on their left-hand
+        side and the other on the right-hand side.
 
     """
-    met1_all_comp_rxn_list = []
-    for met in model.metabolites:
-        if re.match('^{}_.*'.format(met_pair[0]), met.id):
-            met1_all_comp_rxn_list.append(met.reactions)
+    met_ids = [m.id for m in model.metabolites]
+    first = set(model.metabolites.get_by_id(m)
+                for m in met_ids if m.startswith(pair[0]))
+    second = set(model.metabolites.get_by_id(m)
+                 for m in met_ids if m.startswith(pair[1]))
 
-    met2_all_comp_rxn_list = []
-    for met in model.metabolites:
-        if re.match('^{}_.*'.format(met_pair[1]), met.id):
-            met2_all_comp_rxn_list.append(met.reactions)
-
-    met1_union = set().union(*met1_all_comp_rxn_list)
-    met2_union = set().union(*met2_all_comp_rxn_list)
-
-    return met1_union.intersection(met2_union)
+    hits = list()
+    for rxn in model.reactions:
+        if len(first & set(rxn.reactants)) > 0 and len(
+                second & set(rxn.products)) > 0:
+            hits.append(rxn)
+        elif len(first & set(rxn.products)) > 0 and len(
+                second & set(rxn.reactants)) > 0:
+            hits.append(rxn)
+    return frozenset(hits)
 
 
 def find_biomass_reaction(model):

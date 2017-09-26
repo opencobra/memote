@@ -103,9 +103,6 @@ def gam_in_biomass(reaction):
     """
     left = set(["atp_c", "h2o_c"])
     right = set(["adp_c", "pi_c", "h_c"])
-    if left.issubset(
-        set(met.id for met in reaction.reactants)
-    ) and right.issubset(set(met.id for met in reaction.products)):
-        return True
-    else:
-        return False
+    return (
+        left.issubset(met.id for met in reaction.reactants) and
+        right.issubset(met.id for met in reaction.products))

@@ -151,11 +151,10 @@ def test_find_functional_units(gpr_str, expected):
     assert list(helpers.find_functional_units(gpr_str)) == expected
 
 
-@pytest.mark.parametrize("met_pair, expected", [
-    (["a", "b"], 2),
-    (["c", "c"], 2)
-])
-def test_find_converting_reactions(met_pair, expected):
+@pytest.mark.parametrize("model, met_pair, expected", [
+    ("converting_reactions", ("a", "b"), 2),
+    ("converting_reactions", ("c", "c"), 1)
+], indirect=["model"])
+def test_find_converting_reactions(model, met_pair, expected):
     """Expect amount of converting reactions to be identified correctly."""
-    model = model_builder("converting_reactions")
     assert len(helpers.find_converting_reactions(model, met_pair)) == expected
