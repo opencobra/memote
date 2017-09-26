@@ -123,7 +123,7 @@ def test_reaction_annotation_wrong_ids(read_only_model, store):
             "{}".format(db, ", ".join(sub.index))
 
 
-@pytest.skip("Bug causing TypeError in helper function.")
+@pytest.mark.skip("Bug causing TypeError in helper function.")
 def test_metabolite_id_namespace_consistency(read_only_model, store):
     """Expect metabolite IDs to be from the same namespace."""
     overview = annotation.generate_component_id_namespace_overview(
@@ -144,7 +144,7 @@ def test_metabolite_id_namespace_consistency(read_only_model, store):
         "".format(", ".join(overview.loc[~overview[largest], largest].index))
 
 
-@pytest.skip("Bug causing TypeError in helper function.")
+@pytest.mark.skip("Bug causing TypeError in helper function.")
 def test_reaction_id_namespace_consistency(read_only_model, store):
     """Expect reaction IDs to be from the same namespace."""
     overview = annotation.generate_component_id_namespace_overview(
