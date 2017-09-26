@@ -261,5 +261,4 @@ def is_charge_balanced(reaction):
         if metabolite.charge is None:
             return False
         charge += coefficient * metabolite.charge
-    # filter out 0 values
     return charge == 0
