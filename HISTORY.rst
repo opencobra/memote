@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.4.4 (2017-09-26)
+------------------
+
 * Fix a bunch of bugs:
     - Remove false positive detection of Biocyc annotation
     - Allow memote to identify CTP or GTP driven transport reactions
