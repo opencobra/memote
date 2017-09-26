@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 
+* Split mass-charge-balance test into two separate tests for more clarity
 * Fix a bug in ``memote.support.consistency_helpers.get_internals`` that did
   not exclude the (by definition) imbalanced biomass reactions.
 

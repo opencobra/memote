@@ -132,7 +132,7 @@ def all_balanced(base):
 
 
 def mass_imbalanced(base):
-    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=2)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -1, met_b: 1})
@@ -143,6 +143,24 @@ def mass_imbalanced(base):
 def charge_imbalanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
+    rxn1 = cobra.Reaction("RA1")
+    rxn1.add_metabolites({met_a: -2, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+
+def met_no_formula(base):
+    met_a = cobra.Metabolite("A", formula=None, charge=1)
+    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    rxn1 = cobra.Reaction("RA1")
+    rxn1.add_metabolites({met_a: -2, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+
+def met_no_charge(base):
+    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
+    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2')
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -2, met_b: 1})
     base.add_reactions([rxn1])
@@ -215,6 +233,8 @@ def model_builder(name):
         "all_balanced": all_balanced,
         "mass_imbalanced": mass_imbalanced,
         "charge_imbalanced": charge_imbalanced,
+        "met_no_charge": met_no_charge,
+        "met_no_formula": met_no_formula,
         "loopy_toy_model": loopy_toy_model,
         "constrained_toy_model": constrained_toy_model,
         "infeasible_toy_model": infeasible_toy_model
@@ -268,12 +288,27 @@ def test_production_of_atp_closed_bounds(model, atp_production):
 
 @pytest.mark.parametrize("model, num", [
     ("all_balanced", 0),
-    ("mass_imbalanced", 1),
-    ("charge_imbalanced", 1)
+    ("mass_imbalanced", 0),
+    ("charge_imbalanced", 1),
+    ("met_no_charge", 1),
+    ("met_no_formula", 0)
 ], indirect=["model"])
-def test_imbalanced_reactions(model, num):
-    """Expect all reactions to be mass and charge balanced."""
-    reactions = consistency.find_imbalanced_reactions(model)
+def test_find_charge_imbalanced_reactions(model, num):
+    """Expect all reactions to be charge balanced."""
+    reactions = consistency.find_charge_imbalanced_reactions(model)
+    assert len(reactions) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("all_balanced", 0),
+    ("mass_imbalanced", 1),
+    ("charge_imbalanced", 0),
+    ("met_no_charge", 0),
+    ("met_no_formula", 1)
+], indirect=["model"])
+def test_find_mass_imbalanced_reactions(model, num):
+    """Expect all reactions to be mass balanced."""
+    reactions = consistency.find_mass_imbalanced_reactions(model)
     assert len(reactions) == num
 
 

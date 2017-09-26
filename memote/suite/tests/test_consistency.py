@@ -47,14 +47,26 @@ def test_production_of_atp_closed_bounds(read_only_model, store):
         " imbalanced reactions or loops."
 
 
-def test_imbalanced_reactions(read_only_model, store):
-    """Expect all reactions to be mass and charge balanced."""
-    store["imbalanced_reactions"] = [
-        rxn.id for rxn in consistency.find_imbalanced_reactions(
+def test_reaction_charge_balance(read_only_model, store):
+    """Expect all reactions to be charge balanced."""
+    store["charge_imbalanced_reactions"] = [
+        rxn.id for rxn in consistency.find_charge_imbalanced_reactions(
             read_only_model)]
-    assert len(store["imbalanced_reactions"]) == 0,\
-        "The following reactions are imbalanced: {}".format(
-        ", ".join(store["imbalanced_reactions"]))
+    assert len(store["charge_imbalanced_reactions"]) == 0,\
+        "The following reactions are charge imbalanced or at least one " \
+        "metabolite participating in a reaction doesn't have a charge" \
+        ": {}".format(", ".join(store["charge_imbalanced_reactions"]))
+
+
+def test_reaction_mass_balance(read_only_model, store):
+    """Expect all reactions to be mass balanced."""
+    store["mass_imbalanced_reactions"] = [
+        rxn.id for rxn in consistency.find_mass_imbalanced_reactions(
+            read_only_model)]
+    assert len(store["mass_imbalanced_reactions"]) == 0,\
+        "The following reactions are mass imbalanced or at least one " \
+        "metabolite participating in a reaction doesn't have a formula" \
+        ": {}".format(", ".join(store["mass_imbalanced_reactions"]))
 
 
 def test_blocked_reactions(read_only_model, store):

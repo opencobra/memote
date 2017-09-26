@@ -20,11 +20,12 @@
 from __future__ import absolute_import
 
 import logging
+from collections import defaultdict
 
 import numpy as np
 import sympy
 from numpy.linalg import svd
-from six import iteritems
+from six import iteritems, itervalues
 from builtins import zip, dict
 
 from memote.support.helpers import find_biomass_reaction
@@ -240,3 +241,24 @@ def add_cut(problem, indicators, bound, Constraint):
     cut = Constraint(sympy.Add(*indicators), ub=bound)
     problem.add(cut)
     return cut
+
+
+def is_mass_balanced(reaction):
+    """Confirm that a reaction is mass balanced."""
+    balance = defaultdict(int)
+    for metabolite, coefficient in iteritems(reaction.metabolites):
+        if metabolite.elements is None:
+            return False
+        for element, amount in iteritems(metabolite.elements):
+            balance[element] += coefficient * amount
+    return all(amount == 0 for amount in itervalues(balance))
+
+
+def is_charge_balanced(reaction):
+    """Confirm that a reaction is charge balanced."""
+    charge = 0
+    for metabolite, coefficient in iteritems(reaction.metabolites):
+        if metabolite.charge is None:
+            return False
+        charge += coefficient * metabolite.charge
+    return charge == 0
