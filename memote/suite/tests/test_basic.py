@@ -134,7 +134,7 @@ def test_find_pure_metabolic_reactions(read_only_model, store):
     store["metabolic_reactions"] = [
         rxn.id for rxn in basic.find_pure_metabolic_reactions(read_only_model)]
     store["num_metabolic_reactions"] = len(store["metabolic_reactions"])
-    assert store["metabolic_reactions"] >= 1
+    assert store["num_metabolic_reactions"] >= 1
 
 
 def test_find_transport_reactions(read_only_model, store):
@@ -142,7 +142,7 @@ def test_find_transport_reactions(read_only_model, store):
     store["transport_reactions"] = [
         rxn.id for rxn in helpers.find_transport_reactions(read_only_model)]
     store["num_transport_reactions"] = len(store["transport_reactions"])
-    assert store["transport_reactions"] >= 1
+    assert store["num_transport_reactions"] >= 1
 
 
 def test_find_unique_metabolites(read_only_model, store):
