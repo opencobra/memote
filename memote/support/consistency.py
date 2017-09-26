@@ -456,3 +456,46 @@ def find_stoichiometrically_balanced_cycles(model):
         fva_result.minimum != fva_result_loopless.minimum].index
     differential_fluxes = set(row_ids_min).union(set(row_ids_max))
     return [model.reactions.get_by_id(id) for id in differential_fluxes]
+
+
+def find_orphans(model):
+    """
+    Return metabolites that are only consumed in reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return [met for met in model.metabolites
+            if (len(met.reactions) > 0) and all(
+                rxn.metabolites[met] < 0 for rxn in met.reactions)]
+
+
+def find_deadends(model):
+    """
+    Return metabolites that are only produced in reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return [met for met in model.metabolites
+            if (len(met.reactions) > 0) and all(
+                rxn.metabolites[met] > 0 for rxn in met.reactions)]
+
+
+def find_disconnected(model):
+    """
+    Return metabolites that are not in any of the reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return [met for met in model.metabolites if len(met.reactions) == 0]
