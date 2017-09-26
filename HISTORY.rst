@@ -4,6 +4,8 @@ History
 Next Release
 ------------
 
+* Fix the bug in the assertion output of ``memote.memote.suite.tests.test_basic
+  .test_gene_protein_reaction_rule_presence``.
 * Split mass-charge-balance test into two separate tests for more clarity
 * Fix a bug in ``memote.support.consistency_helpers.get_internals`` that did
   not exclude the (by definition) imbalanced biomass reactions.
