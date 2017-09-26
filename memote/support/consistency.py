@@ -26,7 +26,6 @@ import numpy as np
 from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
-import memote.support.helpers as helpers
 import memote.support.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
@@ -281,23 +280,9 @@ def find_mass_imbalanced_reactions(model):
         The metabolic model under investigation.
 
     """
-    exchanges = set(model.exchanges)
-    biomass = set(helpers.find_biomass_reaction(model))
-    total_rxns = set(model.reactions)
-    metab_rxns = total_rxns - (exchanges | biomass)
-    imbalanced_rxns = []
-    for rxn in metab_rxns:
-        balance = rxn.check_mass_balance()
-        met_no_formula = [met for met in rxn.reactants if not met.formula]
-        if met_no_formula:
-            imbalanced_rxns.append(rxn)
-        elif list(balance.keys()) == ["charge"]:
-            pass
-        elif len(balance) > 0:
-            imbalanced_rxns.append(rxn)
-        else:
-            pass
-    return imbalanced_rxns
+    internal_rxns = con_helpers.get_internals(model)
+    return [
+        rxn for rxn in internal_rxns if not con_helpers.is_mass_balanced(rxn)]
 
 
 def find_charge_imbalanced_reactions(model):
@@ -314,21 +299,9 @@ def find_charge_imbalanced_reactions(model):
         The metabolic model under investigation.
 
     """
-    exchanges = set(model.exchanges)
-    biomass = set(helpers.find_biomass_reaction(model))
-    total_rxns = set(model.reactions)
-    metab_rxns = total_rxns - (exchanges | biomass)
-    imbalanced_rxns = []
-    for rxn in metab_rxns:
-        balance = rxn.check_mass_balance()
-        met_no_charge = [met for met in rxn.reactants if not met.charge]
-        if met_no_charge:
-            imbalanced_rxns.append(rxn)
-        elif 'charge' in balance:
-            imbalanced_rxns.append(rxn)
-        else:
-            pass
-    return imbalanced_rxns
+    internal_rxns = con_helpers.get_internals(model)
+    return [
+        rxn for rxn in internal_rxns if not con_helpers.is_charge_balanced(rxn)]
 
 
 def find_blocked_reactions(model):
