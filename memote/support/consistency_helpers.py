@@ -27,6 +27,8 @@ from numpy.linalg import svd
 from six import iteritems
 from builtins import zip, dict
 
+from memote.support.helpers import find_biomass_reaction
+
 __all__ = (
     "stoichiometry_matrix",
     "nullspace"
@@ -139,13 +141,11 @@ def get_internals(model):
         The metabolic model under investigation.
 
     """
-    internal_rxns = set(model.reactions) - set(model.exchanges)
-    metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.info("model '%s' has %d internal metabolites", model.id,
-                len(metabolites))
-    LOGGER.info("model '%s' has %d internal reactions", model.id,
-                len(internal_rxns))
-    return internal_rxns, metabolites
+    biomass = set(find_biomass_reaction(model))
+    if len(biomass) == 0:
+        LOGGER.warn("No biomass reaction detected. Consistency test results "
+                    "are unreliable if one exists.")
+    return set(model.reactions) - (set(model.exchanges) | biomass)
 
 
 def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
