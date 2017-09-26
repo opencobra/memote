@@ -93,7 +93,7 @@ def test_gene_protein_reaction_rule_presence(read_only_model, store):
         ).difference(set(read_only_model.exchanges))
     store["reactions_no_GPR"] = [rxn.id for rxn in missing_gpr_metabolic_rxns]
     assert len(store["reactions_no_GPR"]) == 0, "No GPR found for the " \
-        "following reactions: {}".format(", ".join(missing_gpr_metabolic_rxns))
+        "following reactions: {}".format(", ".join(store["reactions_no_GPR"]))
 
 
 def test_ngam_presence(read_only_model, store):
