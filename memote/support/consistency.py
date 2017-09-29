@@ -470,7 +470,8 @@ def find_orphans(model):
     """
     return [met for met in model.metabolites
             if (len(met.reactions) > 0) and all(
-                rxn.metabolites[met] < 0 for rxn in met.reactions)]
+                (not rxn.reversibility) and (rxn.metabolites[met] < 0)
+                for rxn in met.reactions)]
 
 
 def find_deadends(model):
@@ -485,7 +486,8 @@ def find_deadends(model):
     """
     return [met for met in model.metabolites
             if (len(met.reactions) > 0) and all(
-                rxn.metabolites[met] > 0 for rxn in met.reactions)]
+                (not rxn.reversibility) and
+                (rxn.metabolites[met] > 0) for rxn in met.reactions)]
 
 
 def find_disconnected(model):

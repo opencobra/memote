@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+* Correctly account for reversibility when testing for dead-end and orphan
+  metabolites.
+
 0.4.4 (2017-09-26)
 ------------------
 
