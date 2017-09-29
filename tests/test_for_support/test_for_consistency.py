@@ -440,6 +440,18 @@ def gapfilled_model(base):
     return base
 
 
+def reversible_gap(base):
+    a_c = cobra.Metabolite("a_c")
+    b_c = cobra.Metabolite("b_c")
+    c_c = cobra.Metabolite("c_c")
+    rxn1 = cobra.Reaction("R1", lower_bound=-1000)
+    rxn1.add_metabolites({a_c: -1, b_c: 1})
+    rxn2 = cobra.Reaction("R2")
+    rxn2.add_metabolites({a_c: -1, c_c: 1})
+    base.add_reactions([rxn1, rxn2])
+    return base
+
+
 def model_builder(name):
     choices = {
         "fig-1": figure_1,
@@ -466,7 +478,8 @@ def model_builder(name):
         "maintenance_present": maintenance_present,
         "infeasible": infeasible,
         "gap_model": gap_model,
-        "gapfilled_model": gapfilled_model
+        "gapfilled_model": gapfilled_model,
+        "reversible_gap": reversible_gap
     }
     model = cobra.Model(id_or_model=name, name=name)
     return choices[name](model)
@@ -588,6 +601,7 @@ def test_find_stoichiometrically_balanced_cycles(model, num):
 @pytest.mark.parametrize("model, num", [
     ("gap_model", 1),
     ("gapfilled_model", 0),
+    ("reversible_gap", 0)
 ], indirect=["model"])
 def test_find_orphans(model, num):
     """Expect the appropriate amount of orphans to be found."""
@@ -598,6 +612,7 @@ def test_find_orphans(model, num):
 @pytest.mark.parametrize("model, num", [
     ("gap_model", 2),
     ("gapfilled_model", 0),
+    ("reversible_gap", 1)
 ], indirect=["model"])
 def test_find_deadends(model, num):
     """Expect the appropriate amount of deadends to be found."""
