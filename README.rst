@@ -8,8 +8,8 @@ memote - the genome-scale metabolic model test suite
 .. image:: https://img.shields.io/travis/opencobra/memote.svg
         :target: https://travis-ci.org/opencobra/memote
 
-.. image:: https://readthedocs.org/projects/memote/badge/?version=stable
-        :target: https://memote.readthedocs.io/en/stable/?badge=stable
+.. image:: https://readthedocs.org/projects/memote/badge/?version=latest
+        :target: https://memote.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 .. image:: https://codecov.io/gh/opencobra/memote/branch/master/graph/badge.svg
@@ -50,7 +50,7 @@ at via GitHub pages for your repository.
 
 .. summary-end
 
-* Documentation: https://memote.readthedocs.io.
+* Documentation: https://memote.readthedocs.io/en/latest/.
 
 Installation
 ============
@@ -77,7 +77,7 @@ For comments and questions get in touch via
 * or our `mailing list <https://groups.google.com/forum/#!forum/memote>`_.
 
 Are you excited about this project? Consider `contributing
-<https://memote.readthedocs.io/en/stable/contributing.html>`_ by adding novel
+<https://memote.readthedocs.io/en/latest/contributing.html>`_ by adding novel
 tests, reporting or fixing bugs, and generally help us make this a better
 software for everyone.
 
