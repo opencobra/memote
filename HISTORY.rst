@@ -4,6 +4,8 @@ History
 Next Release
 ------------
 
+* Temporarily change the links to readthedocs to point to latest instead of stable.
+
 0.4.5 (2017-10-09)
 ------------------
 
