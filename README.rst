@@ -50,7 +50,7 @@ at via GitHub pages for your repository.
 
 .. summary-end
 
-* Documentation: https://memote.readthedocs.io/en/latest/.
+* Documentation: https://memote.readthedocs.io/.
 
 Installation
 ============
