@@ -178,7 +178,7 @@ def df2dict(df):
 
 
 def find_demand_reactions(model):
-    """
+    u"""
     Return a list of demand reactions.
 
     Parameters
@@ -216,7 +216,7 @@ def find_demand_reactions(model):
 
 
 def find_sink_reactions(model):
-    """
+    u"""
     Return a list of sink reactions.
 
     Parameters
@@ -253,7 +253,7 @@ def find_sink_reactions(model):
 
 
 def find_exchange_rxns(model):
-    """
+    u"""
     Return a list of exchange reactions.
 
     Parameters

@@ -267,7 +267,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
 
 
 def detect_energy_generating_cycles(model, metabolite_id):
-    """
+    u"""
     Detect erroneous energy-generating cycles for a a single metabolite.
 
     The function will first build a dissipation reaction corresponding to the
@@ -414,7 +414,7 @@ def find_blocked_reactions(model):
 
 
 def find_stoichiometrically_balanced_cycles(model):
-    """
+    u"""
     Find metabolic rxns in stoichiometrically balanced cycles (SBCs).
 
     The flux distribution of nominal FVA is compared with loopless FVA

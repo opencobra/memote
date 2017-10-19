@@ -121,5 +121,5 @@ def history_report(repository, directory, filename, index="hash"):
 
 
 def diff_report():
-    """Coming soon™."""
+    u"""Coming soon™."""
     raise NotImplementedError(u"Coming soon™.")

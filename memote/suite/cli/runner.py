@@ -79,7 +79,7 @@ def cli(level):
               help="Path for the collected results as JSON.")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
-              callback=callbacks.validate_directory,
+              envvar="MEMOTE_DIRECTORY",
               help="If invoked inside a git repository, write the test results "
               "to this directory using the commit hash as the filename.")
 @click.option("--ignore-git", is_flag=True,
@@ -122,6 +122,7 @@ def run(model, collect, filename, directory, ignore_git, pytest_args):
                                   "cookiecutter-memote.json")))
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
+              envvar="MEMOTE_DIRECTORY",
               help="Create a new model repository in the given directory.")
 def new(directory, replay):
     """
@@ -151,7 +152,7 @@ def _test_history(context, filename, pytest_args):
               prompt="Are you sure that you want to change history?")
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
-              callback=callbacks.validate_directory,
+              envvar="MEMOTE_DIRECTORY",
               help="Generated JSON files from the commit history will be "
                    "written to this directory.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
@@ -180,6 +181,8 @@ def history(context, directory, pytest_args, commits):
     try:
         repo = git.Repo()
         branch = repo.active_branch
+    # TODO: If no directory was given use system tempdir and create report in
+    #  gh-pages.
     except git.InvalidGitRepositoryError:
         click.echo(
             Fore.RED +
@@ -188,7 +191,7 @@ def history(context, directory, pytest_args, commits):
             + Fore.RESET, err=True)  # noqa: W503
         sys.exit(1)
     if len(commits) > 0:
-        # TODO: Convert hashes to git.Commit instances.
+        # TODO: Convert hashes to `git.Commit` instances.
         raise NotImplementedError(u"Coming soon™.")
     else:
         commits = list(branch.commit.iter_parents())
@@ -197,8 +200,7 @@ def history(context, directory, pytest_args, commits):
         repo.git.checkout(commit)
         click.echo(
             Fore.GREEN +
-            "Running the test suite for commit '{}'.".format(
-                branch.commit.hexsha)
+            "Running the test suite for commit '{}'.".format(commit.hexsha)
             + Fore.RESET)  # noqa: W503
         filename = join(directory, "{}.json".format(commit.hexsha))
         proc = Process(target=_test_history,

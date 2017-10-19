@@ -19,12 +19,10 @@
 
 from __future__ import absolute_import
 
-import os
 import shlex
 import sys
 import logging
 import warnings
-from os.path import isfile, isdir, exists
 
 import click
 import git
@@ -43,69 +41,17 @@ def _load_model(filename):
 
 
 def validate_model(context, param, value):
-    """Load model path from different locations."""
+    """Load model from path if it exists."""
     if value is not None:
-        return _load_model(value)
-    elif "MEMOTE_MODEL" in os.environ:
-        value = os.environ["MEMOTE_MODEL"]
-        if not exists(value):
-            raise click.BadParameter(
-                "The given path of MEMOTE_MODEL '{}' does not exist."
-                "".format(value))
-        if not isfile(value):
-            raise click.BadParameter(
-                "The given path of MEMOTE_MODEL '{}' is not a valid file."
-                "".format(value))
-        return _load_model(value)
-    elif "model" in context.default_map:
-        value = context.default_map["model"]
-        if not exists(value):
-            raise click.BadParameter(
-                "The path configured for 'model' ({}) does not exist."
-                "".format(value))
-        if not isfile(value):
-            raise click.BadParameter(
-                "The path configured for 'model' ({}) is not a valid file."
-                "".format(value))
         return _load_model(value)
     else:
         raise click.BadParameter("No 'model' path given or configured.")
-
-
-def validate_directory(context, param, value):
-    """Load directory from different locations."""
-    if value is not None:
-        return value
-    elif "MEMOTE_DIRECTORY" in os.environ:
-        value = os.environ["MEMOTE_DIRECTORY"]
-        if not exists(value):
-            raise click.BadParameter(
-                "The given path of MEMOTE_DIRECTORY '{}' does not exist."
-                "".format(value))
-        if not isdir(value):
-            raise click.BadParameter(
-                "The given path of MEMOTE_DIRECTORY '{}' is not a valid "
-                "directory.".format(value))
-        return value
-    elif "directory" in context.default_map:
-        value = context.default_map["directory"]
-        if not exists(value):
-            raise click.BadParameter(
-                "The path configured for 'directory' ({}) does not exist."
-                "".format(value))
-        if not isdir(value):
-            raise click.BadParameter(
-                "The path configured for 'directory' ({}) is not a valid "
-                "directory.".format(value))
-        return value
 
 
 def validate_collect(context, param, value):
     """Handle the report collection flag."""
     if value is not None:
         return value
-    elif "collect" in context.default_map:
-        return context.default_map["collect"]
     else:
         return True
 
@@ -114,8 +60,6 @@ def validate_pytest_args(context, param, value):
     """Handle additional arguments to pytest."""
     if value is not None:
         return shlex.split(value)
-    elif "addargs" in context.default_map:
-        return shlex.split(context.default_map["addargs"])
     else:
         return list()
 
@@ -124,8 +68,6 @@ def validate_repository(context, param, value):
     """Load repository slug from different locations."""
     if value is not None:
         return value
-    elif "github_repository" in context.default_map:
-        return context.default_map["github_repository"]
     else:
         raise click.BadParameter(
             "No GitHub repository slug provided or configured.")
@@ -135,8 +77,6 @@ def validate_username(context, param, value):
     """Load username from different locations."""
     if value is not None:
         return value
-    elif "github_username" in context.default_map:
-        return context.default_map["github_username"]
     else:
         raise click.BadParameter(
             "No GitHub username provided or configured.")
