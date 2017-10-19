@@ -47,7 +47,7 @@ def test_detect_energy_generating_cycles(read_only_model, store, met):
     try:
         result = \
             consistency.detect_energy_generating_cycles(read_only_model, met)
-    except KeyError as err:
+    except KeyError:
         result = "not found"
     store["magic_{}_production".format(met)] = result
 

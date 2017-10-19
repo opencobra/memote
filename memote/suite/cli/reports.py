@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+import logging
 import sys
 
 import click
@@ -28,6 +29,8 @@ from colorama import Fore
 import memote.suite.api as api
 from memote.suite.cli import CONTEXT_SETTINGS
 import memote.suite.cli.callbacks as callbacks
+
+LOGGER = logging.getLogger(__name__)
 
 
 @click.group()
@@ -40,6 +43,7 @@ def report():
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                envvar="MEMOTE_MODEL",
                 required=False, callback=callbacks.validate_model)
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
@@ -65,7 +69,7 @@ def snapshot(model, filename, pytest_args):
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("directory", type=click.Path(exists=True, file_okay=False),
-                callback=callbacks.validate_directory)
+                envvar="MEMOTE_DIRECTORY")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
