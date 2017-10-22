@@ -15,25 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Ensure the expected functioning of ``memote.support.basic``."""
+
 from __future__ import absolute_import
 
 import cobra
 import pytest
 
 import memote.support.basic as basic
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
-"""
-Tests ensuring that the functions in `memote.support.basic` work as expected.
-"""
-
-
+@register_with(MODEL_REGISTRY)
 def three_missing(base):
     base.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i))
                           for i in range(1, 4)])
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def three_present(base):
     base.add_metabolites(
         [cobra.Metabolite(id="M{0:d}".format(i), formula="CH4", charge=-1)
@@ -42,6 +44,7 @@ def three_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gpr_present(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -53,6 +56,7 @@ def gpr_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gpr_present_complex(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -66,6 +70,7 @@ def gpr_present_complex(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gpr_missing(base):
     """Provide a model reactions that lack GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -76,6 +81,7 @@ def gpr_missing(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gpr_missing_with_exchange(base):
     """Provide a model reactions that lack GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -89,6 +95,7 @@ def gpr_missing_with_exchange(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gpr_present_not_lumped(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -100,6 +107,7 @@ def gpr_present_not_lumped(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def unconstrained_rxn(base):
     """Provide a model with one unconstrained reaction"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -111,6 +119,7 @@ def unconstrained_rxn(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def irreversible_rxn(base):
     """Provide a model with one irreversible reaction"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -122,6 +131,7 @@ def irreversible_rxn(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def zero_constrained_rxn(base):
     """Provide a model with one zero-constrained reaction"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -133,6 +143,7 @@ def zero_constrained_rxn(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def nonzero_constrained_rxn(base):
     """Provide a model with one nonzero-constrained reaction"""
     rxn_1 = cobra.Reaction("RXN1")
@@ -147,6 +158,7 @@ def nonzero_constrained_rxn(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def ngam_present(base):
     """Provide a model with a correct NGAM reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
@@ -162,6 +174,7 @@ def ngam_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def simple_atp_hydrolysis(base):
     """Provide a model with an ATP hydrolysis reaction"""
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
@@ -177,6 +190,7 @@ def simple_atp_hydrolysis(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def sufficient_compartments(base):
     """Provide a model with the minimal amount of compartments"""
     met_a = cobra.Metabolite("a_c", compartment="c")
@@ -192,6 +206,7 @@ def sufficient_compartments(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def insufficient_compartments(base):
     """Provide a model with less than the minimal amount of compartments"""
     met_a = cobra.Metabolite("a_c", compartment="c")
@@ -203,6 +218,7 @@ def insufficient_compartments(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def non_metabolic_reactions(base):
     """Provide a model all kinds of reactions that are not purely metabolic"""
     met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
@@ -217,33 +233,10 @@ def non_metabolic_reactions(base):
     return base
 
 
-def model_builder(name):
-    choices = {
-        "three-missing": three_missing,
-        "three-present": three_present,
-        "gpr_present": gpr_present,
-        "gpr_present_complex": gpr_present_complex,
-        "gpr_missing": gpr_missing,
-        "gpr_missing_with_exchange": gpr_missing_with_exchange,
-        "gpr_present_not_lumped": gpr_present_not_lumped,
-        "unconstrained_rxn": unconstrained_rxn,
-        "irreversible_rxn": irreversible_rxn,
-        "zero_constrained_rxn": zero_constrained_rxn,
-        "nonzero_constrained_rxn": nonzero_constrained_rxn,
-        "ngam_present": ngam_present,
-        "simple_atp_hydrolysis": simple_atp_hydrolysis,
-        "sufficient_compartments": sufficient_compartments,
-        "insufficient_compartments": insufficient_compartments,
-        "non_metabolic_reactions": non_metabolic_reactions
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
-
-
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("three-missing", 3),
-    ("three-present", 0)
+    ("three_missing", 3),
+    ("three_present", 0)
 ], indirect=["model"])
 def test_metabolites_formula_presence(model, num):
     """Expect all metabolites to have a formula."""
@@ -252,8 +245,8 @@ def test_metabolites_formula_presence(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("three-missing", 3),
-    ("three-present", 0)
+    ("three_missing", 3),
+    ("three_present", 0)
 ], indirect=["model"])
 def test_metabolites_charge_presence(model, num):
     """Expect all metabolites to have a charge."""

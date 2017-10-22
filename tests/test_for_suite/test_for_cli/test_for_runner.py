@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test the memote command line interface."""
+"""Ensure the expected functioning of ``memote.suite.cli.runner``."""
 
 from __future__ import absolute_import
 
