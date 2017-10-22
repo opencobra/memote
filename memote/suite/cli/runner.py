@@ -29,9 +29,9 @@ from getpass import getpass
 from time import sleep
 
 import click
+import click_log
 import git
 import ruamel.yaml as yaml
-from colorama import Fore
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
@@ -46,15 +46,17 @@ from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
 
 LOGGER = logging.getLogger()
+click_log.basic_config(LOGGER)
 
 
 @click.group()
 @click.help_option("--help", "-h")
 @click.version_option(__version__, "--version", "-V")
-@click.option("--level", "-l", default="INFO",
-              type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
-              help="Set the log level.", show_default=True)
-def cli(level):
+@click_log.simple_verbosity_option(
+    LOGGER, default="INFO", show_default=True,
+    type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
+    help="Set the log level.")
+def cli():
     """
     Metabolic model testing command line tool.
 
@@ -63,13 +65,14 @@ def cli(level):
     generate a model repository structure for starting a new project, and
     recreate the test result history.
     """
-    logging.basicConfig(level=level, format="%(levelname)s - %(message)s")
+    pass
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                required=False, callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL",
+                callback=callbacks.validate_model)
 @click.option("--collect/--no-collect", default=True, show_default=True,
               callback=callbacks.validate_collect,
               help="Whether or not to collect test data needed for "
@@ -139,14 +142,15 @@ def new(directory, replay):
                  replay=replay)
 
 
-def _test_history(context, filename, pytest_args):
-    model = callbacks.validate_model(context, "model", None)
+def _test_history(model, filename, pytest_args):
+    model = callbacks.validate_model(None, "model", model)
     api.test_model(model, filename, pytest_args=pytest_args)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
-@click.pass_context
 @click.help_option("--help", "-h")
+@click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                envvar="MEMOTE_MODEL")
 @click.option("--yes", "-y", is_flag=True, callback=callbacks.abort_if_false,
               expose_value=False, help="Confirm overwriting previous results.",
               prompt="Are you sure that you want to change history?")
@@ -159,7 +163,7 @@ def _test_history(context, filename, pytest_args):
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-def history(context, directory, pytest_args, commits):
+def history(model, directory, pytest_args, commits):
     """
     Re-compute test results for the git branch history.
 
@@ -184,11 +188,9 @@ def history(context, directory, pytest_args, commits):
     # TODO: If no directory was given use system tempdir and create report in
     #  gh-pages.
     except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "The history requires a git repository in order to follow "
-            "the current branch's commit history."
-            + Fore.RESET, err=True)  # noqa: W503
+            "the current branch's commit history.")
         sys.exit(1)
     if len(commits) > 0:
         # TODO: Convert hashes to `git.Commit` instances.
@@ -198,13 +200,11 @@ def history(context, directory, pytest_args, commits):
         commits.insert(0, branch.commit)
     for commit in commits:
         repo.git.checkout(commit)
-        click.echo(
-            Fore.GREEN +
-            "Running the test suite for commit '{}'.".format(commit.hexsha)
-            + Fore.RESET)  # noqa: W503
+        LOGGER.info(
+            "Running the test suite for commit '{}'.".format(commit.hexsha))
         filename = join(directory, "{}.json".format(commit.hexsha))
         proc = Process(target=_test_history,
-                       args=(context, filename, pytest_args))
+                       args=(model, filename, pytest_args))
         proc.start()
         proc.join()
     repo.git.checkout(branch)
@@ -216,94 +216,76 @@ def history(context, directory, pytest_args, commits):
 @click.option("--note", default="memote-ci access", show_default=True,
               help="A note describing a personal access token on GitHub. "
                    "Must be unique!")
-@click.option("--repository", callback=callbacks.validate_repository,
+@click.option("--github_repository", callback=callbacks.validate_repository,
               help="The repository name on GitHub. Usually this is configured "
                    "for you.")
-@click.option("--username", callback=callbacks.validate_username,
+@click.option("--github_username", callback=callbacks.validate_username,
               help="The GitHub username. Usually this is configured for you.")
-@click.pass_context
-def online(context, note, repository, username):
+def online(note, github_repository, github_username):
     """Upload the repository to GitHub and enable testing on Travis CI."""
     try:
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "The history requires a git repository in order to follow "
-            "the current branch's commit history."
-            + Fore.RESET, err=True)  # noqa: W503
+            "the current branch's commit history.")
         sys.exit(1)
     password = getpass("GitHub Password: ")
-    gh = Github(username, password)
+    gh = Github(github_username, password)
     user = gh.get_user()
     try:
         when = user.created_at.isoformat(sep=" ")
-        click.echo(
+        LOGGER.info(
             "Logged in to user '{}' created on '{}'.".format(user.login, when))
     except BadCredentialsException:
-        click.echo(
-            Fore.RED +
-            "Incorrect username or password!"
-            + Fore.RESET, err=True)  # noqa: W503
+        LOGGER.critical("Incorrect username or password!")
         sys.exit(1)
     try:
-        gh_repo = user.get_repo(repository)
-        click.echo(
-            Fore.YELLOW +
+        gh_repo = user.get_repo(github_repository)
+        LOGGER.warning(
             "Using existing repository '{}'. This may override previous "
-            "settings.".format(repository)
-            + Fore.RESET)  # noqa: W503
+            "settings.".format(github_repository))
     except UnknownObjectException:
-        gh_repo = user.create_repo(repository)
+        gh_repo = user.create_repo(github_repository)
     try:
-        click.echo("Creating token.")
+        LOGGER.info("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
     except GithubException:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "A personal access token with the note '{}' already exists. "
-            "Either delete it or choose another note.".format(note)
-            + Fore.RESET, err=True)  # noqa: W503
+            "Either delete it or choose another note.".format(note))
         sys.exit(1)
     try:
-        click.echo("Authorizing with TravisCI.")
+        LOGGER.info("Authorizing with TravisCI.")
         travis = TravisPy.github_auth(auth.token)
         t_user = travis.user()
     except TravisError:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "Something is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!"
-            + Fore.RESET, err=True)  # noqa: W503
+            "link your GitHub account on 'https://travis-ci.org/'!")
         sys.exit(1)
-    click.echo("Synchronizing repositories.")
+    LOGGER.info("Synchronizing repositories.")
     while not t_user.sync():
         sleep(0.1)
     try:
         t_repo = travis.repo(gh_repo.full_name)
     except TravisError:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "Repository could not be found. Is it on GitHub already and "
-            "spelled correctly?"
-            + Fore.RESET, err=True)  # noqa: W503
+            "spelled correctly?")
         sys.exit(1)
     if t_repo.enable():
-        click.echo(
-            Fore.GREEN +
+        LOGGER.info(
             "Your repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!" + Fore.RESET)  # noqa: W503
+            "been enabled on Travis CI. Congrats!")
     else:
-        click.echo(
-            Fore.RED +
-            "Unable to enable automatic testing on Travis CI!",
-            + Fore.RESET, err=True)  # noqa: W503
+        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
         sys.exit(1)
-    click.echo(
+    LOGGER.info(
         "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
     key = retrieve_public_key(gh_repo.full_name)
     secret = encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
-    click.echo("Storing GitHub token in '.travis.yml'.")
+    LOGGER.info("Storing GitHub token in '.travis.yml'.")
     with io.open(".travis.yml", "r") as file_h:
         config = yaml.load(file_h, yaml.RoundTripLoader)
     config["env"]["global"].append({"secure": secret})

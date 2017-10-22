@@ -33,7 +33,6 @@ except ImportError:
 
 import pandas as pd
 import dask.bag as db
-from colorama import Fore
 
 LOGGER = logging.getLogger(__name__)
 
@@ -59,10 +58,7 @@ class ResultBagWrapper(object):
         objects = list()
         for filename in files:
             if not exists(filename):
-                LOGGER.warning(
-                    Fore.YELLOW +
-                    "Expected file %s is missing."
-                    + Fore.RESET, filename)  # noqa: W503
+                LOGGER.warning("Expected file %s is missing.")
                 continue
             with io.open(filename) as file_h:
                 objects.append(json.load(file_h))

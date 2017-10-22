@@ -35,7 +35,7 @@ PKG_ORDER = [
     "lxml",
     "click",
     "click-configfile",
-    "colorama",
+    "click-log",
     "pytest",
     "gitpython",
     "dask",
