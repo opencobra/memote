@@ -20,26 +20,25 @@
 from __future__ import absolute_import
 
 import locale
+import logging
 from builtins import dict
 
 import click
-from colorama import init, Fore
 
 from memote.suite.cli.config import ConfigFileProcessor
 
+LOGGER = logging.getLogger(__name__)
+
 locale.setlocale(locale.LC_ALL, "")  # set to system default
-init()
 
 try:
     CONTEXT_SETTINGS = dict(
         default_map=ConfigFileProcessor.read_config()
     )
 except click.BadParameter as err:
-    click.echo(
-        Fore.RED +
+    LOGGER.error(
         "Error in configuration file: {}\nAll configured values will "
-        "be ignored!".format(str(err))
-        + Fore.RESET, err=True)  # noqa: W503
+        "be ignored!".format(str(err)))
     CONTEXT_SETTINGS = dict()
 
 

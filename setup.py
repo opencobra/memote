@@ -36,7 +36,7 @@ requirements = [
     "pip",
     "click",
     "click-configfile",
-    "colorama",
+    "click-log",
     "future",
     "pytest>=3.1",
     "gitpython",

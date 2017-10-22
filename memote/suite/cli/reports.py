@@ -24,7 +24,6 @@ import sys
 
 import click
 import git
-from colorama import Fore
 
 import memote.suite.api as api
 from memote.suite.cli import CONTEXT_SETTINGS
@@ -44,7 +43,7 @@ def report():
 @click.help_option("--help", "-h")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL",
-                required=False, callback=callbacks.validate_model)
+                callback=callbacks.validate_model)
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
@@ -88,11 +87,9 @@ def history(directory, filename, index):
     try:
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "The history report requires a git repository in order to check "
-            "the current branch's commit history."
-            + Fore.RESET, err=True)  # noqa: W503
+            "the current branch's commit history.")
         sys.exit(1)
     api.history_report(repo, directory, filename, index)
 

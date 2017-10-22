@@ -26,7 +26,6 @@ import warnings
 
 import click
 import git
-from colorama import Fore
 from cobra.io import read_sbml_model
 
 LOGGER = logging.getLogger(__name__)
@@ -87,18 +86,15 @@ def probe_git():
     try:
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
-        click.echo(
-            Fore.YELLOW +
+        LOGGER.warning(
             "We highly recommend keeping your model in a git repository."
             " It allows you to track changes and to easily collaborate with"
-            " others via online platforms such as https://github.com.\n"
-            + Fore.RESET)  # noqa: W503
+            " others via online platforms such as https://github.com.\n")
         return
     if repo.is_dirty():
-        click.echo(
-            Fore.RED +
+        LOGGER.critical(
             "Please git commit or git stash all changes before running"
-            " the memote suite." + Fore.RESET, err=True)
+            " the memote suite.")
         sys.exit(1)
     return repo
 
