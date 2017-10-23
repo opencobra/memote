@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests ensuring that the functions in `memote.support.basic` work as expected.
-"""
+"""Ensure the expected functioning of ``memote.support.consistency``."""
 
 from __future__ import absolute_import
 
@@ -25,8 +23,12 @@ import cobra
 import pytest
 
 import memote.support.consistency as consistency
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
+@register_with(MODEL_REGISTRY)
 def figure_1(base):
     # Example in figure 1 of Gevorgyan et al. (2008) Bioinformatics
     # Metabolites
@@ -47,6 +49,7 @@ def figure_1(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def equation_8(base):
     # Example in equation 8 of Gevorgyan et al. (2008) Bioinformatics
     # Metabolites
@@ -64,6 +67,7 @@ def equation_8(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def figure_2(base):
     # Example in figure 2 of Gevorgyan et al. (2008) Bioinformatics
     # Metabolites
@@ -85,6 +89,7 @@ def figure_2(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def free_reactions(base):
     met_a = cobra.Metabolite("C")
     met_b = cobra.Metabolite("A")
@@ -103,6 +108,7 @@ def free_reactions(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def blocked_reactions(base):
     met_a = cobra.Metabolite("C")
     met_b = cobra.Metabolite("A")
@@ -122,6 +128,7 @@ def blocked_reactions(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_atp(base):
     """Returns a simple model with an EGC producing atp_c"""
     ra = cobra.Reaction('A')
@@ -141,6 +148,7 @@ def produces_atp(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def infeasible(base):
     """Returns an infeasible model with an EGC producing atp_c"""
     ra = cobra.Reaction('A')
@@ -163,6 +171,7 @@ def infeasible(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def maintenance_present(base):
     """Returns a model with an ATPM reaction"""
     ra = cobra.Reaction('A')
@@ -185,6 +194,7 @@ def maintenance_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def missing_energy_partner(base):
     """Returns a broken model with a missing energy partner to atp"""
     ra = cobra.Reaction('A')
@@ -197,6 +207,7 @@ def missing_energy_partner(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_nadh(base):
     """Returns a simple model with an EGC producing nadh_c"""
     ra = cobra.Reaction('A')
@@ -214,6 +225,7 @@ def produces_nadh(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_fadh2(base):
     """Returns a simple model with an EGC producing fadh2_c"""
     ra = cobra.Reaction('A')
@@ -231,6 +243,7 @@ def produces_fadh2(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_accoa(base):
     """Returns a simple model with an EGC producing accoa_c"""
     ra = cobra.Reaction('A')
@@ -250,6 +263,7 @@ def produces_accoa(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_glu(base):
     """Returns a simple model with an EGC producing glu__L_c"""
     ra = cobra.Reaction('A')
@@ -269,6 +283,7 @@ def produces_glu(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def produces_h(base):
     """Returns a simple model with an EGC producing h_p"""
     ra = cobra.Reaction('A')
@@ -285,6 +300,7 @@ def produces_h(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def no_atp(base):
     """Returns a simple model without an EGC producing atp_c"""
     ra = cobra.Reaction('A')
@@ -304,6 +320,7 @@ def no_atp(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def all_balanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
@@ -313,6 +330,7 @@ def all_balanced(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def mass_imbalanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=2)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
@@ -322,6 +340,7 @@ def mass_imbalanced(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def charge_imbalanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
@@ -331,6 +350,7 @@ def charge_imbalanced(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_no_formula(base):
     met_a = cobra.Metabolite("A", formula=None, charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
@@ -340,6 +360,7 @@ def met_no_formula(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_no_charge(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2')
@@ -349,6 +370,7 @@ def met_no_charge(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def loopy_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
     base.add_reactions([cobra.Reaction(i)
@@ -367,6 +389,7 @@ def loopy_toy_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def constrained_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
     base.add_reactions([cobra.Reaction(i)
@@ -385,6 +408,7 @@ def constrained_toy_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def infeasible_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
     base.add_reactions([cobra.Reaction(i)
@@ -405,6 +429,7 @@ def infeasible_toy_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gap_model(base):
     a_c = cobra.Metabolite("a_c")
     a_e = cobra.Metabolite("a_e")
@@ -419,6 +444,7 @@ def gap_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def gapfilled_model(base):
     a_c = cobra.Metabolite("a_c")
     a_e = cobra.Metabolite("a_e")
@@ -440,6 +466,7 @@ def gapfilled_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def reversible_gap(base):
     a_c = cobra.Metabolite("a_c")
     b_c = cobra.Metabolite("b_c")
@@ -452,44 +479,11 @@ def reversible_gap(base):
     return base
 
 
-def model_builder(name):
-    choices = {
-        "fig-1": figure_1,
-        "eq-8": equation_8,
-        "fig-2": figure_2,
-        "free_reactions": free_reactions,
-        "blocked_reactions": blocked_reactions,
-        "produces_atp": produces_atp,
-        "no_atp": no_atp,
-        "all_balanced": all_balanced,
-        "mass_imbalanced": mass_imbalanced,
-        "charge_imbalanced": charge_imbalanced,
-        "met_no_charge": met_no_charge,
-        "met_no_formula": met_no_formula,
-        "loopy_toy_model": loopy_toy_model,
-        "constrained_toy_model": constrained_toy_model,
-        "infeasible_toy_model": infeasible_toy_model,
-        "produces_accoa": produces_accoa,
-        "produces_fadh2": produces_fadh2,
-        "produces_glu": produces_glu,
-        "produces_h": produces_h,
-        "produces_nadh": produces_nadh,
-        "missing_energy_partner": missing_energy_partner,
-        "maintenance_present": maintenance_present,
-        "infeasible": infeasible,
-        "gap_model": gap_model,
-        "gapfilled_model": gapfilled_model,
-        "reversible_gap": reversible_gap
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
-
-
 @pytest.mark.parametrize("model, consistent", [
     ("textbook", True),
-    ("fig-1", False),
-    ("eq-8", False),
-    ("fig-2", False),
+    ("figure_1", False),
+    ("equation_8", False),
+    ("figure_2", False),
 ], indirect=["model"])
 def test_check_stoichiometric_consistency(model, consistent):
     assert consistency.check_stoichiometric_consistency(model) is consistent
@@ -497,9 +491,9 @@ def test_check_stoichiometric_consistency(model, consistent):
 
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
-    ("fig-1", ["A'", "B'", "C'"]),
-    ("eq-8", ["A", "B", "C"]),
-    ("fig-2", ["X"]),
+    ("figure_1", ["A'", "B'", "C'"]),
+    ("equation_8", ["A", "B", "C"]),
+    ("figure_2", ["X"]),
 ], indirect=["model"])
 def test_find_unconserved_metabolites(model, inconsistent):
     unconserved_mets = consistency.find_unconserved_metabolites(model)
@@ -508,9 +502,9 @@ def test_find_unconserved_metabolites(model, inconsistent):
 
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
-    ("fig-1", [("A'",), ("B'",), ("C'",)]),
-    ("eq-8", [("A",), ("B",), ("C",)]),
-    ("fig-2", [("X",)]),
+    ("figure_1", [("A'",), ("B'",), ("C'",)]),
+    ("equation_8", [("A",), ("B",), ("C",)]),
+    ("figure_2", [("X",)]),
 ], indirect=["model"])
 def test_find_inconsistent_min_stoichiometry(model, inconsistent):
     unconserved_sets = consistency.find_inconsistent_min_stoichiometry(model)

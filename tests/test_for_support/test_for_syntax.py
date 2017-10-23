@@ -15,19 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Ensure the expected functioning of ``memote.support.syntax``."""
+
 from __future__ import absolute_import
 
 import cobra
 import pytest
 
 import memote.support.syntax as syntax
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
-"""
-Tests ensuring that the functions in `memote.support.syntax` work as expected.
-"""
-
-
+@register_with(MODEL_REGISTRY)
 def rxn_correct_tags(base):
     for i, pairs in enumerate(syntax.SUFFIX_MAP.items()):
         if 'c' in pairs[0]:
@@ -38,6 +39,7 @@ def rxn_correct_tags(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_no_tags(base):
     for i, pairs in enumerate(syntax.SUFFIX_MAP.items()):
         rxn = cobra.Reaction('R{}'.format(i))
@@ -51,6 +53,7 @@ def rxn_no_tags(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_tags_but_wrong_compartments(base):
     misaligned_suffix_map = dict({'p': 'c',
                                   'c': 'e',
@@ -75,6 +78,7 @@ def rxn_tags_but_wrong_compartments(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def trxn_correct_tags(base):
     # Simple diffusion
     rxn = cobra.Reaction('Rt')
@@ -116,6 +120,7 @@ def trxn_correct_tags(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def trxn_no_tags(base):
     # Simple diffusion
     rxn = cobra.Reaction('R')
@@ -157,6 +162,7 @@ def trxn_no_tags(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def trxn_correct_atp_driven(base):
     # ATP-driven
     rxn = cobra.Reaction('Rabc')
@@ -210,6 +216,7 @@ def trxn_correct_atp_driven(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def trxn_no_tag_atp_driven(base):
     # ATP-driven
     rxn = cobra.Reaction('R')
@@ -263,6 +270,7 @@ def trxn_no_tag_atp_driven(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def proton_pump(base):
     # Proton pump
     rxn = cobra.Reaction('Ah')
@@ -280,6 +288,7 @@ def proton_pump(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def atp_synthase(base):
     # ATPS
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
@@ -295,6 +304,7 @@ def atp_synthase(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def lower_case_mets(base):
     rxn = cobra.Reaction('RLOM')
     rxn.add_metabolites(
@@ -308,6 +318,7 @@ def lower_case_mets(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def upper_case_mets(base):
     rxn = cobra.Reaction('RHIM')
     rxn.add_metabolites(
@@ -321,6 +332,7 @@ def upper_case_mets(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def correct_demand_tag(base):
     rxn = cobra.Reaction('DM_abc_c')
     rxn.add_metabolites(
@@ -331,6 +343,7 @@ def correct_demand_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def missing_demand_tag(base):
     rxn = cobra.Reaction('EX_abc_c')
     rxn.add_metabolites(
@@ -346,6 +359,7 @@ def missing_demand_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def false_demand_tag(base):
     rxn = cobra.Reaction('DM_abc_e')
     rxn.add_metabolites(
@@ -356,6 +370,7 @@ def false_demand_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def correct_exchange_tag(base):
     rxn = cobra.Reaction('EX_abc_e')
     rxn.add_metabolites(
@@ -366,6 +381,7 @@ def correct_exchange_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def missing_exchange_tag(base):
     rxn = cobra.Reaction('DM_ghi_e')
     rxn.add_metabolites(
@@ -381,6 +397,7 @@ def missing_exchange_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def correct_sink_tag(base):
     rxn = cobra.Reaction('SK_abc_c')
     rxn.add_metabolites(
@@ -392,6 +409,7 @@ def correct_sink_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def missing_sink_tag(base):
     rxn = cobra.Reaction('EX_abc_c')
     rxn.add_metabolites(
@@ -409,6 +427,7 @@ def missing_sink_tag(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def false_sink_tag(base):
     rxn = cobra.Reaction('SK_abc_c')
     rxn.add_metabolites(
@@ -417,32 +436,6 @@ def false_sink_tag(base):
     )
     base.add_reactions([rxn])
     return base
-
-
-def model_builder(name):
-    choices = {
-        "rxn_correct_tags": rxn_correct_tags,
-        "rxn_no_tags": rxn_no_tags,
-        "rxn_tags_but_wrong_compartments": rxn_tags_but_wrong_compartments,
-        "trxn_correct_tags": trxn_correct_tags,
-        "trxn_no_tags": trxn_no_tags,
-        "trxn_correct_atp_driven": trxn_correct_atp_driven,
-        "trxn_no_tag_atp_driven": trxn_no_tag_atp_driven,
-        "atp_synthase": atp_synthase,
-        "proton_pump": proton_pump,
-        "lower_case_mets": lower_case_mets,
-        "upper_case_mets": upper_case_mets,
-        "correct_demand_tag": correct_demand_tag,
-        "missing_demand_tag": missing_demand_tag,
-        "false_demand_tag": false_demand_tag,
-        "correct_exchange_tag": correct_exchange_tag,
-        "missing_exchange_tag": missing_exchange_tag,
-        "correct_sink_tag": correct_sink_tag,
-        "missing_sink_tag": missing_sink_tag,
-        "false_sink_tag": false_sink_tag
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, num", [

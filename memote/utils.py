@@ -15,27 +15,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Ensure the expected functioning of ``memote.suite.cli.reports``."""
+"""Utility functions used by memote and its tests."""
 
 from __future__ import absolute_import
 
-from os.path import exists
-
-from memote.suite.cli.reports import report
+__all__ = ("register_with",)
 
 
-def test_report(runner):
-    """Expect a simple memote report invocation to be successful."""
-    result = runner.invoke(report)
-    assert result.exit_code == 0
-    assert result.output.startswith(
-        "Usage: report [OPTIONS] COMMAND [ARGS]...")
+def register_with(registry):
+    """
+    Register a passed in object.
 
+    Intended to be used as a decorator on model building functions with a
+    ``dict`` as a registry.
 
-def test_snapshot(runner, model_file):
-    """Expect the snapshot report to function."""
-    output = model_file.split(".", 1)[0] + ".html"
-    result = runner.invoke(report, [
-        "snapshot", "--filename", output, model_file])
-    assert result.exit_code == 0
-    assert exists(output)
+    Examples
+    --------
+    REGISTRY = dict()
+    @register_with(REGISTRY)
+    def build_empty(base):
+        return base
+
+    """
+    def decorator(func):
+        registry[func.__name__] = func
+        return func
+    return decorator

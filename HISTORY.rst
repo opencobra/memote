@@ -4,6 +4,8 @@ History
 Next Release
 ------------
 
+* Provide a new decorator ``@register_with`` that can be used in all
+  ``test_for*`` modules and replaces the ``model_builder`` function.
 * Temporarily change the links to readthedocs to point to latest instead of stable.
 
 0.4.5 (2017-10-09)

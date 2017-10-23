@@ -51,8 +51,8 @@ def model(request, solver):
         model = read_sbml_model(join(dirname(__file__), "data",
                                      "EcoliCore.xml.gz"))
     else:
-        builder = getattr(request.module, "model_builder")
-        model = builder(request.param)
+        builder = getattr(request.module, "MODEL_REGISTRY")[request.param]
+        model = builder(Model(id_or_model=request.param, name=request.param))
     model.solver = solver
     return model
 

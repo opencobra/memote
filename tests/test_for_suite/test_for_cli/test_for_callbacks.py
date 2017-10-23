@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test the callbacks for the command line interface."""
+"""Ensure the expected functioning of ``memote.suite.cli.callbacks``."""
 
 from __future__ import absolute_import
 

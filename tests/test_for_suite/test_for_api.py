@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test the memote programmatic API."""
+"""Ensure the expected functioning of ``memote.suite.api``."""
 
 from __future__ import absolute_import
 
@@ -26,8 +26,12 @@ import cobra
 import pytest
 
 import memote.suite.api as api
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
+@register_with(MODEL_REGISTRY)
 def complete_failure(base):
     met_a = cobra.Metabolite("atp_c")
     met_b = cobra.Metabolite("A")
@@ -46,23 +50,15 @@ def complete_failure(base):
     return base
 
 
-def model_builder(name):
-    choices = {
-        "complete-failure": complete_failure,
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
-
-
 @pytest.mark.parametrize("model, code", [
-    ("complete-failure", 1),
+    ("complete_failure", 1),
 ], indirect=["model"])
 def test_test_model_code(model, code):
     assert api.test_model(model) == code
 
 
 @pytest.mark.parametrize("model", [
-    "complete-failure",
+    "complete_failure",
 ], indirect=["model"])
 def test_test_model_result(model):
     _, result = api.test_model(model, results=True)
@@ -71,7 +67,7 @@ def test_test_model_result(model):
 
 
 @pytest.mark.parametrize("model", [
-    "complete-failure",
+    "complete_failure",
 ], indirect=["model"])
 def test_test_model_file(model, tmpdir):
     filename = str(tmpdir.join("result.json"))
@@ -80,7 +76,7 @@ def test_test_model_file(model, tmpdir):
 
 
 @pytest.mark.parametrize("model", [
-    "complete-failure",
+    "complete_failure",
 ], indirect=["model"])
 def test_basic_report_file(model, tmpdir):
     filename = str(tmpdir.join("index.html"))

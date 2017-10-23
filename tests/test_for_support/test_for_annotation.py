@@ -15,19 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Ensure the expected functioning of ``memote.support.annotation``."""
+
 from __future__ import absolute_import
+
+from builtins import dict
 
 import cobra
 import pytest
 
 import memote.support.annotation as annotation
+from memote.utils import register_with
 
-"""
-Tests ensuring that the functions in `memote.support.annotation` work as
-expected.
-"""
+MODEL_REGISTRY = dict()
 
 
+@register_with(MODEL_REGISTRY)
 def no_annotations(base):
     met = cobra.Metabolite(id='met_c', name="Met")
     met1 = cobra.Metabolite(id='met1_c', name="Met1")
@@ -37,6 +40,7 @@ def no_annotations(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_annotations(base):
     met = cobra.Metabolite(id='met_c', name="Met")
     met1 = cobra.Metabolite(id='met1_c', name="Met1")
@@ -48,6 +52,7 @@ def met_annotations(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_annotations(base):
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.annotation = {'brenda': '1.1.1.1'}
@@ -55,6 +60,7 @@ def rxn_annotations(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_each_present(base):
     met = cobra.Metabolite(id='met_c', name="Met")
     met.annotation = {'pubchem.compound' : "107735",
@@ -78,6 +84,7 @@ def met_each_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_each_absent(base):
     met = cobra.Metabolite(id='met_c', name="Met")
     met.annotation = {'METANETX': "MNXM23",
@@ -88,6 +95,7 @@ def met_each_absent(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_each_present(base):
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.annotation = {'metanetx.reaction': "MNXR13125",
@@ -101,6 +109,7 @@ def rxn_each_present(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_each_absent(base):
     # Old or unknown databases and
     # keys that don't follow the MIRIAM namespaces
@@ -111,6 +120,7 @@ def rxn_each_absent(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def met_broken_id(base):
     met = cobra.Metabolite(id='met_c', name="Met")
     met.annotation = {'metanetx.chemical': "MNXR23",
@@ -131,6 +141,7 @@ def met_broken_id(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def rxn_broken_id(base):
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.annotation = {'metanetx.reaction': "MNXM13125",
@@ -144,6 +155,7 @@ def rxn_broken_id(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def consistent_ids(base):
     met = cobra.Metabolite(id='pyr_c', name="Pyruvate")
     met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
@@ -158,6 +170,7 @@ def consistent_ids(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def inconsistent_ids(base):
     met = cobra.Metabolite(id='META:PYRUVATE_c', name="Pyruvate")
     met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
@@ -174,24 +187,6 @@ def inconsistent_ids(base):
     rxn4.add_metabolites({met2: -1, met: 1})
     base.add_reactions([rxn, rxn2, rxn3, rxn4])
     return base
-
-
-def model_builder(name):
-    choices = {
-        'no_annotations': no_annotations,
-        'met_annotations': met_annotations,
-        'rxn_annotations': rxn_annotations,
-        'met_each_present': met_each_present,
-        'met_each_absent': met_each_absent,
-        'rxn_each_present': rxn_each_present,
-        'rxn_each_absent': rxn_each_absent,
-        'met_broken_id': met_broken_id,
-        'rxn_broken_id': rxn_broken_id,
-        'consistent_ids': consistent_ids,
-        'inconsistent_ids': inconsistent_ids,
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, num, components", [

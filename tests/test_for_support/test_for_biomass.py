@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests ensuring that the functions in `memote.support.basic` work as expected.
-"""
+"""Ensure the expected functioning of ``memote.support.biomass``."""
 
 from __future__ import absolute_import
 
@@ -28,8 +26,12 @@ from optlang.interface import OPTIMAL
 
 import memote.support.helpers as helpers
 import memote.support.biomass as biomass
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
+@register_with(MODEL_REGISTRY)
 def sum_within_deviation(base):
     """Metabolites for a superficial, simple toy biomass reaction. The
     composition will follow the distribution depicted here:
@@ -66,6 +68,7 @@ def sum_within_deviation(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def sum_outside_of_deviation(base):
     """ Same as above, yet here H2O is on the wrong side of the equation
     which will throw off the balance.
@@ -92,6 +95,7 @@ def sum_outside_of_deviation(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def precursors_producing(base):
     met_a = cobra.Metabolite("lipid_c")
     met_b = cobra.Metabolite("protein_c")
@@ -116,6 +120,7 @@ def precursors_producing(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def precursors_uptake_limited(base):
     met_a = cobra.Metabolite("lipid_c")
     met_b = cobra.Metabolite("protein_c")
@@ -140,6 +145,7 @@ def precursors_uptake_limited(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def precursors_blocked(base):
     met_a = cobra.Metabolite("lipid_c")
     met_b = cobra.Metabolite("protein_c")
@@ -164,6 +170,7 @@ def precursors_blocked(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def precursors_not_in_medium(base):
     met_a = cobra.Metabolite("lipid_c")
     met_b = cobra.Metabolite("protein_c")
@@ -188,6 +195,7 @@ def precursors_not_in_medium(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def no_gam_in_biomass(base):
     met_a = cobra.Metabolite("lipid_c", "H744")
     met_b = cobra.Metabolite("protein_c", "H119")
@@ -203,20 +211,6 @@ def no_gam_in_biomass(base):
                            met_g: -0.032})
     base.add_reactions([rxn_1])
     return base
-
-
-def model_builder(name):
-    choices = {
-        "sum_within_deviation": sum_within_deviation,
-        "sum_outside_of_deviation": sum_outside_of_deviation,
-        "precursors_producing": precursors_producing,
-        "precursors_uptake_limited": precursors_uptake_limited,
-        "precursors_blocked": precursors_blocked,
-        "precursors_not_in_medium": precursors_not_in_medium,
-        "no_gam_in_biomass": no_gam_in_biomass,
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, expected", [

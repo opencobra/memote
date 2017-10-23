@@ -15,16 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Ensure the expected functioning of ``memote.support.helpers``."""
+
 from __future__ import absolute_import
-import memote.support.helpers as helpers
+
 import cobra
 import pytest
 
-"""
-Tests ensuring that the functions in `memote.support.helpers` work as expected.
-"""
+import memote.support.helpers as helpers
+from memote.utils import register_with
+
+MODEL_REGISTRY = dict()
 
 
+@register_with(MODEL_REGISTRY)
 def uni_anti_symport(base):
     """Provide a model with 3 simple transport reactions."""
     met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
@@ -41,6 +45,7 @@ def uni_anti_symport(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def abc_pump(base):
     """Provide a model with an ABC transport reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
@@ -57,6 +62,7 @@ def abc_pump(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def proton_pump(base):
     """Provide a model with an ABC proton pump reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
@@ -72,6 +78,7 @@ def proton_pump(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def phosphotransferase_system(base):
     """Provide a model with a PTS transport reaction."""
     pep = cobra.Metabolite("pep_c", formula='C3H2O6P', compartment="c")
@@ -86,6 +93,7 @@ def phosphotransferase_system(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def energy_transfer(base):
     """Provide a model with a membrane-spanning electron transfer reaction."""
     cytaox = cobra.Metabolite("cytaox_c", formula='X', compartment="c")
@@ -98,6 +106,7 @@ def energy_transfer(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def converting_reactions(base):
     """Provide a model with a couple of converting reaction."""
     a = cobra.Metabolite("a_c")
@@ -113,20 +122,6 @@ def converting_reactions(base):
     rxn3.add_metabolites({a: -1, c3: 1, c2: 1})
     base.add_reactions([rxn1, rxn2, rxn3])
     return base
-
-
-def model_builder(name):
-    """Return an empty cobra.model object."""
-    choices = {
-        "uni_anti_symport": uni_anti_symport,
-        "abc_pump": abc_pump,
-        "proton_pump": proton_pump,
-        "energy_transfer": energy_transfer,
-        "phosphotransferase_system": phosphotransferase_system,
-        "converting_reactions": converting_reactions,
-    }
-    model = cobra.Model(id_or_model=name, name=name)
-    return choices[name](model)
 
 
 @pytest.mark.parametrize("model, num", [
