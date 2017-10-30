@@ -4,6 +4,7 @@ sphinx-bootstrap-theme
 pytest
 pandas
 click
+click-log
 plotly
 sympy
 colorama

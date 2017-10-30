@@ -48,7 +48,7 @@ requirements = [
     "jinja2-ospath",
     "cookiecutter",
     "python-libsbml",
-    "cobra>=0.6.1",
+    "cobra>=0.9.1",
     "ruamel.yaml<0.15",
     "plotly",
     "travispy",

@@ -4,49 +4,58 @@ git:
   depth: 1
 cache:
 - pip: true
-addons:
-  apt:
-    packages:
-    - swig
-    - libxml2-dev
-    - libglpk-dev
-    - glpk-utils
 branches:
   only:
   - master
   - develop
-  - "/v\\d+\\.\\d+\\.\\d+/"
+  - "/^\\d+\\.\\d+\\.\\d+[a]?\\d*$/"
+env:
+  global:
+    - GITHUB_REPO=opencobra/memote
 matrix:
   fast_finish: true
   include:
-  - python: 3.5
+  - python: '3.5'
     env: TOXENV=flake8
-  - python: 3.5
+  - python: '3.5'
     env: TOXENV=docs
-  - python: 2.7
+  - python: '2.7'
     env: TOXENV=py27
-  - python: 3.4
+  - python: '3.4'
     env: TOXENV=py34
-  - python: 3.5
+  - python: '3.5'
     env: TOXENV=py35
-  - python: 3.5-dev
+  - python: '3.5-dev'
     env: TOXENV=py35
-  - python: 3.6
+  - python: '3.6'
     env: TOXENV=py36
 before_install:
 - travis_retry pip install -U pip setuptools wheel tox
 script:
 - tox
 deploy:
-  provider: pypi
-  distributions: sdist bdist_wheel
-  on:
-    repo: opencobra/memote
-    python: '3.6'
-    tags: true
-  user: midnighter
-  password:
-    secure: kNj5W/9vLd77d9FXEi8QZxb+8NDJzqDQYrIrrqq5tqqVRcBt/PAkMQ5PrwuBeNxNJALun8RSM2Mq/hDYijQ6lqxyFMpECKXmtDXb5OeMgQvQ5y96OHo0VXqoA1nELdJJp6lHKUxKaH75bfp9s7506n9teHUvlGdP0eE+E17XtRax5zuWv/IOqolF//mT6TzdKIIMrnZFZ2XxxNYuqk7GNym7ywccuZNNRSLJn6lKEAYlsGUQlm76YbGSSvrDKMfTrB2nChzrjEzsfpPUZJfdqSjz8vjJgyLgGZhMJ/hfWM3i6buaAhpvxsVW9SXbUA9DTfQkMOUKd3RmhE6HgOp9Bd04g4oY7e7v72b3Agiz7H2edJCrtLlVMTS5uzqqzgoL0lfYfu3dn/g8xxla3FeQy2GFDdDmEJ3XhFTgUyLKhW8CCjmEX4Fgi0bf2CUqt/NXK3JU2iSrFndpvRfD+BvA3WCfPX5IhwSOkYh1HESxhc6POPw2hYj8L/Gpa30sbGh8XMTMW7mKp9se6xy/vfNVxB0J7fnKyh94API7U32Zsuw4CVIU/FXrgkjvZf7DR2lM0KXDKldixsyhyEbo3IdOkg5GHZE+PiREmUFioOAZfxD+GrcTj4Xw53WhDu2wi4RtH5J21PhdNDzM61gK1iiSSDt9At6XnJkHDz1z7jdDt0E=
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    on:
+      tags: true
+      repo: $GITHUB_REPO
+      python: '3.6'
+    user: midnighter
+    password:
+      secure: kNj5W/9vLd77d9FXEi8QZxb+8NDJzqDQYrIrrqq5tqqVRcBt/PAkMQ5PrwuBeNxNJALun8RSM2Mq/hDYijQ6lqxyFMpECKXmtDXb5OeMgQvQ5y96OHo0VXqoA1nELdJJp6lHKUxKaH75bfp9s7506n9teHUvlGdP0eE+E17XtRax5zuWv/IOqolF//mT6TzdKIIMrnZFZ2XxxNYuqk7GNym7ywccuZNNRSLJn6lKEAYlsGUQlm76YbGSSvrDKMfTrB2nChzrjEzsfpPUZJfdqSjz8vjJgyLgGZhMJ/hfWM3i6buaAhpvxsVW9SXbUA9DTfQkMOUKd3RmhE6HgOp9Bd04g4oY7e7v72b3Agiz7H2edJCrtLlVMTS5uzqqzgoL0lfYfu3dn/g8xxla3FeQy2GFDdDmEJ3XhFTgUyLKhW8CCjmEX4Fgi0bf2CUqt/NXK3JU2iSrFndpvRfD+BvA3WCfPX5IhwSOkYh1HESxhc6POPw2hYj8L/Gpa30sbGh8XMTMW7mKp9se6xy/vfNVxB0J7fnKyh94API7U32Zsuw4CVIU/FXrgkjvZf7DR2lM0KXDKldixsyhyEbo3IdOkg5GHZE+PiREmUFioOAZfxD+GrcTj4Xw53WhDu2wi4RtH5J21PhdNDzM61gK1iiSSDt9At6XnJkHDz1z7jdDt0E=
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    body: "Please see https://github.com/${GITHUB_REPO}/blob/${TRAVIS_TAG}/HISTORY.rst for the full release notes."
+    on:
+      tags: true
+      repo: $GITHUB_REPO
+      python: '3.6'
+  - provider: script
+    script: ci/travis/update_docker.sh
+    on:
+      tags: true
+      repo: $GITHUB_REPO
+      python: '3.6'
 notifications:
   slack:
     secure: udevSzdcN71zqk9Y8Rev5zrf7gjHWdLQPMbz30YXrUD3uK2i4ofvXIKJhwctchFfqjxNQlm57QOb3YDksaiizHGskx7ljnEGPrrDoVBnTG7wI/wcw6JcTDOII9klA+sp/yMKniuBYHML5U7xiEuNpMblgnUg1P/q9qcoNDIgli1uS6ftzuq242kMDcPxf+L4XOvK8SLukfVUjAKqLJoywPvJ6hqcJPbfIRRBpCGSMRpbPbkoju7aFt7Maz4VY5CpKqPRNodldxyzn3ZvPQvdAPX0o5UW3ioF7b5/CCbPJNhREQvzWdAJlJP9tZYXkTBrGDrFNEEjaCHhUbkCVL5BhndGz4W+guWCXx+gOhQ/imdqVlfXYOnl9/StquhHF7Uc3aYJZ1uzHW1WAm1cyfYjemiORawVgswv1jPtxB4Fa474DPOMCIX6qGeck0CuS/gGn+NlitWdypggTK8PyN+SCH+vS/brJ/+OPpr5lj1UHd9qeI4O8OntZbxZgJH8saCzULVh/FszSusLJ61djlX6tn2fCvNnOxR1FdhaPvR3srKxhAOH2RpLm3kTVFAHf5a28umIRNK79M7KZUEbap+7GlH2dCtb23pVToUngdGc6paZ/RDe8qeZbG4obLbRCnX/VvWNlgHlYo5SMr3vhawmf/ErJDWQbc5ZuhhVRm3L/4g=
