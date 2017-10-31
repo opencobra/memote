@@ -29,10 +29,10 @@ matrix:
     env: TOXENV=py35
   - python: '3.6'
     env: TOXENV=py36
-before_install:
+install:
 - travis_retry pip install -U pip setuptools wheel tox
 script:
-- tox
+- travis_wait tox
 deploy:
   - provider: pypi
     distributions: sdist bdist_wheel
