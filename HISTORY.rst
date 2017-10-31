@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.4.6 (2017-10-31)
+------------------
+
+* Improve the automated release pipeline. It now creates pumpkins.
 * Provide a new decorator ``@register_with`` that can be used in all
   ``test_for*`` modules and replaces the ``model_builder`` function.
 * Temporarily change the links to readthedocs to point to latest instead of stable.
