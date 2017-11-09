@@ -23,10 +23,8 @@ from warnings import warn
 from builtins import dict
 
 import pytest
-from pandas import DataFrame
 
 import memote.support.annotation as annotation
-from memote.support.helpers import df2dict
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
@@ -38,7 +36,7 @@ def test_metabolite_annotation_presence(read_only_model):
         read_only_model, "metabolites"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """A total of {} metabolites ({:.2%}) lack any form of annotation: 
+        """A total of {} metabolites ({:.2%}) lack any form of annotation:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 
@@ -48,10 +46,10 @@ def test_reaction_annotation_presence(read_only_model):
     """Expect all reactions to have a non-empty annotation attribute."""
     ann = test_reaction_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
-            read_only_model, "reactions"))
+        read_only_model, "reactions"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {} reactions ({:.2%}) lack any form of annotation: 
+        """A total of {} reactions ({:.2%}) lack any form of annotation:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 
@@ -71,7 +69,7 @@ def test_metabolite_annotation_overview(read_only_model, db):
     # TODO: metric must also be a dict in this case.
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
     ann["message"][db] = wrapper.fill(
-        """The following {} metabolites ({:.2%}) lack annotation for {}: 
+        """The following {} metabolites ({:.2%}) lack annotation for {}:
         {}""".format(len(ann["data"][db]), ann["metric"][db], db,
                      truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
@@ -91,7 +89,7 @@ def test_reaction_annotation_overview(read_only_model, db):
         read_only_model.reactions, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
     ann["message"][db] = wrapper.fill(
-        """The following {} reactions ({:.2%}) lack annotation for {}: 
+        """The following {} reactions ({:.2%}) lack annotation for {}:
         {}""".format(len(ann["data"][db]), ann["metric"][db], db,
                      truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
@@ -112,8 +110,8 @@ def test_metabolite_annotation_wrong_ids(read_only_model, db):
             read_only_model.metabolites, "metabolites", db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
     ann["message"][db] = wrapper.fill(
-        """The provided metabolite annotations for the {} database do not match 
-        the regular expression patterns defined on identifiers.org. A total of 
+        """The provided metabolite annotations for the {} database do not match
+        the regular expression patterns defined on identifiers.org. A total of
         {} metabolite annotations ({:.2%}) needs to be fixed: {}""".format(
             db, len(ann["data"][db]), ann["metric"][db],
             truncate(ann["data"][db])))
@@ -135,8 +133,8 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
             read_only_model.reactions, "reactions", db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
     ann["message"][db] = wrapper.fill(
-        """The provided reaction annotations for the {} database do not match 
-        the regular expression patterns defined on identifiers.org. A total of 
+        """The provided reaction annotations for the {} database do not match
+        the regular expression patterns defined on identifiers.org. A total of
         {} reaction annotations ({:.2%}) needs to be fixed: {}""".format(
             db, len(ann["data"][db]), ann["metric"][db],
             truncate(ann["data"][db])))
@@ -154,14 +152,14 @@ def test_metabolite_id_namespace_consistency(read_only_model):
     largest = distribution[cols].idxmax()
     if largest != 'bigg.metabolite':
         warn(wrapper.fill(
-            """memote currently only supports syntax checks for BiGG 
+            """memote currently only supports syntax checks for BiGG
             identifiers. Please consider mapping your IDs from {} to BiGG
             """.format(largest)))
     # Assume that all identifiers match the largest namespace.
     ann["data"] = overview[overview[largest]].index.tolist()
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """{} metabolite identifiers ({:.2%}) do not match the largest found 
+        """{} metabolite identifiers ({:.2%}) do not match the largest found
         namespace ({}): {}""".format(
             len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -178,14 +176,14 @@ def test_reaction_id_namespace_consistency(read_only_model):
     largest = distribution[cols].idxmax()
     if largest != 'bigg.reaction':
         warn(wrapper.fill(
-            """memote currently only supports syntax checks for BiGG 
+            """memote currently only supports syntax checks for BiGG
             identifiers. Please consider mapping your IDs from {} to BiGG
             """.format(largest)))
     # Assume that all identifiers match the largest namespace.
     ann["data"] = overview[overview[largest]].index.tolist()
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """{} reaction identifiers ({:.2%}) do not match the largest found 
+        """{} reaction identifiers ({:.2%}) do not match the largest found
         namespace ({}): {}""".format(
             len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]

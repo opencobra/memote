@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import
 
-import os
 import platform
 import logging
 import re
@@ -118,9 +117,9 @@ class ResultCollectionPlugin(object):
             compartment_ids.remove("c")
         except ValueError:
             LOGGER.error(
-                "The model does not contain a compartment ID labeled 'c' for the "
-                "cytosol which is an essential compartment. Many syntax tests "
-                "depend on this being labeled accordingly.")
+                "The model does not contain a compartment ID labeled 'c' for "
+                "the cytosol which is an essential compartment. Many syntax "
+                "tests depend on this being labeled accordingly.")
         return {
             "memote": {
                 "biomass_ids": biomass_ids,

@@ -86,7 +86,7 @@ def test_metabolites_formula_presence(read_only_model):
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
         """To ensure that reactions are mass-balanced, all model metabolites
-        ought to be provided with a formula. There are a total of {} 
+        ought to be provided with a formula. There are a total of {}
         metabolites ({:.2%}) without a formula: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -101,7 +101,7 @@ def test_metabolites_charge_presence(read_only_model):
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
         """To ensure that reactions are charge-balanced, all model metabolites
-        ought to be provided with a charge. There are a total of {} 
+        ought to be provided with a charge. There are a total of {}
         metabolites ({:.2%}) without a charge: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -135,7 +135,7 @@ def test_ngam_presence(read_only_model):
     ann["message"] = wrapper.fill(
         """The Non-Growth Associated Maintenance reaction (NGAM) is an
         ATP-hydrolysis reaction added to metabolic models to represent energy
-        expenses that the cell invests in continuous processes independent of 
+        expenses that the cell invests in continuous processes independent of
         the growth rate. A total of {} NGAM reactions could be identified:
         {}""".format(len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 1, ann["message"]
@@ -148,12 +148,12 @@ def test_metabolic_coverage(read_only_model):
     ann["metric"] = basic.calculate_metabolic_coverage(read_only_model)
     ann["message"] = wrapper.fill(
         """The degree of metabolic coverage indicates the modeling detail of a
-        given reconstruction calculated by dividing the total amount of 
-        reactions by the amount of genes. Models with a 'high level of modeling 
-        detail have ratios >1, and models with a low level of detail have 
-        ratios <1. This difference arises as models with basic or intermediate 
-        levels of detail are assumed to include many reactions in which several 
-        gene products and their enzymatic transformations are ‘lumped’. The 
+        given reconstruction calculated by dividing the total amount of
+        reactions by the amount of genes. Models with a 'high level of modeling
+        detail have ratios >1, and models with a low level of detail have
+        ratios <1. This difference arises as models with basic or intermediate
+        levels of detail are assumed to include many reactions in which several
+        gene products and their enzymatic transformations are ‘lumped’. The
         degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
     assert ann["metric"] >= 1, ann["message"]
 
@@ -176,7 +176,7 @@ def test_enzyme_complex_presence(read_only_model):
     ann = test_enzyme_complex_presence.annotation
     ann["data"] = list(basic.find_enzyme_complexes(read_only_model))
     ann["message"] = wrapper.fill(
-        """A total of {:d} enzyme complexes are defined through GPR rules in 
+        """A total of {:d} enzyme complexes are defined through GPR rules in
         the model.""".format(len(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
 
@@ -189,7 +189,7 @@ def test_find_pure_metabolic_reactions(read_only_model):
         basic.find_pure_metabolic_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) purely metabolic reactions are defined in 
+        """A total of {:d} ({:.2%}) purely metabolic reactions are defined in
         the model, this excludes transporters, exchanges, or pseudo-reactions:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
@@ -202,8 +202,8 @@ def test_find_transport_reactions(read_only_model):
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) transport reactions are defined in the 
-        model, this excludes purely metabolic reactions, exchanges, or 
+        """A total of {:d} ({:.2%}) transport reactions are defined in the
+        model, this excludes purely metabolic reactions, exchanges, or
         pseudo-reactions: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
@@ -216,7 +216,7 @@ def test_find_unique_metabolites(read_only_model):
     ann["data"] = list(basic.find_unique_metabolites(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """Not counting the same entities in other compartments, there is a 
+        """Not counting the same entities in other compartments, there is a
         total of {} ({:.2%}) unique metabolites in the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) < len(read_only_model.metabolites), ann["message"]

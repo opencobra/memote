@@ -22,9 +22,7 @@ from __future__ import absolute_import
 from builtins import dict
 from textwrap import TextWrapper
 
-from numpydoc.docscrape import NumpyDocString
-
-__all__ = ("register_with", "annotate")
+__all__ = ("register_with", "annotate", "get_ids", "truncate")
 
 
 LIST_SLICE = 5

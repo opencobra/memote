@@ -25,7 +25,6 @@ to remain the same as the parametrized test cases.
 
 from __future__ import absolute_import
 
-import os
 import logging
 
 import pytest
@@ -46,10 +45,10 @@ def test_biomass_presence():
     ann = test_biomass_presence.annotation
     ann["data"] = BIOMASS_IDS
     ann["message"] = wrapper.fill(
-        """The biomass composition aka biomass formulation aka biomass reaction 
-        is a common pseudo-reaction accounting for biomass synthesis in 
-        constraints-based modelling. It describes the stoichiometry of 
-        intracellular compounds that are required for cell growth. In this 
+        """The biomass composition aka biomass formulation aka biomass reaction
+        is a common pseudo-reaction accounting for biomass synthesis in
+        constraints-based modelling. It describes the stoichiometry of
+        intracellular compounds that are required for cell growth. In this
         model {} the following biomass reactions were identified: {}""".format(
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) > 0, ann["message"]
@@ -64,7 +63,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
     reaction = read_only_model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
     ann["message"][reaction_id] = wrapper.fill(
-        """The component molar mass of the biomass reaction {} sums up to {} 
+        """The component molar mass of the biomass reaction {} sums up to {}
         which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
         """.format(reaction_id, ann["data"][reaction_id]))
     assert np.isclose(
@@ -79,7 +78,7 @@ def test_biomass_default_production(model, reaction_id):
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} this is the growth rate that can be 
+        """Using the biomass reaction {} this is the growth rate that can be
         achieved when the model is simulated on the provided default medium: {}
         """.format(reaction_id, ann["data"][reaction_id]))
     assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
@@ -96,7 +95,7 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
         biomass.find_blocked_biomass_precursors(reaction, read_only_model)
     )
     ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} and when the model is simulated on the 
+        """Using the biomass reaction {} and when the model is simulated on the
         provided default medium a total of {} precursors cannot be produced: {}
         """.format(reaction_id, len(ann["data"][reaction_id]),
                    ann["data"][reaction_id]))
@@ -117,7 +116,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
             biomass.find_blocked_biomass_precursors(reaction, model)
         )
     ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} and when the model is simulated in 
+        """Using the biomass reaction {} and when the model is simulated in
         complete medium a total of {} precursors cannot be produced: {}
         """.format(reaction_id, len(ann["data"][reaction_id]),
                    ann["data"][reaction_id]))
@@ -150,7 +149,7 @@ def test_fast_growth_default(model, reaction_id):
     ann = test_fast_growth_default.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} and when the model is simulated on 
+        """Using the biomass reaction {} and when the model is simulated on
         the provided default medium the growth rate amounts to {}""".format(
             reaction_id, ann["data"][reaction_id]))
     assert ann["data"][reaction_id] <= 10.3972, ann["message"][reaction_id]

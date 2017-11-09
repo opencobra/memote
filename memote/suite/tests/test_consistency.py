@@ -35,11 +35,11 @@ def test_stoichiometric_consistency(read_only_model):
         consistency.find_unconserved_metabolites(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """Stoichiometric inconsistency violates universal constraints: the 
-        positivity of molecular masses and the mass conservation for each 
-        reaction. A single incorrectly defined reaction can lead to 
-        stoichiometric inconsistency in the model and consequently to 
-        unconserved metabolites. This model contains {} ({:.2%}) unconserved 
+        """Stoichiometric inconsistency violates universal constraints: the
+        positivity of molecular masses and the mass conservation for each
+        reaction. A single incorrectly defined reaction can lead to
+        stoichiometric inconsistency in the model and consequently to
+        unconserved metabolites. This model contains {} ({:.2%}) unconserved
         metabolites: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert is_consistent, ann["message"]
@@ -57,9 +57,9 @@ def test_detect_energy_generating_cycles(read_only_model, met):
     ann["data"][met] = consistency.detect_energy_generating_cycles(
         read_only_model, met)
     ann["message"][met] = wrapper.fill(
-        """The model can produce '{}' without requiring resources. This is 
-        caused by improperly constrained reactions leading to erroneous 
-        energy-generating cycles. The following {} reactions are involved in 
+        """The model can produce '{}' without requiring resources. This is
+        caused by improperly constrained reactions leading to erroneous
+        energy-generating cycles. The following {} reactions are involved in
         those cycles: {}""".format(
             met, len(ann["data"][met]), truncate(ann["data"][met])))
     assert len(ann["data"][met]) == 0, ann["message"][met]
@@ -74,7 +74,7 @@ def test_reaction_charge_balance(read_only_model):
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge imbalanced with at least
-        one of the metabolites not having a charge or the overall charge not 
+        one of the metabolites not having a charge or the overall charge not
         equal to 0: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -90,7 +90,7 @@ def test_reaction_mass_balance(read_only_model):
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are mass imbalanced with at least
-        one of the metabolites not having a formula or the overall mass not 
+        one of the metabolites not having a formula or the overall mass not
         equal to 0: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -103,10 +103,10 @@ def test_blocked_reactions(read_only_model):
     ann["data"] = get_ids(consistency.find_blocked_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """Blocked reactions are reactions that during Flux Variability Analysis 
-        cannot carry any flux while all model boundaries are open. Generally 
-        blocked reactions are caused by network gaps, which can be attributed 
-        to scope or knowledge gaps. There are {} ({:.2%}) blocked reactions in 
+        """Blocked reactions are reactions that during Flux Variability Analysis
+        cannot carry any flux while all model boundaries are open. Generally
+        blocked reactions are caused by network gaps, which can be attributed
+        to scope or knowledge gaps. There are {} ({:.2%}) blocked reactions in
         the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -122,9 +122,9 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
         consistency.find_stoichiometrically_balanced_cycles(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """Stoichiometrically Balanced Cycles are artifacts of insufficiently 
-        constrained networks resulting in reactions that can carry flux when 
-        all the boundaries have been closed. There are {} ({:.2%}) reactions 
+        """Stoichiometrically Balanced Cycles are artifacts of insufficiently
+        constrained networks resulting in reactions that can carry flux when
+        all the boundaries have been closed. There are {} ({:.2%}) reactions
         which participate in SBC in the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -137,7 +137,7 @@ def test_find_orphans(read_only_model):
     ann["data"] = get_ids(consistency.find_orphans(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites are not produced by any reaction 
+        """A total of {} ({:.2%}) metabolites are not produced by any reaction
         of the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -150,7 +150,7 @@ def test_find_deadends(read_only_model):
     ann["data"] = get_ids(consistency.find_deadends(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites are not consumed by any reaction 
+        """A total of {} ({:.2%}) metabolites are not consumed by any reaction
         of the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert ann["data"] == 0, ann["message"]
@@ -163,7 +163,7 @@ def test_find_disconnected(read_only_model):
     ann["data"] = get_ids(consistency.find_disconnected(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites are not associated with any 
+        """A total of {} ({:.2%}) metabolites are not associated with any
         reaction of the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
