@@ -79,14 +79,18 @@ def test_transport_reaction_presence(read_only_model):
 
 @annotate(title="Metabolites without Formula", type="length")
 def test_metabolites_formula_presence(read_only_model):
-    """Expect all metabolites to have a formula."""
+    """
+    Expect all metabolites to have a formula.
+
+    To ensure that reactions are mass-balanced, all model metabolites
+    ought to be provided with a formula.
+    """
     ann = test_metabolites_formula_presence.annotation
     ann["data"] = get_ids(
         basic.check_metabolites_formula_presence(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """To ensure that reactions are mass-balanced, all model metabolites
-        ought to be provided with a formula. There are a total of {}
+        """There are a total of {}
         metabolites ({:.2%}) without a formula: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -94,14 +98,18 @@ def test_metabolites_formula_presence(read_only_model):
 
 @annotate(title="Metabolites without Charge", type="length")
 def test_metabolites_charge_presence(read_only_model):
-    """Expect all metabolites to have charge information."""
+    """
+    Expect all metabolites to have charge information.
+
+    To ensure that reactions are charge-balanced, all model metabolites
+        ought to be provided with a charge.
+    """
     ann = test_metabolites_charge_presence.annotation
     ann["data"] = get_ids(
         basic.check_metabolites_charge_presence(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """To ensure that reactions are charge-balanced, all model metabolites
-        ought to be provided with a charge. There are a total of {}
+        """There are a total of {}
         metabolites ({:.2%}) without a charge: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -109,7 +117,16 @@ def test_metabolites_charge_presence(read_only_model):
 
 @annotate(title="Reactions without GPR", type="length")
 def test_gene_protein_reaction_rule_presence(read_only_model):
-    """Expect all non-exchange reactions to have a GPR rule."""
+    """
+    Expect all non-exchange reactions to have a GPR rule.
+
+    Gene-Protein-Reaction rules express which gene has what function.
+    The presence of this annotation is important to justify the existence
+    of reactions in the model, and is required to conduct in silico gene
+    deletion studies. However, reactions without GPR may also be valid:
+    Spontaneous reactions, or known reactions with yet undiscovered genes
+    likely lack GPR.
+    """
     ann = test_gene_protein_reaction_rule_presence.annotation
     missing_gpr_metabolic_rxns = set(
         basic.check_gene_protein_reaction_rule_presence(read_only_model)
@@ -117,44 +134,46 @@ def test_gene_protein_reaction_rule_presence(read_only_model):
     ann["data"] = get_ids(missing_gpr_metabolic_rxns)
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """Gene-Protein-Reaction rules express which gene has what function.
-        The presence of this annotation is important to justify the existence
-        of reactions in the model, and is required to conduct in silico gene
-        deletion studies. However, reactions without GPR may also be valid:
-        Spontaneous reactions, or known reactions with yet undiscovered genes
-        likely lack GPR. There are a total of {} reactions ({:.2%}) without GPR:
+        """There are a total of {} reactions ({:.2%}) without GPR:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Non-Growth Associated Maintenance Reaction", type="length")
 def test_ngam_presence(read_only_model):
-    """Expect a single non growth-associated maintenance reaction."""
+    """
+    Expect a single non growth-associated maintenance reaction.
+
+    The Non-Growth Associated Maintenance reaction (NGAM) is an
+    ATP-hydrolysis reaction added to metabolic models to represent energy
+    expenses that the cell invests in continuous processes independent of
+    the growth rate.
+    """
     ann = test_ngam_presence.annotation
     ann["data"] = get_ids(basic.find_ngam(read_only_model))
     ann["message"] = wrapper.fill(
-        """The Non-Growth Associated Maintenance reaction (NGAM) is an
-        ATP-hydrolysis reaction added to metabolic models to represent energy
-        expenses that the cell invests in continuous processes independent of
-        the growth rate. A total of {} NGAM reactions could be identified:
+        """A total of {} NGAM reactions could be identified:
         {}""".format(len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 1, ann["message"]
 
 
 @annotate(title="Metabolic Coverage", type="number")
 def test_metabolic_coverage(read_only_model):
-    """Expect a model to have a metabolic coverage >= 1."""
+    """
+    Expect a model to have a metabolic coverage >= 1.
+
+    The degree of metabolic coverage indicates the modeling detail of a
+    given reconstruction calculated by dividing the total amount of
+    reactions by the amount of genes. Models with a 'high level of modeling
+    detail have ratios >1, and models with a low level of detail have
+    ratios <1. This difference arises as models with basic or intermediate
+    levels of detail are assumed to include many reactions in which several
+    gene products and their enzymatic transformations are ‘lumped’.
+    """
     ann = test_metabolic_coverage.annotation
     ann["metric"] = basic.calculate_metabolic_coverage(read_only_model)
     ann["message"] = wrapper.fill(
-        """The degree of metabolic coverage indicates the modeling detail of a
-        given reconstruction calculated by dividing the total amount of
-        reactions by the amount of genes. Models with a 'high level of modeling
-        detail have ratios >1, and models with a low level of detail have
-        ratios <1. This difference arises as models with basic or intermediate
-        levels of detail are assumed to include many reactions in which several
-        gene products and their enzymatic transformations are ‘lumped’. The
-        degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
+        """The degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
     assert ann["metric"] >= 1, ann["message"]
 
 
