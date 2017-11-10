@@ -41,15 +41,19 @@ BIOMASS_IDS = pytest.memote.biomass_ids
 
 @annotate(title="Presence of a Biomass Reaction", type="array")
 def test_biomass_presence():
-    """Expect the model to contain at least one biomass reaction."""
+    """
+    Expect the model to contain at least one biomass reaction.
+
+    The biomass composition aka biomass formulation aka biomass reaction
+    is a common pseudo-reaction accounting for biomass synthesis in
+    constraints-based modelling. It describes the stoichiometry of
+    intracellular compounds that are required for cell growth.
+    """
     ann = test_biomass_presence.annotation
     ann["data"] = BIOMASS_IDS
     ann["message"] = wrapper.fill(
-        """The biomass composition aka biomass formulation aka biomass reaction
-        is a common pseudo-reaction accounting for biomass synthesis in
-        constraints-based modelling. It describes the stoichiometry of
-        intracellular compounds that are required for cell growth. In this
-        model {} the following biomass reactions were identified: {}""".format(
+        """In this model {} the following biomass reactions were
+        identified: {}""".format(
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) > 0, ann["message"]
 

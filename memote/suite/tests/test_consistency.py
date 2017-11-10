@@ -27,7 +27,15 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 
 @annotate(title="Stoichiometric Consistency", type="length")
 def test_stoichiometric_consistency(read_only_model):
-    """Expect that the stoichiometry is mass-balanced."""
+    """
+    Expect that the stoichiometry is mass-balanced.
+
+    Stoichiometric inconsistency violates universal constraints: the
+    positivity of molecular masses and the mass conservation for each
+    reaction. A single incorrectly defined reaction can lead to
+    stoichiometric inconsistency in the model and consequently to
+    unconserved metabolites.
+    """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(
         read_only_model)
@@ -35,11 +43,7 @@ def test_stoichiometric_consistency(read_only_model):
         consistency.find_unconserved_metabolites(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """Stoichiometric inconsistency violates universal constraints: the
-        positivity of molecular masses and the mass conservation for each
-        reaction. A single incorrectly defined reaction can lead to
-        stoichiometric inconsistency in the model and consequently to
-        unconserved metabolites. This model contains {} ({:.2%}) unconserved
+        """This model contains {} ({:.2%}) unconserved
         metabolites: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert is_consistent, ann["message"]
@@ -98,15 +102,19 @@ def test_reaction_mass_balance(read_only_model):
 
 @annotate(title="Number of Blocked Reactions", type="length")
 def test_blocked_reactions(read_only_model):
-    """Expect all reactions to be able to carry flux."""
+    """
+    Expect all reactions to be able to carry flux.
+
+    Blocked reactions are reactions that during Flux Variability Analysis
+    cannot carry any flux while all model boundaries are open. Generally
+    blocked reactions are caused by network gaps, which can be attributed
+    to scope or knowledge gaps.
+    """
     ann = test_blocked_reactions.annotation
     ann["data"] = get_ids(consistency.find_blocked_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """Blocked reactions are reactions that during Flux Variability Analysis
-        cannot carry any flux while all model boundaries are open. Generally
-        blocked reactions are caused by network gaps, which can be attributed
-        to scope or knowledge gaps. There are {} ({:.2%}) blocked reactions in
+        """There are {} ({:.2%}) blocked reactions in
         the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -116,15 +124,19 @@ def test_blocked_reactions(read_only_model):
     reason="Loopless FVA currently runs too slowly for large models.")
 @annotate(title="Stoichiometrically Balanced Cycles", type="length")
 def test_find_stoichiometrically_balanced_cycles(read_only_model):
-    """Expect no stoichiometrically balanced loops to be present."""
+    """
+    Expect no stoichiometrically balanced loops to be present.
+
+    Stoichiometrically Balanced Cycles are artifacts of insufficiently
+    constrained networks resulting in reactions that can carry flux when
+    all the boundaries have been closed.
+    """
     ann = test_find_stoichiometrically_balanced_cycles.annotation
     ann["data"] = get_ids(
         consistency.find_stoichiometrically_balanced_cycles(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """Stoichiometrically Balanced Cycles are artifacts of insufficiently
-        constrained networks resulting in reactions that can carry flux when
-        all the boundaries have been closed. There are {} ({:.2%}) reactions
+        """There are {} ({:.2%}) reactions
         which participate in SBC in the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
