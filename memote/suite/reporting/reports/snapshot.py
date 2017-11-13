@@ -37,4 +37,4 @@ class SnapshotReport(Report):
         This is currently a stub while we convert from ``jinja2`` templates
         to a full Angular based report.
         """
-        return ""
+        return u""

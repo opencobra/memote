@@ -81,7 +81,7 @@ class HistoryReport(Report):
         This is currently a stub while we convert from ``jinja2`` templates
         to a full Angular based report.
         """
-        return ""
+        return u""
 
     def _collect_basic_plots(self):
         """Create plots from the basic info data frame."""
