@@ -69,13 +69,27 @@ def test_register_with(func, func_name):
 
 @pytest.mark.parametrize("notes, func, summary", [
     (dict(title="One", data=4, type="integer"), one,
-     "One line."),
+     """One line."""),
     (dict(title="Two", data="some text", type="string"), two,
-     "Two lines.     Why?"),
+     """Two lines.
+    Why?
+    """),
     (dict(title="Three", data=[2, 4, 51, 63], type="number"), three,
-     "Three lines. Why?"),
+     """
+    Three lines.
+    Why?
+    """),
     (dict(title="Four", data=None, type="array"), four,
-     "Fourth summary."),
+     """
+    Fourth summary.
+
+    A proper description.
+
+    Returns
+    -------
+    None
+
+    """),
 ])
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
@@ -85,5 +99,3 @@ def test_annotate(notes, func, summary):
     assert res.annotation["message"] is None
     assert res.annotation["type"] == notes["type"]
     assert res.annotation["metric"] == 1.0
-    assert res.annotation["result"] is None
-    assert res.annotation["duration"] == 0.0

@@ -75,17 +75,13 @@ class HistoryReport(Report):
             raise self.index
 
     def render_html(self):
-        """Render a rich report for the repository."""
-        template = self.env.get_template("history_report.html")
-        names = self.bag.get_model_ids()
-        return template.render(
-            names=names,
-            basics=self._collect_basic_plots(),
-            consistency=self._collect_consistency_plots(),
-            # FIXME: Syntax tests and result retrieval are broken.
-#            syntax=self._collect_syntax_plots(),  # noqa
-            biomass=self._collect_biomass_plots(),
-        )
+        """
+        Render a rich report for the repository.
+
+        This is currently a stub while we convert from ``jinja2`` templates
+        to a full Angular based report.
+        """
+        return ""
 
     def _collect_basic_plots(self):
         """Create plots from the basic info data frame."""
