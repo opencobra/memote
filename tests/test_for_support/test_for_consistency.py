@@ -530,11 +530,8 @@ def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
 
 @pytest.mark.parametrize("model, metabolite_id, output", [
     # test for possible exceptions
-    pytest.mark.raises(("produces_nadh", "atp_c", None), exception=KeyError),
-    pytest.mark.raises(("missing_energy_partner", "atp_c", None),
-                       exception=KeyError),
     ("no_atp", "atp_c", []),
-    ("infeasible", "atp_c", "infeasible")
+    ("infeasible", "atp_c", {'A', 'B', 'C'})
 ], indirect=["model"])
 def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
                                                     output):

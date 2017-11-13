@@ -17,149 +17,173 @@
 
 """Annotation tests performed on an instance of ``cobra.Model``."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 from warnings import warn
 from builtins import dict
 
 import pytest
-from pandas import DataFrame
 
 import memote.support.annotation as annotation
-from memote.support.helpers import df2dict
+from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-def test_metabolite_annotation_presence(read_only_model, store):
+@annotate(title="Metabolites without Annotation", type="length")
+def test_metabolite_annotation_presence(read_only_model):
     """Expect all metabolites to have a non-empty annotation attribute."""
-    store["metabolites_without_annotation"] = [
-        met.id for met in annotation.find_components_without_annotation(
-            read_only_model, "metabolites")]
-    assert len(store["metabolites_without_annotation"]) == 0, \
-        "The following metabolites lack any form of annotation: " \
-        "{}".format(", ".join(store["metabolites_without_annotation"]))
+    ann = test_metabolite_annotation_presence.annotation
+    ann["data"] = get_ids(annotation.find_components_without_annotation(
+        read_only_model, "metabolites"))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} metabolites ({:.2%}) lack any form of annotation:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-def test_reaction_annotation_presence(read_only_model, store):
+@annotate(title="Reactions without Annotation", type="integer")
+def test_reaction_annotation_presence(read_only_model):
     """Expect all reactions to have a non-empty annotation attribute."""
-    store["reactions_without_annotation"] = [
-        rxn.id for rxn in annotation.find_components_without_annotation(
-            read_only_model, "reactions")]
-    assert len(store["reactions_without_annotation"]) == 0, \
-        "The following reactions lack any form of annotation: " \
-        "{}".format(", ".join(store["reactions_without_annotation"]))
+    ann = test_reaction_annotation_presence.annotation
+    ann["data"] = get_ids(annotation.find_components_without_annotation(
+        read_only_model, "reactions"))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {} reactions ({:.2%}) lack any form of annotation:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-def test_metabolite_annotation_overview(read_only_model, store):
+@pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
+@annotate(title="Missing Metabolite Annotations Per Database",
+          type="object", message=dict(), data=dict(), metric=dict())
+def test_metabolite_annotation_overview(read_only_model, db):
     """
     Expect all metabolites to have annotations from common databases.
 
     The required databases are outlined in `annotation.py`.
     """
-    overview = annotation.generate_component_annotation_overview(
-        read_only_model, "metabolites")
-    store['met_annotation_overview'] = df2dict(overview)
-    for db in annotation.METABOLITE_ANNOTATIONS:
-        sub = overview.loc[~overview[db], db]
-        assert len(sub) == 0, \
-            "The following metabolites lack annotation for {}: " \
-            "{}".format(db, ", ".join(sub.index))
+    ann = test_metabolite_annotation_overview.annotation
+    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
+        read_only_model.metabolites, db))
+    # TODO: metric must also be a dict in this case.
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
+    ann["message"][db] = wrapper.fill(
+        """The following {} metabolites ({:.2%}) lack annotation for {}:
+        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
+                     truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
-def test_reaction_annotation_overview(read_only_model, store):
+@pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
+@annotate(title="Missing Reaction Annotations Per Database",
+          type="object", message=dict(), data=dict(), metric=dict())
+def test_reaction_annotation_overview(read_only_model, db):
     """
     Expect all reactions to have annotations from common databases.
 
     The required databases are outlined in `annotation.py`.
     """
-    overview = annotation.generate_component_annotation_overview(
-        read_only_model, "reactions")
-    store['rxn_annotation_overview'] = df2dict(overview)
-    for db in annotation.REACTION_ANNOTATIONS:
-        sub = overview.loc[~overview[db], db]
-        assert len(sub) == 0, \
-            "The following reactions lack annotation for {}: " \
-            "{}".format(db, ", ".join(sub.index))
+    ann = test_reaction_annotation_overview.annotation
+    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
+        read_only_model.reactions, db))
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
+    ann["message"][db] = wrapper.fill(
+        """The following {} reactions ({:.2%}) lack annotation for {}:
+        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
+                     truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
-def test_metabolite_annotation_wrong_ids(read_only_model, store):
+@pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
+@annotate(title="Wrong Metabolite Annotations Per Database",
+          type="object", message=dict(), data=dict(), metric=dict())
+def test_metabolite_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of metabolites to be in the correct format.
 
     The required formats, i.e., regex patterns are outlined in `annotation.py`.
     """
-    has_annotation = annotation.generate_component_annotation_overview(
-        read_only_model, "metabolites")
-    matches = annotation.generate_component_annotation_miriam_match(
-        read_only_model, "metabolites")
-    wrong = DataFrame(has_annotation.values & (~matches.values),
-                      index=has_annotation.index,
-                      columns=has_annotation.columns)
-    store['met_wrong_annotation_ids'] = df2dict(wrong)
-    for db in annotation.METABOLITE_ANNOTATIONS:
-        sub = wrong.loc[wrong[db], db]
-        assert len(sub) == 0, \
-            "The following metabolites use wrong IDs for {}: " \
-            "{}".format(db, ", ".join(sub.index))
+    ann = test_metabolite_annotation_wrong_ids.annotation
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_miriam_match(
+            read_only_model.metabolites, "metabolites", db))
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
+    ann["message"][db] = wrapper.fill(
+        """The provided metabolite annotations for the {} database do not match
+        the regular expression patterns defined on identifiers.org. A total of
+        {} metabolite annotations ({:.2%}) needs to be fixed: {}""".format(
+            db, len(ann["data"][db]), ann["metric"][db],
+            truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
-def test_reaction_annotation_wrong_ids(read_only_model, store):
+@pytest.mark.parametrize("db", annotation.REACTION_ANNOTATIONS)
+@annotate(title="Wrong Reaction Annotations Per Database",
+          type="object", message=dict(), data=dict(), metric=dict())
+def test_reaction_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of reactions to be in the correct format.
 
     The required formats, i.e., regex patterns are outlined in `annotation.py`.
     """
-    has_annotation = annotation.generate_component_annotation_overview(
-        read_only_model, "reactions")
-    matches = annotation.generate_component_annotation_miriam_match(
-        read_only_model, "reactions")
-    wrong = DataFrame(has_annotation.values & (~matches.values),
-                      index=has_annotation.index,
-                      columns=has_annotation.columns)
-    store["rxn_wrong_annotation_ids"] = df2dict(wrong)
-    for db in annotation.REACTION_ANNOTATIONS:
-        sub = wrong.loc[wrong[db], db]
-        assert len(sub) == 0, \
-            "The following reactions use wrong IDs for {}: " \
-            "{}".format(db, ", ".join(sub.index))
+    ann = test_reaction_annotation_wrong_ids.annotation
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_miriam_match(
+            read_only_model.reactions, "reactions", db))
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
+    ann["message"][db] = wrapper.fill(
+        """The provided reaction annotations for the {} database do not match
+        the regular expression patterns defined on identifiers.org. A total of
+        {} reaction annotations ({:.2%}) needs to be fixed: {}""".format(
+            db, len(ann["data"][db]), ann["metric"][db],
+            truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
-@pytest.mark.skip("Bug causing TypeError in helper function.")
-def test_metabolite_id_namespace_consistency(read_only_model, store):
-    """Expect metabolite IDs to be from the same namespace."""
+@annotate(title="Uniform Metabolite Identifier Namespace", type="length")
+def test_metabolite_id_namespace_consistency(read_only_model):
+    """Expect metabolite identifiers to be from the same namespace."""
+    ann = test_metabolite_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "metabolites")
-    store['met_ids_in_each_namespace'] = dict(
-        (key, int(val)) for key, val in overview.iteritems())
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
     if largest != 'bigg.metabolite':
-        warn(
-            'memote currently only supports syntax checks for BiGG identifiers.'
-            ' Please consider mapping your IDs from {} to BiGG'
-            ''.format(largest)
-        )
-    assert distribution[largest] == len(read_only_model.metabolites), \
-        "Metabolite IDs that don't belong to the largest fraction: {}"\
-        "".format(", ".join(overview.loc[~overview[largest], largest].index))
+        warn(wrapper.fill(
+            """memote currently only supports syntax checks for BiGG
+            identifiers. Please consider mapping your IDs from {} to BiGG
+            """.format(largest)))
+    # Assume that all identifiers match the largest namespace.
+    ann["data"] = overview[overview[largest]].index.tolist()
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """{} metabolite identifiers ({:.2%}) do not match the largest found
+        namespace ({}): {}""".format(
+            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-@pytest.mark.skip("Bug causing TypeError in helper function.")
-def test_reaction_id_namespace_consistency(read_only_model, store):
-    """Expect reaction IDs to be from the same namespace."""
+@annotate(title="Uniform Metabolite Identifier Namespace", type="length")
+def test_reaction_id_namespace_consistency(read_only_model):
+    """Expect reaction identifiers to be from the same namespace."""
+    ann = test_reaction_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "reactions")
-    store['rxn_ids_in_each_namespace'] = dict(
-        (key, int(val)) for key, val in overview.iteritems())
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
     if largest != 'bigg.reaction':
-        warn(
-            'memote currently only supports syntax checks for BiGG identifiers.'
-            ' Please consider mapping your IDs from {} to BiGG'
-            ''.format(largest)
-        )
-    assert distribution[largest] == len(read_only_model.metabolites), \
-        "Reaction IDs that don't belong to the largest fraction: {}" \
-        "".format(", ".join(overview.loc[~overview[largest], largest].index))
+        warn(wrapper.fill(
+            """memote currently only supports syntax checks for BiGG
+            identifiers. Please consider mapping your IDs from {} to BiGG
+            """.format(largest)))
+    # Assume that all identifiers match the largest namespace.
+    ann["data"] = overview[overview[largest]].index.tolist()
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """{} reaction identifiers ({:.2%}) do not match the largest found
+        namespace ({}): {}""".format(
+            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]

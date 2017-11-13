@@ -54,7 +54,8 @@ requirements = [
     "travispy",
     "pygithub",
     "travis-encrypt",
-    "sympy"
+    "sympy",
+    "numpydoc"
 ]
 
 test_requirements = [

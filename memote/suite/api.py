@@ -27,12 +27,13 @@ except ImportError:
     import json
 
 import pytest
+from six import iteritems
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.reporting.reports import BasicReport, HistoryReport
+from memote.suite.reporting.reports import SnapshotReport, HistoryReport
 
-__all__ = ("test_model", "basic_report", "diff_report", "history_report")
+__all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -71,15 +72,32 @@ def test_model(model, filename=None, results=False, pytest_args=None):
     if filename is not None:
         with open(filename, "w") as file_h:
             LOGGER.info("Writing JSON output '%s'.", filename)
-            json.dump(plugin.results, file_h, sort_keys=True, indent=4,
-                      separators=(",", ": "))
+            try:
+                json.dump(plugin.results, file_h, sort_keys=True, indent=4,
+                          separators=(",", ": "))
+            except TypeError:
+                # Log information to easily find the culprit.
+                json_types = (type(None), int, float, str, list, dict)
+                for mod, functions in iteritems(plugin.results["report"]):
+                    LOGGER.debug("%s:", mod)
+                    for name, annotation in iteritems(functions):
+                        data = annotation.get("data")
+                        try:
+                            for key, value in iteritems(data):
+                                if not isinstance(value, json_types):
+                                    LOGGER.debug(
+                                        "  %s - %s: %s", name, key, type(value))
+                        except AttributeError:
+                            if not isinstance(data, json_types):
+                                LOGGER.debug("  %s: %s", name, type(data))
+
     if results:
         return code, plugin.results
     else:
         return code
 
 
-def basic_report(results, filename):
+def snapshot_report(results, filename):
     """
     Test a model and save a basic report.
 
@@ -91,7 +109,7 @@ def basic_report(results, filename):
         A filename for the HTML report.
 
     """
-    report = BasicReport(results)
+    report = SnapshotReport(results)
     LOGGER.info("Writing basic report '%s'.", filename)
     with io.open(filename, "w") as file_h:
         file_h.write(report.render_html())

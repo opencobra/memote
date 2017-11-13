@@ -63,7 +63,7 @@ def rxn_annotations(base):
 @register_with(MODEL_REGISTRY)
 def met_each_present(base):
     met = cobra.Metabolite(id='met_c', name="Met")
-    met.annotation = {'pubchem.compound' : "107735",
+    met.annotation = {'pubchem.compound': "107735",
                       'metanetx.chemical': "MNXM23",
                       'kegg.compound': "C00022",
                       'seed.compound': "cpd00020",
@@ -123,18 +123,19 @@ def rxn_each_absent(base):
 @register_with(MODEL_REGISTRY)
 def met_broken_id(base):
     met = cobra.Metabolite(id='met_c', name="Met")
-    met.annotation = {'metanetx.chemical': "MNXR23",
-                      'kegg.compound': "K00022",
-                      'seed.compound': "cdp00020",
-                      'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
-                      'chebi': ["CHEBI:487", "CHEBI:15361",
-                                "CHEBI:26462", "CHEBI:26466",
-                                "CHEBI:32816", "CEBI:O",
-                                "CHEBI:86354", "CHEBI:8685"],
-                      'hmdb': "HMBD00243",
-                      'biocyc': "/:PYRUVATE",
-                      'reactome': ["113557", "29398", "389680"],
-                      'bigg.metabolite': ""}
+    met.annotation = {
+        'pubchem.compound': "x",
+        'metanetx.chemical': "MNXR23",
+        'kegg.compound': "K00022",
+        'seed.compound': "cdp00020",
+        'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
+        'chebi': ["CHEBI:487", "CHEBI:15361", "CHEBI:26462", "CHEBI:26466",
+            "CHEBI:32816", "CEBI:O", "CHEBI:86354", "CHEBI:8685"],
+        'hmdb': "HMBD00243",
+        'biocyc': "/:PYRUVATE",
+        'reactome': ["113557", "29398", "389680"],
+        'bigg.metabolite': ""
+    }
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.add_metabolites({met: -1})
     base.add_reactions([rxn])
@@ -202,41 +203,71 @@ def test_find_components_without_annotation(model, num, components):
     assert len(without_annotation) == num
 
 
-@pytest.mark.parametrize("model, num, components", [
-    ("met_each_present", 1, "metabolites"),
-    ("met_each_absent", 0, "metabolites"),
-    ("rxn_each_present", 1, "reactions"),
-    ("rxn_each_absent", 0, "reactions")
+@pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
+@pytest.mark.parametrize("model, num", [
+    ("met_each_present", 0),
+    ("met_each_absent", 1)
 ], indirect=["model"])
-def test_generate_component_annotation_overview(model, num, components):
+def test_generate_metabolite_annotation_overview(model, num, db):
     """
-    Expect all components to have `num` annotations from common databases.
+    Expect all metabolites to have `num` annotations from common databases.
 
     The required databases are outlined in `annotation.py`.
     """
     overview = \
-        annotation.generate_component_annotation_overview(model, components)
-    for key in overview.columns:
-        assert overview[key].sum() == num
+        annotation.generate_component_annotation_overview(
+            model.metabolites, db)
+    assert len(overview) == num
 
 
-@pytest.mark.parametrize("model, num, components", [
-    ("met_each_present", 1, "metabolites"),
-    ("met_broken_id", 0, "metabolites"),
-    ("rxn_each_present", 1, "reactions"),
-    ("rxn_broken_id", 0, "reactions")
+@pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
+@pytest.mark.parametrize("model, num", [
+    ("rxn_each_present", 0),
+    ("rxn_each_absent", 1)
 ], indirect=["model"])
-def test_generate_component_annotation_miriam_match(
-        model, num, components):
+def test_generate_reaction_annotation_overview(model, num, db):
+    """
+    Expect all reactions to have `num` annotations from common databases.
+
+    The required databases are outlined in `annotation.py`.
+    """
+    overview = \
+        annotation.generate_component_annotation_overview(
+            model.reactions, db)
+    assert len(overview) == num
+
+
+@pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
+@pytest.mark.parametrize("model, num, components", [
+    ("met_each_present", 0, "metabolites"),
+    ("met_broken_id", 1, "metabolites")
+], indirect=["model"])
+def test_generate_metabolite_annotation_miriam_match(model, num, components,
+                                                     db):
     """
     Expect all items to have annotations that match MIRIAM patterns.
 
     The required databases are outlined in `annotation.py`.
     """
-    annotation_matches = annotation.generate_component_annotation_miriam_match(
-        model, components)
-    for key in annotation_matches.columns:
-        assert annotation_matches[key].sum() == num
+    faulty = annotation.generate_component_annotation_miriam_match(
+        model.metabolites, components, db)
+    assert len(faulty) == num
+
+
+@pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
+@pytest.mark.parametrize("model, num, components", [
+    ("rxn_each_present", 0, "reactions"),
+    ("rxn_broken_id", 1, "reactions")
+], indirect=["model"])
+def test_generate_reaction_annotation_miriam_match(model, num, components, db):
+    """
+    Expect all items to have annotations that match MIRIAM patterns.
+
+    The required databases are outlined in `annotation.py`.
+    """
+    faulty = annotation.generate_component_annotation_miriam_match(
+        model.reactions, components, db)
+    assert len(faulty) == num
 
 
 @pytest.mark.parametrize("model, namespace, num, components", [
