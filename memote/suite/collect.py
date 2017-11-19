@@ -71,7 +71,7 @@ class ResultCollectionPlugin(object):
         self.branch = branch
         self.commit = commit
         self._collect_meta_info()
-        self._param = re.compile(r"\[(?P<param>[a-z0-9_.\-]+)\]$")
+        self._param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
     def _collect_meta_info(self):
         """Record environment information."""
@@ -150,6 +150,7 @@ class ResultCollectionPlugin(object):
             A test report object from pytest with test case result.
 
         """
+        LOGGER.debug("%s - %s", report.when, report.outcome)
         if report.when != "call":
             return
         module_name = basename(report.location[0]).split(".")[0]
@@ -160,16 +161,19 @@ class ResultCollectionPlugin(object):
         if match is not None:
             param = match.group("param")
             item_name = item_name[:match.start()]
+            LOGGER.debug("Parametrized name matched: %s - %s", item_name, param)
 
         module = self._data.setdefault(module_name, dict())
         case = module.setdefault(item_name, dict())
 
         if match is not None:
+            LOGGER.debug("Nested outcome.")
             case["duration"] = case.setdefault("duration", dict())
             case["duration"][param] = report.duration
             case["result"] = case.setdefault("result", dict())
             case["result"][param] = report.outcome
         else:
+            LOGGER.debug("Single outcome.")
             case["duration"] = report.duration
             case["result"] = report.outcome
 

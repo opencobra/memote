@@ -54,8 +54,7 @@ click_log.basic_config(LOGGER)
 @click.version_option(__version__, "--version", "-V")
 @click_log.simple_verbosity_option(
     LOGGER, default="INFO", show_default=True,
-    type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]),
-    help="Set the log level.")
+    type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]))
 def cli():
     """
     Metabolic model testing command line tool.

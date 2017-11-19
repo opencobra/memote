@@ -120,8 +120,6 @@ def test_blocked_reactions(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@pytest.mark.skip(
-    reason="Loopless FVA currently runs too slowly for large models.")
 @annotate(title="Stoichiometrically Balanced Cycles", type="length")
 def test_find_stoichiometrically_balanced_cycles(read_only_model):
     """
@@ -131,6 +129,9 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
     constrained networks resulting in reactions that can carry flux when
     all the boundaries have been closed.
     """
+    # Skip inside function so it happens during call and not during setup.
+    # TODO: Consider using a timeout on the solver in future instead.
+    pytest.skip("Loopless FVA currently runs too slowly for large models.")
     ann = test_find_stoichiometrically_balanced_cycles.annotation
     ann["data"] = get_ids(
         consistency.find_stoichiometrically_balanced_cycles(read_only_model))

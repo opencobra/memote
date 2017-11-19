@@ -33,7 +33,7 @@ def test_model_id_presence(read_only_model):
     assert bool(read_only_model.id)
 
 
-@annotate(title="Total Number of Genes", type="integer")
+@annotate(title="Total Number of Genes", type="length")
 def test_genes_presence(read_only_model):
     """Expect that >= 1 genes are defined in the model."""
     ann = test_genes_presence.annotation
@@ -44,7 +44,7 @@ def test_genes_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Reactions", type="integer")
+@annotate(title="Total Number of Reactions", type="length")
 def test_reactions_presence(read_only_model):
     """Expect that >= 1 reactions are present in the model."""
     ann = test_reactions_presence.annotation
@@ -55,7 +55,7 @@ def test_reactions_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Metabolites", type="integer")
+@annotate(title="Total Number of Metabolites", type="length")
 def test_metabolites_presence(read_only_model):
     """Expect that >= 1 metabolites are present in the model."""
     ann = test_metabolites_presence.annotation
