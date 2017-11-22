@@ -71,7 +71,7 @@ class ResultCollectionPlugin(object):
         self.branch = branch
         self.commit = commit
         self._collect_meta_info()
-        self._param = re.compile(r"\[(?P<param>[a-z0-9_.\-]+)\]$")
+        self._param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
     def _collect_meta_info(self):
         """Record environment information."""
@@ -160,6 +160,11 @@ class ResultCollectionPlugin(object):
         if match is not None:
             param = match.group("param")
             item_name = item_name[:match.start()]
+            LOGGER.debug(
+                "%s with parameter %s %s", item_name, param, report.outcome)
+        else:
+            LOGGER.debug(
+                "%s %s", item_name, report.outcome)
 
         module = self._data.setdefault(module_name, dict())
         case = module.setdefault(item_name, dict())

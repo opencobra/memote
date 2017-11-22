@@ -41,7 +41,7 @@ def test_metabolite_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without Annotation", type="integer")
+@annotate(title="Reactions without Annotation", type="length")
 def test_reaction_annotation_presence(read_only_model):
     """Expect all reactions to have a non-empty annotation attribute."""
     ann = test_reaction_annotation_presence.annotation
