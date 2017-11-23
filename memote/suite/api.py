@@ -38,7 +38,8 @@ __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 LOGGER = logging.getLogger(__name__)
 
 
-def test_model(model, filename=None, results=False, pytest_args=None):
+def test_model(model, filename=None, results=False, pytest_args=None,
+               exclusive=None, skip=None):
     """
     Test a model and optionally store results as JSON.
 
@@ -52,6 +53,11 @@ def test_model(model, filename=None, results=False, pytest_args=None):
         Whether to return the results in addition to the return code.
     pytest_args : list, optional
         Additional arguments for the pytest suite.
+    exclusive : iterable, optional
+        Names of test cases or modules to run and exclude all others. Takes
+        precedence over ``skip``.
+    skip : iterable, optional
+        Names of test cases or modules to skip.
 
     Returns
     -------
@@ -67,7 +73,7 @@ def test_model(model, filename=None, results=False, pytest_args=None):
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    plugin = ResultCollectionPlugin(model)
+    plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip)
     code = pytest.main(pytest_args, plugins=[plugin])
     if filename is not None:
         with open(filename, "w") as file_h:

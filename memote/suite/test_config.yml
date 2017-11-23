@@ -1,0 +1,39 @@
+cards:
+  scored:
+    title: "Core Tests"
+    sections:
+      consistency:
+        title: "Consistency"
+        weight: 1.0
+        cases:
+        - test_1
+        - test_2
+      annotation:
+        title: "Annotation"
+        weight: 1.0
+        cases:
+        - test_1
+        - test_2
+  basic:
+    title: "Basic Information"
+    cases:
+      - test_1
+      - test_2
+  biomass:
+    title: "Biomass"
+    cases:
+      - test_1
+      - test_2
+  consistency:
+    title: "Stoichiometry Matrix"
+    cases:
+      - test_1
+      - test_2
+  syntax:
+    title: "BiGG Syntax"
+    cases:
+      - test_1
+      - test_2
+weights:
+  test_1: 1.0
+  test_2: 1.0
