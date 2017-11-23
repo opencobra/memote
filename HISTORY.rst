@@ -3,7 +3,14 @@ History
 
 Next Release
 ------------
+
 * Enable test result and meta-data collection.
+* Allow command line option and configuration of exclusive test cases and
+  modules skipping all others (``--exclusive test_biomass``).
+* Allow command line option and configuration to skip test cases and
+  modules (``--skip test_model_id_presence``).
+* Introduce a dummy configuration file for the report organization and test
+  scoring weights.
 
 0.4.6 (2017-10-31)
 ------------------

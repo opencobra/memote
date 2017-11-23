@@ -69,9 +69,6 @@ def cli():
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL",
-                callback=callbacks.validate_model)
 @click.option("--collect/--no-collect", default=True, show_default=True,
               callback=callbacks.validate_collect,
               help="Whether or not to collect test data needed for "
@@ -89,7 +86,18 @@ def cli():
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
-def run(model, collect, filename, directory, ignore_git, pytest_args):
+@click.option("--exclusive", type=str, multiple=True,
+              help="The name of a test or test module to be run exclusively. "
+                   "All other tests are skipped. This option can be used "
+                   "multiple times and takes precedence over '--skip'.")
+@click.option("--skip", type=str, multiple=True,
+              help="The name of a test or test module to be skipped. This "
+                   "option can be used multiple times.")
+@click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                envvar="MEMOTE_MODEL",
+                callback=callbacks.validate_model)
+def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
+        skip):
     """
     Run the test suite and collect results.
 
@@ -108,9 +116,11 @@ def run(model, collect, filename, directory, ignore_git, pytest_args):
         if repo is not None and directory is not None:
             filename = join(directory,
                             "{}.json".format(repo.active_branch.commit.hexsha))
-        code = api.test_model(model, filename, pytest_args=pytest_args)
+        code = api.test_model(model, filename, pytest_args=pytest_args,
+                              skip=skip, exclusive=exclusive)
     else:
-        code = api.test_model(model, pytest_args=pytest_args)
+        code = api.test_model(model, pytest_args=pytest_args, skip=skip,
+                              exclusive=exclusive)
     sys.exit(code)
 
 
@@ -141,15 +151,13 @@ def new(directory, replay):
                  replay=replay)
 
 
-def _test_history(model, filename, pytest_args):
+def _test_history(model, filename, pytest_args, skip):
     model = callbacks.validate_model(None, "model", model)
-    api.test_model(model, filename, pytest_args=pytest_args)
+    api.test_model(model, filename, pytest_args=pytest_args, skip=skip)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL")
 @click.option("--yes", "-y", is_flag=True, callback=callbacks.abort_if_false,
               expose_value=False, help="Confirm overwriting previous results.",
               prompt="Are you sure that you want to change history?")
@@ -161,8 +169,11 @@ def _test_history(model, filename, pytest_args):
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
+@click.argument("model", type=click.Path(exists=True, dir_okay=False),
+                envvar="MEMOTE_MODEL")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-def history(model, directory, pytest_args, commits):
+@click.pass_context
+def history(context, model, directory, pytest_args, commits):
     """
     Re-compute test results for the git branch history.
 
@@ -197,13 +208,14 @@ def history(model, directory, pytest_args, commits):
     else:
         commits = list(branch.commit.iter_parents())
         commits.insert(0, branch.commit)
+    skip = context.default_map.get("skip", [])
     for commit in commits:
         repo.git.checkout(commit)
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit.hexsha))
         filename = join(directory, "{}.json".format(commit.hexsha))
         proc = Process(target=_test_history,
-                       args=(model, filename, pytest_args))
+                       args=(model, filename, pytest_args, skip))
         proc.start()
         proc.join()
     repo.git.checkout(branch)

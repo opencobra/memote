@@ -22,12 +22,13 @@ from __future__ import absolute_import
 import platform
 import logging
 import re
-from os.path import basename
-from builtins import dict
+from os.path import join, dirname
+from builtins import dict, open
 from datetime import datetime
 
 import pytest
 import pip
+import ruamel.yaml as yaml
 
 from memote.support.helpers import find_biomass_reaction
 
@@ -46,7 +47,7 @@ class ResultCollectionPlugin(object):
     """
 
     def __init__(self, model, repository=None, branch=None, commit=None,
-                 **kwargs):
+                 exclusive=None, skip=None, **kwargs):
         """
         Collect and store values during testing.
 
@@ -60,18 +61,26 @@ class ResultCollectionPlugin(object):
             The name of the git branch to use.
         commit : str, optional
             The specific commit hash that is being tested.
+        exclusive : iterable, optional
+            Names of test cases or modules to run and exclude all others. Takes
+            precedence over ``skip``.
+        skip : iterable, optional
+            Names of test cases or modules to skip.
 
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
         self._store = dict()
         self._store["meta"] = self._meta = dict()
-        self._store["report"] = self._data = dict()
+        self._store["tests"] = self._cases = dict()
         self.repo = repository
         self.branch = branch
         self.commit = commit
-        self._collect_meta_info()
         self._param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
+        self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
+        self._skip = frozenset() if skip is None else frozenset(skip)
+        self._collect_meta_info()
+        self._read_organization()
 
     def _collect_meta_info(self):
         """Record environment information."""
@@ -109,6 +118,11 @@ class ResultCollectionPlugin(object):
                 " ")
             self._meta["commit_hash"] = self.commit.hexsha
 
+    def _read_organization(self):
+        """Read the test organization."""
+        with open(join(dirname(__file__), "test_config.yml")) as file_h:
+            self._store.update(yaml.load(file_h))
+
     def pytest_namespace(self):
         """Insert model information into the pytest namespace."""
         biomass_ids = [rxn.id for rxn in find_biomass_reaction(self._model)]
@@ -128,10 +142,23 @@ class ResultCollectionPlugin(object):
         }
 
     @pytest.hookimpl(tryfirst=True)
+    def pytest_runtest_call(self, item):
+        """Either run a test exclusively or skip it."""
+        if item.obj.__module__ in self._xcld:
+            return
+        elif item.obj.__name__ in self._xcld:
+            return
+        elif len(self._xcld) > 0:
+            pytest.skip("Excluded.")
+        elif item.obj.__module__ in self._skip:
+            pytest.skip("Skipped by module.")
+        elif item.obj.__name__ in self._skip:
+            pytest.skip("Skipped individually.")
+
+    @pytest.hookimpl(tryfirst=True)
     def pytest_runtest_teardown(self, item):
         """Collect the annotation from each test case and store it."""
-        module = self._data.setdefault(item.obj.__module__, dict())
-        case = module.setdefault(item.obj.__name__, dict())
+        case = self._cases.setdefault(item.obj.__name__, dict())
         if hasattr(item.obj, "annotation"):
             case.update(item.obj.annotation)
         else:
@@ -152,7 +179,6 @@ class ResultCollectionPlugin(object):
         """
         if report.when != "call":
             return
-        module_name = basename(report.location[0]).split(".")[0]
         item_name = report.location[2]
 
         # Check for a parametrized test.
@@ -166,8 +192,7 @@ class ResultCollectionPlugin(object):
             LOGGER.debug(
                 "%s %s", item_name, report.outcome)
 
-        module = self._data.setdefault(module_name, dict())
-        case = module.setdefault(item_name, dict())
+        case = self._cases.setdefault(item_name, dict())
 
         if match is not None:
             case["duration"] = case.setdefault("duration", dict())
