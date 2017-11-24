@@ -9,7 +9,8 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico"
+        "favicon.ico",
+        "data"
       ],
       "index": "index.html",
       "main": "main.ts",
@@ -19,7 +20,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
+        "styles.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
@@ -54,10 +55,7 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
-    "class": {
-      "spec": false
-    },
+    "styleExt": "scss",
     "component": {}
   }
 }

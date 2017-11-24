@@ -1,0 +1,75 @@
+<div
+  fxLayout='row wrap'
+  fxLayoutAlign='center stretch'
+  fxLayout.xs='column'>
+    <div
+    fxFlex="45%"
+    fxFlexAlign='stretch'
+    matTooltip="Scored Section"
+    style="margin:0.5vmax">
+      <mat-card fxFlex *ngIf='data.scoreData'>
+        <app-universal-core [scoreData]="data.scoreData"></app-universal-core>
+      </mat-card>
+    </div>
+  <div
+  fxLayout='row wrap'
+  fxFlex="45%"
+  fxLayout.xs='column'
+  fxLayoutAlign='stretch center'
+  fxFlexAlign='stretch'
+  matTooltip="Unscored Section"
+  *ngIf='data'>
+    <div fxFlex="45%" fxFlexAlign='stretch'
+      *ngIf='data.metaData' style="margin:0.5vmax">
+      <mat-card fxFlex>
+        <mat-card-title>Environment</mat-card-title>
+        <mat-card-content>
+          <mat-accordion
+          multi="true"
+          displayMode="flat" >
+             <mat-expansion-panel
+             hideToggle="true">
+              <mat-expansion-panel-header class="mat-expansion-panel-header">
+                <mat-panel-description fxLayoutAlign="space-between start">
+                  <span> Python Version </span>
+                  <span>{{data.metaData.python}}</span>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+            </mat-expansion-panel>
+            <mat-expansion-panel
+            hideToggle="true">
+             <mat-expansion-panel-header class="mat-expansion-panel-header">
+               <mat-panel-description fxLayoutAlign="space-between start">
+                 <span> Platform </span>
+                 <span>{{data.metaData.platform}}</span>
+               </mat-panel-description>
+             </mat-expansion-panel-header>
+           </mat-expansion-panel>
+           <mat-expansion-panel
+           *ngIf='data.metaData.packages'
+           hideToggle="true">
+            <mat-expansion-panel-header class="mat-expansion-panel-header">
+              <mat-panel-description fxLayoutAlign="space-between start">
+                <span> Memote Version </span>
+                <span>{{data.metaData.platform}}</span>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div fxLayout='column' flexLayoutAlign='space-between center'>
+            <div> Package Versions </div>
+            <div>
+              <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+              {{data.getString(data.metaData.packages)}}
+              </textarea>
+            </div>
+            </div>
+          </mat-expansion-panel>
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div fxFlex="45%" fxFlexAlign='stretch' style="margin:0.5vmax"
+      *ngFor="let currentModule of data.reportData">
+        <app-statistics [module]="currentModule"></app-statistics>
+    </div>
+  </div>
+</div>
