@@ -4,36 +4,56 @@ cards:
     sections:
       consistency:
         title: "Consistency"
-        weight: 1.0
+        weight: 3.0
         cases:
-        - test_1
-        - test_2
+        - test_reaction_mass_balance
+        - test_find_disconnected
+        - test_stoichiometric_consistency
+        - test_reaction_charge_balance
       annotation:
         title: "Annotation"
         weight: 1.0
         cases:
-        - test_1
-        - test_2
-  basic:
+        - test_metabolite_annotation_presence
+        - test_reaction_annotation_presence
+        - test_metabolite_annotation_overview
+        - test_reaction_annotation_overview
+        - test_metabolite_annotation_wrong_ids
+        - test_reaction_annotation_wrong_ids
+        - test_metabolite_id_namespace_consistency
+        - test_reaction_id_namespace_consistency
+      sbo:
+        title: "SBO Terms"
+        weight: 2.0
+        cases:
+      sequence:
+        title: "Sequence Cross References"
+        weight: 2.0
+        cases:
+      matrix:
+        title: "Matrix Conditioning"
+        weight: 1.0
+        cases:
+  test_basic:
     title: "Basic Information"
-    cases:
-      - test_1
-      - test_2
-  biomass:
+  test_biomass:
     title: "Biomass"
-    cases:
-      - test_1
-      - test_2
-  consistency:
+  test_consistency:
     title: "Stoichiometry Matrix"
-    cases:
-      - test_1
-      - test_2
+  test_annotation:
+    title: "Annotation"
   syntax:
     title: "BiGG Syntax"
-    cases:
-      - test_1
-      - test_2
 weights:
-  test_1: 1.0
-  test_2: 1.0
+  test_reaction_mass_balance:
+  test_find_disconnected:
+  test_stoichiometric_consistency: 3.0
+  test_reaction_charge_balance:
+  test_metabolite_annotation_presence:
+  test_reaction_annotation_presence:
+  test_metabolite_annotation_overview:
+  test_reaction_annotation_overview:
+  test_metabolite_annotation_wrong_ids:
+  test_reaction_annotation_wrong_ids:
+  test_metabolite_id_namespace_consistency:
+  test_reaction_id_namespace_consistency:
