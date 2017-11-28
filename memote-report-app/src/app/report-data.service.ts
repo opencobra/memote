@@ -1,12 +1,12 @@
-import { Injectable, Observable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PyModule } from './pymodule.model';
 import { TestResult } from './test-result.model';
 
 @Injectable()
 export class ReportDataService {
-  metaData: Object = [];
-  reportData: Object[] = [];
+  metaData: any;
+  reportData:any[] = [];
   scoreData: PyModule;
 
   constructor(private http:HttpClient){

@@ -57,3 +57,21 @@ $memote-theme: mat-light-theme(
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include angular-material-theme($memote-theme);
+
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%  !important;
+}
+
+body {padding-top: 3%;}
+
+textarea {
+  color:Gray;
+  border: none;
+  background-color: #f0f6fc;
+  overflow-wrap: break-word;
+  width:100%;
+}

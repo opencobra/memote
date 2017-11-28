@@ -11,6 +11,8 @@ import { UniversalCoreComponent } from './dashboard/universal-core/universal-cor
 import { StatisticsComponent } from './dashboard/statistics/statistics.component';
 import { ReportDataService } from './report-data.service';
 import { AttributeFilterPipe } from './olfilter.pipe';
+import { SystemInformationComponent } from './dashboard/system-information/system-information.component';
+import { TabularizeComponent } from './tabularize/tabularize.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { AttributeFilterPipe } from './olfilter.pipe';
     DashboardComponent,
     UniversalCoreComponent,
     StatisticsComponent,
-    AttributeFilterPipe
+    AttributeFilterPipe,
+    SystemInformationComponent,
+    TabularizeComponent
   ],
   imports: [
     BrowserModule,

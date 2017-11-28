@@ -22,11 +22,12 @@
         <h3>Scored Tests</h3>
         <mat-accordion
         multi="true"
-        displayMode="flat" >
+        displayMode="flat">
            <mat-expansion-panel
            hideToggle="true"
            *ngFor="let test of scoreData.testResults"
-           #expPanel>
+           #expPanel
+           class="mat-elevation-z0">
             <mat-expansion-panel-header class="mat-expansion-panel-header">
               <mat-panel-description fxLayoutAlign="space-between start">
                 <span>
@@ -47,6 +48,7 @@
             <div fxLayout='column' flexLayoutAlign='space-between center'>
             <div> {{ test.summary }} </div>
             <div *ngIf="test.data">
+              <p></p>
               <textarea rows="4" style="overflow-wrap: break-word; width:100%">
               {{ test.data }}
               </textarea>

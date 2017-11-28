@@ -13,9 +13,11 @@
   color: black;
 }
 
-textarea {
-  border: none;
-  background-color: LightGray;
-  overflow-wrap: break-word;
-  width:100%
+.mat-expansion-panel-content:not(.mat-expanded) {
+    height: 0px;
+    visibility: hidden;
+}
+
+.mat-expansion-panel-header  {
+    height: 48px;
 }

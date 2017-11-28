@@ -7,7 +7,8 @@
          <mat-expansion-panel
          hideToggle="true"
          *ngFor="let test of module.testResults"
-         #expPanel>
+         #expPanel
+         class="mat-elevation-z0">
           <mat-expansion-panel-header class="mat-expansion-panel-header">
             <mat-panel-description fxLayoutAlign="space-between start">
               <span> {{ test.title }} </span>
@@ -18,9 +19,9 @@
                 <span *ngSwitchCase="'number'">
                   {{ test.metric | number : '1.2-2'}}
                 </span>
-                <span *ngSwitchCase="'object'">
-                  Click for details
-                </span>
+                <div *ngSwitchCase="'object'">
+                  Results inside!
+                </div>
                 <span *ngSwitchCase="'array'">
                   {{ test.data }}
                 </span>
@@ -32,11 +33,20 @@
           </mat-expansion-panel-header>
           <div fxLayout='column' flexLayoutAlign='space-between center'>
           <div> {{ test.summary }} </div>
-          <div *ngIf="test.data">
+          <div *ngIf="test.type === 'object'; else rawData">
+            <p></p>
+            <app-tabularize [objectData]="test.data"></app-tabularize>
+            <p></p>
+            <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+            {{ data.getString(test.data) }}
+            </textarea>
+          </div>
+          <ng-template #rawData>
+            <p></p>
             <textarea rows="4" style="overflow-wrap: break-word; width:100%">
             {{ test.data }}
             </textarea>
-          </div>
+          </ng-template>
           </div>
         </mat-expansion-panel>
       </mat-accordion>
