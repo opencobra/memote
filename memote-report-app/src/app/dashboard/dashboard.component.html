@@ -10,26 +10,25 @@
     <mat-toolbar
       class="mat-elevation-z2"
       color='secondary'> Scored Tests </mat-toolbar>
-      <mat-card fxFlex *ngIf='data.scoreData'>
-        <app-universal-core [scoreData]="data.scoreData"></app-universal-core>
+      <mat-card fxFlex *ngIf='data.scoredCard'>
+        <app-universal-core [scoreData]="data.scoredCard"></app-universal-core>
       </mat-card>
   </div>
   <div
     fxLayout='column'
     fxFlex="45%"
     fxFlexAlign='stretch'
+    fxLayoutAlign='start stretch'
     style="margin:0.5vmax"
     *ngIf='data'>
       <mat-toolbar
       class="mat-elevation-z2"
       color='secondary'> Unscored Tests </mat-toolbar>
       <div
-        fxFlex
-        *ngFor="let currentModule of data.reportData">
-          <app-statistics [module]="currentModule"></app-statistics>
+        *ngFor="let card of data.statisticsCards">
+          <app-statistics [currentCard]="card"></app-statistics>
       </div>
       <div
-        fxFlex
         *ngIf='data.metaData'>
           <app-system-information></app-system-information>
       </div>

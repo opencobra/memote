@@ -1,16 +1,20 @@
-<table  style="width:100%">
-    <tr>
-      <td> Parameter</td>
-      <td> Result </td>
-    </tr>
-    <tr *ngFor="let pair of keyValuePairs">
-      <td> {{ pair[0] }}</td>
-        <div [ngSwitch]="getType(pair[1])">
-          <td *ngSwitchCase="'object'"> {{ pair[1].length }}</td>
-          <td *ngSwitchCase="'enum'"> {{ pair[1].length }}</td>
-          <td *ngSwitchCase="'array'"> {{ pair[1].length }}</td>
-          <td *ngSwitchCase="'number'"> {{ pair[1] }}</td>
-          <td *ngSwitchCase="'string'"> {{ pair[1] }}</td>
-        </div>
-    </tr>
-  </table>
+
+<hr>
+<div *ngIf="!scored; else metricTable" fxLayout='column' fxLayoutAlign='start stretch'>
+<tr *ngFor="let pair of keyValuePairs" fxLayoutAlign='space-between center' style="padding:0.05vh 0vh 0.05vh">
+  <td> {{ pair[0] }}</td>
+    <div [ngSwitch]="getType(pair[1])">
+      <td *ngSwitchCase="'object'"> {{ pair[1].length }}</td>
+      <td *ngSwitchCase="'enum'"> {{ pair[1].length }}</td>
+      <td *ngSwitchCase="'array'"> {{ pair[1].length }}</td>
+      <td *ngSwitchCase="'number'"> {{ pair[1] }}</td>
+      <td *ngSwitchCase="'string'"> {{ pair[1] }}</td>
+    </div>
+</tr>
+</div>
+<ng-template #metricTable>
+  <tr *ngFor="let pair of keyValuePairs" fxLayoutAlign='space-between center' style="padding:0.05vh 0vh 0.05vh">
+    <td> {{ pair[0] }}</td>
+    <td> <app-coloured-score [metric]="pair[1]"></app-coloured-score></td>
+  </tr>
+</ng-template>

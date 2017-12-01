@@ -1,50 +1,57 @@
 <mat-card fxFlex>
-  <mat-card-title>{{ module.moduleName }}</mat-card-title>
+  <mat-card-title>{{ currentCard.cardName }}</mat-card-title>
     <mat-card-content>
       <mat-accordion
       multi="true"
       displayMode="flat" >
          <mat-expansion-panel
-         hideToggle="true"
-         *ngFor="let test of module.testResults"
+         *ngFor="let test of currentCard.associatedTests"
          #expPanel
          class="mat-elevation-z0">
-          <mat-expansion-panel-header class="mat-expansion-panel-header">
-            <mat-panel-description fxLayoutAlign="space-between start">
-              <span> {{ test.title }} </span>
-              <div [ngSwitch]="test.type">
-                <span *ngSwitchCase="'length'">
-                  {{ test.data.length | number : '1.'}}
-                </span>
-                <span *ngSwitchCase="'number'">
-                  {{ test.metric | number : '1.2-2'}}
-                </span>
-                <div *ngSwitchCase="'object'">
-                  Results inside!
-                </div>
-                <span *ngSwitchCase="'array'">
-                  {{ test.data }}
-                </span>
-                <span *ngSwitchCase="'string'">
-                  {{ test.data }}
-                </span>
-              </div>
-            </mat-panel-description>
+          <mat-expansion-panel-header class="mat-expansion-panel-header"
+          collapsedHeight="auto"
+          expandedHeight="auto"
+          style="padding:0.05vh">
+              <mat-panel-description
+              fxLayout='column' fxLayoutAlign='center stretch'
+              *ngIf="data.byID(test).type !== 'object'; else forObject">
+                  <tr fxLayoutAlign='space-between center'>
+                    <td> {{ data.byID(test).title }} </td>
+                    <div [ngSwitch]="data.byID(test).type">
+                      <td *ngSwitchCase="'length'">
+                        {{ data.byID(test).data.length | number : '1.'}}
+                      </td>
+                      <td *ngSwitchCase="'number'">
+                        {{ data.byID(test).metric | number : '1.2-2'}}
+                      </td>
+                      <td *ngSwitchCase="'array'">
+                        {{ data.byID(test).data }}
+                      </td>
+                      <td *ngSwitchCase="'string'">
+                        {{ data.byID(test).data }}
+                      </td>
+                    </div>
+                  </tr>
+              </mat-panel-description>
+            <ng-template #forObject>
+              <mat-panel-description fxLayout="column" fxLayoutAlign="start stretch">
+                <span> {{ data.byID(test).title }} </span>
+                <app-tabularize [objectData]="data.byID(test).data"></app-tabularize>
+              </mat-panel-description>
+            </ng-template>
           </mat-expansion-panel-header>
-          <div fxLayout='column' flexLayoutAlign='space-between center'>
-          <div> {{ test.summary }} </div>
-          <div *ngIf="test.type === 'object'; else rawData">
-            <p></p>
-            <app-tabularize [objectData]="test.data"></app-tabularize>
-            <p></p>
+          <div fxLayout='column'>
+          <div> {{ data.byID(test).summary }} </div>
+          <div *ngIf="data.byID(test).type === 'object'; else rawData">
+            <br>
             <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-            {{ data.getString(test.data) }}
+            {{ data.getString(data.byID(test).data) }}
             </textarea>
           </div>
           <ng-template #rawData>
-            <p></p>
+            <br>
             <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-            {{ test.data }}
+            {{ data.byID(test).data }}
             </textarea>
           </ng-template>
           </div>

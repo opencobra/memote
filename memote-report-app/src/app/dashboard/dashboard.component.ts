@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ReportDataService } from './../report-data.service';
-import { AttributeFilterPipe } from './../olfilter.pipe';
 
 @Component({
   selector: 'app-dashboard',

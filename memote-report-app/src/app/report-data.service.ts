@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PyModule } from './pymodule.model';
+import { ResultCard } from './resultcard.model';
 import { TestResult } from './test-result.model';
 
 @Injectable()
 export class ReportDataService {
   metaData: any;
-  reportData:any[] = [];
-  scoreData: PyModule;
+  allTests: TestResult[] = [];
+  scoredCard: Object;
+  statisticsCards: ResultCard[] = [];
 
   constructor(private http:HttpClient){
   }
@@ -17,31 +18,45 @@ export class ReportDataService {
     this.http.get("data/testData.json").subscribe(data => {this.convertResults(data)});
   }
 
+  public byID(string){
+    return this.allTests.find(x => x.id === string);
+  }
+
   public getString(object){
     return JSON.stringify(object);
   }
 
-  private convertResults(data:any[]): void{
+  private convertResults(data:Object): void{
+    // Store each test result as a TestResult object in a central list.
+    for (let test of Object.keys(data["tests"])){
+      this.allTests.push(
+        new TestResult(
+          test,
+          data["tests"][test]['data'],
+          data["tests"][test]['duration'],
+          data["tests"][test]['message'],
+          data["tests"][test]['metric'],
+          data["tests"][test]['result'],
+          data["tests"][test]['summary'],
+          data["tests"][test]['title'],
+         data["tests"][test]['type']));
+    };
+    // Extract metaddata information to be used in the metadata card
     this.metaData = data["meta"];
-    console.log(this.metaData);
-      for (let key of Object.keys(data["report"])){
-        // console.log(data["report"][key]);
-        let inner_list = [];
-        for (let test of Object.keys(data["report"][key])){
-          let content = data["report"][key][test];
-          inner_list.push(
-            new TestResult(test, content['data'], content['duration'], content['message'],
-             content['metric'], content['result'], content['summary'], content['title'],
-           content['type'])
-         );
-        }
-        // console.log(inner_list);
-        if (key === "test_consistency" ) {
-          this.scoreData = new PyModule(key, inner_list)
-        } else {
-        this.reportData.push(new PyModule(key, inner_list));
-        }
+    for (let card of Object.keys(data["cards"])){
+      if (card === "scored"){
+        this.scoredCard = data["cards"]["scored"]
       }
-    // console.log(this.reportData);
+      else{
+        this.statisticsCards.push(
+          new ResultCard(
+            card,
+            data["cards"][card]["title"],
+            data["cards"][card]["cases"]
+          )
+        )
+      }
+    }
+    console.log(this.statisticsCards)
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
-import { PyModule } from './../../pymodule.model';
 import { TestResult } from './../../test-result.model';
+import { ReportDataService } from './../../report-data.service';
+import { KeysPipe } from './../../keys.pipe';
 
 @Component({
   selector: 'app-universal-core',
@@ -9,17 +10,12 @@ import { TestResult } from './../../test-result.model';
   encapsulation: ViewEncapsulation.None
 })
 export class UniversalCoreComponent implements OnInit {
-  @Input() scoreData: PyModule;
+  @Input() scoreData: Object;
   panelOpenState: boolean = false;
 
-  constructor() { }
+  constructor(private data: ReportDataService) { }
 
   ngOnInit() {
   }
-
-  getColor(value){
-    let hue=((1-value)*131).toString(10);
-    return ["hsl(",hue,",75%,40%)"].join("");
-}
 
 }

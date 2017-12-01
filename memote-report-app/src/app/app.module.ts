@@ -10,9 +10,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { UniversalCoreComponent } from './dashboard/universal-core/universal-core.component';
 import { StatisticsComponent } from './dashboard/statistics/statistics.component';
 import { ReportDataService } from './report-data.service';
-import { AttributeFilterPipe } from './olfilter.pipe';
+import { KeysPipe } from './keys.pipe';
 import { SystemInformationComponent } from './dashboard/system-information/system-information.component';
 import { TabularizeComponent } from './tabularize/tabularize.component';
+import { ColouredScoreComponent } from './coloured-score/coloured-score.component';
 
 
 @NgModule({
@@ -22,9 +23,10 @@ import { TabularizeComponent } from './tabularize/tabularize.component';
     DashboardComponent,
     UniversalCoreComponent,
     StatisticsComponent,
-    AttributeFilterPipe,
+    KeysPipe,
     SystemInformationComponent,
-    TabularizeComponent
+    TabularizeComponent,
+    ColouredScoreComponent
   ],
   imports: [
     BrowserModule,

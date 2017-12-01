@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
-import { PyModule } from './../../pymodule.model';
+import { ResultCard } from './../../resultcard.model';
 import { TestResult } from './../../test-result.model';
 import { ReportDataService } from './../../report-data.service';
 
@@ -10,7 +10,7 @@ import { ReportDataService } from './../../report-data.service';
   encapsulation: ViewEncapsulation.None
 })
 export class StatisticsComponent implements OnInit {
-  @Input() module: PyModule;
+  @Input() currentCard: ResultCard;
 
   constructor(private data: ReportDataService) { }
 

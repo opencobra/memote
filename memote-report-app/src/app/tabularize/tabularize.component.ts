@@ -8,6 +8,7 @@ import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 })
 export class TabularizeComponent implements OnInit {
   @Input() objectData: any;
+  @Input() scored: boolean = false;
   keyValuePairs = [];
 
   constructor() { }

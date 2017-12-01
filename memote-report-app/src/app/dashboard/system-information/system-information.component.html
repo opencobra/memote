@@ -7,7 +7,11 @@
          <mat-expansion-panel
          class="mat-elevation-z0"
          hideToggle="true">
-          <mat-expansion-panel-header class="mat-expansion-panel-header">
+          <mat-expansion-panel-header
+          class="mat-expansion-panel-header"
+          collapsedHeight="auto"
+          expandedHeight="auto"
+          style="padding:0.05vh">
             <mat-panel-description fxLayoutAlign="space-between start">
               <span> Python Version </span>
               <span>{{data.metaData.python}}</span>
@@ -17,7 +21,11 @@
         <mat-expansion-panel
         class="mat-elevation-z0"
         hideToggle="true">
-         <mat-expansion-panel-header class="mat-expansion-panel-header">
+         <mat-expansion-panel-header
+         class="mat-expansion-panel-header"
+         collapsedHeight="auto"
+         expandedHeight="auto"
+         style="padding:0.05vh">
            <mat-panel-description fxLayoutAlign="space-between start">
              <span> Platform </span>
              <span>{{data.metaData.platform}}</span>
@@ -28,7 +36,11 @@
        class="mat-elevation-z0"
        *ngIf='data.metaData.packages'
        hideToggle="true">
-        <mat-expansion-panel-header class="mat-expansion-panel-header">
+        <mat-expansion-panel-header
+        class="mat-expansion-panel-header"
+        collapsedHeight="auto"
+        expandedHeight="auto"
+        style="padding:0.05vh">
           <mat-panel-description fxLayoutAlign="space-between start">
             <span> Memote Version </span>
             <span>{{data.metaData.packages.memote}}</span>
