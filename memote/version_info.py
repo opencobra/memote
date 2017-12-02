@@ -24,6 +24,7 @@ SYS_ORDER = [
 PKG_ORDER = [
     "pip",
     "setuptools",
+    "memote",
     "cobra",
     "future",
     "swiglpk",
