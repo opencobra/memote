@@ -26,6 +26,8 @@ from cobra import Model
 
 """Configuration and fixtures for the py.test suite."""
 
+pytest_plugins = ["pytester"]
+
 # Gurobi MILP is currently not fully supported in optlang.
 # A MOSEK interface still needs to be completed.
 SUPPORTED_SOLVERS = [solver for solver in ["glpk", "cplex"]

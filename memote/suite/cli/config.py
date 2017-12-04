@@ -39,6 +39,8 @@ class ConfigSectionSchema(object):
                                           writable=True))
         github_repository = Param(type=str)
         github_username = Param(type=str)
+        exclusive = Param(type=str, multiple=True)
+        skip = Param(type=str, multiple=True)
 
 
 class ConfigFileProcessor(ConfigFileReader):

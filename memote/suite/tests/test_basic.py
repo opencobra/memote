@@ -17,137 +17,225 @@
 
 """Perform basic tests on an instance of ``cobra.Model``."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import memote.support.basic as basic
 import memote.support.helpers as helpers
+from memote.utils import annotate, get_ids, truncate, wrapper
 
 
-def test_model_id_presence(read_only_model, store):
+@annotate(title="Model Identifier", type="string")
+def test_model_id_presence(read_only_model):
     """Expect that the model has an identifier."""
+    ann = test_model_id_presence.annotation
     assert hasattr(read_only_model, "id")
-    store["model_id"] = read_only_model.id
+    ann["data"] = read_only_model.id
     assert bool(read_only_model.id)
 
 
-def test_genes_presence(read_only_model, store):
-    """Expect that >= 1 genes are present in the model."""
+@annotate(title="Total Number of Genes", type="length")
+def test_genes_presence(read_only_model):
+    """Expect that >= 1 genes are defined in the model."""
+    ann = test_genes_presence.annotation
     assert hasattr(read_only_model, "genes")
-    store["num_genes"] = len(read_only_model.genes)
-    assert len(read_only_model.genes) > 0
+    ann["data"] = get_ids(read_only_model.genes)
+    ann["message"] = "{:d} genes are defined in the model.".format(
+        len(ann["data"]))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_reactions_presence(read_only_model, store):
+@annotate(title="Total Number of Reactions", type="length")
+def test_reactions_presence(read_only_model):
     """Expect that >= 1 reactions are present in the model."""
+    ann = test_reactions_presence.annotation
     assert hasattr(read_only_model, "reactions")
-    store["num_reactions"] = len(read_only_model.reactions)
-    assert len(read_only_model.reactions) > 0
+    ann["data"] = get_ids(read_only_model.reactions)
+    ann["message"] = "{:d} reactions are defined in the model.".format(
+        len(ann["data"]))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_metabolites_presence(read_only_model, store):
+@annotate(title="Total Number of Metabolites", type="length")
+def test_metabolites_presence(read_only_model):
     """Expect that >= 1 metabolites are present in the model."""
+    ann = test_metabolites_presence.annotation
     assert hasattr(read_only_model, "metabolites")
-    store["num_metabolites"] = len(read_only_model.metabolites)
-    assert len(read_only_model.metabolites) > 0
+    ann["data"] = get_ids(read_only_model.metabolites)
+    ann["message"] = "{:d} metabolites are defined in the model.".format(
+        len(ann["data"]))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_transport_reaction_presence(read_only_model, store):
+@annotate(title="Total Number of Transport Reactions", type="length")
+def test_transport_reaction_presence(read_only_model):
     """Expect >= 1 transport reactions are present in the model."""
-    store["transporters"] = [
-        rxn.id for rxn in helpers.find_transport_reactions(read_only_model)]
-    store["num_transporters"] = len(store["transporters"])
-    assert store["num_transporters"] >= 1
+    ann = test_transport_reaction_presence.annotation
+    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
+    ann["message"] = wrapper.fill(
+        """{:d} transport reactions are defined in the model.""".format(
+            len(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_metabolites_formula_presence(read_only_model, store):
-    """Expect all metabolites to have a formula."""
-    missing = [
-        met.id for met in basic.check_metabolites_formula_presence(
-            read_only_model
-        )
-    ]
-    store["metabolites_no_formula"] = missing
-    assert len(missing) == 0, "No formula found for the following "\
-        "metabolites: {}".format(", ".join(missing))
+@annotate(title="Metabolites without Formula", type="length")
+def test_metabolites_formula_presence(read_only_model):
+    """
+    Expect all metabolites to have a formula.
+
+    To ensure that reactions are mass-balanced, all model metabolites
+    ought to be provided with a formula.
+    """
+    ann = test_metabolites_formula_presence.annotation
+    ann["data"] = get_ids(
+        basic.check_metabolites_formula_presence(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """There are a total of {}
+        metabolites ({:.2%}) without a formula: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-def test_metabolites_charge_presence(read_only_model, store):
-    """Expect all metabolites to have charge information."""
-    missing = [
-        met.id for met in basic.check_metabolites_charge_presence(
-            read_only_model
-        )
-    ]
-    store["metabolites_no_charge"] = missing
-    assert len(missing) == 0, "No charge found for the following "\
-        "metabolites: {}".format(", ".join(missing))
+@annotate(title="Metabolites without Charge", type="length")
+def test_metabolites_charge_presence(read_only_model):
+    """
+    Expect all metabolites to have charge information.
+
+    To ensure that reactions are charge-balanced, all model metabolites
+        ought to be provided with a charge.
+    """
+    ann = test_metabolites_charge_presence.annotation
+    ann["data"] = get_ids(
+        basic.check_metabolites_charge_presence(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """There are a total of {}
+        metabolites ({:.2%}) without a charge: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-def test_gene_protein_reaction_rule_presence(read_only_model, store):
-    """Expect all non-exchange reactions to have a GPR rule."""
-    missing_gpr_metabolic_rxns = \
-        set(
-            basic.check_gene_protein_reaction_rule_presence(
-                read_only_model
-            )
-        ).difference(set(read_only_model.exchanges))
-    store["reactions_no_GPR"] = [rxn.id for rxn in missing_gpr_metabolic_rxns]
-    assert len(store["reactions_no_GPR"]) == 0, "No GPR found for the " \
-        "following reactions: {}".format(", ".join(store["reactions_no_GPR"]))
+@annotate(title="Reactions without GPR", type="length")
+def test_gene_protein_reaction_rule_presence(read_only_model):
+    """
+    Expect all non-exchange reactions to have a GPR rule.
+
+    Gene-Protein-Reaction rules express which gene has what function.
+    The presence of this annotation is important to justify the existence
+    of reactions in the model, and is required to conduct in silico gene
+    deletion studies. However, reactions without GPR may also be valid:
+    Spontaneous reactions, or known reactions with yet undiscovered genes
+    likely lack GPR.
+    """
+    ann = test_gene_protein_reaction_rule_presence.annotation
+    missing_gpr_metabolic_rxns = set(
+        basic.check_gene_protein_reaction_rule_presence(read_only_model)
+    ).difference(set(read_only_model.exchanges))
+    ann["data"] = get_ids(missing_gpr_metabolic_rxns)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} reactions ({:.2%}) without GPR:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
 
 
-def test_ngam_presence(read_only_model, store):
-    """Expect a single non growth-associated maintenance reaction."""
-    ngam_reaction = basic.find_ngam(read_only_model)
-    store["ngam_reaction"] = [rxn.id for rxn in ngam_reaction]
-    assert len(ngam_reaction) == 1, \
-        "Could not identify a unique non growth-associated maintenance " \
-        "reaction. Please make sure to add only a single ATP-hydrolysis " \
-        "reaction and set the lower bound to a fixed value."
+@annotate(title="Non-Growth Associated Maintenance Reaction", type="length")
+def test_ngam_presence(read_only_model):
+    """
+    Expect a single non growth-associated maintenance reaction.
+
+    The Non-Growth Associated Maintenance reaction (NGAM) is an
+    ATP-hydrolysis reaction added to metabolic models to represent energy
+    expenses that the cell invests in continuous processes independent of
+    the growth rate.
+    """
+    ann = test_ngam_presence.annotation
+    ann["data"] = get_ids(basic.find_ngam(read_only_model))
+    ann["message"] = wrapper.fill(
+        """A total of {} NGAM reactions could be identified:
+        {}""".format(len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) == 1, ann["message"]
 
 
-def test_metabolic_coverage(read_only_model, store):
-    """Expect a model to have high metabolic coverage."""
-    store["metabolic_coverage"] = \
-        basic.calculate_metabolic_coverage(read_only_model)
-    assert store["metabolic_coverage"] >= 1
+@annotate(title="Metabolic Coverage", type="number")
+def test_metabolic_coverage(read_only_model):
+    """
+    Expect a model to have a metabolic coverage >= 1.
+
+    The degree of metabolic coverage indicates the modeling detail of a
+    given reconstruction calculated by dividing the total amount of
+    reactions by the amount of genes. Models with a 'high level of modeling
+    detail have ratios >1, and models with a low level of detail have
+    ratios <1. This difference arises as models with basic or intermediate
+    levels of detail are assumed to include many reactions in which several
+    gene products and their enzymatic transformations are ‘lumped’.
+    """
+    ann = test_metabolic_coverage.annotation
+    ann["metric"] = basic.calculate_metabolic_coverage(read_only_model)
+    ann["message"] = wrapper.fill(
+        """The degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
+    assert ann["metric"] >= 1, ann["message"]
 
 
-def test_compartments_presence(read_only_model, store):
+@annotate(title="Total Number of Compartments", type="length")
+def test_compartments_presence(read_only_model):
     """Expect that >= 3 compartments are defined in the model."""
+    ann = test_compartments_presence.annotation
     assert hasattr(read_only_model, "compartments")
-    store["compartments"] = list(read_only_model.get_metabolite_compartments())
-    store["num_compartments"] = len(store["compartments"])
-    assert store["num_compartments"] >= 3
+    ann["data"] = list(read_only_model.get_metabolite_compartments())
+    ann["message"] = wrapper.fill(
+        """A total of {:d} compartments are defined in the model: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) >= 3, ann["message"]
 
 
-def test_enzyme_complex_presence(read_only_model, store):
+@annotate(title="Number of Enzyme Complexes", type="length")
+def test_enzyme_complex_presence(read_only_model):
     """Expect that >= 1 enzyme complexes are present in the model."""
-    store["enzyme_complexes"] = list(basic.find_enzyme_complexes(
-        read_only_model))
-    store["num_enzyme_complexes"] = len(store["enzyme_complexes"])
-    assert store["num_enzyme_complexes"] >= 1
+    ann = test_enzyme_complex_presence.annotation
+    ann["data"] = list(basic.find_enzyme_complexes(read_only_model))
+    ann["message"] = wrapper.fill(
+        """A total of {:d} enzyme complexes are defined through GPR rules in
+        the model.""".format(len(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_find_pure_metabolic_reactions(read_only_model, store):
+@annotate(title="Number of Purely Metabolic Reactions", type="length")
+def test_find_pure_metabolic_reactions(read_only_model):
     """Expect >= 1 pure metabolic reactions are present in the model."""
-    store["metabolic_reactions"] = [
-        rxn.id for rxn in basic.find_pure_metabolic_reactions(read_only_model)]
-    store["num_metabolic_reactions"] = len(store["metabolic_reactions"])
-    assert store["num_metabolic_reactions"] >= 1
+    ann = test_find_pure_metabolic_reactions.annotation
+    ann["data"] = get_ids(
+        basic.find_pure_metabolic_reactions(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) purely metabolic reactions are defined in
+        the model, this excludes transporters, exchanges, or pseudo-reactions:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_find_transport_reactions(read_only_model, store):
+@annotate(title="Number of Transport Reactions", type="length")
+def test_find_transport_reactions(read_only_model):
     """Expect >= 1 transport reactions are present in the read_only_model."""
-    store["transport_reactions"] = [
-        rxn.id for rxn in helpers.find_transport_reactions(read_only_model)]
-    store["num_transport_reactions"] = len(store["transport_reactions"])
-    assert store["num_transport_reactions"] >= 1
+    ann = test_find_transport_reactions.annotation
+    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) transport reactions are defined in the
+        model, this excludes purely metabolic reactions, exchanges, or
+        pseudo-reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
-def test_find_unique_metabolites(read_only_model, store):
+@annotate(title="Number of Unique Metabolites", type="length")
+def test_find_unique_metabolites(read_only_model):
     """Expect there to be less metabolites when removing compartment tag."""
-    store["num_unique_metabolites"] = len(
-        basic.find_unique_metabolites(read_only_model)
-    )
-    assert store["num_unique_metabolites"] < len(read_only_model.metabolites)
+    ann = test_find_unique_metabolites.annotation
+    ann["data"] = list(basic.find_unique_metabolites(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """Not counting the same entities in other compartments, there is a
+        total of {} ({:.2%}) unique metabolites in the model: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) < len(read_only_model.metabolites), ann["message"]

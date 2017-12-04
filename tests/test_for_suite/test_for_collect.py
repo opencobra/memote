@@ -15,18 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-(Me)tabolic (Mo)del (Te)sts.
+"""Test the result collection plugin."""
 
-The memote Python package provides a number of hard and soft expectations about
-genome-scale metabolic models.
-"""
 
-from __future__ import absolute_import
+def test_store(testdir):
+    """Make sure that the store fixture in the collect plugin works."""
+    testdir.makeconftest("""
+           import pytest
+       """)
+    # create a temporary pytest test file
+    # TODO: Figure out why this doesn't work.
+    testdir.makepyfile("""
+        #def test_store(store):
+        #    pass
+    """)
 
-from memote.version_info import show_versions
-from memote.suite.api import *
+    # run all tests with pytest
+    result = testdir.runpytest()
 
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.4.6"
+    # check that the test passes
+    result.assert_outcomes(passed=0)

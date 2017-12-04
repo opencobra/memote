@@ -1,0 +1,59 @@
+cards:
+  scored:
+    title: "Core Tests"
+    sections:
+      consistency:
+        title: "Consistency"
+        weight: 3.0
+        cases:
+        - test_reaction_mass_balance
+        - test_find_disconnected
+        - test_stoichiometric_consistency
+        - test_reaction_charge_balance
+      annotation:
+        title: "Annotation"
+        weight: 1.0
+        cases:
+        - test_metabolite_annotation_presence
+        - test_reaction_annotation_presence
+        - test_metabolite_annotation_overview
+        - test_reaction_annotation_overview
+        - test_metabolite_annotation_wrong_ids
+        - test_reaction_annotation_wrong_ids
+        - test_metabolite_id_namespace_consistency
+        - test_reaction_id_namespace_consistency
+      sbo:
+        title: "SBO Terms"
+        weight: 2.0
+        cases:
+      sequence:
+        title: "Sequence Cross References"
+        weight: 2.0
+        cases:
+      matrix:
+        title: "Matrix Conditioning"
+        weight: 1.0
+        cases:
+  test_basic:
+    title: "Basic Information"
+  test_biomass:
+    title: "Biomass"
+  test_consistency:
+    title: "Stoichiometry Matrix"
+  test_annotation:
+    title: "Annotation"
+  syntax:
+    title: "BiGG Syntax"
+weights:
+  test_reaction_mass_balance:
+  test_find_disconnected:
+  test_stoichiometric_consistency: 3.0
+  test_reaction_charge_balance:
+  test_metabolite_annotation_presence:
+  test_reaction_annotation_presence:
+  test_metabolite_annotation_overview:
+  test_reaction_annotation_overview:
+  test_metabolite_annotation_wrong_ids:
+  test_reaction_annotation_wrong_ids:
+  test_metabolite_id_namespace_consistency:
+  test_reaction_id_namespace_consistency:

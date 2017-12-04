@@ -81,7 +81,7 @@ def test_test_model_file(model, tmpdir):
 def test_basic_report_file(model, tmpdir):
     filename = str(tmpdir.join("index.html"))
     _, results = api.test_model(model, results=True)
-    api.basic_report(results, filename)
+    api.snapshot_report(results, filename)
     assert exists(filename)
     # TODO: Perform some content checks here.
 

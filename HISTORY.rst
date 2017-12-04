@@ -4,6 +4,18 @@ History
 Next Release
 ------------
 
+* Enable test result and meta-data collection.
+* Allow command line option and configuration of exclusive test cases and
+  modules skipping all others (``--exclusive test_biomass``).
+* Allow command line option and configuration to skip test cases and
+  modules (``--skip test_model_id_presence``).
+* Introduce a dummy configuration file for the report organization and test
+  scoring weights.
+
+0.4.6 (2017-10-31)
+------------------
+
+* Improve the automated release pipeline. It now creates pumpkins.
 * Provide a new decorator ``@register_with`` that can be used in all
   ``test_for*`` modules and replaces the ``model_builder`` function.
 * Temporarily change the links to readthedocs to point to latest instead of stable.

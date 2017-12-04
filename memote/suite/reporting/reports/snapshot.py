@@ -22,18 +22,19 @@ from __future__ import absolute_import
 from memote.suite.reporting.reports.report import Report
 
 
-class BasicReport(Report):
+class SnapshotReport(Report):
     """Render a basic report from the given data."""
 
     def __init__(self, data, **kwargs):
         """Initialize the data."""
-        super(BasicReport, self).__init__(**kwargs)
+        super(SnapshotReport, self).__init__(**kwargs)
         self.data = data
 
     def render_html(self):
-        """Render a one-shot report for a model."""
-        template = self.env.get_template("basic_report.html")
-        return template.render(
-            name=self.data["report"]["test_basic"]["model_id"],
-            timestamp=self.data["meta"]["timestamp"],
-            data=self.data)
+        """
+        Render a one-shot report for a model.
+
+        This is currently a stub while we convert from ``jinja2`` templates
+        to a full Angular based report.
+        """
+        return u""

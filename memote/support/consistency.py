@@ -309,14 +309,13 @@ def detect_energy_generating_cycles(model, metabolite_id):
     """
     met = model.metabolites.get_by_id(metabolite_id)
     dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
-
     dissipation_rxn = Reaction('Dissipation')
     with model:
-        try:
-            maintenance = model.reactions.get_by_id('ATPM')
-            maintenance.bounds = 0, 1000
-        except KeyError:
-            pass
+        for rxn in model.reactions:
+            if rxn.reversibility:
+                rxn.bounds = -1, 1
+            else:
+                rxn.bounds = 0, 1
         for exchange in model.exchanges:
             exchange.bounds = (0, 0)
         model.add_reactions([dissipation_rxn])
@@ -342,7 +341,10 @@ def detect_energy_generating_cycles(model, metabolite_id):
         model.objective = dissipation_rxn
         solution = model.optimize()
         if solution.status == 'infeasible':
-            return 'infeasible'
+            raise RuntimeError(
+                "The model cannot be solved as the solver status is"
+                "infeasible. This may be a bug."
+            )
         elif solution.objective_value > 0.0:
             return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
                 drop(["Dissipation"]).tolist()
