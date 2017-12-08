@@ -1,0 +1,61 @@
+  <mat-card fxFlex>
+    <mat-card-title>Environment</mat-card-title>
+    <mat-card-content>
+      <mat-accordion
+      multi="true"
+      displayMode="flat" >
+         <mat-expansion-panel
+         class="mat-elevation-z0"
+         hideToggle="true">
+          <mat-expansion-panel-header
+          class="mat-expansion-panel-header"
+          collapsedHeight="auto"
+          expandedHeight="auto"
+          style="padding:0.05vh">
+            <mat-panel-description fxLayoutAlign="space-between start">
+              <span> Python Version </span>
+              <span>{{data.metaData.python}}</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+        class="mat-elevation-z0"
+        hideToggle="true">
+         <mat-expansion-panel-header
+         class="mat-expansion-panel-header"
+         collapsedHeight="auto"
+         expandedHeight="auto"
+         style="padding:0.05vh">
+           <mat-panel-description fxLayoutAlign="space-between start">
+             <span> Platform </span>
+             <span>{{data.metaData.platform}}</span>
+           </mat-panel-description>
+         </mat-expansion-panel-header>
+       </mat-expansion-panel>
+       <mat-expansion-panel
+       class="mat-elevation-z0"
+       *ngIf='data.metaData.packages'
+       hideToggle="true">
+        <mat-expansion-panel-header
+        class="mat-expansion-panel-header"
+        collapsedHeight="auto"
+        expandedHeight="auto"
+        style="padding:0.05vh">
+          <mat-panel-description fxLayoutAlign="space-between start">
+            <span> Memote Version </span>
+            <span>{{data.metaData.packages.memote}}</span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div fxLayout='column' flexLayoutAlign='space-between center'>
+        <div> Package Versions </div>
+        <div>
+          <p></p>
+          <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+          {{data.getString(data.metaData.packages)}}
+          </textarea>
+        </div>
+        </div>
+      </mat-expansion-panel>
+      </mat-accordion>
+    </mat-card-content>
+  </mat-card>

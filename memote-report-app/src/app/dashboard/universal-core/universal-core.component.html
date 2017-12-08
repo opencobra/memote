@@ -1,0 +1,79 @@
+<mat-card-title>Universal Core</mat-card-title>
+    <mat-card-content>
+      <div
+        fxLayout='row'
+        fxLayoutAlign='space-between start'
+        fxLayoutAlign.xs='space-between center'
+        fxLayout.xs='column'>
+        <div fxFlex> Total Score
+          <div>
+            <div style="font-size:15vh">99</div>
+          </div>
+        </div>
+        <div fxFlex> Score per Category
+        <div id="catScore">
+
+        </div>
+        </div>
+      </div>
+      <hr>
+      <div>
+      <div fxFlex>
+        <h3>Scored Tests</h3>
+        <div *ngFor="let section of scoreData.sections | keys">
+          <h4> {{ scoreData.sections[section].title }}</h4>
+          <mat-accordion
+          multi="true"
+          displayMode="flat">
+             <mat-expansion-panel
+             *ngFor="let case of scoreData.sections[section].cases"
+             #expPanel
+             class="mat-elevation-z0">
+              <mat-expansion-panel-header
+              class="mat-expansion-panel-header"
+              collapsedHeight="auto"
+              expandedHeight="auto"
+              style="padding:0.05vh">
+                <mat-panel-description
+                fxLayout="column" fxLayoutAlign='center stretch'
+                *ngIf="data.byID(case).type === 'object'; else singleButton">
+                  <tr fxLayout="column" fxLayoutAlign='center stretch'>
+                    <td> {{ data.byID(case).title }} </td>
+                    <app-tabularize
+                    [scored]="true"
+                    [objectData]="data.byID(case).metric">
+                    </app-tabularize>
+                  </tr>
+                  </mat-panel-description>
+                  <ng-template #singleButton>
+                    <mat-panel-description fxLayoutAlign='space-between center'>
+                    <td> {{ data.byID(case).title }} </td>
+                    <!-- This may be useful later when we get to the export! -->
+                    <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
+                    <td>
+                      <app-coloured-score [metric]="data.byID(case).metric"></app-coloured-score>
+                    </td>
+                    </mat-panel-description>
+              </ng-template>
+              </mat-expansion-panel-header>
+              <div fxLayout='column' flexLayoutAlign='space-between center'>
+              <div> {{ data.byID(case).summary }} </div>
+              <div *ngIf="data.byID(case).type === 'object'; else noObject">
+                <br>
+                <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+                {{ data.getString(data.byID(case).data) }}
+                </textarea>
+              </div>
+              <ng-template #noObject>
+                <br>
+                <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+                {{ data.byID(case).data }}
+                </textarea>
+              </ng-template>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+          </div>
+      </div>
+      </div>
+</mat-card-content>

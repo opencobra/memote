@@ -1,0 +1,61 @@
+<mat-card fxFlex>
+  <mat-card-title>{{ currentCard.cardName }}</mat-card-title>
+    <mat-card-content>
+      <mat-accordion
+      multi="true"
+      displayMode="flat" >
+         <mat-expansion-panel
+         *ngFor="let test of currentCard.associatedTests"
+         #expPanel
+         class="mat-elevation-z0">
+          <mat-expansion-panel-header class="mat-expansion-panel-header"
+          collapsedHeight="auto"
+          expandedHeight="auto"
+          style="padding:0.05vh">
+              <mat-panel-description
+              fxLayout='column' fxLayoutAlign='center stretch'
+              *ngIf="data.byID(test).type !== 'object'; else forObject">
+                  <tr fxLayoutAlign='space-between center'>
+                    <td> {{ data.byID(test).title }} </td>
+                    <div [ngSwitch]="data.byID(test).type">
+                      <td *ngSwitchCase="'length'">
+                        {{ data.byID(test).data.length | number : '1.'}}
+                      </td>
+                      <td *ngSwitchCase="'number'">
+                        {{ data.byID(test).metric | number : '1.2-2'}}
+                      </td>
+                      <td *ngSwitchCase="'array'">
+                        {{ data.byID(test).data }}
+                      </td>
+                      <td *ngSwitchCase="'string'">
+                        {{ data.byID(test).data }}
+                      </td>
+                    </div>
+                  </tr>
+              </mat-panel-description>
+            <ng-template #forObject>
+              <mat-panel-description fxLayout="column" fxLayoutAlign="start stretch">
+                <span> {{ data.byID(test).title }} </span>
+                <app-tabularize [objectData]="data.byID(test).data"></app-tabularize>
+              </mat-panel-description>
+            </ng-template>
+          </mat-expansion-panel-header>
+          <div fxLayout='column'>
+          <div> {{ data.byID(test).summary }} </div>
+          <div *ngIf="data.byID(test).type === 'object'; else rawData">
+            <br>
+            <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+            {{ data.getString(data.byID(test).data) }}
+            </textarea>
+          </div>
+          <ng-template #rawData>
+            <br>
+            <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+            {{ data.byID(test).data }}
+            </textarea>
+          </ng-template>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </mat-card-content>
+  </mat-card>
