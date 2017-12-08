@@ -28,22 +28,15 @@ export class ReportDataService {
 
   private convertResults(data:Object): void{
     // Store each test result as a TestResult object in a central list.
-    for (let test of Object.keys(data["tests"])){
+    for (const test of Object.keys(data["tests"])){
       this.allTests.push(
         new TestResult(
           test,
-          data["tests"][test]['data'],
-          data["tests"][test]['duration'],
-          data["tests"][test]['message'],
-          data["tests"][test]['metric'],
-          data["tests"][test]['result'],
-          data["tests"][test]['summary'],
-          data["tests"][test]['title'],
-         data["tests"][test]['type']));
+          data["tests"][test]))
     };
     // Extract metaddata information to be used in the metadata card
     this.metaData = data["meta"];
-    for (let card of Object.keys(data["cards"])){
+    for (const card of Object.keys(data["cards"])){
       if (card === "scored"){
         this.scoredCard = data["cards"]["scored"]
       }
@@ -51,12 +44,10 @@ export class ReportDataService {
         this.statisticsCards.push(
           new ResultCard(
             card,
-            data["cards"][card]["title"],
-            data["cards"][card]["cases"]
+            data["cards"][card],
           )
         )
       }
     }
-    console.log(this.statisticsCards)
   }
 }

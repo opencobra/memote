@@ -5,9 +5,12 @@ export class ResultCard {
   public cardID: string;
   public associatedTests: TestResult[];
 
-  constructor(cardID:string, cardName: string, associatedTests: TestResult[]){
+  constructor(
+    cardID:string,
+    {title, cases}: {title: string, cases: TestResult[]}
+  ){
     this.cardID = cardID
-    this.cardName = cardName;
-    this.associatedTests = associatedTests;
+    this.cardName = title;
+    this.associatedTests = cases;
   }
 }
