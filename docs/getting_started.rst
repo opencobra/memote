@@ -125,7 +125,7 @@ as a great resource for models in the correct format.
 .. _The RAVEN Toolbox: https://github.com/SysBioChalmers/RAVEN
 .. _others: http://www.secondarymetabolites.org/sysbio/
 .. _BiGG: http://bigg.ucsd.edu
-.. _BioModels: https://www.ebi.ac.uk/biomodels-main/
+.. _BioModels: https://www.ebi.ac.uk/biomodels/
 
 With this in mind, starting a local, version-controlled model repository is as
 simple as running the following command:
