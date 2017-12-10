@@ -43,6 +43,7 @@ requirements = [
     "click",
     "click-configfile",
     "click-log",
+    "six",
     "future",
     "pytest>=3.1",
     "gitpython",
