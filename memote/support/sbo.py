@@ -20,12 +20,7 @@
 from __future__ import absolute_import
 
 import logging
-import re
-from future.utils import native_str
-
-import pandas as pd
-
-from collections import OrderedDict
+import memote.support.basic as basic
 
 LOGGER = logging.getLogger(__name__)
 
@@ -49,3 +44,27 @@ def find_components_without_sbo_terms(model, components):
     """
     return [elem for elem in getattr(model, components) if
             elem.annotation is None or 'SBO' not in elem.annotation ]
+
+
+def check_component_for_specific_sbo_term(items, term):
+    """
+    Identify model components that lack a specific SBO term.
+
+    Parameters
+    ----------
+    items : list
+        A list of model components i.e. reactions to be checked for a specific
+        SBO term.
+    term : str
+        A string denoting a valid SBO term matching the regex '^SBO:\d{7}$'.
+
+    Returns
+    -------
+    list
+        The components without any or that specific SBO term annotation.
+
+    """
+    return [elem for elem in result if
+            elem.annotation is None
+            or 'SBO' not in elem.annotation
+            or elem.annotation['SBO'] != term]

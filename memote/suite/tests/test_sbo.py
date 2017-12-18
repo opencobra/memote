@@ -19,10 +19,8 @@
 
 from __future__ import absolute_import, division
 
-from warnings import warn
-from builtins import dict
-
-import pytest
+import memote.support.basic as basic
+import memote.support.helpers as helpers
 
 import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
@@ -86,6 +84,50 @@ def test_reaction_sbo_presence(read_only_model):
     ann["message"] = wrapper.fill(
         """A total of {} genes ({:.2%}) lack annotation with any type of
         SBO term: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        ))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Metabolic Reactions without SBO:0000176", type="length")
+def test_metabolic_reaction_sbo_presence(read_only_model):
+    """Expect all metabolic reactions to be annotated with SBO:0000176.
+
+    SBO:0000176 represents the term 'biochemical reaction'. Every metabolic
+    reaction that is not a transport or boundary reaction should be annotated
+    with this. The results shown are relative to the total amount of pure
+    metabolic reactions.
+    """
+    ann = test_metabolic_reaction_sbo_presence.annotation
+    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
+        basic.find_pure_metabolic_reactions(read_only_model)) "SBO:0000176"))
+    ann["metric"] = len(ann["data"]) / len(
+    basic.find_pure_metabolic_reactions(read_only_model))
+    ann["message"] = wrapper.fill(
+        """A total of {} metabolic reactions ({:.2%}) lack annotation with the
+        SBO term "SBO:0000176" for 'biochemical reaction': {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        ))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Transport Reactions without SBO:0000185", type="length")
+def test_transport_reaction_sbo_presence(read_only_model):
+    """Expect all transport reactions to be annotated with SBO:0000185.
+
+    SBO:0000185 represents the term 'transport reaction'. Every transport
+    reaction that is not a pure metabolic or boundary reaction should be
+    annotated with this. The results shown are relative to the total of all
+    transport reactions.
+    """
+    ann = test_transport_reaction_sbo_presence.annotation
+    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
+        helpers.find_transport_reactions(read_only_model)) "SBO:0000185"))
+    ann["metric"] = len(ann["data"]) / len(
+    basic.find_transport_reactions(read_only_model))
+    ann["message"] = wrapper.fill(
+        """A total of {} transport reactions ({:.2%}) lack annotation with the
+        SBO term "SBO:0000185" for 'transport reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
     assert len(ann["data"]) == 0, ann["message"]
