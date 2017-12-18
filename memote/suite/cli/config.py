@@ -41,6 +41,8 @@ class ConfigSectionSchema(object):
         github_username = Param(type=str)
         exclusive = Param(type=str, multiple=True)
         skip = Param(type=str, multiple=True)
+        solver = Param(type=click.Choice(["cplex", "glpk", "gurobi"]),
+                       default="glpk")
 
 
 class ConfigFileProcessor(ConfigFileReader):
