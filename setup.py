@@ -24,6 +24,12 @@ import sys
 
 from setuptools import find_packages, setup
 
+if sys.version_info[:2] == (3, 4):
+    warn("Support for Python 3.4 was dropped by pandas. Since cobrapy is a "
+         "pure Python package you can still install it but will have to "
+         "carefully manage your own pandas and numpy versions. We no longer "
+         "include it in our automatic testing.")
+
 with open("README.rst") as readme_file:
     readme = readme_file.read()
 
@@ -37,6 +43,7 @@ requirements = [
     "click",
     "click-configfile",
     "click-log",
+    "six",
     "future",
     "pytest>=3.1",
     "gitpython",

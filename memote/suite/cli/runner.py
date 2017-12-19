@@ -81,7 +81,7 @@ def cli():
               envvar="MEMOTE_DIRECTORY",
               help="If invoked inside a git repository, write the test results "
               "to this directory using the commit hash as the filename.")
-@click.option("--ignore-git", is_flag=True,
+@click.option("--ignore-git", is_flag=True, show_default=True,
               help="Avoid checking the git repository status.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
@@ -93,11 +93,14 @@ def cli():
 @click.option("--skip", type=str, multiple=True,
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
+@click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
+              default="glpk", show_default=True,
+              help="Set the solver to be used.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL",
                 callback=callbacks.validate_model)
 def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
-        skip):
+        skip, solver):
     """
     Run the test suite and collect results.
 
@@ -112,6 +115,7 @@ def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
+    model.solver = solver
     if collect:
         if repo is not None and directory is not None:
             filename = join(directory,

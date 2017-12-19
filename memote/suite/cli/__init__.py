@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import
 
-import locale
 import logging
 from builtins import dict
 
@@ -28,8 +27,6 @@ import click
 from memote.suite.cli.config import ConfigFileProcessor
 
 LOGGER = logging.getLogger(__name__)
-
-locale.setlocale(locale.LC_ALL, "")  # set to system default
 
 try:
     CONTEXT_SETTINGS = dict(

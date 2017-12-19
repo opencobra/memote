@@ -50,7 +50,10 @@ def report():
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
-def snapshot(model, filename, pytest_args):
+@click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
+              default="glpk", show_default=True,
+              help="Set the solver to be used.")
+def snapshot(model, filename, pytest_args, solver):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -61,6 +64,7 @@ def snapshot(model, filename, pytest_args):
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
+    model.solver = solver
     _, results = api.test_model(model, results=True, pytest_args=pytest_args)
     api.snapshot_report(results, filename)
 

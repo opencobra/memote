@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def test_model(model, filename=None, results=False, pytest_args=None,
-               exclusive=None, skip=None):
+               exclusive=None, skip=None, solver=None):
     """
     Test a model and optionally store results as JSON.
 
