@@ -11,6 +11,7 @@ Next Release
   modules (``--skip test_model_id_presence``).
 * Introduce a dummy configuration file for the report organization and test
   scoring weights.
+* Add new module to test for the presence of SBO term annotations.
 
 0.4.6 (2017-10-31)
 ------------------
