@@ -70,7 +70,7 @@ def test_reaction_sbo_presence(read_only_model):
 
 
 @annotate(title="Genes without SBO-Term Annotation", type="length")
-def test_reaction_sbo_presence(read_only_model):
+def test_gene_sbo_presence(read_only_model):
     """Expect all genes to have a some form of SBO-Term annotation.
 
     The Systems Biology Ontology (SBO) allows researchers to annotate a model
@@ -78,7 +78,7 @@ def test_reaction_sbo_presence(read_only_model):
     components. The available terms are controlled and relational and can be
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
-    ann = test_reaction_sbo_presence.annotation
+    ann = test_gene_sbo_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
         read_only_model, "genes"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
@@ -91,7 +91,7 @@ def test_reaction_sbo_presence(read_only_model):
 
 
 @annotate(title="Metabolic Reactions without SBO:0000176", type="length")
-def test_metabolic_reaction_sbo_presence(read_only_model):
+def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     """Expect all metabolic reactions to be annotated with SBO:0000176.
 
     SBO:0000176 represents the term 'biochemical reaction'. Every metabolic
@@ -99,11 +99,11 @@ def test_metabolic_reaction_sbo_presence(read_only_model):
     with this. The results shown are relative to the total amount of pure
     metabolic reactions.
     """
-    ann = test_metabolic_reaction_sbo_presence.annotation
+    ann = test_metabolic_reaction_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         basic.find_pure_metabolic_reactions(read_only_model), "SBO:0000176"))
     ann["metric"] = len(ann["data"]) / len(
-    basic.find_pure_metabolic_reactions(read_only_model))
+        basic.find_pure_metabolic_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all purely metabolic
         reactions) lack annotation with the SBO term "SBO:0000176" for
@@ -114,7 +114,7 @@ def test_metabolic_reaction_sbo_presence(read_only_model):
 
 
 @annotate(title="Transport Reactions without SBO:0000185", type="length")
-def test_transport_reaction_sbo_presence(read_only_model):
+def test_transport_reaction_specific_sbo_presence(read_only_model):
     """Expect all transport reactions to be annotated with SBO:0000185.
 
     SBO:0000185 represents the term 'transport reaction'. Every transport
@@ -122,11 +122,11 @@ def test_transport_reaction_sbo_presence(read_only_model):
     annotated with this. The results shown are relative to the total of all
     transport reactions.
     """
-    ann = test_transport_reaction_sbo_presence.annotation
+    ann = test_transport_reaction_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_transport_reactions(read_only_model), "SBO:0000185"))
     ann["metric"] = len(ann["data"]) / len(
-    basic.find_transport_reactions(read_only_model))
+        basic.find_transport_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all transport
         reactions) lack annotation with the SBO term "SBO:0000185" for
@@ -137,13 +137,13 @@ def test_transport_reaction_sbo_presence(read_only_model):
 
 
 @annotate(title="Metabolites without SBO:0000247", type="length")
-def test_metabolite_sbo_presence(read_only_model):
+def test_metabolite_specific_sbo_presence(read_only_model):
     """Expect all metabolites to be annotated with SBO:0000247.
 
     SBO:0000247 represents the term 'simple chemical'. Every metabolite should
     be annotated with this.
     """
-    ann = test_metabolite_sbo_presence.annotation
+    ann = test_metabolite_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         read_only_model.metabolites, "SBO:0000247"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
@@ -157,13 +157,13 @@ def test_metabolite_sbo_presence(read_only_model):
 
 
 @annotate(title="Genes without SBO:0000243", type="length")
-def test_gene_sbo_presence(read_only_model):
+def test_gene_specific_sbo_presence(read_only_model):
     """Expect all genes to be annotated with SBO:0000243.
 
     SBO:0000243 represents the term 'gene'. Every gene should
     be annotated with this.
     """
-    ann = test_gene_sbo_presence.annotation
+    ann = test_gene_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         read_only_model.genes, "SBO:0000243"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
@@ -177,7 +177,7 @@ def test_gene_sbo_presence(read_only_model):
 
 
 @annotate(title="Exchange reactions without SBO:0000627", type="length")
-def test_exchange_sbo_presence(read_only_model):
+def test_exchange_specific_sbo_presence(read_only_model):
     """Expect all exchange reactions to be annotated with SBO:0000627.
 
     SBO:0000627 represents the term 'exchange reaction'. The Systems Biology
@@ -194,7 +194,7 @@ def test_exchange_sbo_presence(read_only_model):
     metabolites are removed from or added to the extracellular
     environment only.
     """
-    ann = test_gene_sbo_presence.annotation
+    ann = test_gene_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_exchange_rxns(read_only_model), "SBO:0000627"))
     ann["metric"] = len(ann["data"]) / len(
@@ -209,7 +209,7 @@ def test_exchange_sbo_presence(read_only_model):
 
 
 @annotate(title="Demand reactions without SBO:0000628", type="length")
-def test_demand_sbo_presence(read_only_model):
+def test_demand_specific_sbo_presence(read_only_model):
     """Expect all demand reactions to be annotated with SBO:0000627.
 
     SBO:0000628 represents the term 'demand reaction'. The Systems Biology
@@ -225,7 +225,7 @@ def test_demand_sbo_presence(read_only_model):
     any of the organism's compartments. Demand reactions differ from sink
     reactions in that they are designated as irreversible.
     """
-    ann = test_demand_sbo_presence.annotation
+    ann = test_demand_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_demand_reactions(read_only_model), "SBO:0000628"))
     ann["metric"] = len(ann["data"]) / len(
@@ -240,7 +240,7 @@ def test_demand_sbo_presence(read_only_model):
 
 
 @annotate(title="Sink reactions without SBO:0000632", type="length")
-def test_sink_sbo_presence(read_only_model):
+def test_sink_specific_sbo_presence(read_only_model):
     """Expect all sink reactions to be annotated with SBO:0000632.
 
     SBO:0000632 represents the term 'sink reaction'. The Systems Biology
@@ -259,7 +259,7 @@ def test_sink_sbo_presence(read_only_model):
     are not removed from the extracellular environment, but from any of the
     organism's compartments.
     """
-    ann = test_sink_sbo_presence.annotation
+    ann = test_sink_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_sink_reactions(read_only_model), "SBO:0000632"))
     ann["metric"] = len(ann["data"]) / len(
@@ -274,7 +274,7 @@ def test_sink_sbo_presence(read_only_model):
 
 
 @annotate(title="Biomass reactions without SBO:0000629", type="length")
-def test_biomass_sbo_presence(read_only_model):
+def test_biomass_specific_sbo_presence(read_only_model):
     """Expect all biomass reactions to be annotated with SBO:0000629.
 
     SBO:0000629 represents the term 'biomass production'. The Systems Biology
@@ -293,7 +293,7 @@ def test_biomass_sbo_presence(read_only_model):
     Every reaction representing the biomass production should be annotated with
     this.
     """
-    ann = test_biomass_sbo_presence.annotation
+    ann = test_biomass_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_biomass_reaction(read_only_model), "SBO:0000629"))
     ann["metric"] = len(ann["data"]) / len(
