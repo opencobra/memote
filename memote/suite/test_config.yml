@@ -36,14 +36,39 @@ cards:
         cases:
   test_basic:
     title: "Basic Information"
+    cases:
+    - test_find_unique_metabolites
+    - test_find_transport_reactions
+    - test_find_pure_metabolic_reactions
+    - test_enzyme_complex_presence
+    - test_compartments_presence
+    - test_metabolic_coverage
+    - test_ngam_presence
+    - test_gene_protein_reaction_rule_presence
+    - test_metabolites_charge_presence
+    - test_metabolites_formula_presence
+    - test_transport_reaction_presence
+    - test_metabolites_presence
+    - test_reactions_presence
+    - test_genes_presence
+    - test_model_id_presence
   test_biomass:
     title: "Biomass"
+    cases:
+    - test_biomass_presence
+    - test_biomass_consistency
+    - test_biomass_default_production
+    - test_biomass_precursors_default_production
+    - test_biomass_precursors_open_production
+    - test_gam_in_biomass
+    - test_fast_growth_default
   test_consistency:
     title: "Stoichiometry Matrix"
-  test_annotation:
-    title: "Annotation"
-  syntax:
-    title: "BiGG Syntax"
+    cases:
+    - test_detect_energy_generating_cycles
+    - test_blocked_reactions
+    - test_find_orphans
+    - test_find_deadends
 weights:
   test_reaction_mass_balance:
   test_find_disconnected:
