@@ -2,6 +2,7 @@
     "cards": {
         "misc": {
             "cases": [
+              "test_find_stoichiometrically_balanced_cycles"
             ],
             "title": "Misc. Tests"
         },
@@ -15966,7 +15967,7 @@
                 "seed.compound": 0.0
             },
             "result": {
-                "bigg.metabolite": "passed",
+                "bigg.metabolite": "skipped",
                 "biocyc": "passed",
                 "chebi": "passed",
                 "hmdb": "passed",
@@ -41959,7 +41960,7 @@
             "duration": 0.11264681816101074,
             "message": "A total of 0 (0.00%) reactions are mass imbalanced with at least\none of the metabolites not having a formula or the overall mass not\nequal to 0:",
             "metric": 0,
-            "result": "passed",
+            "result": "skipped",
             "summary": "Expect all reactions to be mass balanced.",
             "title": "Number of Mass-Unbalanced Reactions",
             "type": "length"
