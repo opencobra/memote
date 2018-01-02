@@ -11,6 +11,8 @@ Next Release
   modules (``--skip test_model_id_presence``).
 * Introduce a dummy configuration file for the report organization and test
   scoring weights.
+* Sort unconfigured tests into the card 'Misc. Tests' in the snapshot report.
+* Handle skipped tests better in the snapshot report.
 
 0.4.6 (2017-10-31)
 ------------------
