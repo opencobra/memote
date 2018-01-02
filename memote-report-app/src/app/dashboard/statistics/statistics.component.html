@@ -13,9 +13,11 @@
           expandedHeight="auto"
           style="padding:0.05vh">
               <mat-panel-description
-              fxLayout='column' fxLayoutAlign='center stretch'
               *ngIf="data.byID(test).type !== 'object'; else forObject">
-              <div *ngIf="data.byID(test).result !== 'skipped'; else forSkipped">
+              <div
+              fxFlex
+              fxLayout='column' fxLayoutAlign='center stretch'
+              *ngIf="data.byID(test).result !== 'skipped'; else forSkipped">
                   <tr fxLayoutAlign='space-between center'>
                     <td> {{ data.byID(test).title }} </td>
                     <div [ngSwitch]="data.byID(test).type">
