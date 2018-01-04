@@ -53,7 +53,62 @@ def register_with(registry):
 
 
 def annotate(title, type, message=None, data=None, metric=1.0):
-    """Annotate a test case."""
+    """
+    Annotate a test case.
+
+    Parameters
+    ----------
+    title : str
+        A human-readable descriptive title of the test case.
+    type : str
+        A sting that determines how the result data is formatted in the report.
+        - 'array' : The tested quality is represented as a list, e.g. all
+          biomass reactions in the model. In the angular report, 'data' is
+          interpreted as a list. It is expected not to be None.
+        - 'length' : The tested quality is represented as the
+          length of a list, set or tuple, e.g. number of metabolites without
+          formula. In the angular report, 'data' is interpreted as a list. It
+          is expected not to be None.
+        - 'number' : The tested quality is represented as a percentage, e.g.
+          percentage of metabolites without charge. In the angular report,
+          'metric' is used and expected to be a floating point number.
+        - 'object' : Use only if the test case is parametrized i.e. if the
+          same basic test logic can be applied to several tested components,
+          such as testing for the presence of annotations for specific
+          databases for all metabolites. In the angular report, 'data' is
+          interpreted as a dictionary whose values can be dictionaries, lists,
+          strings, floats and integers. It is expected not to be None.
+        - 'string' : The tested quality is represented as a single string,
+          e.g. the ID of the model. In the angular report, 'data' is
+          interpreted as a string. It is expected not to be None.
+    message : str
+        A short written explanation that states and possibly explains the test
+        result.
+    data
+        Raw data which the test case generates and assesses. Can be of the
+        following types: list, set, tuple, string, float, integer, boolean and
+        dictionary.
+    metric: float
+        A value x in the range of 0 <= x <= 1 which represents the fraction of
+        'data' to the total in the model. For example, if 'data' are all
+        metabolites without formula, 'metric' should be the fraction of
+        metabolites without formula from the total of metabolites in the model.
+
+    Returns
+    -------
+    function
+        The decorated function, now extended by the attribute 'annotation'.
+
+    Notes
+    -----
+    Adds "annotation" attribute to the function object, which stores values for
+    predefined keys as a dictionary.
+
+    """
+    types = ['array', 'length', 'number', 'object', 'string']
+    if type not in types:
+        raise ValueError("Invalid type. Expected one of: %s" % types)
+
     def decorator(func):
         func.annotation = dict(
             title=title,

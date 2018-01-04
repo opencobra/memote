@@ -98,9 +98,10 @@ def cli():
               help="Set the solver to be used.")
 @click.option("--custom", type=(click.Path(exists=True, file_okay=False),
                                 click.Path(exists=True, dir_okay=False)),
+              default=(None, None), show_default=True,
               help="The absolute path to a directory containing custom test "
                    "modules followed by the absolute path to a config file "
-                   "corresponding to the custom test modules. Please refer to"
+                   "corresponding to the custom test modules. Please refer to "
                    "the documentation for more information on the required "
                    "file formats.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),

@@ -20,13 +20,15 @@ Next Release
     - Color the header text of the parametrized test results in pure black
     - Remove the horizontal lines in the parametrized test results
     - Display all results regardless of scored/ unscored inside of buttons to
-    force a uniform line height and a more consistent look
+      force a uniform line height and a more consistent look
     - Add logic to correctly display errored tests
     - Give skipped and errored test results a distinct look
     - Explicitly handle boolean results, and add boolean as an option for the
-    'type' attribute.
+      'type' attribute.
     - Fix the raw data output in the textboxes so that they are formatted
-    python code.
+      python code.
+* Allow command line option to enable the definition of a custom test directory
+  in combination with a corresponding config file.
 
 0.4.6 (2017-10-31)
 ------------------

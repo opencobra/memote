@@ -53,7 +53,15 @@ def report():
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-def snapshot(model, filename, pytest_args, solver):
+@click.option("--custom", type=(click.Path(exists=True, file_okay=False),
+                                click.Path(exists=True, dir_okay=False)),
+              default=(None, None), show_default=True,
+              help="The absolute path to a directory containing custom test "
+                   "modules followed by the absolute path to a config file "
+                   "corresponding to the custom test modules. Please refer to "
+                   "the documentation for more information on the required "
+                   "file formats.")
+def snapshot(model, filename, pytest_args, solver, custom):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -65,7 +73,9 @@ def snapshot(model, filename, pytest_args, solver):
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
     model.solver = solver
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args)
+    _, results = api.test_model(
+        model, results=True, pytest_args=pytest_args, custom=custom
+    )
     api.snapshot_report(results, filename)
 
 

@@ -67,14 +67,16 @@ def test_register_with(func, func_name):
     assert registry[func_name] is func
 
 
+# TODO: Change naming of the 'type' argument once the angular app is completed.
+# It is misleading.
 @pytest.mark.parametrize("notes, func, summary", [
-    (dict(title="One", data=4, type="integer"), one,
+    (dict(title="One", data=4, type="string"), one,
      """One line."""),
     (dict(title="Two", data="some text", type="string"), two,
      """Two lines.
     Why?
     """),
-    (dict(title="Three", data=[2, 4, 51, 63], type="number"), three,
+    (dict(title="Three", data=[2, 4, 51, 63], type="length"), three,
      """
     Three lines.
     Why?
@@ -99,3 +101,8 @@ def test_annotate(notes, func, summary):
     assert res.annotation["message"] is None
     assert res.annotation["type"] == notes["type"]
     assert res.annotation["metric"] == 1.0
+
+
+def test_annotate_value_error():
+    with pytest.raises(ValueError):
+        utils.annotate("Some Title","wrong_type")(one)

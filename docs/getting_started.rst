@@ -96,8 +96,15 @@ To illustrate here it is changed to ``report.html``.
 
 While the html report is still a work in progress, we recommend relying on the
 verbose output of the command line tool above. Users can tweak the console
-output by passing additional arguments directly to pytest. This can be done by
+output by passing additional arguments directly to pytest through the
+``--pytest-args`` or simply ``-a`` option. This can be done by
 writing the pytest arguments as one continuous string.
+
+For a more detailed traceback try:
+
+.. code-block:: console
+
+    $ memote report snapshot -a "--tb long" --filename "report.html" path/to/model.xml
 
 For a full list of possible arguments please refer to the `pytest
 documentation`_.
