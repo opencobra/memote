@@ -79,8 +79,8 @@ def cli():
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
               envvar="MEMOTE_DIRECTORY",
-              help="If invoked inside a git repository, write the test results "
-              "to this directory using the commit hash as the filename.")
+              help="If invoked inside a git repository, write the test results"
+              " to this directory using the commit hash as the filename.")
 @click.option("--ignore-git", is_flag=True, show_default=True,
               help="Avoid checking the git repository status.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
@@ -96,11 +96,18 @@ def cli():
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--custom", type=(click.Path(exists=True, file_okay=False),
+                                click.Path(exists=True, dir_okay=False)),
+              help="The absolute path to a directory containing custom test "
+                   "modules followed by the absolute path to a config file "
+                   "corresponding to the custom test modules. Please refer to"
+                   "the documentation for more information on the required "
+                   "file formats.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL",
                 callback=callbacks.validate_model)
 def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
-        skip, solver):
+        skip, solver, custom):
     """
     Run the test suite and collect results.
 
@@ -121,10 +128,10 @@ def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
             filename = join(directory,
                             "{}.json".format(repo.active_branch.commit.hexsha))
         code = api.test_model(model, filename, pytest_args=pytest_args,
-                              skip=skip, exclusive=exclusive)
+                              skip=skip, exclusive=exclusive, custom=custom)
     else:
         code = api.test_model(model, pytest_args=pytest_args, skip=skip,
-                              exclusive=exclusive)
+                              exclusive=exclusive, custom=custom)
     sys.exit(code)
 
 
