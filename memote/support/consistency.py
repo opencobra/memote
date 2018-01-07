@@ -311,46 +311,39 @@ def detect_energy_generating_cycles(model, metabolite_id):
     met = model.metabolites.get_by_id(metabolite_id)
     dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
     dissipation_rxn = Reaction('Dissipation')
-    with model:
-        for rxn in model.reactions:
-            if rxn.reversibility:
-                rxn.bounds = -1, 1
-            else:
-                rxn.bounds = 0, 1
-        for exchange in model.exchanges:
-            exchange.bounds = (0, 0)
-        model.add_reactions([dissipation_rxn])
-        if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
-            # build nucleotide-type dissipation reaction
-            dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
-        elif met.id in ['nadph_c', 'nadh_c']:
-            # build nicotinamide-type dissipation reaction
-            dissipation_rxn.reaction = "--> h_c"
-        elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
-                        'mql6_c', 'mql7_c', 'dmmql8_c']:
-            # build redox-partner-type dissipation reaction
-            dissipation_rxn.reaction = "--> 2 h_c"
-        elif met.id == 'accoa_c':
-            dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
-        elif met.id == 'glu__L_c':
-            dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
-        elif met.id == 'h_p':
-            pass
+    model = helpers.close_boundaries_sensibly(model)
+    model.add_reactions([dissipation_rxn])
+    if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
+        # build nucleotide-type dissipation reaction
+        dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
+    elif met.id in ['nadph_c', 'nadh_c']:
+        # build nicotinamide-type dissipation reaction
+        dissipation_rxn.reaction = "--> h_c"
+    elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
+                    'mql6_c', 'mql7_c', 'dmmql8_c']:
+        # build redox-partner-type dissipation reaction
+        dissipation_rxn.reaction = "--> 2 h_c"
+    elif met.id == 'accoa_c':
+        dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
+    elif met.id == 'glu__L_c':
+        dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
+    elif met.id == 'h_p':
+        pass
 
-        dissipation_rxn.add_metabolites(
-            {met.id: -1, dissipation_product: 1})
-        model.objective = dissipation_rxn
-        solution = model.optimize()
-        if solution.status == 'infeasible':
-            raise RuntimeError(
-                "The model cannot be solved as the solver status is"
-                "infeasible. This may be a bug."
-            )
-        elif solution.objective_value > 0.0:
-            return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
-                drop(["Dissipation"]).tolist()
-        else:
-            return []
+    dissipation_rxn.add_metabolites(
+        {met.id: -1, dissipation_product: 1})
+    model.objective = dissipation_rxn
+    solution = model.optimize()
+    if solution.status == 'infeasible':
+        raise RuntimeError(
+            "The model cannot be solved as the solver status is"
+            "infeasible. This may be a bug."
+        )
+    elif solution.objective_value > 0.0:
+        return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
+            drop(["Dissipation"]).tolist()
+    else:
+        return []
 
 
 def find_mass_imbalanced_reactions(model):
@@ -517,23 +510,15 @@ def find_metabolites_produced_with_closed_bounds(model):
 
     """
     mets_produced = list()
-    with model:
-        for rxn in model.reactions:
-            if rxn.reversibility:
-                rxn.bounds = -1, 1
-            else:
-                rxn.bounds = 0, 1
-        for exchange in model.exchanges:
-            exchange.bounds = (0, 0)
-
-        for met in model.metabolites:
-            with model:
-                exch = model.add_boundary(
-                    met, type='irrex', reaction_id='IRREX', lb=0, ub=1
-                )
-                if helpers.run_fba(model, exch.id) > 0:
-                    mets_produced.append(met.id)
-        return mets_produced
+    model = helpers.close_boundaries_sensibly(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type='irrex', reaction_id='IRREX', lb=0, ub=1
+            )
+            if helpers.run_fba(model, exch.id) > 0:
+                mets_produced.append(met.id)
+    return mets_produced
 
 
 def find_metabolites_consumed_with_closed_bounds(model):
@@ -551,20 +536,12 @@ def find_metabolites_consumed_with_closed_bounds(model):
 
     """
     mets_consumed = list()
-    with model:
-        for rxn in model.reactions:
-            if rxn.reversibility:
-                rxn.bounds = -1, 1
-            else:
-                rxn.bounds = 0, 1
-        for exchange in model.exchanges:
-            exchange.bounds = (0, 0)
-
-        for met in model.metabolites:
-            with model:
-                exch = model.add_boundary(
-                    met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
-                )
-                if helpers.run_fba(model, exch.id, direction='min') < 0:
-                    mets_consumed.append(met.id)
-        return mets_consumed
+    model = helpers.close_boundaries_sensibly(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
+            )
+            if helpers.run_fba(model, exch.id, direction='min') < 0:
+                mets_consumed.append(met.id)
+    return mets_consumed
