@@ -430,6 +430,28 @@ def infeasible_toy_model(base):
 
 
 @register_with(MODEL_REGISTRY)
+def producing_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.VD.add_metabolites({"D": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v4.add_metabolites({"A": -1, "C": 1, "D": 1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = -1000, 1000
+    base.reactions.v4.bounds = -1000, 1000
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def gap_model(base):
     a_c = cobra.Metabolite("a_c")
     a_e = cobra.Metabolite("a_e")
@@ -619,3 +641,13 @@ def test_find_disconnected(model, num):
     """Expect the appropriate amount of disconnected to be found."""
     disconnected = consistency.find_disconnected(model)
     assert len(disconnected) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("producing_toy_model", 1),
+    ("loopy_toy_model", 0),
+], indirect=["model"])
+def test_find_disconnected(model, num):
+    """Expect the appropriate amount of disconnected to be found."""
+    produced = consistency.find_metabolites_produced_with_closed_bounds(model)
+    assert len(produced) == num

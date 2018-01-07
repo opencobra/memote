@@ -232,3 +232,28 @@ def test_find_disconnected(read_only_model):
         reaction of the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Produced Without Substrate Consumption",
+          type="length")
+def test_find_metabolites_produced_with_closed_bounds(read_only_model):
+    """
+    Expect no metabolites to be produced without substrate consumption.
+
+    It should not be possible for the model to produce metabolites without
+    consuming substrate from the medium. This tests disables all the boundary
+    reactions and checks if each metabolite can still be produced individually
+    using flux balance analysis.
+    """
+    ann = test_find_metabolites_produced_with_closed_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_produced_with_closed_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites can be produced without the model
+        needing to consume any substrate: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]

@@ -28,6 +28,7 @@ from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.consistency_helpers as con_helpers
+import memote.support.helpers as helpers
 
 LOGGER = logging.getLogger(__name__)
 
@@ -503,3 +504,33 @@ def find_disconnected(model):
 
     """
     return [met for met in model.metabolites if len(met.reactions) == 0]
+
+
+def find_metabolites_produced_with_closed_bounds(model):
+    """
+    Return metabolites that can be produced when boundary reactions are closed.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_produced = list()
+    with model:
+        for rxn in model.reactions:
+            if rxn.reversibility:
+                rxn.bounds = -1, 1
+            else:
+                rxn.bounds = 0, 1
+        for exchange in model.exchanges:
+            exchange.bounds = (0, 0)
+
+        for met in model.metabolites:
+            with model:
+                exch = model.add_boundary(
+                    met, type='irrex', reaction_id='IRREX', lb=0, ub=1
+                )
+                if helpers.run_fba(model, exch.id) > 0:
+                    mets_produced.append(met.id)
+        return mets_produced
