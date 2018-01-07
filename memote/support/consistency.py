@@ -534,3 +534,37 @@ def find_metabolites_produced_with_closed_bounds(model):
                 if helpers.run_fba(model, exch.id) > 0:
                     mets_produced.append(met.id)
         return mets_produced
+
+
+def find_metabolites_consumed_with_closed_bounds(model):
+    """
+    Return metabolites that can be consumed when boundary reactions are closed.
+
+    Reverse case from 'find_metabolites_produced_with_closed_bounds', just
+    like metabolites should not be produced from nothing, mass should not
+    simply be removed from the model.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_consumed = list()
+    with model:
+        for rxn in model.reactions:
+            if rxn.reversibility:
+                rxn.bounds = -1, 1
+            else:
+                rxn.bounds = 0, 1
+        for exchange in model.exchanges:
+            exchange.bounds = (0, 0)
+
+        for met in model.metabolites:
+            with model:
+                exch = model.add_boundary(
+                    met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
+                )
+                if helpers.run_fba(model, exch.id, direction='min') < 0:
+                    mets_consumed.append(met.id)
+        return mets_consumed

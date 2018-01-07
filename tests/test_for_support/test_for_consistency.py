@@ -445,7 +445,29 @@ def producing_toy_model(base):
     base.reactions.v1.bounds = -1000, 1000
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = -1000, 1000
-    base.reactions.v4.bounds = -1000, 1000
+    base.reactions.v4.bounds = 0, 1
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def consuming_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.VD.add_metabolites({"D": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v4.add_metabolites({"A": -1, "C": 1, "D": -1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = -1000, 1000
+    base.reactions.v4.bounds = -1, 0
     base.objective = 'VB'
     base.reactions.VB.bounds = 0, 1
     return base
@@ -645,9 +667,21 @@ def test_find_disconnected(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("producing_toy_model", 1),
+    ("consuming_toy_model", 0),
     ("loopy_toy_model", 0),
 ], indirect=["model"])
-def test_find_disconnected(model, num):
-    """Expect the appropriate amount of disconnected to be found."""
+def test_find_metabolites_produced_with_closed_bounds(model, num):
+    """Expect the appropriate amount of produced metabolites to be found."""
     produced = consistency.find_metabolites_produced_with_closed_bounds(model)
     assert len(produced) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("producing_toy_model", 0),
+    ("consuming_toy_model", 1),
+    ("loopy_toy_model", 0),
+], indirect=["model"])
+def test_find_metabolites_consumed_with_closed_bounds(model, num):
+    """Expect the appropriate amount of consumed metabolites to be found."""
+    consumed = consistency.find_metabolites_consumed_with_closed_bounds(model)
+    assert len(consumed) == num

@@ -241,9 +241,11 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
     Expect no metabolites to be produced without substrate consumption.
 
     It should not be possible for the model to produce metabolites without
-    consuming substrate from the medium. This tests disables all the boundary
-    reactions and checks if each metabolite can still be produced individually
-    using flux balance analysis.
+    consuming substrate from the medium. This test disables all the boundary
+    reactions and checks if each metabolite can be produced individually
+    using flux balance analysis. To pass this test no metabolite outside of
+    specific boundary reactions should be produced without the consumption of
+    substrate.
     """
     ann = test_find_metabolites_produced_with_closed_bounds.annotation
     ann["data"] = get_ids(
@@ -257,3 +259,31 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
         needing to consume any substrate: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+    @annotate(
+        title="Number of Metabolites Consumed Without Product Removal ",
+        type="length")
+    def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
+        """
+        Expect no metabolites to be consumed without product removal.
+
+        Just like metabolites should not be produced from nothing, mass should
+        not simply be removed from the model. This test disables all the
+        boundary reactions and checks if each metabolite can be consumed
+        individually using flux balance analysis. To pass this test no
+        metabolite outside of specific boundary reactions should be consumed
+        without product leaving the system.
+        """
+        ann = test_find_metabolites_consumed_with_closed_bounds.annotation
+        ann["data"] = get_ids(
+            consistency.find_metabolites_consumed_with_closed_bounds(
+                read_only_model
+            )
+        )
+        ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+        ann["message"] = wrapper.fill(
+            """A total of {} ({:.2%}) metabolites can be consumed without
+            using the system's boundary reactions: {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        assert len(ann["data"]) == 0, ann["message"]
