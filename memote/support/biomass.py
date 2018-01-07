@@ -24,6 +24,8 @@ import logging
 from six import iteritems
 from cobra.exceptions import Infeasible
 
+import memote.support.helpers as helpers
+
 __all__ = (
     "sum_biomass_weight", "find_biomass_precursors",
     "find_blocked_biomass_precursors")
@@ -106,3 +108,31 @@ def gam_in_biomass(reaction):
     return (
         left.issubset(met.id for met in reaction.reactants) and
         right.issubset(met.id for met in reaction.products))
+
+
+def find_direct_metabolites(model, reaction):
+    """
+    Return list of possible direct biomass precursor metabolites.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    reaction : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+
+    Returns
+    -------
+    list
+        Metabolites that qualify as direct metabolites i.e. biomass precursors
+        that are taken up to be consumed by the biomass reaction only.
+
+    """
+    transport_reactions = set(helpers.find_transport_reactions(model))
+    exchange_reactions = set(model.exchanges)
+    biomass_reactions = set(helpers.find_biomass_reaction(model))
+
+    combined_set = transport_reactions | exchange_reactions | biomass_reactions
+    precursors = find_biomass_precursors(reaction)
+
+    return [met for met in precursors if met.reactions.issubset(combined_set)]

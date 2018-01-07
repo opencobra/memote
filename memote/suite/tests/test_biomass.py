@@ -207,3 +207,49 @@ def test_fast_growth_default(model, reaction_id):
         the provided default medium the growth rate amounts to {}""".format(
             reaction_id, ann["data"][reaction_id]))
     assert ann["data"][reaction_id] <= 10.3972, ann["message"][reaction_id]
+
+
+@pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
+@annotate(title="Ratio of Direct Metabolites in Biomass Reaction",
+          type="object", data=dict(), message=dict(), metric=dict())
+def test_direct_metabolites_in_biomass(model, reaction_id):
+    """
+    Expect the biomass reactions to contain atp and adp.
+
+    Some biomass precursors are taken from the media and directly consumed by
+    the biomass reaction. It might not be a problem for ions or
+    metabolites for which the organism in question is auxotrophic. However,
+    too many of these metabolites may be artifacts of automated gap-filling
+    procedures. Many gap-filling algorithms attempt to minimise the number of
+    added reactions. This can lead to many biomass precursors being
+    "direct metabolites".
+
+    This test reports the ratio of direct metabolites to the total amount of
+    precursors to a given biomass reaction. It specifically looks for
+    metabolites that are only in either exchange, transport or biomass
+    reactions. Bear in mind that this may lead to false positives in heavily
+    compartimentalized models.
+
+    To pass this test, the ratio of direct metabolites should be less than 50%
+    of all biomass precursors. This is an arbitrary threshold but it takes
+    into account that while certain ions do not serve a relevant metabolic
+    function, it may still be important to include them in the biomass
+    reaction to account for the impact of their uptake energy costs.
+
+    This threshold is subject to change in the future.
+    """
+    #TODO: Update the threshold as soon as we have an overview of the average!
+    ann = test_direct_metabolites_in_biomass.annotation
+    reaction = model.reactions.get_by_id(reaction_id)
+    ann["data"][reaction_id] = biomass.find_direct_metabolites(model, reaction)
+    ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
+                                 len(biomass.find_biomass_precursors(reaction))
+    ann["message"][reaction_id] = wrapper.fill(
+        """{} contains a total of {} direct metabolites ({:.2%}). Specifically
+        these are: {}.""".format(reaction_id,
+                                 len(ann["data"][reaction_id]),
+                                 ann["metric"],
+                                 ann["data"][reaction_id]
+                                 )
+    )
+    assert ann["metric"] < 0.5, ann["message"][reaction_id]
