@@ -233,6 +233,25 @@ def non_metabolic_reactions(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def transport_gpr(base):
+    """Provide a model with a transport reaction without GPR."""
+    met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
+    met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
+    met_c = cobra.Metabolite("na_c", formula='Na', compartment="c")
+    met_d = cobra.Metabolite("na_e", formula='Na', compartment="e")
+    uni = cobra.Reaction("UNI")
+    uni.gene_reaction_rule="X and Y"
+    uni.add_metabolites({met_a: 1, met_b: -1})
+    anti = cobra.Reaction("ANTI")
+    anti.gene_reaction_rule = "W or V"
+    anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
+    sym = cobra.Reaction("SYM")
+    sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    base.add_reactions([uni, anti, sym])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -372,3 +391,11 @@ def test_find_pure_metabolic_reactions(model, num):
 def test_find_unique_metabolites(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_unique_metabolites(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("transport_gpr", 1)
+], indirect=["model"])
+def test_check_transport_reaction_gpr_presence(model, num):
+    """Expect amount of transport reactions without gpr to be identified."""
+    assert len(basic.check_transport_reaction_gpr_presence(model)) == num
