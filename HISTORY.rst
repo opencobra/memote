@@ -32,6 +32,15 @@ Next Release
 * Extend test descriptions to make it more clear how a user can satisfy the
   test conditions.
 * Remove duplicate test for the presence of transport reactions.
+* Implement a test for unbounded flux through reactions in the default
+  condition.
+* Implement a test for detecting metabolites that can either be produced or
+  removed from the model when all system boundaries are closed.
+* Implement a test for 'direct' metabolites, i.e. the detection of biomass
+  precursors that are not involved in any metabolic reactions; only in
+  exchange reactions, transporters and the biomass reaction itself.
+* Implement a test that checks for a low ratio of transport reactions without
+  GPR relative to the total amount of transport reactions.
 
 0.4.6 (2017-10-31)
 ------------------
