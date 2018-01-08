@@ -287,3 +287,33 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
             using the system's boundary reactions: {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
         assert len(ann["data"]) == 0, ann["message"]
+
+
+    @annotate(
+        title="Fraction of Unbounded Reactions in the Default Condition",
+        type="metric")
+    def test_find_reactions_unbounded_flux_default_condition(read_only_model):
+        """
+        Expect the fraction of unbounded reactions to be low.
+
+        A large fraction of model reactions able to carry unlimited flux under
+        default conditions indicates problems with reaction directionality,
+        missing cofactors, incorrectly defined transport reactions and more.
+        """
+        #TODO: Arbitrary threshold right now! Update after meta study!
+        ann = test_find_reactions_unbounded_flux_default_condition.annotation
+        unbounded_rxns, fraction, _ = \
+            consistency.find_reactions_with_unbounded_flux_default_condition(
+            read_only_model
+        )
+        ann["data"] = get_ids(unbounded_rxns)
+        ann["metric"] = fraction
+        ann["message"] = wrapper.fill(
+            """ A fraction of {:.2%} of the non-blocked reactions (in total {}
+            reactions) can carry unbounded flux in the default model
+            condition. Unbounded reactions may be involved in
+            thermodynamically infeasible cycles: {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
+        assert ann["metric"] <= 0.1, ann["message"]

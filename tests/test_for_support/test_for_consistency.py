@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import cobra
 import pytest
+from cobra.exceptions import Infeasible
 
 import memote.support.consistency as consistency
 from memote.utils import register_with
@@ -685,3 +686,26 @@ def test_find_metabolites_consumed_with_closed_bounds(model, num):
     """Expect the appropriate amount of consumed metabolites to be found."""
     consumed = consistency.find_metabolites_consumed_with_closed_bounds(model)
     assert len(consumed) == num
+
+
+@pytest.mark.parametrize("model, fraction", [
+    ("blocked_reactions", 1.0),
+    ("constrained_toy_model", 0.0),
+    ("constrained_toy_model", 0.6)
+], indirect=["model"])
+def test_find_reactions_with_unbounded_flux_default_condition(model, fraction):
+    """Expect the number of unbounded and blocked metabolites to be correct."""
+    unb_fraction = \
+        consistency.find_reactions_with_unbounded_flux_default_condition(model)
+    assert unb_fraction == fraction
+
+
+@pytest.mark.parametrize("model", [
+    pytest.param("missing_energy_partner",
+                 marks=pytest.mark.raises(exception=ZeroDivisionError)),
+    pytest.param("infeasible",
+                 marks=pytest.mark.raises(exception=Infeasible))
+], indirect=["model"])
+def test_find_reactions_with_unbounded_flux_default_condition(model):
+    """Expect the number of unbounded and blocked metabolites to be correct."""
+    consistency.find_reactions_with_unbounded_flux_default_condition(model)

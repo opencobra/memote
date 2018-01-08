@@ -384,6 +384,7 @@ def find_charge_imbalanced_reactions(model):
         rxn for rxn in internal_rxns if not con_helpers.is_charge_balanced(rxn)]
 
 
+#TODO: Rename this to universally_blocked_reactions, all exchanges are open!
 def find_blocked_reactions(model):
     """
     Find metabolic reactions that are blocked.
@@ -545,3 +546,63 @@ def find_metabolites_consumed_with_closed_bounds(model):
             if helpers.run_fba(model, exch.id, direction='min') < 0:
                 mets_consumed.append(met.id)
     return mets_consumed
+
+
+def find_reactions_with_unbounded_flux_default_condition(model):
+    """
+    Return list of reactions whose flux is unbounded in the default condition.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns:
+    --------
+    unlimited_reactions: list
+        A list of reactions that in default modeling conditions are able to
+        carry flux as high/low as the systems maximal and minimal bounds.
+    fraction: float
+        The fraction of the amount of unbounded reactions to the amount of
+        non-blocked reactions.
+    conditionally_blocked_reactions: list
+        A list of reactions that in default modeling conditions are not able
+        to carry flux at all.
+
+    """
+    with model:
+        try:
+            fva_result = flux_variability_analysis(model)
+        except Infeasible as err:
+            LOGGER.error("Failed to find reactions with unbounded flux "
+                         "because '{}'. This may be a bug.".format(err))
+            raise Infeasible("It was not possible to run flux variability "
+                             "analysis on the model. Make sure that the model "
+                             "can be solved! Check if the constraints are not "
+                             "too strict.")
+        conditionally_blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
+                                               (fva_result["minimum"] == 0.0)]
+        max_bound = max([rxn.upper_bound for rxn in model.reactions])
+        min_bound = min([rxn.lower_bound for rxn in model.reactions])
+        unlimited_flux = fva_result.loc[(fva_result["maximum"] == max_bound) |
+                                        (fva_result["minimum"] == min_bound)]
+        conditionally_blocked_reactions = [model.reactions.get_by_id(met_id)
+                                           for met_id in
+                                           conditionally_blocked.index]
+        unlimited_reactions = [model.reactions.get_by_id(met_id) for met_id in
+                               unlimited_flux.index]
+        try:
+            fraction = len(unlimited_reactions) / float(
+                (len(model.reactions) - len(conditionally_blocked_reactions)))
+        except ZeroDivisionError:
+            LOGGER.error("Division by Zero! Failed to calculate the "
+                         "fraction of unbounded reactions. Does this model "
+                         "have any reactions at all?")
+            raise ZeroDivisionError("It was not possible to calculate the "
+                                    "fraction of unbounded reactions to "
+                                    "un-blocked reactions. This may be because"
+                                    "the model doesn't have any reactions at "
+                                    "all or that none of the reactions can "
+                                    "carry a flux larger than zero!")
+
+        return unlimited_reactions, fraction, conditionally_blocked_reactions
