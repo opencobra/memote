@@ -691,11 +691,11 @@ def test_find_metabolites_consumed_with_closed_bounds(model, num):
 @pytest.mark.parametrize("model, fraction", [
     ("blocked_reactions", 1.0),
     ("constrained_toy_model", 0.0),
-    ("constrained_toy_model", 0.6)
+    ("loopy_toy_model", 0.6)
 ], indirect=["model"])
 def test_find_reactions_with_unbounded_flux_default_condition(model, fraction):
     """Expect the number of unbounded and blocked metabolites to be correct."""
-    unb_fraction = \
+    _, unb_fraction, _ = \
         consistency.find_reactions_with_unbounded_flux_default_condition(model)
     assert unb_fraction == fraction
 
