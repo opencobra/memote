@@ -706,6 +706,6 @@ def test_find_reactions_with_unbounded_flux_default_condition(model, fraction):
     pytest.param("infeasible",
                  marks=pytest.mark.raises(exception=Infeasible))
 ], indirect=["model"])
-def test_find_reactions_with_unbounded_flux_default_condition(model):
+def test_find_reactions_with_unbounded_flux_default_condition_errors(model):
     """Expect the number of unbounded and blocked metabolites to be correct."""
     consistency.find_reactions_with_unbounded_flux_default_condition(model)

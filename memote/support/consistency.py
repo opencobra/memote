@@ -384,7 +384,7 @@ def find_charge_imbalanced_reactions(model):
         rxn for rxn in internal_rxns if not con_helpers.is_charge_balanced(rxn)]
 
 
-#TODO: Rename this to universally_blocked_reactions, all exchanges are open!
+# TODO: Rename this to universally_blocked_reactions, all exchanges are open!
 def find_blocked_reactions(model):
     """
     Find metabolic reactions that are blocked.
