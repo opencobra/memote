@@ -226,7 +226,7 @@ def test_biomass_weight_production(model, expected):
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         control_sum = biomass.sum_biomass_weight(rxn)
-        assert np.isclose(1, control_sum, atol=1e-03) is expected
+        assert np.isclose(1, control_sum, atol=1e-03) == expected
 
 
 @pytest.mark.parametrize("model, expected", [
