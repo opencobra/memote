@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { TestResult } from '.././test-result.model';
 
 @Component({
   selector: 'app-tabularize',
@@ -7,14 +8,20 @@ import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
   encapsulation: ViewEncapsulation.None
 })
 export class TabularizeComponent implements OnInit {
-  @Input() objectData: any;
-  @Input() scored: boolean = false;
+  @Input() testCase: TestResult;
+  @Input() scored = false;
   keyValuePairs = [];
+  resultObject = [];
 
   constructor() { }
 
   ngOnInit() {
-     this.keyValuePairs = Object.entries(this.objectData);
+     if (this.scored) {
+       this.keyValuePairs = Object.entries(this.testCase.metric);
+     } else {
+       this.keyValuePairs = Object.entries(this.testCase.data);
+     }
+     this.resultObject = Object.entries(this.testCase.result);
   }
 
   getType(val) {

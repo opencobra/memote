@@ -203,9 +203,50 @@ class ResultCollectionPlugin(object):
             case["duration"] = report.duration
             case["result"] = report.outcome
 
+    def _determine_tests_not_on_cards(self):
+        """
+        Identify tests not explicitly configured in test organization.
+
+        List them as an additional card called `Misc`, which is where they will
+        now appear in the report.
+
+        """
+        tests_in_the_scored_card = list()
+        tests_in_unscored_cards = list()
+
+        try:
+            scored_sections = self._store['cards']['scored']['sections']
+        except ValueError:
+            LOGGER.error(
+                "Malformed config file! The config file does not appear to "
+                "be structured correctly.")
+
+        for section in scored_sections:
+            if scored_sections[section]['cases']:
+                for case in scored_sections[section].setdefault(
+                    'cases', list()
+                ):
+                    tests_in_the_scored_card.append(case)
+
+        for card in self._store['cards']:
+            if card is not 'scored':
+                for case in self._store['cards'][card].setdefault(
+                    'cases', list()
+                ):
+                    tests_in_unscored_cards.append(case)
+
+        self._store['cards'].setdefault('misc', dict())
+        self._store['cards']['misc']['cases'] = list(
+            set(self._cases) -
+            set(tests_in_the_scored_card) -
+            set(tests_in_unscored_cards)
+        )
+        self._store['cards']['misc']['title'] = 'Misc. Tests'
+
     @property
     def results(self):
         """Return the test results as a nested dictionary."""
+        self._determine_tests_not_on_cards()
         return self._store
 
     @pytest.fixture(scope="session")

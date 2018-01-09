@@ -40,8 +40,8 @@
                   <tr fxLayout="column" fxLayoutAlign='center stretch'>
                     <td> {{ data.byID(case).title }} </td>
                     <app-tabularize
-                    [scored]="true"
-                    [objectData]="data.byID(case).metric">
+                    [testCase]="data.byID(case)"
+                    [scored]="true">
                     </app-tabularize>
                   </tr>
                   </mat-panel-description>
@@ -50,9 +50,14 @@
                     <td> {{ data.byID(case).title }} </td>
                     <!-- This may be useful later when we get to the export! -->
                     <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
+                    <div *ngIf="data.byID(case).result !== 'skipped', else forSkipped">
                     <td>
                       <app-coloured-score [metric]="data.byID(case).metric"></app-coloured-score>
                     </td>
+                    </div>
+                    <ng-template #forSkipped>
+                      <td>Test Skipped</td>
+                    </ng-template>
                     </mat-panel-description>
               </ng-template>
               </mat-expansion-panel-header>
