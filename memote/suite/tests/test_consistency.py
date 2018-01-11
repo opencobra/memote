@@ -28,13 +28,21 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 @annotate(title="Stoichiometric Consistency", type="length")
 def test_stoichiometric_consistency(read_only_model):
     """
-    Expect that the stoichiometry is mass-balanced.
+    Expect that the stoichiometry is consistent.
 
-    Stoichiometric inconsistency violates universal constraints: the
-    positivity of molecular masses and the mass conservation for each
-    reaction. A single incorrectly defined reaction can lead to
-    stoichiometric inconsistency in the model and consequently to
-    unconserved metabolites.
+    Stoichiometric inconsistency violates universal constraints:
+    1. Molecular masses are always positive, and
+    2. On each side of a reaction the mass is conserved.
+    A single incorrectly defined reaction can lead to stoichiometric
+    inconsistency in the model, and consequently to unconserved metabolites.
+    Similar to insufficient constraints, this may give rise to cycles which
+    either produce mass from nothing or consume mass from the model.
+
+    This test uses an implementation of the algorithm presented by
+    Gevorgyan, A., M. G Poolman, and D. A Fell.
+    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+    Bioinformatics 24, no. 19 (2008): 2245.
+    doi: 10.1093/bioinformatics/btn425
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(
@@ -53,7 +61,23 @@ def test_stoichiometric_consistency(read_only_model):
 @annotate(title="Erroneous Energy-generating Cycles", type="object",
           data=dict(), message=dict())
 def test_detect_energy_generating_cycles(read_only_model, met):
-    """Expect that no energy metabolite can be produced out of nothing."""
+    """
+    Expect that no energy metabolite can be produced out of nothing.
+
+    When a model is not sufficiently constrained to account for the
+    thermodynamics of reactions, flux cycles may form which provide reduced
+    metabolites to the model without requiring nutrient uptake. These cycles
+    are referred to as erroneous energy-generating cycles. Their effect on the
+    predicted growth rate in FBA may account for an increase of up to 25%,
+    which makes studies involving the growth rates predicted from such models
+    unreliable.
+
+    This test uses an implementation of the algorithm presented by:
+    Fritzemeier, C. J., Hartleb, D., Szappanos, B., Papp, B., & Lercher,
+    M. J. (2017). Erroneous energy-generating cycles in published genome scale
+    metabolic networks: Identification and removal. PLoS Computational
+    Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
+    """
     ann = test_detect_energy_generating_cycles.annotation
     if met not in read_only_model.metabolites:
         pytest.skip("This test has been skipped since metabolite {} could "
@@ -71,7 +95,13 @@ def test_detect_energy_generating_cycles(read_only_model, met):
 
 @annotate(title="Number of Charge-Imbalanced Reactions", type="length")
 def test_reaction_charge_balance(read_only_model):
-    """Expect all reactions to be charge balanced."""
+    """
+    Expect all reactions to be charge balanced.
+
+    In steady state, for each metabolite the sum of influx equals the sum
+    of outflux. Hence the net charges of both sides of any model reaction have
+    to be equal.
+    """
     ann = test_reaction_charge_balance.annotation
     ann["data"] = get_ids(
         consistency.find_charge_imbalanced_reactions(read_only_model))
@@ -86,7 +116,13 @@ def test_reaction_charge_balance(read_only_model):
 
 @annotate(title="Number of Mass-Unbalanced Reactions", type="length")
 def test_reaction_mass_balance(read_only_model):
-    """Expect all reactions to be mass balanced."""
+    """
+    Expect all reactions to be mass balanced.
+
+    In steady state, for each metabolite the sum of influx equals the sum
+    of outflux. Hence the net masses of both sides of any model reaction have
+    to be equal.
+    """
     ann = test_reaction_mass_balance.annotation
     ann["data"] = get_ids(
         consistency.find_mass_imbalanced_reactions(read_only_model)
@@ -100,15 +136,15 @@ def test_reaction_mass_balance(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Blocked Reactions", type="length")
+@annotate(title="Number of Universally Blocked Reactions", type="length")
 def test_blocked_reactions(read_only_model):
     """
-    Expect all reactions to be able to carry flux.
+    Expect all reactions to be able to carry flux in complete medium.
 
-    Blocked reactions are reactions that during Flux Variability Analysis
-    cannot carry any flux while all model boundaries are open. Generally
-    blocked reactions are caused by network gaps, which can be attributed
-    to scope or knowledge gaps.
+    Universally blocked reactions are reactions that during Flux Variability
+    Analysis cannot carry any flux while all model boundaries are open.
+    Generally blocked reactions are caused by network gaps, which can be
+    attributed to scope or knowledge gaps.
     """
     ann = test_blocked_reactions.annotation
     ann["data"] = get_ids(consistency.find_blocked_reactions(read_only_model))
@@ -145,7 +181,12 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
 
 @annotate(title="Number of Orphan Metabolites", type="length")
 def test_find_orphans(read_only_model):
-    """Expect no orphans to be present."""
+    """
+    Expect no orphans to be present.
+
+    Orphans are metabolites that are only consumed in reactions. The may
+    indicate the presence of network gaps.
+    """
     ann = test_find_orphans.annotation
     ann["data"] = get_ids(consistency.find_orphans(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
@@ -158,7 +199,12 @@ def test_find_orphans(read_only_model):
 
 @annotate(title="Number of Dead-end Metabolites", type="length")
 def test_find_deadends(read_only_model):
-    """Expect no deadends to be present."""
+    """
+    Expect no deadends to be present.
+
+    Deadends are metabolites that are only produced in reactions. The may
+    indicate the presence of network gaps.
+    """
     ann = test_find_deadends.annotation
     ann["data"] = get_ids(consistency.find_deadends(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
@@ -171,7 +217,13 @@ def test_find_deadends(read_only_model):
 
 @annotate(title="Number of Disconnected Metabolites", type="length")
 def test_find_disconnected(read_only_model):
-    """Expect no disconnected metabolites to be present."""
+    """
+    Expect no disconnected metabolites to be present.
+
+    Disconnected metabolites are not part of any model reactions. They are
+    most likely left-over from the reconstruction process, but may also point
+    to network gaps.
+    """
     ann = test_find_disconnected.annotation
     ann["data"] = get_ids(consistency.find_disconnected(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)

@@ -163,6 +163,7 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
+# TODO: Improve the heuristics of identifying the biomass reaction(s)!!!
 def find_biomass_reaction(model):
     """
     Return a list of the biomass reaction(s) of the model.
