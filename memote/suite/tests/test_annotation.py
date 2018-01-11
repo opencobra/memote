@@ -30,7 +30,15 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 
 @annotate(title="Metabolites without Annotation", type="length")
 def test_metabolite_annotation_presence(read_only_model):
-    """Expect all metabolites to have a non-empty annotation attribute."""
+    """
+    Expect all metabolites to have a non-empty annotation attribute.
+
+    This test checks if any annotations at all are present in the SBML
+    annotations field for each metabolite, irrespective of the type of
+    annotation i.e. specific database  cross-references, ontology terms,
+    additional information. For this test to pass the model is expected to
+    have metabolites and each of them should have some form of annotation.
+    """
     ann = test_metabolite_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
         read_only_model, "metabolites"))
@@ -43,7 +51,16 @@ def test_metabolite_annotation_presence(read_only_model):
 
 @annotate(title="Reactions without Annotation", type="length")
 def test_reaction_annotation_presence(read_only_model):
-    """Expect all reactions to have a non-empty annotation attribute."""
+    """
+    Expect all reactions to have a non-empty annotation attribute.
+
+
+    This test checks if any annotations at all are present in the SBML
+    annotations field for each reaction, irrespective of the type of
+    annotation i.e. specific database  cross-references, ontology terms,
+    additional information. For this test to pass the model is expected to
+    have reactions and each of them should have some form of annotation.
+    """
     ann = test_reaction_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
         read_only_model, "reactions"))
@@ -61,7 +78,23 @@ def test_metabolite_annotation_overview(read_only_model, db):
     """
     Expect all metabolites to have annotations from common databases.
 
-    The required databases are outlined in `annotation.py`.
+    Specific database cross-references are paramount to mapping information.
+    To provide references to as many databases as possible helps to make the
+    metabolic model more accessible to other researchers. This does not only
+    facilitate the use of a model in a broad array of computational pipelines,
+    it also promotes the metabolic model itself to become an organism-specific
+    knowledge base.
+
+    For this test to pass, each metabolite annotation should contain
+    cross-references to a number of databases (listed in `annotation.py`).
+    For each database this test checks for the presence of its corresponding
+    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
+    those defined on https://identifiers.org/.
+
+    Since each database is quite different and some potentially incomplete, it
+    may not be feasible to achieve 100% coverage for each of them. Generally
+    it should be possible, however, to obtain cross-references to at least
+    one of the databases for all metabolites consistently.
     """
     ann = test_metabolite_annotation_overview.annotation
     ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
@@ -82,7 +115,23 @@ def test_reaction_annotation_overview(read_only_model, db):
     """
     Expect all reactions to have annotations from common databases.
 
-    The required databases are outlined in `annotation.py`.
+    Specific database cross-references are paramount to mapping information.
+    To provide references to as many databases as possible helps to make the
+    metabolic model more accessible to other researchers. This does not only
+    facilitate the use of a model in a broad array of computational pipelines,
+    it also promotes the metabolic model itself to become an organism-specific
+    knowledge base.
+
+    For this test to pass, each reaction annotation should contain
+    cross-references to a number of databases (listed in `annotation.py`).
+    For each database this test checks for the presence of its corresponding
+    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
+    those defined on https://identifiers.org/.
+
+    Since each database is quite different and some potentially incomplete, it
+    may not be feasible to achieve 100% coverage for each of them. Generally
+    it should be possible, however, to obtain cross-references to at least
+    one of the databases for all reactions consistently.
     """
     ann = test_reaction_annotation_overview.annotation
     ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
@@ -102,7 +151,16 @@ def test_metabolite_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of metabolites to be in the correct format.
 
-    The required formats, i.e., regex patterns are outlined in `annotation.py`.
+    To identify databases and the identifiers belonging to them, computational
+    tools rely on the presence of specific patterns. Only when these patterns
+    can be identified consistently is an ID truly machine-readable. This test
+    checks if the database cross-references in metabolite annotations conform
+    to patterns defined according to the MIRIAM guidelines, i.e. matching
+    those that are defined at https://identifiers.org/.
+
+    The required formats, i.e., regex patterns are further outlined in
+    `annotation.py`. This test does not carry out a web query for the composed
+    URI, it merely controls that the regex patterns match the identifiers.
     """
     ann = test_metabolite_annotation_wrong_ids.annotation
     ann["data"][db] = get_ids(
@@ -125,7 +183,16 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of reactions to be in the correct format.
 
-    The required formats, i.e., regex patterns are outlined in `annotation.py`.
+    To identify databases and the identifiers belonging to them, computational
+    tools rely on the presence of specific patterns. Only when these patterns
+    can be identified consistently is an ID truly machine-readable. This test
+    checks if the database cross-references in reaction annotations conform
+    to patterns defined according to the MIRIAM guidelines, i.e. matching
+    those that are defined at https://identifiers.org/.
+
+    The required formats, i.e., regex patterns are further outlined in
+    `annotation.py`. This test does not carry out a web query for the composed
+    URI, it merely controls that the regex patterns match the identifiers.
     """
     ann = test_reaction_annotation_wrong_ids.annotation
     ann["data"][db] = get_ids(
@@ -143,7 +210,19 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
 
 @annotate(title="Uniform Metabolite Identifier Namespace", type="length")
 def test_metabolite_id_namespace_consistency(read_only_model):
-    """Expect metabolite identifiers to be from the same namespace."""
+    """
+    Expect metabolite identifiers to be from the same namespace.
+
+    In well-annotated models it is no problem if the pool of main identifiers
+    for metabolites consists of identifiers from several databases. However,
+    in models that lack appropriate annotations, it may hamper the ability of
+    other researchers to use it. Running the model through a computational
+    pipeline may be difficult without first consolidating the namespace.
+
+    Hence, this test checks if the main metabolite identifiers can be
+    attributed to one single namespace based on the regex patterns defined at
+    https://identifiers.org/
+    """
     ann = test_metabolite_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "metabolites")
@@ -167,7 +246,19 @@ def test_metabolite_id_namespace_consistency(read_only_model):
 
 @annotate(title="Uniform Metabolite Identifier Namespace", type="length")
 def test_reaction_id_namespace_consistency(read_only_model):
-    """Expect reaction identifiers to be from the same namespace."""
+    """
+    Expect reaction identifiers to be from the same namespace.
+
+    In well-annotated models it is no problem if the pool of main identifiers
+    for reactions consists of identifiers from several databases. However,
+    in models that lack appropriate annotations, it may hamper the ability of
+    other researchers to use it. Running the model through a computational
+    pipeline may be difficult without first consolidating the namespace.
+
+    Hence, this test checks if the main reaction identifiers can be
+    attributed to one single namespace based on the regex patterns defined at
+    https://identifiers.org/
+    """
     ann = test_reaction_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(
         read_only_model, "reactions")
