@@ -26,7 +26,13 @@ from memote.utils import annotate, get_ids, truncate, wrapper
 
 @annotate(title="Model Identifier", type="string")
 def test_model_id_presence(read_only_model):
-    """Expect that the model has an identifier."""
+    """
+    Expect that the model has an identifier.
+
+    The MIRIAM guidelines require a model to be named. While it is not
+    required, the ID will be displayed on the memote reports, which helps to
+    distinguish the output clearly.
+    """
     ann = test_model_id_presence.annotation
     assert hasattr(read_only_model, "id")
     ann["data"] = read_only_model.id
@@ -35,7 +41,14 @@ def test_model_id_presence(read_only_model):
 
 @annotate(title="Total Number of Genes", type="length")
 def test_genes_presence(read_only_model):
-    """Expect that >= 1 genes are defined in the model."""
+    """
+    Expect that more than one gene is defined in the model.
+
+    A metabolic model can still be a useful tool without any
+    genes, however there are certain methods which rely on the presence of
+    genes and, more importantly, the corresponding gene-protein-reaction
+    rules. This test requires that there is at least one gene defined.
+    """
     ann = test_genes_presence.annotation
     assert hasattr(read_only_model, "genes")
     ann["data"] = get_ids(read_only_model.genes)
@@ -46,7 +59,12 @@ def test_genes_presence(read_only_model):
 
 @annotate(title="Total Number of Reactions", type="length")
 def test_reactions_presence(read_only_model):
-    """Expect that >= 1 reactions are present in the model."""
+    """
+    Expect that more than one reaction is defined in the model.
+
+    To be useful a metabolic model should consist at least of a few reactions.
+    This test simply checks if there are more than one.
+    """
     ann = test_reactions_presence.annotation
     assert hasattr(read_only_model, "reactions")
     ann["data"] = get_ids(read_only_model.reactions)
@@ -57,7 +75,13 @@ def test_reactions_presence(read_only_model):
 
 @annotate(title="Total Number of Metabolites", type="length")
 def test_metabolites_presence(read_only_model):
-    """Expect that >= 1 metabolites are present in the model."""
+    """
+    Expect that more than one metabolite is defined in the model.
+
+    To be useful a metabolic model should consist at least of a few
+    metabolites that are converted by reactions.
+    This test simply checks if there are more than one metabolites defined.
+    """
     ann = test_metabolites_presence.annotation
     assert hasattr(read_only_model, "metabolites")
     ann["data"] = get_ids(read_only_model.metabolites)
@@ -68,7 +92,14 @@ def test_metabolites_presence(read_only_model):
 
 @annotate(title="Total Number of Transport Reactions", type="length")
 def test_transport_reaction_presence(read_only_model):
-    """Expect >= 1 transport reactions are present in the model."""
+    """
+    Expect more than one transport reaction to be defined in the model.
+
+    Cellular metabolism in any organism usually involves the transport of
+    metabolites across a lipid bi-layer. Hence, this test checks that there is
+    at least one reaction, which transports metabolites from one compartment
+    to another.
+    """
     ann = test_transport_reaction_presence.annotation
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
     ann["message"] = wrapper.fill(
@@ -82,8 +113,8 @@ def test_metabolites_formula_presence(read_only_model):
     """
     Expect all metabolites to have a formula.
 
-    To ensure that reactions are mass-balanced, all model metabolites
-    ought to be provided with a formula.
+    To be able to ensure that reactions are mass-balanced, all model
+    metabolites ought to be provided with a chemical formula.
     """
     ann = test_metabolites_formula_presence.annotation
     ann["data"] = get_ids(
@@ -101,8 +132,8 @@ def test_metabolites_charge_presence(read_only_model):
     """
     Expect all metabolites to have charge information.
 
-    To ensure that reactions are charge-balanced, all model metabolites
-        ought to be provided with a charge.
+    To be able to ensure that reactions are charge-balanced, all model
+    metabolites ought to be provided with a charge.
     """
     ann = test_metabolites_charge_presence.annotation
     ann["data"] = get_ids(
@@ -179,7 +210,19 @@ def test_metabolic_coverage(read_only_model):
 
 @annotate(title="Total Number of Compartments", type="length")
 def test_compartments_presence(read_only_model):
-    """Expect that >= 3 compartments are defined in the model."""
+    """
+    Expect that more than two compartments are defined in the model.
+
+    While simplified metabolic models may be perfectly viable, generally
+    across the tree of life organisms contain at least one distinct
+    compartment: the cytosol or cytoplasm. In the case of prokaryotes there is
+    usually a periplasm, and eurkaryotes are more complex. In addition to the
+    internal compartment, a metabolic model also reflects the extracellular
+    environment i.e. the medium/ metabolic context in which the modelled cells
+    grow. Hence, in total, at least two compartments can be expected from a
+    metabolic model.
+    """
+    #TODO: Fix the test in a later PR! It should expect 2 compartments instead!
     ann = test_compartments_presence.annotation
     assert hasattr(read_only_model, "compartments")
     ann["data"] = list(read_only_model.get_metabolite_compartments())
@@ -190,8 +233,21 @@ def test_compartments_presence(read_only_model):
 
 
 @annotate(title="Number of Enzyme Complexes", type="length")
+# TODO: Rename this test to protein_complex because it may otherwise be
+# confused with multi-enzyme complexes!!
 def test_enzyme_complex_presence(read_only_model):
-    """Expect that >= 1 enzyme complexes are present in the model."""
+    """
+    Expect that more than one enzyme complex is present in the model.
+
+    Based on the gene-protein-reaction (GPR) rules, it is possible to infer
+    whether a reaction is catalyzed by a single gene product, isozymes or by a
+    heteromeric protein complex. This test checks that at least one
+    such protein complex is defined in the GPR of the model. For S. cerevisiae
+    it could be shown that "essential proteins tend to [cluster] together in
+    essential complexes" (https://doi.org/10.1074%2Fmcp.M800490-MCP200).
+
+    This might also be a relevant metric for other organisms.
+    """
     ann = test_enzyme_complex_presence.annotation
     ann["data"] = list(basic.find_enzyme_complexes(read_only_model))
     ann["message"] = wrapper.fill(
@@ -202,7 +258,16 @@ def test_enzyme_complex_presence(read_only_model):
 
 @annotate(title="Number of Purely Metabolic Reactions", type="length")
 def test_find_pure_metabolic_reactions(read_only_model):
-    """Expect >= 1 pure metabolic reactions are present in the model."""
+    """
+    Expect at least one pure metabolic reaction to be defined in the model.
+
+    If a reaction is neither a transport reaction, a biomass reaction nor a
+    boundary reaction, it is counted as a purely metabolic reaction. This test
+    requires the presence of metabolite formula to be able to identify
+    transport reactions. This test is passed when the model contains at least
+    one purely metabolic reaction i.e. a conversion of one metabolite into
+    another.
+    """
     ann = test_find_pure_metabolic_reactions.annotation
     ann["data"] = get_ids(
         basic.find_pure_metabolic_reactions(read_only_model))
@@ -216,7 +281,16 @@ def test_find_pure_metabolic_reactions(read_only_model):
 
 @annotate(title="Number of Transport Reactions", type="length")
 def test_find_transport_reactions(read_only_model):
-    """Expect >= 1 transport reactions are present in the read_only_model."""
+    """
+    Expect at least one transport reaction to be defined in the model.
+
+    A transport reaction is defined as follows:
+    1. It contains metabolites from at least two compartments and
+    2. at least one metabolite undergoes no chemical conversion, i.e.,
+    the formula stays the same on both sides of the equation.
+
+    This test will not be able to identify transport via the PTS System.
+    """
     ann = test_find_transport_reactions.annotation
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
@@ -230,7 +304,17 @@ def test_find_transport_reactions(read_only_model):
 
 @annotate(title="Number of Unique Metabolites", type="length")
 def test_find_unique_metabolites(read_only_model):
-    """Expect there to be less metabolites when removing compartment tag."""
+    """
+    Expect there to be less metabolites when removing compartment tag.
+
+    Metabolites may be transported into different compartments, which means
+    that in a compartimentalized model the number of metabolites may be
+    much higher than in a model with no compartments. This test counts only
+    one occurrence of each metabolite and returns this as the number of unique
+    metabolites. The test expects that the model is compartimentalized, and
+    thus, that the number of unique metabolites is generally lower than the
+    total number of metabolites.
+    """
     ann = test_find_unique_metabolites.annotation
     ann["data"] = list(basic.find_unique_metabolites(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
