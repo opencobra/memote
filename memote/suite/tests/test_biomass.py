@@ -47,7 +47,14 @@ def test_biomass_presence():
     The biomass composition aka biomass formulation aka biomass reaction
     is a common pseudo-reaction accounting for biomass synthesis in
     constraints-based modelling. It describes the stoichiometry of
-    intracellular compounds that are required for cell growth.
+    intracellular compounds that are required for cell growth. While this
+    reaction may not be relevant to modeling the metabolism of higher
+    organisms, it is essential for single-cell modeling.
+
+    This test checks if at least one biomass reaction is present. Currently,
+    the biomass reaction is identified by looking for the word 'biomass' in
+    the reaction ID. The heuristics of identification will be improved in the
+    future.
     """
     ann = test_biomass_presence.annotation
     ann["data"] = BIOMASS_IDS
@@ -62,7 +69,15 @@ def test_biomass_presence():
 @annotate(title="Biomass Consistency", type="object", data=dict(),
           message=dict())
 def test_biomass_consistency(read_only_model, reaction_id):
-    """Expect biomass components to sum up to 1 g[CDW]."""
+    """
+    Expect biomass components to sum up to 1 g[CDW].
+
+    The molecular weight of the biomass reaction in metabolic models is
+    defined to be equal to 1 g/mmol. Conforming to this is essential in order
+    to be able to reliably calculate growth yields, to cross-compare models,
+    and to obtain valid predictions when simulating microbial consortia. A
+    deviation by 1e-03 is accepted.
+    """
     ann = test_biomass_consistency.annotation
     reaction = read_only_model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
@@ -78,7 +93,13 @@ def test_biomass_consistency(read_only_model, reaction_id):
 @annotate(title="Biomass Production At Default State", type="object",
           data=dict(), message=dict())
 def test_biomass_default_production(model, reaction_id):
-    """Expect biomass production in default medium."""
+    """
+    Expect biomass production in default medium.
+
+    Using flux balance analysis this test optimizes the model for growth in
+    the medium that is set by default. Any non-zero growth rate is accepted to
+    pass this test.
+    """
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     ann["message"][reaction_id] = wrapper.fill(
@@ -92,7 +113,16 @@ def test_biomass_default_production(model, reaction_id):
 @annotate(title="Blocked Biomass Precursors At Default State", type="object",
           data=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
-    """Expect production of all biomass precursors in default medium."""
+    """
+    Expect production of all biomass precursors in default medium.
+
+    Using flux balance analysis this test optimizes for the production of each
+    metabolite that is a substrate of the biomass reaction with the exception
+    of atp and h2o. Optimizations are carried out using the default
+    conditions. This is useful when reconstructing the precursor biosynthesis
+    pathways of a metabolic model. To pass this test, the model should be able
+    to synthesis all the precursors.
+    """
     ann = test_biomass_precursors_default_production.annotation
     reaction = read_only_model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = get_ids(
@@ -110,7 +140,17 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
 @annotate(title="Blocked Biomass Precursors In Complete Medium", type="object",
           data=dict(), message=dict())
 def test_biomass_precursors_open_production(model, reaction_id):
-    """Expect precursor production in complete medium."""
+    """
+    Expect precursor production in complete medium.
+
+    Using flux balance analysis this test optimizes for the production of each
+    metabolite that is a substrate of the biomass reaction with the exception
+    of atp and h2o. Optimizations are carried out using a complete
+    medium i.e. unconstrained boundary reactions. This is useful when
+    reconstructing the precursor biosynthesis pathways of a metabolic model.
+    To pass this test, the model should be able to synthesis all the
+    precursors.
+    """
     ann = test_biomass_precursors_open_production.annotation
     with model:
         for exchange in model.exchanges:
@@ -131,7 +171,14 @@ def test_biomass_precursors_open_production(model, reaction_id):
 @annotate(title="Growth-associated Maintenance in Biomass Reaction",
           type="object", data=dict(), message=dict())
 def test_gam_in_biomass(model, reaction_id):
-    """Expect the biomass reactions to contain atp and adp."""
+    """
+    Expect the biomass reactions to contain atp and adp.
+
+    The growth-associated maintenance (GAM) term accounts for the energy in
+    the form of ATP that is required to synthesize macromolecules such as
+    Proteins, DNA and RNA, and other processes during growth. This test checks
+    if a biomass reaction contains this term.
+    """
     ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = biomass.gam_in_biomass(reaction)
@@ -145,9 +192,12 @@ def test_gam_in_biomass(model, reaction_id):
 @annotate(title="Unrealistic Growth Rate In Default Condition", type='object',
           data=dict(), message=dict())
 def test_fast_growth_default(model, reaction_id):
-    """Expect the predicted growth rate for each BOF to be below 10.3972.
+    """
+    Expect the predicted growth rate for each BOF to be below 10.3972.
 
-    This is based on lowest doubling time reported here
+    The growth rate of a metabolic model should not be faster than that of the
+    fastest growing organism. This is based on lowest doubling time reported
+    here:
     http://www.pnnl.gov/science/highlights/highlight.asp?id=879
     """
     ann = test_fast_growth_default.annotation
