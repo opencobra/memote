@@ -222,7 +222,7 @@ def test_compartments_presence(read_only_model):
     grow. Hence, in total, at least two compartments can be expected from a
     metabolic model.
     """
-    #TODO: Fix the test in a later PR! It should expect 2 compartments instead!
+    # TODO: Fix the test in a later PR! Should expect 2 compartments instead!
     ann = test_compartments_presence.annotation
     assert hasattr(read_only_model, "compartments")
     ann["data"] = list(read_only_model.get_metabolite_compartments())
