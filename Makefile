@@ -71,7 +71,11 @@ servedocs: docs ## compile the docs watching for changes
 release: clean ## package and upload a release
 	python setup.py sdist bdist_wheel upload
 
-dist: clean ## builds source and wheel package
+reports:
+	$(MAKE) -C memote-report-app bundle
+	cp memote-report-app/build/index.html memote/suite/reporting/templates/snapshot.html
+
+dist: clean reports ## builds source and wheel package
 	python setup.py sdist bdist_wheel
 	ls -l dist
 

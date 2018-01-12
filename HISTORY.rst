@@ -13,6 +13,8 @@ Next Release
   scoring weights.
 * Sort unconfigured tests into the card 'Misc. Tests' in the snapshot report.
 * Handle skipped tests better in the snapshot report.
+* Bundle the Angular report javascript libraries in the snapshot template
+* Pass results into the report as JSON
 
 0.4.6 (2017-10-31)
 ------------------
