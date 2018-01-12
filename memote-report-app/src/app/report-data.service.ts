@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ResultCard } from './resultcard.model';
 import { TestResult } from './test-result.model';
-import * as testData from './data/testData.json';
+// import * as testData from './data/testData.json';
 
 @Injectable()
 export class ReportDataService {
@@ -14,8 +14,9 @@ export class ReportDataService {
   constructor(private http: HttpClient) {}
 
   public loadResults(): void {
-    // this.http.get("data/testData.json").subscribe(data => {this.rawReportData = data});
-    this.convertResults((<any>window).data || testData);
+    // TODO: Might want to parse and decompress a string in future.
+    // const data = JSON.parse((<any>window).data);
+    this.convertResults((<any>window).data);
   }
 
   public byID(string){

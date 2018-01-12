@@ -19,6 +19,13 @@
 
 from __future__ import absolute_import
 
+import io
+import json
+# from base64 import b64encode
+from string import Template
+from os.path import join, dirname
+# from zlib import compress
+
 from memote.suite.reporting.reports.report import Report
 
 
@@ -37,4 +44,16 @@ class SnapshotReport(Report):
         This is currently a stub while we convert from ``jinja2`` templates
         to a full Angular based report.
         """
-        return u""
+        # template = self.env.get_template("snapshot.html")
+        with io.open(join(dirname(__file__), "../templates/snapshot.html")) as \
+                file_handle:
+            template = Template(file_handle.read())
+        return template.safe_substitute(
+            results=json.dumps(self.data))
+
+        # TODO: Use compression of JSON in future.
+        # return template.safe_substitute(
+        #     results=b64encode(compress(
+        #         json.dumps(self.data).encode("UTF-16"), level=9)))
+        # return template.render(
+        #     result=Markup(b64encode(compress(json.dumps(self.data), level=9))))
