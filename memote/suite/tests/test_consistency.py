@@ -184,8 +184,8 @@ def test_find_orphans(read_only_model):
     """
     Expect no orphans to be present.
 
-    Orphans are metabolites that are only consumed in reactions. The may
-    indicate the presence of network gaps.
+    Orphans are metabolites that are only consumed but not produced by
+    reactions in the model. They may indicate the presence of network gaps.
     """
     ann = test_find_orphans.annotation
     ann["data"] = get_ids(consistency.find_orphans(read_only_model))
@@ -202,8 +202,8 @@ def test_find_deadends(read_only_model):
     """
     Expect no deadends to be present.
 
-    Deadends are metabolites that are only produced in reactions. The may
-    indicate the presence of network gaps.
+    Deadends are metabolites that can only be produced but not consumed by
+    reactions in the model. They may indicate the presence of network gaps.
     """
     ann = test_find_deadends.annotation
     ann["data"] = get_ids(consistency.find_deadends(read_only_model))
@@ -220,9 +220,9 @@ def test_find_disconnected(read_only_model):
     """
     Expect no disconnected metabolites to be present.
 
-    Disconnected metabolites are not part of any model reactions. They are
-    most likely left-over from the reconstruction process, but may also point
-    to network gaps.
+    Disconnected metabolites are not part of any reaction in the model. They
+    are most likely left-over from the reconstruction process, but may also
+    point to network gaps.
     """
     ann = test_find_disconnected.annotation
     ann["data"] = get_ids(consistency.find_disconnected(read_only_model))
