@@ -200,9 +200,9 @@ def test_find_orphans(read_only_model):
 @annotate(title="Number of Dead-end Metabolites", type="length")
 def test_find_deadends(read_only_model):
     """
-    Expect no deadends to be present.
+    Expect no dead-ends to be present.
 
-    Deadends are metabolites that can only be produced but not consumed by
+    Dead-ends are metabolites that can only be produced but not consumed by
     reactions in the model. They may indicate the presence of network gaps.
     """
     ann = test_find_deadends.annotation
