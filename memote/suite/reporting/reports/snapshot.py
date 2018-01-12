@@ -56,4 +56,5 @@ class SnapshotReport(Report):
         #     results=b64encode(compress(
         #         json.dumps(self.data).encode("UTF-16"), level=9)))
         # return template.render(
-        #     result=Markup(b64encode(compress(json.dumps(self.data), level=9))))
+        #     result=Markup(b64encode(
+        #       compress(json.dumps(self.data), level=9))))
