@@ -50,14 +50,30 @@
                     <td class="test-title"> {{ data.byID(case).title }} </td>
                     <!-- This may be useful later when we get to the export! -->
                     <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
-                    <div *ngIf="data.byID(case).result !== 'skipped', else forSkipped">
+                    <div *ngIf="data.byID(case).result === 'passed' || data.byID(case).result === 'failed'">
                     <td>
                       <app-coloured-score [metric]="data.byID(case).metric"></app-coloured-score>
                     </td>
                     </div>
-                    <ng-template #forSkipped>
-                      <td>Test Skipped</td>
-                    </ng-template>
+                    <div *ngIf="data.byID(case).result === 'skipped'">
+                      <td>
+                        <button
+                         mat-raised-button
+                         disabled
+                         style="color:black">
+                         Skipped
+                         </button>
+                       </td>
+                    </div>
+                    <div *ngIf="data.byID(case).result === 'error'">
+                      <td>
+                        <button
+                         mat-raised-button
+                         style="color:red;background-color:black">
+                         Errored
+                         </button>
+                       </td>
+                    </div>
                     </mat-panel-description>
               </ng-template>
               </mat-expansion-panel-header>
