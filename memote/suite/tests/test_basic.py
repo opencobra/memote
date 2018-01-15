@@ -99,12 +99,21 @@ def test_transport_reaction_presence(read_only_model):
     metabolites across a lipid bi-layer. Hence, this test checks that there is
     at least one reaction, which transports metabolites from one compartment
     to another.
+
+    A transport reaction is defined as follows:
+    1. It contains metabolites from at least two compartments and
+    2. at least one metabolite undergoes no chemical conversion, i.e.,
+    the formula stays the same on both sides of the equation.
+
+    This test will not be able to identify transport via the PTS System.
     """
     ann = test_transport_reaction_presence.annotation
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
     ann["message"] = wrapper.fill(
-        """{:d} transport reactions are defined in the model.""".format(
-            len(ann["data"])))
+        """A total of {:d} ({:.2%}) transport reactions are defined in the
+        model, this excludes purely metabolic reactions, exchanges, or
+        pseudo-reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
 
 
@@ -276,29 +285,6 @@ def test_find_pure_metabolic_reactions(read_only_model):
         """A total of {:d} ({:.2%}) purely metabolic reactions are defined in
         the model, this excludes transporters, exchanges, or pseudo-reactions:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert len(ann["data"]) >= 1, ann["message"]
-
-
-@annotate(title="Number of Transport Reactions", type="length")
-def test_find_transport_reactions(read_only_model):
-    """
-    Expect at least one transport reaction to be defined in the model.
-
-    A transport reaction is defined as follows:
-    1. It contains metabolites from at least two compartments and
-    2. at least one metabolite undergoes no chemical conversion, i.e.,
-    the formula stays the same on both sides of the equation.
-
-    This test will not be able to identify transport via the PTS System.
-    """
-    ann = test_find_transport_reactions.annotation
-    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
-    ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) transport reactions are defined in the
-        model, this excludes purely metabolic reactions, exchanges, or
-        pseudo-reactions: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
 
 
