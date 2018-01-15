@@ -20,8 +20,7 @@
               *ngIf="data.byID(test).result === 'passed' || data.byID(test).result === 'failed'">
                   <tr fxLayoutAlign='space-between center'>
                     <td class="test-title"> {{ data.byID(test).title }} </td>
-                    <div [ngSwitch]="data.byID(test).type">
-                      <td *ngSwitchCase="'length'">
+                      <td *ngIf="data.byID(test).type === 'length'">
                         <button
                         mat-raised-button
                         color="primary"
@@ -29,7 +28,7 @@
                           {{ data.byID(test).data.length | number : '1.'}}
                         </button>
                       </td>
-                      <td *ngSwitchCase="'number'">
+                      <td *ngIf="data.byID(test).type === 'number'">
                         <button
                         mat-raised-button
                         color="primary"
@@ -37,7 +36,7 @@
                           {{ data.byID(test).metric | number : '1.2-2'}}
                         </button>
                       </td>
-                      <td *ngSwitchCase="'array'">
+                      <td *ngIf="data.byID(test).type === 'array' || data.byID(test).type === 'string' || data.byID(test).type === 'boolean'">
                         <button
                         mat-raised-button
                         color="primary"
@@ -45,15 +44,6 @@
                           {{ data.byID(test).data }}
                         </button>
                       </td>
-                      <td *ngSwitchCase="'string'">
-                        <button
-                        mat-raised-button
-                        color="primary"
-                        style="color:white">
-                          {{ data.byID(test).data }}
-                        </button>
-                      </td>
-                    </div>
                   </tr>
                </div>
                <div fxFlex *ngIf="data.byID(test).result === 'skipped'">

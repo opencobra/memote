@@ -3,8 +3,7 @@
 <tr *ngFor="let pair of keyValuePairs; let i = index" fxLayoutAlign='space-between center' style="padding:0.05vh 0vh 0.05vh">
   <td style="padding-left:1vh"> {{ pair[0] }}</td>
   <div *ngIf="resultObject[i][1] === 'passed' || resultObject[i][1] === 'failed'">
-    <div [ngSwitch]="getType(pair[1])">
-      <td *ngSwitchCase="'object'">
+      <td *ngIf="getType(pair[1]) === 'object' || getType(pair[1]) === 'enum' || getType(pair[1]) === 'number'">
         <button
         mat-raised-button
         color="primary"
@@ -12,23 +11,7 @@
           {{ pair[1].length }}
         </button>
       </td>
-      <td *ngSwitchCase="'enum'">
-        <button
-        mat-raised-button
-        color="primary"
-        style="color:white">
-          {{ pair[1].length }}
-        </button>
-      </td>
-      <td *ngSwitchCase="'array'">
-        <button
-        mat-raised-button
-        color="primary"
-        style="color:white">
-          {{ pair[1].length }}
-        </button>
-      </td>
-      <td *ngSwitchCase="'number'">
+      <td *ngIf="getType(pair[1]) ==='number'">
         <button
         mat-raised-button
         color="primary"
@@ -36,7 +19,7 @@
            {{ pair[1] | number : '1.2-2' }}
         </button>
       </td>
-      <td *ngSwitchCase="'string'">
+      <td *ngIf="getType(pair[1]) === 'string' || getType(pair[1]) === 'boolean'">
         <button
         mat-raised-button
         color="primary"
@@ -44,7 +27,6 @@
            {{ pair[1] }}
         </button>
       </td>
-    </div>
   </div>
   <div *ngIf="resultObject[i][1] === 'skipped'">
     <td>
