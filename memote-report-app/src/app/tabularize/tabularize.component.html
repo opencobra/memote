@@ -7,7 +7,7 @@
       <td *ngSwitchCase="'object'"> {{ pair[1].length }}</td>
       <td *ngSwitchCase="'enum'"> {{ pair[1].length }}</td>
       <td *ngSwitchCase="'array'"> {{ pair[1].length }}</td>
-      <td *ngSwitchCase="'number'"> {{ pair[1] }}</td>
+      <td *ngSwitchCase="'number'"> {{ pair[1] | number : '1.2-2' }}</td>
       <td *ngSwitchCase="'string'"> {{ pair[1] }}</td>
     </div>
   </div>
