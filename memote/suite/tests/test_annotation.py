@@ -54,7 +54,6 @@ def test_reaction_annotation_presence(read_only_model):
     """
     Expect all reactions to have a non-empty annotation attribute.
 
-
     This test checks if any annotations at all are present in the SBML
     annotations field for each reaction, irrespective of the type of
     annotation i.e. specific database  cross-references, ontology terms,
