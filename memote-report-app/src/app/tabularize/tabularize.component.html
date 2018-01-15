@@ -1,8 +1,7 @@
 
-<hr>
 <div *ngIf="!scored; else metricTable" fxLayout='column' fxLayoutAlign='start stretch'>
 <tr *ngFor="let pair of keyValuePairs; let i = index" fxLayoutAlign='space-between center' style="padding:0.05vh 0vh 0.05vh">
-  <td> {{ pair[0] }}</td>
+  <td style="padding-left:1vh"> {{ pair[0] }}</td>
   <div *ngIf="resultObject[i][1] !== 'skipped'; else forSkipped">
     <div [ngSwitch]="getType(pair[1])">
       <td *ngSwitchCase="'object'"> {{ pair[1].length }}</td>
@@ -19,7 +18,7 @@
 </div>
 <ng-template #metricTable>
   <tr *ngFor="let pair of keyValuePairs; let i = index" fxLayoutAlign='space-between center' style="padding:0.05vh 0vh 0.05vh">
-    <td> {{ pair[0] }}</td>
+    <td style="padding-left:1vh"> {{ pair[0] }}</td>
       <div *ngIf="resultObject[i][1] !== 'skipped'; else forSkipped">
         <td> <app-coloured-score [metric]="pair[1]"></app-coloured-score></td>
       </div>

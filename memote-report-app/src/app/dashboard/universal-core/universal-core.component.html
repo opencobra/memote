@@ -38,7 +38,7 @@
                 fxLayout="column" fxLayoutAlign='center stretch'
                 *ngIf="data.byID(case).type === 'object'; else singleButton">
                   <tr fxLayout="column" fxLayoutAlign='center stretch'>
-                    <td> {{ data.byID(case).title }} </td>
+                    <td class="test-title"> {{ data.byID(case).title }} </td>
                     <app-tabularize
                     [testCase]="data.byID(case)"
                     [scored]="true">
@@ -47,7 +47,7 @@
                   </mat-panel-description>
                   <ng-template #singleButton>
                     <mat-panel-description fxLayoutAlign='space-between center'>
-                    <td> {{ data.byID(case).title }} </td>
+                    <td class="test-title"> {{ data.byID(case).title }} </td>
                     <!-- This may be useful later when we get to the export! -->
                     <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
                     <div *ngIf="data.byID(case).result !== 'skipped', else forSkipped">
