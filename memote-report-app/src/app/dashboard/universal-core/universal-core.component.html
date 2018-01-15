@@ -88,7 +88,7 @@
               <ng-template #noObject>
                 <br>
                 <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-                {{ data.byID(case).data }}
+                {{ data.getString(data.byID(case).data) }}
                 </textarea>
               </ng-template>
               </div>
