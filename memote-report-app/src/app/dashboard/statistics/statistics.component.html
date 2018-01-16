@@ -16,58 +16,13 @@
               *ngIf="data.byID(test).type !== 'object'; else forObject">
               <div
               fxFlex
-              fxLayout='column' fxLayoutAlign='center stretch'
-              *ngIf="data.byID(test).result === 'passed' || data.byID(test).result === 'failed'">
+              fxLayout='column' fxLayoutAlign='center stretch'>
                   <tr fxLayoutAlign='space-between center'>
                     <td class="test-title"> {{ data.byID(test).title }} </td>
-                      <td *ngIf="data.byID(test).type === 'length'">
-                        <button
-                        mat-raised-button
-                        color="primary"
-                        style="color:white">
-                          {{ data.byID(test).data.length | number : '1.'}}
-                        </button>
-                      </td>
-                      <td *ngIf="data.byID(test).type === 'number'">
-                        <button
-                        mat-raised-button
-                        color="primary"
-                        style="color:white">
-                          {{ data.byID(test).metric | number : '1.2-2'}}
-                        </button>
-                      </td>
-                      <td *ngIf="data.byID(test).type === 'array' || data.byID(test).type === 'string' || data.byID(test).type === 'boolean'">
-                        <button
-                        mat-raised-button
-                        color="primary"
-                        style="color:white">
-                          {{ data.byID(test).data }}
-                        </button>
-                      </td>
+                    <td>
+                      <app-coloured-score [testId]="test"></app-coloured-score>
+                    </td>
                   </tr>
-               </div>
-               <div fxFlex *ngIf="data.byID(test).result === 'skipped'">
-                 <tr fxFlex fxLayoutAlign='space-between center'>
-                   <td class="test-title"> {{ data.byID(test).title }} </td>
-                   <td>
-                     <button
-                      mat-raised-button
-                      disabled
-                      style="color:black">
-                      Skipped
-                      </button>
-                    </td>
-               </div>
-               <div fxFlex *ngIf="data.byID(test).result === 'error'">
-                 <tr fxFlex fxLayoutAlign='space-between center'>
-                   <td class="test-title"> {{ data.byID(test).title }} </td>
-                   <td>
-                     <button
-                      mat-raised-button
-                      style="color:red;background-color:black">
-                      Errored
-                      </button>
-                    </td>
                </div>
               </mat-panel-description>
             <ng-template #forObject>

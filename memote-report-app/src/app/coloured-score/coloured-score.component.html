@@ -1,10 +1,30 @@
 <div *ngIf="data.byID(testId).result === 'passed' || data.byID(testId).result === 'failed'">
-  <button
-  mat-raised-button
-  style="color:white"
-  [ngStyle]="{'background-color':getColor(data.byID(testId).metric | number : '1.2-2')}">
-    {{ data.byID(testId).metric | number : '1.2-2' }}
-  </button>
+  <div *ngIf="data.isScored(testId); else notScored">
+    <button
+    mat-raised-button
+    style="color:white"
+    [ngStyle]="{'background-color':getColor(data.byID(testId).metric | number : '1.2-2')}">
+      {{ data.byID(testId).metric | number : '1.2-2' }}
+    </button>
+  </div>
+  <ng-template #notScored>
+    <button
+    mat-raised-button
+    color="primary"
+    style="color:white">
+      <div *ngIf="data.byID(testId).type === 'length'">
+        {{ data.byID(testId).data.length | number : '1.'}}
+      </div>
+      <div *ngIf="data.byID(testId).type === 'number'">
+        {{ data.byID(testId).metric | number : '1.2-2'}}
+      </div>
+      <div *ngIf="data.byID(testId).type === 'array' ||
+                  data.byID(testId).type === 'string' ||
+                  data.byID(testId).type === 'boolean'">
+        {{ data.byID(testId).data }}
+      </div>
+    </button>
+  </ng-template>
 </div>
 <div *ngIf="data.byID(testId).result === 'skipped'">
     <button

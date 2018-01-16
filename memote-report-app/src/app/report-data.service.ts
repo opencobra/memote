@@ -10,6 +10,7 @@ export class ReportDataService {
   allTests: TestResult[] = [];
   scoredCard: Object;
   statisticsCards: ResultCard[] = [];
+  scoredTests: string[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -22,6 +23,10 @@ export class ReportDataService {
 
   public byID(string) {
     return this.allTests.find(x => x.id === string);
+  }
+
+  public isScored(string) {
+    return this.scoredTests.includes(string);
   }
 
   public getString(object) {
@@ -48,6 +53,15 @@ export class ReportDataService {
             data['cards'][card],
           )
         );
+      }
+    }
+    // Build a list of IDs of tests that are scored. This is only used in the
+    //  logic of `coloured-score.component`.
+    for (const section of Object.keys(this.scoredCard['sections'])) {
+      if (this.scoredCard['sections'][section]['cases'] instanceof Array) {
+      for (const testId of this.scoredCard['sections'][section]['cases']) {
+        console.log(testId);
+        this.scoredTests.push(testId);
       }
     }
   }
