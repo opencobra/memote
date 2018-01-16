@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.5.0 (2018-01-16)
+------------------
+
 * Enable test result and meta-data collection.
 * Allow command line option and configuration of exclusive test cases and
   modules skipping all others (``--exclusive test_biomass``).
