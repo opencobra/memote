@@ -21,12 +21,17 @@ from __future__ import absolute_import
 
 import io
 import json
+import logging
 # from base64 import b64encode
 from string import Template
 from os.path import join, dirname
 # from zlib import compress
 
+from six import iteritems
+
 from memote.suite.reporting.reports.report import Report
+
+LOGGER = logging.getLogger(__name__)
 
 
 class SnapshotReport(Report):
@@ -48,8 +53,25 @@ class SnapshotReport(Report):
         with io.open(join(dirname(__file__), "../templates/snapshot.html")) as \
                 file_handle:
             template = Template(file_handle.read())
-        return template.safe_substitute(
-            results=json.dumps(self.data))
+        try:
+            return template.safe_substitute(
+                results=json.dumps(self.data, sort_keys=True, indent=2,
+                                   separators=(",", ": ")))
+        except TypeError:
+            # Log information to easily find the culprit.
+            json_types = (type(None), int, float, str, list, dict)
+            for name, annotation in iteritems(self.data["tests"]):
+                data = annotation.get("data")
+                try:
+                    for key, value in iteritems(data):
+                        if not isinstance(value, json_types):
+                            LOGGER.debug(
+                                "  %s - %s: %s", name, key, type(
+                                    value)
+                            )
+                except AttributeError:
+                    if not isinstance(data, json_types):
+                        LOGGER.debug("  %s: %s", name, type(data))
 
         # TODO: Use compression of JSON in future.
         # return template.safe_substitute(
