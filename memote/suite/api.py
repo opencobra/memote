@@ -82,9 +82,9 @@ def test_model(model, filename=None, results=False, pytest_args=None,
         pytest_args.append(custom_test_path)
         plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip,
                                         custom_config=custom_config)
-        print('#' * 50)
-        print(plugin._custom_config)
-        print('#' * 50)
+        LOGGER.info("#" * 50)
+        LOGGER.info("%s", plugin.custom_config)
+        LOGGER.info("#" * 50)
     else:
         plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip)
     code = pytest.main(pytest_args, plugins=[plugin])

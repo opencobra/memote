@@ -52,6 +52,8 @@ def register_with(registry):
     return decorator
 
 
+# TODO: Change naming of the 'type' argument once the angular app is completed.
+# It is misleading.
 def annotate(title, type, message=None, data=None, metric=1.0):
     """
     Annotate a test case.

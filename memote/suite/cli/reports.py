@@ -73,9 +73,8 @@ def snapshot(model, filename, pytest_args, solver, custom):
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
     model.solver = solver
-    _, results = api.test_model(
-        model, results=True, pytest_args=pytest_args, custom=custom
-    )
+    _, results = api.test_model(model, results=True, pytest_args=pytest_args,
+                                custom=custom)
     api.snapshot_report(results, filename)
 
 
