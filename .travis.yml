@@ -1,9 +1,12 @@
 language: python
+node_js: "node"
 sudo: false
 git:
   depth: 1
 cache:
 - pip: true
+- directories:
+  - "memote-report-app/node_modules"
 branches:
   only:
   - master
@@ -28,6 +31,7 @@ matrix:
   - python: '3.6-dev'
     env: TOXENV=py36
 install:
+- travis_retry make reports
 - travis_retry pip install -U pip setuptools wheel tox
 script:
 - travis_wait tox
