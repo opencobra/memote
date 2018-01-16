@@ -15,6 +15,18 @@ Next Release
 * Handle skipped tests better in the snapshot report.
 * Bundle the Angular report javascript libraries in the snapshot template
 * Pass results into the report as JSON
+* Fixed/ changed a lot of visuals on the angular report:
+    - Indent the rows of the parametrized test results
+    - Color the header text of the parametrized test results in pure black
+    - Remove the horizontal lines in the parametrized test results
+    - Display all results regardless of scored/ unscored inside of buttons to
+    force a uniform line height and a more consistent look
+    - Add logic to correctly display errored tests
+    - Give skipped and errored test results a distinct look
+    - Explicitly handle boolean results, and add boolean as an option for the
+    'type' attribute.
+    - Fix the raw data output in the textboxes so that they are formatted
+    python code.
 
 0.4.6 (2017-10-31)
 ------------------
