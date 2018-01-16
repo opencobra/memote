@@ -213,6 +213,28 @@ def no_gam_in_biomass(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def direct_met_no_compartments(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCDEFG"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["EX_A", "EX_C",
+                                  "EX_E", "EX_G",
+                                  "A2B", "C2D",
+                                  "E2F", "biomass"]]
+                       )
+    base.reactions.EX_A.add_metabolites({"A": 1})
+    base.reactions.EX_C.add_metabolites({"C": -1})
+    base.reactions.EX_E.add_metabolites({"E": -1})
+    base.reactions.EX_G.add_metabolites({"G": -1})
+    base.reactions.A2B.add_metabolites({"A": -1, "B": 1})
+    base.reactions.C2D.add_metabolites({"C": -1, "D": 1})
+    base.reactions.E2F.add_metabolites({"E": -1, "F": 1})
+    base.reactions.biomass.add_metabolites(
+        {"B": -1, "D": -1, "F": -1, "G": -1}
+    )
+    return base
+
+
 @pytest.mark.parametrize("model, expected", [
     ("sum_within_deviation", True),
     ("sum_outside_of_deviation", False),
@@ -306,3 +328,14 @@ def test_fast_growth_default(model, boolean):
     assert solution.status == OPTIMAL
     fast_growth = solution.objective_value <= 10.3972
     assert fast_growth == boolean
+
+
+@pytest.mark.parametrize("model, number", [
+    ("direct_met_no_compartments", 1),
+    ("precursors_producing", 0)
+], indirect=["model"])
+def test_find_direct_metabolites(model, number):
+    """Expect the appropriate amount of direct metabolites to be found."""
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        assert len(biomass.find_direct_metabolites(model, rxn)) is number

@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import cobra
 import pytest
+from cobra.exceptions import Infeasible
 
 import memote.support.consistency as consistency
 from memote.utils import register_with
@@ -430,6 +431,50 @@ def infeasible_toy_model(base):
 
 
 @register_with(MODEL_REGISTRY)
+def producing_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.VD.add_metabolites({"D": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v4.add_metabolites({"A": -1, "C": 1, "D": 1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = -1000, 1000
+    base.reactions.v4.bounds = 0, 1
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def consuming_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.VD.add_metabolites({"D": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v3.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v4.add_metabolites({"A": -1, "C": 1, "D": -1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.reactions.v3.bounds = -1000, 1000
+    base.reactions.v4.bounds = -1, 0
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def gap_model(base):
     a_c = cobra.Metabolite("a_c")
     a_e = cobra.Metabolite("a_e")
@@ -572,7 +617,7 @@ def test_find_mass_imbalanced_reactions(model, num):
 ], indirect=["model"])
 def test_blocked_reactions(model, num):
     """Expect all reactions to be able to carry flux."""
-    dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
+    dict_of_blocked_rxns = consistency.find_universally_blocked_reactions(model)
     assert len(dict_of_blocked_rxns) == num
 
 
@@ -619,3 +664,48 @@ def test_find_disconnected(model, num):
     """Expect the appropriate amount of disconnected to be found."""
     disconnected = consistency.find_disconnected(model)
     assert len(disconnected) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("producing_toy_model", 1),
+    ("consuming_toy_model", 0),
+    ("loopy_toy_model", 0),
+], indirect=["model"])
+def test_find_metabolites_produced_with_closed_bounds(model, num):
+    """Expect the appropriate amount of produced metabolites to be found."""
+    produced = consistency.find_metabolites_produced_with_closed_bounds(model)
+    assert len(produced) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("producing_toy_model", 0),
+    ("consuming_toy_model", 1),
+    ("loopy_toy_model", 0),
+], indirect=["model"])
+def test_find_metabolites_consumed_with_closed_bounds(model, num):
+    """Expect the appropriate amount of consumed metabolites to be found."""
+    consumed = consistency.find_metabolites_consumed_with_closed_bounds(model)
+    assert len(consumed) == num
+
+
+@pytest.mark.parametrize("model, fraction", [
+    ("blocked_reactions", 1.0),
+    ("constrained_toy_model", 0.0),
+    ("loopy_toy_model", 0.6)
+], indirect=["model"])
+def test_find_reactions_with_unbounded_flux_default_condition(model, fraction):
+    """Expect the number of unbounded and blocked metabolites to be correct."""
+    _, unb_fraction, _ = \
+        consistency.find_reactions_with_unbounded_flux_default_condition(model)
+    assert unb_fraction == fraction
+
+
+@pytest.mark.parametrize("model", [
+    pytest.param("missing_energy_partner",
+                 marks=pytest.mark.raises(exception=ZeroDivisionError)),
+    pytest.param("infeasible",
+                 marks=pytest.mark.raises(exception=Infeasible))
+], indirect=["model"])
+def test_find_reactions_with_unbounded_flux_default_condition_errors(model):
+    """Expect the number of unbounded and blocked metabolites to be correct."""
+    consistency.find_reactions_with_unbounded_flux_default_condition(model)

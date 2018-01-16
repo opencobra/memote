@@ -194,3 +194,9 @@ def find_pure_metabolic_reactions(model):
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
+
+
+def check_transport_reaction_gpr_presence(model):
+    """Return the list of transport reactions that have no associated gpr."""
+    return [rxn for rxn in helpers.find_transport_reactions(model)
+            if not rxn.gene_reaction_rule]

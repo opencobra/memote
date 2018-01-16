@@ -353,3 +353,35 @@ def run_fba(model, rxn_id, direction="max", single_value=True):
             return solution
         except Infeasible:
             return np.nan
+
+
+def close_boundaries_sensibly(model):
+    """
+    Return a cobra model with all boundaries closed and changed constraints.
+
+    In the returned model previously fixed reactions are no longer constrained
+    as such. Instead reactions are constrained according to their
+    reversibility. This is to prevent the FBA from becoming infeasible when
+    trying to solve a model with closed exchanges and one fixed reaction.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Returns
+    -------
+    cobra.Model
+        A cobra model with all boundary reactions closed and the constraints
+        of each reaction set according to their reversibility.
+
+    """
+    with model:
+        for rxn in model.reactions:
+            if rxn.reversibility:
+                rxn.bounds = -1, 1
+            else:
+                rxn.bounds = 0, 1
+        for exchange in model.exchanges:
+            exchange.bounds = (0, 0)
+        return model.copy()

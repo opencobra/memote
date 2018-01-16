@@ -232,3 +232,88 @@ def test_find_disconnected(read_only_model):
         reaction of the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Produced Without Substrate Consumption",
+          type="length")
+def test_find_metabolites_produced_with_closed_bounds(read_only_model):
+    """
+    Expect no metabolites to be produced without substrate consumption.
+
+    It should not be possible for the model to produce metabolites without
+    consuming substrate from the medium. This test disables all the boundary
+    reactions and checks if each metabolite can be produced individually
+    using flux balance analysis. To pass this test no metabolite outside of
+    specific boundary reactions should be produced without the consumption of
+    substrate.
+    """
+    ann = test_find_metabolites_produced_with_closed_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_produced_with_closed_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites can be produced without the model
+        needing to consume any substrate: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(
+    title="Number of Metabolites Consumed Without Product Removal ",
+    type="length")
+def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
+    """
+    Expect no metabolites to be consumed without product removal.
+
+    Just like metabolites should not be produced from nothing, mass should
+    not simply be removed from the model. This test disables all the
+    boundary reactions and checks if each metabolite can be consumed
+    individually using flux balance analysis. To pass this test no
+    metabolite outside of specific boundary reactions should be consumed
+    without product leaving the system.
+    """
+    ann = test_find_metabolites_consumed_with_closed_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_consumed_with_closed_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites can be consumed without
+        using the system's boundary reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(
+    title="Fraction of Unbounded Reactions in the Default Condition",
+    type="number")
+def test_find_reactions_unbounded_flux_default_condition(read_only_model):
+    """
+    Expect the fraction of unbounded reactions to be low.
+
+    A large fraction of model reactions able to carry unlimited flux under
+    default conditions indicates problems with reaction directionality,
+    missing cofactors, incorrectly defined transport reactions and more.
+    """
+    # TODO: Arbitrary threshold right now! Update after meta study!
+    ann = test_find_reactions_unbounded_flux_default_condition.annotation
+    unbounded_rxns, fraction, _ = \
+        consistency.find_reactions_with_unbounded_flux_default_condition(
+            read_only_model
+        )
+    ann["data"] = get_ids(unbounded_rxns)
+    ann["metric"] = fraction
+    ann["message"] = wrapper.fill(
+        """ A fraction of {:.2%} of the non-blocked reactions (in total {}
+        reactions) can carry unbounded flux in the default model
+        condition. Unbounded reactions may be involved in
+        thermodynamically infeasible cycles: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
+    assert ann["metric"] <= 0.1, ann["message"]

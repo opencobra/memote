@@ -286,6 +286,48 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
+@annotate(title="Number of Transport Reactions", type="length")
+def test_find_transport_reactions(read_only_model):
+    """Expect >= 1 transport reactions are present in the read_only_model."""
+    ann = test_find_transport_reactions.annotation
+    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) transport reactions are defined in the
+        model, this excludes purely metabolic reactions, exchanges, or
+        pseudo-reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
+
+
+@annotate(title="Fraction of Transport Reactions without GPR", type="length")
+def test_transport_reaction_gpr_presence(read_only_model):
+    """
+    Expect a small fraction of transport reactions not to have a GPR rule.
+
+    As it is hard to identify the exact transport processes within a cell,
+    transport reactions are often added purely for modeling purposes.
+    Highlighting where assumptions have been made vs where
+    there is proof may help direct the efforts to improve transport and
+    transport energetics of the tested metabolic model.
+    However, transport reactions without GPR may also be valid:
+    Diffusion, or known reactions with yet undiscovered genes likely lack GPR.
+    """
+    # TODO: Update threshold with improved insight from meta study.
+    ann = test_transport_reaction_gpr_presence.annotation
+    ann["data"] = get_ids(
+        basic.check_transport_reaction_gpr_presence(read_only_model)
+    )
+    ann["metric"] = len(ann["data"]) / len(
+        helpers.find_transport_reactions(read_only_model)
+    )
+    ann["message"] = wrapper.fill(
+        """There are a total of {} transport reactions ({:.2%} of all
+        transport reactions) without GPR:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["metric"]) < 0.2, ann["message"]
+
+
 @annotate(title="Number of Unique Metabolites", type="length")
 def test_find_unique_metabolites(read_only_model):
     """

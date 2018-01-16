@@ -28,6 +28,7 @@ from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.consistency_helpers as con_helpers
+import memote.support.helpers as helpers
 
 LOGGER = logging.getLogger(__name__)
 
@@ -310,46 +311,39 @@ def detect_energy_generating_cycles(model, metabolite_id):
     met = model.metabolites.get_by_id(metabolite_id)
     dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
     dissipation_rxn = Reaction('Dissipation')
-    with model:
-        for rxn in model.reactions:
-            if rxn.reversibility:
-                rxn.bounds = -1, 1
-            else:
-                rxn.bounds = 0, 1
-        for exchange in model.exchanges:
-            exchange.bounds = (0, 0)
-        model.add_reactions([dissipation_rxn])
-        if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
-            # build nucleotide-type dissipation reaction
-            dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
-        elif met.id in ['nadph_c', 'nadh_c']:
-            # build nicotinamide-type dissipation reaction
-            dissipation_rxn.reaction = "--> h_c"
-        elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
-                        'mql6_c', 'mql7_c', 'dmmql8_c']:
-            # build redox-partner-type dissipation reaction
-            dissipation_rxn.reaction = "--> 2 h_c"
-        elif met.id == 'accoa_c':
-            dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
-        elif met.id == 'glu__L_c':
-            dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
-        elif met.id == 'h_p':
-            pass
+    model = helpers.close_boundaries_sensibly(model)
+    model.add_reactions([dissipation_rxn])
+    if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
+        # build nucleotide-type dissipation reaction
+        dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
+    elif met.id in ['nadph_c', 'nadh_c']:
+        # build nicotinamide-type dissipation reaction
+        dissipation_rxn.reaction = "--> h_c"
+    elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
+                    'mql6_c', 'mql7_c', 'dmmql8_c']:
+        # build redox-partner-type dissipation reaction
+        dissipation_rxn.reaction = "--> 2 h_c"
+    elif met.id == 'accoa_c':
+        dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
+    elif met.id == 'glu__L_c':
+        dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
+    elif met.id == 'h_p':
+        pass
 
-        dissipation_rxn.add_metabolites(
-            {met.id: -1, dissipation_product: 1})
-        model.objective = dissipation_rxn
-        solution = model.optimize()
-        if solution.status == 'infeasible':
-            raise RuntimeError(
-                "The model cannot be solved as the solver status is"
-                "infeasible. This may be a bug."
-            )
-        elif solution.objective_value > 0.0:
-            return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
-                drop(["Dissipation"]).tolist()
-        else:
-            return []
+    dissipation_rxn.add_metabolites(
+        {met.id: -1, dissipation_product: 1})
+    model.objective = dissipation_rxn
+    solution = model.optimize()
+    if solution.status == 'infeasible':
+        raise RuntimeError(
+            "The model cannot be solved as the solver status is"
+            "infeasible. This may be a bug."
+        )
+    elif solution.objective_value > 0.0:
+        return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
+            drop(["Dissipation"]).tolist()
+    else:
+        return []
 
 
 def find_mass_imbalanced_reactions(model):
@@ -390,7 +384,7 @@ def find_charge_imbalanced_reactions(model):
         rxn for rxn in internal_rxns if not con_helpers.is_charge_balanced(rxn)]
 
 
-def find_blocked_reactions(model):
+def find_universally_blocked_reactions(model):
     """
     Find metabolic reactions that are blocked.
 
@@ -503,3 +497,111 @@ def find_disconnected(model):
 
     """
     return [met for met in model.metabolites if len(met.reactions) == 0]
+
+
+def find_metabolites_produced_with_closed_bounds(model):
+    """
+    Return metabolites that can be produced when boundary reactions are closed.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_produced = list()
+    model = helpers.close_boundaries_sensibly(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type='irrex', reaction_id='IRREX', lb=0, ub=1
+            )
+            if helpers.run_fba(model, exch.id) > 0:
+                mets_produced.append(met.id)
+    return mets_produced
+
+
+def find_metabolites_consumed_with_closed_bounds(model):
+    """
+    Return metabolites that can be consumed when boundary reactions are closed.
+
+    Reverse case from 'find_metabolites_produced_with_closed_bounds', just
+    like metabolites should not be produced from nothing, mass should not
+    simply be removed from the model.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_consumed = list()
+    model = helpers.close_boundaries_sensibly(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
+            )
+            if helpers.run_fba(model, exch.id, direction='min') < 0:
+                mets_consumed.append(met.id)
+    return mets_consumed
+
+
+def find_reactions_with_unbounded_flux_default_condition(model):
+    """
+    Return list of reactions whose flux is unbounded in the default condition.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns:
+    --------
+    unlimited_reactions: list
+        A list of reactions that in default modeling conditions are able to
+        carry flux as high/low as the systems maximal and minimal bounds.
+    fraction: float
+        The fraction of the amount of unbounded reactions to the amount of
+        non-blocked reactions.
+    conditionally_blocked_reactions: list
+        A list of reactions that in default modeling conditions are not able
+        to carry flux at all.
+
+    """
+    with model:
+        try:
+            fva_result = flux_variability_analysis(model)
+        except Infeasible as err:
+            LOGGER.error("Failed to find reactions with unbounded flux "
+                         "because '{}'. This may be a bug.".format(err))
+            raise Infeasible("It was not possible to run flux variability "
+                             "analysis on the model. Make sure that the model "
+                             "can be solved! Check if the constraints are not "
+                             "too strict.")
+        conditionally_blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
+                                               (fva_result["minimum"] == 0.0)]
+        max_bound = max([rxn.upper_bound for rxn in model.reactions])
+        min_bound = min([rxn.lower_bound for rxn in model.reactions])
+        unlimited_flux = fva_result.loc[(fva_result["maximum"] == max_bound) |
+                                        (fva_result["minimum"] == min_bound)]
+        conditionally_blocked_reactions = [model.reactions.get_by_id(met_id)
+                                           for met_id in
+                                           conditionally_blocked.index]
+        unlimited_reactions = [model.reactions.get_by_id(met_id) for met_id in
+                               unlimited_flux.index]
+        try:
+            fraction = len(unlimited_reactions) / float(
+                (len(model.reactions) - len(conditionally_blocked_reactions)))
+        except ZeroDivisionError:
+            LOGGER.error("Division by Zero! Failed to calculate the "
+                         "fraction of unbounded reactions. Does this model "
+                         "have any reactions at all?")
+            raise ZeroDivisionError("It was not possible to calculate the "
+                                    "fraction of unbounded reactions to "
+                                    "un-blocked reactions. This may be because"
+                                    "the model doesn't have any reactions at "
+                                    "all or that none of the reactions can "
+                                    "carry a flux larger than zero!")
+
+        return unlimited_reactions, fraction, conditionally_blocked_reactions
