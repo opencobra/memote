@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def test_model(model, filename=None, results=False, pytest_args=None,
-               exclusive=None, skip=None, solver=None, custom=None):
+               exclusive=None, skip=None, solver=None, custom=(None, None)):
     """
     Test a model and optionally store results as JSON.
 
@@ -77,7 +77,8 @@ def test_model(model, filename=None, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    if custom is not None:
+    LOGGER.debug("%s", str(custom))
+    if custom != (None, None):
         custom_test_path, custom_config = custom
         pytest_args.append(custom_test_path)
         plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip,
@@ -97,20 +98,18 @@ def test_model(model, filename=None, results=False, pytest_args=None,
             except TypeError:
                 # Log information to easily find the culprit.
                 json_types = (type(None), int, float, str, list, dict)
-                for mod, functions in iteritems(plugin.results["report"]):
-                    LOGGER.debug("%s:", mod)
-                    for name, annotation in iteritems(functions):
-                        data = annotation.get("data")
-                        try:
-                            for key, value in iteritems(data):
-                                if not isinstance(value, json_types):
-                                    LOGGER.debug(
-                                        "  %s - %s: %s", name, key, type(
-                                            value)
-                                    )
-                        except AttributeError:
-                            if not isinstance(data, json_types):
-                                LOGGER.debug("  %s: %s", name, type(data))
+                for name, annotation in iteritems(self.data["tests"]):
+                    data = annotation.get("data")
+                    try:
+                        for key, value in iteritems(data):
+                            if not isinstance(value, json_types):
+                                LOGGER.debug(
+                                    "  %s - %s: %s", name, key, type(
+                                        value)
+                                )
+                    except AttributeError:
+                        if not isinstance(data, json_types):
+                            LOGGER.debug("  %s: %s", name, type(data))
 
     if results:
         return code, plugin.results

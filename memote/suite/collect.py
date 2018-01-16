@@ -66,6 +66,8 @@ class ResultCollectionPlugin(object):
             precedence over ``skip``.
         skip : iterable, optional
             Names of test cases or modules to skip.
+        custom_config : str, optional
+            Path to additional configuration.
 
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
@@ -123,7 +125,7 @@ class ResultCollectionPlugin(object):
         """Read the test organization."""
         with open(join(dirname(__file__), "test_config.yml")) as file_h:
             self._store.update(yaml.load(file_h))
-        if self.custom_config:
+        if self.custom_config is not None:
             LOGGER.debug("Reading custom config with path: '%s'.",
                          self.custom_config)
             try:

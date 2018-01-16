@@ -241,7 +241,8 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
     # TODO: Update the threshold as soon as we have an overview of the average!
     ann = test_direct_metabolites_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
-    ann["data"][reaction_id] = biomass.find_direct_metabolites(model, reaction)
+    ann["data"][reaction_id] = [
+        m.id for m in biomass.find_direct_metabolites(model, reaction)]
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
         len(biomass.find_biomass_precursors(reaction))
     ann["message"][reaction_id] = wrapper.fill(
