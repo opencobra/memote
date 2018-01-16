@@ -98,7 +98,7 @@ def test_model(model, filename=None, results=False, pytest_args=None,
             except TypeError:
                 # Log information to easily find the culprit.
                 json_types = (type(None), int, float, str, list, dict)
-                for name, annotation in iteritems(self.data["tests"]):
+                for name, annotation in iteritems(plugin.results["tests"]):
                     data = annotation.get("data")
                     try:
                         for key, value in iteritems(data):
