@@ -23,6 +23,7 @@ Contents
 
    getting_started
    flowchart
+   custom_tests
    test_suite
    api
    contributing

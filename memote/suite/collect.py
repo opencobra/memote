@@ -47,7 +47,7 @@ class ResultCollectionPlugin(object):
     """
 
     def __init__(self, model, repository=None, branch=None, commit=None,
-                 exclusive=None, skip=None, **kwargs):
+                 exclusive=None, skip=None, custom_config=None, **kwargs):
         """
         Collect and store values during testing.
 
@@ -79,6 +79,7 @@ class ResultCollectionPlugin(object):
         self._param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
         self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
         self._skip = frozenset() if skip is None else frozenset(skip)
+        self.custom_config = custom_config
         self._collect_meta_info()
         self._read_organization()
 
@@ -122,6 +123,19 @@ class ResultCollectionPlugin(object):
         """Read the test organization."""
         with open(join(dirname(__file__), "test_config.yml")) as file_h:
             self._store.update(yaml.load(file_h))
+        if self.custom_config:
+            LOGGER.debug("Reading custom config with path: '%s'.",
+                         self.custom_config)
+            try:
+                with open(self.custom_config) as file_h:
+                    self._store.update(yaml.load(file_h))
+                LOGGER.debug("Successfully read custom config at: '%s'.",
+                             self.custom_config)
+            except IOError as err:
+                LOGGER.error(
+                    "The following error occurred while trying to read the "
+                    "custom configuration at '%s': %s",
+                    self.custom_config, str(err))
 
     def pytest_namespace(self):
         """Insert model information into the pytest namespace."""

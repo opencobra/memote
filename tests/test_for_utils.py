@@ -68,13 +68,13 @@ def test_register_with(func, func_name):
 
 
 @pytest.mark.parametrize("notes, func, summary", [
-    (dict(title="One", data=4, type="integer"), one,
+    (dict(title="One", data=4, type="string"), one,
      """One line."""),
     (dict(title="Two", data="some text", type="string"), two,
      """Two lines.
     Why?
     """),
-    (dict(title="Three", data=[2, 4, 51, 63], type="number"), three,
+    (dict(title="Three", data=[2, 4, 51, 63], type="length"), three,
      """
     Three lines.
     Why?
@@ -90,6 +90,8 @@ def test_register_with(func, func_name):
     None
 
     """),
+    pytest.mark.raises((dict(title="Some Title", type="wrong_type"), one, ""),
+                       exception=ValueError)
 ])
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
