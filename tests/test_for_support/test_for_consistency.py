@@ -617,7 +617,7 @@ def test_find_mass_imbalanced_reactions(model, num):
 ], indirect=["model"])
 def test_blocked_reactions(model, num):
     """Expect all reactions to be able to carry flux."""
-    dict_of_blocked_rxns = consistency.find_blocked_reactions(model)
+    dict_of_blocked_rxns = consistency.find_universally_blocked_reactions(model)
     assert len(dict_of_blocked_rxns) == num
 
 
