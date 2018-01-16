@@ -291,7 +291,7 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
 
 @annotate(
     title="Fraction of Unbounded Reactions in the Default Condition",
-    type="metric")
+    type="number")
 def test_find_reactions_unbounded_flux_default_condition(read_only_model):
     """
     Expect the fraction of unbounded reactions to be low.

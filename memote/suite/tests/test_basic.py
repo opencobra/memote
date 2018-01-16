@@ -300,7 +300,7 @@ def test_find_transport_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Fraction of Transport Reactions without GPR", type="metric")
+@annotate(title="Fraction of Transport Reactions without GPR", type="length")
 def test_transport_reaction_gpr_presence(read_only_model):
     """
     Expect a small fraction of transport reactions not to have a GPR rule.
