@@ -29,6 +29,9 @@ Next Release
       python code.
 * Allow command line option to enable the definition of a custom test directory
   in combination with a corresponding config file.
+* Extend test descriptions to make it more clear how a user can satisfy the
+  test conditions.
+* Remove duplicate test for the presence of transport reactions.
 
 0.4.6 (2017-10-31)
 ------------------

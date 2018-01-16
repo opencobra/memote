@@ -155,9 +155,9 @@ def calculate_metabolic_coverage(model):
     return float(len(model.reactions)) / float(len(model.genes))
 
 
-def find_enzyme_complexes(model):
+def find_protein_complexes(model):
     """
-    Return a set of gene id tuples that constitute a functional enzyme complex.
+    Find tuples of gene identifiers that constitute functional enzyme complexes.
 
     Parameters
     ----------
@@ -165,14 +165,14 @@ def find_enzyme_complexes(model):
         The metabolic model under investigation.
 
     """
-    enzyme_complexes = set()
+    protein_complexes = set()
     for rxn in model.reactions:
         if rxn.gene_reaction_rule:
             for candidate in helpers.find_functional_units(
                     rxn.gene_reaction_rule):
                 if len(candidate) >= 2:
-                    enzyme_complexes.add(tuple(candidate))
-    return enzyme_complexes
+                    protein_complexes.add(tuple(candidate))
+    return protein_complexes
 
 
 def find_pure_metabolic_reactions(model):
