@@ -242,9 +242,7 @@ def test_compartments_presence(read_only_model):
 
 
 @annotate(title="Number of Enzyme Complexes", type="length")
-# TODO: Rename this test to protein_complex because it may otherwise be
-# confused with multi-enzyme complexes!!
-def test_enzyme_complex_presence(read_only_model):
+def test_protein_complex_presence(read_only_model):
     """
     Expect that more than one enzyme complex is present in the model.
 
@@ -257,10 +255,10 @@ def test_enzyme_complex_presence(read_only_model):
 
     This might also be a relevant metric for other organisms.
     """
-    ann = test_enzyme_complex_presence.annotation
-    ann["data"] = list(basic.find_enzyme_complexes(read_only_model))
+    ann = test_protein_complex_presence.annotation
+    ann["data"] = list(basic.find_protein_complexes(read_only_model))
     ann["message"] = wrapper.fill(
-        """A total of {:d} enzyme complexes are defined through GPR rules in
+        """A total of {:d} protein complexes are defined through GPR rules in
         the model.""".format(len(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
 

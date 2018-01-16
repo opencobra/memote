@@ -353,7 +353,7 @@ def test_compartments_presence(model, boolean):
 ], indirect=["model"])
 def test_enzyme_complex_presence(model, num):
     """Expect amount of enzyme complexes to be identified correctly."""
-    assert len(basic.find_enzyme_complexes(model)) == num
+    assert len(basic.find_protein_complexes(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [

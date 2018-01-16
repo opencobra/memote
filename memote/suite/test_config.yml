@@ -40,7 +40,7 @@ cards:
     - test_find_unique_metabolites
     - test_find_transport_reactions
     - test_find_pure_metabolic_reactions
-    - test_enzyme_complex_presence
+    - test_protein_complex_presence
     - test_compartments_presence
     - test_metabolic_coverage
     - test_ngam_presence
