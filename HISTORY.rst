@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Let Travis re-package the snapshot report with every release.
 
 0.5.0 (2018-01-16)
 ------------------

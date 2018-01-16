@@ -1,9 +1,12 @@
 language: python
+node_js: "node"
 sudo: false
 git:
   depth: 1
 cache:
 - pip: true
+- directories:
+  - "memote-report-app/node_modules"
 branches:
   only:
   - master
@@ -28,11 +31,13 @@ matrix:
   - python: '3.6-dev'
     env: TOXENV=py36
 install:
+- travis_retry make reports
 - travis_retry pip install -U pip setuptools wheel tox
 script:
 - travis_wait tox
 deploy:
   - provider: pypi
+    skip_cleanup: true
     distributions: sdist bdist_wheel
     on:
       tags: true
@@ -42,6 +47,7 @@ deploy:
     password:
       secure: kNj5W/9vLd77d9FXEi8QZxb+8NDJzqDQYrIrrqq5tqqVRcBt/PAkMQ5PrwuBeNxNJALun8RSM2Mq/hDYijQ6lqxyFMpECKXmtDXb5OeMgQvQ5y96OHo0VXqoA1nELdJJp6lHKUxKaH75bfp9s7506n9teHUvlGdP0eE+E17XtRax5zuWv/IOqolF//mT6TzdKIIMrnZFZ2XxxNYuqk7GNym7ywccuZNNRSLJn6lKEAYlsGUQlm76YbGSSvrDKMfTrB2nChzrjEzsfpPUZJfdqSjz8vjJgyLgGZhMJ/hfWM3i6buaAhpvxsVW9SXbUA9DTfQkMOUKd3RmhE6HgOp9Bd04g4oY7e7v72b3Agiz7H2edJCrtLlVMTS5uzqqzgoL0lfYfu3dn/g8xxla3FeQy2GFDdDmEJ3XhFTgUyLKhW8CCjmEX4Fgi0bf2CUqt/NXK3JU2iSrFndpvRfD+BvA3WCfPX5IhwSOkYh1HESxhc6POPw2hYj8L/Gpa30sbGh8XMTMW7mKp9se6xy/vfNVxB0J7fnKyh94API7U32Zsuw4CVIU/FXrgkjvZf7DR2lM0KXDKldixsyhyEbo3IdOkg5GHZE+PiREmUFioOAZfxD+GrcTj4Xw53WhDu2wi4RtH5J21PhdNDzM61gK1iiSSDt9At6XnJkHDz1z7jdDt0E=
   - provider: releases
+    skip_cleanup: true
     api_key: $GITHUB_TOKEN
     body: "Please see https://github.com/${GITHUB_REPO}/blob/${TRAVIS_TAG}/HISTORY.rst for the full release notes."
     on:
@@ -49,6 +55,7 @@ deploy:
       repo: $GITHUB_REPO
       python: '3.6'
   - provider: script
+    skip_cleanup: true
     script: ci/travis/update_docker.sh
     on:
       tags: true
