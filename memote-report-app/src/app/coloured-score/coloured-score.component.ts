@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { ReportDataService } from './../report-data.service';
 
 @Component({
   selector: 'app-coloured-score',
@@ -7,17 +8,18 @@ import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
   encapsulation: ViewEncapsulation.None
 })
 export class ColouredScoreComponent implements OnInit {
-  @Input() metric: any;
+  @Input() testId: string;
 
-  constructor() { }
+  constructor(private data: ReportDataService) {
+  }
 
   ngOnInit() {
   }
 
 // I tested this scheme against Deuteranopia, Protanopia and Tritanopia
-  getColor(value){
-    let hue=((1-value)*132).toString(10);
-    return ["hsl(",hue,",80%,35%)"].join("");
+  getColor(value) {
+    const hue = ((1 - value) * 132).toString(10);
+    return ['hsl(', hue, ',80%,35%)'].join('');
 }
 
 // I tested this scheme against Deuteranopia, Protanopia and Tritanopia

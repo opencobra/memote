@@ -1,6 +1,23 @@
-<button
-mat-raised-button
-style="color:white"
-[ngStyle]="{'background-color':getColor(metric | number : '1.2-2')}">
-  {{ metric | number : '1.2-2' }}
-</button>
+<div *ngIf="data.byID(testId).result === 'passed' || data.byID(testId).result === 'failed'">
+  <button
+  mat-raised-button
+  style="color:white"
+  [ngStyle]="{'background-color':getColor(data.byID(testId).metric | number : '1.2-2')}">
+    {{ data.byID(testId).metric | number : '1.2-2' }}
+  </button>
+</div>
+<div *ngIf="data.byID(testId).result === 'skipped'">
+    <button
+     mat-raised-button
+     disabled
+     style="color:black">
+       Skipped
+     </button>
+</div>
+<div *ngIf="data.byID(testId).result === 'error'">
+    <button
+     mat-raised-button
+     style="color:red;background-color:black">
+       Errored
+     </button>
+</div>
