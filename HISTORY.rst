@@ -7,6 +7,10 @@ Next Release
 * Add new module to test for the presence of SBO term annotations.
 * Add a test for Biomass production in complete medium.
 * Clarify extend of mass- and charge-imbalance testing.
+* Remove much of the boilerplate code of the report template as a preparation
+  for the history and diff report.
+* Fix bug with test_blocked_reactions
+* Update the testData.json with data from the previous release
 
 0.5.0 (2018-01-16)
 ------------------
