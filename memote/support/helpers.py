@@ -385,3 +385,24 @@ def close_boundaries_sensibly(model):
         for exchange in model.exchanges:
             exchange.bounds = (0, 0)
         return model.copy()
+
+
+def open_boundaries(model):
+    """
+    Return a copy of cobra model with all boundaries opened.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Returns
+    -------
+    cobra.Model
+        A cobra model with all boundary reactions opened.
+
+    """
+    with model:
+        for exchange in model.exchanges:
+            exchange.bounds = (-1000, 1000)
+        return model.copy()
