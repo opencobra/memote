@@ -594,7 +594,7 @@ def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
 ], indirect=["model"])
 def test_find_charge_imbalanced_reactions(model, num):
     """Expect all reactions to be charge balanced."""
-    reactions = consistency.find_charge_imbalanced_reactions(model)
+    reactions = consistency.find_charge_unbalanced_reactions(model)
     assert len(reactions) == num
 
 
@@ -607,7 +607,7 @@ def test_find_charge_imbalanced_reactions(model, num):
 ], indirect=["model"])
 def test_find_mass_imbalanced_reactions(model, num):
     """Expect all reactions to be mass balanced."""
-    reactions = consistency.find_mass_imbalanced_reactions(model)
+    reactions = consistency.find_mass_unbalanced_reactions(model)
     assert len(reactions) == num
 
 

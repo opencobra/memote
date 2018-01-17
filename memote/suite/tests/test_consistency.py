@@ -93,7 +93,7 @@ def test_detect_energy_generating_cycles(read_only_model, met):
     assert len(ann["data"][met]) == 0, ann["message"][met]
 
 
-@annotate(title="Number of Charge-Imbalanced Reactions", type="length")
+@annotate(title="Number of Charge-Unbalanced Reactions", type="length")
 def test_reaction_charge_balance(read_only_model):
     """
     Expect all reactions to be charge balanced.
@@ -104,7 +104,7 @@ def test_reaction_charge_balance(read_only_model):
     """
     ann = test_reaction_charge_balance.annotation
     ann["data"] = get_ids(
-        consistency.find_charge_imbalanced_reactions(read_only_model))
+        consistency.find_charge_unbalanced_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge imbalanced with at least
@@ -125,7 +125,7 @@ def test_reaction_mass_balance(read_only_model):
     """
     ann = test_reaction_mass_balance.annotation
     ann["data"] = get_ids(
-        consistency.find_mass_imbalanced_reactions(read_only_model)
+        consistency.find_mass_unbalanced_reactions(read_only_model)
     )
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
