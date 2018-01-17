@@ -358,14 +358,14 @@
             "type": "count"
         },
         "test_blocked_reactions": {
-            "data": null,
-            "duration": 0.0002009868621826172,
-            "message": null,
-            "metric": 1.0,
-            "result": "failed",
-            "summary": "\n    Expect all reactions to be able to carry flux in complete medium.\n\n    Universally blocked reactions are reactions that during Flux Variability\n    Analysis cannot carry any flux while all model boundaries are open.\n    Generally blocked reactions are caused by network gaps, which can be\n    attributed to scope or knowledge gaps.\n    ",
-            "title": "Number of Universally Blocked Reactions",
-            "type": "count"
+             "data": [],
+             "duration": 0.062155961990356445,
+             "message": "There are 0 (0.00%) blocked reactions in         the model:",
+             "metric": 0,
+             "result": "passed",
+             "summary": "\n    Expect all reactions to be able to carry flux in complete medium.\n\n    Universally blocked reactions are reactions that during Flux Variability\n    Analysis cannot carry any flux while all model boundaries are open.\n    Generally blocked reactions are caused by network gaps, which can be\n    attributed to scope or knowledge gaps.\n    ",
+             "title": "Number of Universally Blocked Reactions",
+             "type": "count"
         },
         "test_compartments_presence": {
             "data": [
