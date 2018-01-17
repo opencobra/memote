@@ -100,16 +100,18 @@ def test_reaction_charge_balance(read_only_model):
 
     In steady state, for each metabolite the sum of influx equals the sum
     of outflux. Hence the net charges of both sides of any model reaction have
-    to be equal.
+    to be equal. Reactions where at least one metabolite does not have a
+    formula are not considered to be balanced, even though the remaining
+    metabolites participating in the reaction might be.
     """
     ann = test_reaction_charge_balance.annotation
     ann["data"] = get_ids(
         consistency.find_charge_unbalanced_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) reactions are charge imbalanced with at least
-        one of the metabolites not having a charge or the overall charge not
-        equal to 0: {}""".format(
+        """A total of {} ({:.2%}) reactions are charge unbalanced with at
+        least one of the metabolites not having a charge or the overall
+        charge not equal to 0: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 
@@ -121,7 +123,9 @@ def test_reaction_mass_balance(read_only_model):
 
     In steady state, for each metabolite the sum of influx equals the sum
     of outflux. Hence the net masses of both sides of any model reaction have
-    to be equal.
+    to be equal. Reactions where at least one metabolite does not have a
+    charge are not considered to be balanced, even though the remaining
+    metabolites participating in the reaction might be.
     """
     ann = test_reaction_mass_balance.annotation
     ann["data"] = get_ids(
@@ -129,7 +133,7 @@ def test_reaction_mass_balance(read_only_model):
     )
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) reactions are mass imbalanced with at least
+        """A total of {} ({:.2%}) reactions are mass unbalanced with at least
         one of the metabolites not having a formula or the overall mass not
         equal to 0: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
