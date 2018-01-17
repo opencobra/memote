@@ -27,11 +27,11 @@ except ImportError:
     import json
 
 import pytest
-from six import iteritems
 
+from memote.utils import log_json_incompatible_types
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.reporting.reports import SnapshotReport, HistoryReport
+from memote.suite.reporting import SnapshotReport, HistoryReport
 
 __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
@@ -96,21 +96,7 @@ def test_model(model, filename=None, results=False, pytest_args=None,
                 json.dump(plugin.results, file_h, sort_keys=True, indent=4,
                           separators=(",", ": "))
             except TypeError:
-                # Log information to easily find the culprit.
-                json_types = (type(None), int, float, str, list, dict)
-                for name, annotation in iteritems(plugin.results["tests"]):
-                    data = annotation.get("data")
-                    try:
-                        for key, value in iteritems(data):
-                            if not isinstance(value, json_types):
-                                LOGGER.debug(
-                                    "  %s - %s: %s", name, key, type(
-                                        value)
-                                )
-                    except AttributeError:
-                        if not isinstance(data, json_types):
-                            LOGGER.debug("  %s: %s", name, type(data))
-
+                log_json_incompatible_types(plugin.results)
     if results:
         return code, plugin.results
     else:

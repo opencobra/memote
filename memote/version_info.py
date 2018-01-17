@@ -35,17 +35,16 @@ PKG_ORDER = [
     "python-libsbml",
     "lxml",
     "click",
-    "click-configfile",
-    "click-log",
+    "click_configfile",
+    "click_log",
     "pytest",
-    "gitpython",
-    "dask",
-    "cloudpickle",
-    "toolz",
     "Jinja2",
     "jinja2-ospath",
     "cookiecutter",
-    "plotly"
+    "git",
+    "github",
+    "travispy",
+    "travis"
 ]
 
 
@@ -60,9 +59,6 @@ def get_sys_info():
 
 def get_pkg_info():
     """Return Python package information as a dict."""
-    # TODO: Basically copying the requirements from setup.py is brittle,
-    # should come up with a better way in future, for example,
-    # using requirements files that can be read in.
     dependencies = frozenset(PKG_ORDER)
     blob = dict()
     for dist in pip.get_installed_distributions():

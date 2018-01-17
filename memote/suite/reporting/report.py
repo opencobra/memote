@@ -15,24 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Render results into pretty HTML."""
+"""Provide an abstract report base class that sets the interface."""
 
 from __future__ import absolute_import
 
-from jinja2 import Environment, PackageLoader, select_autoescape
-
 
 class Report(object):
-    """Render a model report."""
-
-    def __init__(self, **kwargs):
-        """Initialize the Jinja2 environment."""
-        super(Report, self).__init__(**kwargs)
-        self.env = Environment(
-            loader=PackageLoader("memote.suite.reporting", "templates"),
-            autoescape=select_autoescape(["html", "xml"])
-        )
+    """Determine the abstract report interface."""
 
     def render_html(self):
-        """Render an HTML report for a model."""
-        raise NotImplementedError("Semi-abstract base class.")
+        """Render an HTML report."""
+        raise NotImplementedError("Abstract method.")

@@ -19,14 +19,19 @@
 
 from __future__ import absolute_import
 
-from builtins import dict
+import logging
+from builtins import dict, str
 from textwrap import TextWrapper
 
-__all__ = ("register_with", "annotate", "get_ids", "truncate")
+__all__ = ("register_with", "annotate", "get_ids", "truncate",
+           "log_json_incompatible_types")
 
+LOGGER = logging.getLogger(__name__)
 
 LIST_SLICE = 5
 FLOAT_FORMAT = 7.2
+TYPES = frozenset(['array', 'length', 'number', 'object', 'string'])
+JSON_TYPES = (type(None), bool, int, float, str, list, set, dict)
 
 wrapper = TextWrapper(width=70)
 
@@ -107,9 +112,9 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     predefined keys as a dictionary.
 
     """
-    types = ['array', 'length', 'number', 'object', 'string']
-    if type not in types:
-        raise ValueError("Invalid type. Expected one of: %s" % types)
+    if type not in TYPES:
+        raise ValueError(
+            "Invalid type. Expected one of: {}.".format(", ".join(TYPES)))
 
     def decorator(func):
         func.annotation = dict(
@@ -147,3 +152,30 @@ def truncate(sequence):
         return ", ".join(sequence[:LIST_SLICE] + ["..."])
     else:
         return ", ".join(sequence)
+
+
+def log_json_incompatible_types(obj):
+    """
+    Log types that are not JSON compatible.
+
+    Explore a nested dictionary structure and log types that are not JSON
+    compatible.
+
+    Parameters
+    ----------
+    obj : dict
+        A potentially nested dictionary.
+
+    """
+    keys_to_explore = list(obj)
+    while len(keys_to_explore) > 0:
+        key = keys_to_explore.pop()
+        if not isinstance(key, str):
+            LOGGER.debug(type(key))
+        value = obj[key]
+        if isinstance(value, dict):
+            LOGGER.debug("%s:", key)
+            log_json_incompatible_types(value)
+            continue
+        if not isinstance(value, JSON_TYPES):
+            LOGGER.debug("%s: %s", key, type(value))
