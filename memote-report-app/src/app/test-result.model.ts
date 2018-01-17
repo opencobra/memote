@@ -15,12 +15,12 @@ export class TestResult {
     }) {
         this.id = id;
         this.data = data;
-        this.duration= duration;
-        this.message= message;
-        this.metric= metric;
-        this.result= result;
-        this.summary= summary;
-        this.title= title;
-        this.type= type;
+        this.duration = duration;
+        this.message = message;
+        this.metric = metric;
+        this.result = result;
+        this.summary = summary;
+        this.title = title;
+        this.type = type;
        }
 }

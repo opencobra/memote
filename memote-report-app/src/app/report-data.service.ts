@@ -25,8 +25,23 @@ export class ReportDataService {
     return this.allTests.find(x => x.id === string);
   }
 
+  public byReg(string) {
+    const expr = new RegExp(string);
+    const groupedResultIDs = [];
+    for (const testResultObject of this.allTests) {
+      if (expr.test(testResultObject.id)) {
+        groupedResultIDs.push(testResultObject.id);
+      }
+    }
+    return groupedResultIDs;
+  }
+
   public isScored(string) {
     return this.scoredTests.includes(string);
+  }
+
+  public getParam(string, integer) {
+    return string.split(':')[integer];
   }
 
   public getString(object) {
@@ -36,10 +51,29 @@ export class ReportDataService {
   private convertResults(data: Object): void {
     // Store each test result as a TestResult object in a central list.
     for (const test of Object.keys(data['tests'])){
+      if (data['tests'][test]['message'] instanceof Object) {
+        for (const param of Object.keys(data['tests'][test]['data'])) {
+          const newID = test + ':' + param;
+          this.allTests.push(
+            new TestResult(
+              newID,
+              {data: data['tests'][test]['data'][param],
+              duration: data['tests'][test]['duration'][param],
+              message: data['tests'][test]['message'][param],
+              metric: data['tests'][test]['metric'][param],
+              result: data['tests'][test]['result'][param],
+              summary: data['tests'][test]['summary'],
+              title: data['tests'][test]['title'],
+              type: data['tests'][test]['type']}
+            )
+          );
+        }
+      } else {
       this.allTests.push(
         new TestResult(
           test,
           data['tests'][test]));
+      }
     }
     // Extract metaddata information to be used in the metadata card
     this.metaData = data['meta'];
@@ -60,7 +94,6 @@ export class ReportDataService {
     for (const section of Object.keys(this.scoredCard['sections'])) {
       if (this.scoredCard['sections'][section]['cases'] instanceof Array) {
       for (const testId of this.scoredCard['sections'][section]['cases']) {
-        console.log(testId);
         this.scoredTests.push(testId);
       }
     }

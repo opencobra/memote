@@ -1,32 +1,40 @@
-<div *ngIf="data.byID(testId).result === 'passed' || data.byID(testId).result === 'failed'">
-  <div *ngIf="data.isScored(testId); else notScored">
+<!-- First distinguish wether the tests have passed/failed or skipped or errorer -->
+<div *ngIf="data.byID(testId)?.result === 'passed' || data.byID(testId)?.result === 'failed'">
+  <!-- Then determine if the test results are from scored or from unscored tests -->
+  <div *ngIf="data.isScored(data.getParam(testId, 0)); else notScored">
+    <!-- If they are from scored tests colorize the result button -->
     <button
     mat-raised-button
     style="color:white"
-    [ngStyle]="{'background-color':getColor(data.byID(testId).metric | number : '1.2-2')}">
-      {{ data.byID(testId).metric | number : '1.2-2' }}
+    [ngStyle]="{'background-color':getColor(data.byID(testId)?.metric | number : '1.2-2')}">
+      {{ data.byID(testId)?.metric | number : '1.2-2' }}
     </button>
   </div>
   <ng-template #notScored>
+    <!-- If they are from unscored tests the user has some control over how -->
+    <!-- they are displayed using the 'type' attribute of each test. -->
     <button
     mat-raised-button
     color="primary"
     style="color:white">
-      <div *ngIf="data.byID(testId).type === 'length'">
-        {{ data.byID(testId).data.length | number : '1.'}}
+      <!-- Hence for each test, determine now how the result ought to be formatted -->
+      <div *ngIf="data.byID(testId)?.type === 'length'">
+        {{ data.byID(testId)?.data.length | number : '1.'}}
       </div>
-      <div *ngIf="data.byID(testId).type === 'number'">
-        {{ data.byID(testId).metric | number : '1.2-2'}}
+      <div *ngIf="data.byID(testId)?.type === 'number'">
+        {{ data.byID(testId)?.metric | number : '1.2-2'}}
       </div>
-      <div *ngIf="data.byID(testId).type === 'array' ||
-                  data.byID(testId).type === 'string' ||
-                  data.byID(testId).type === 'boolean'">
-        {{ data.byID(testId).data }}
+      <div *ngIf="data.byID(testId)?.type === 'array' ||
+                  data.byID(testId)?.type === 'string' ||
+                  data.byID(testId)?.type === 'object' ||
+                  data.byID(testId)?.type === 'boolean'">
+        {{ data.byID(testId)?.data }}
       </div>
     </button>
   </ng-template>
 </div>
-<div *ngIf="data.byID(testId).result === 'skipped'">
+<div *ngIf="data.byID(testId)?.result === 'skipped'">
+<!-- Skipped tests are marked with a gray button with black text -->
     <button
      mat-raised-button
      disabled
@@ -34,7 +42,8 @@
        Skipped
      </button>
 </div>
-<div *ngIf="data.byID(testId).result === 'error'">
+<div *ngIf="data.byID(testId)?.result === 'error'">
+<!-- Tests with errors are marked with a black button with red text -->
     <button
      mat-raised-button
      style="color:red;background-color:black">

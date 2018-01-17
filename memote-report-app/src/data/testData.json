@@ -271,7 +271,10 @@
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "The component molar mass of the biomass reaction\nBIOMASS_Ec_iJO1366_WT_53p95M sums up to 0.999657756064         which\nis outside of the 1e-03 margin from 1 mmol / g[CDW] / h.",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "The component molar mass of the biomass reaction\nBIOMASS_Ec_iJO1366_core_53p95M sums up to 0.999994493722         which\nis outside of the 1e-03 margin from 1 mmol / g[CDW] / h."
             },
-            "metric": 1.0,
+            "metric": {
+                "BIOMASS_Ec_iJO1366_WT_53p95M": 1.0,
+                "BIOMASS_Ec_iJO1366_core_53p95M": 1.0
+            },
             "result": {
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "passed",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "passed"
@@ -293,7 +296,10 @@
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_WT_53p95M this is the\ngrowth rate that can be         achieved when the model is simulated\non the provided default medium: 0.986514446953",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_core_53p95M this is the\ngrowth rate that can be         achieved when the model is simulated\non the provided default medium: 0.982371812727"
             },
-            "metric": 1.0,
+            "metric": {
+                "BIOMASS_Ec_iJO1366_WT_53p95M": 1.0,
+                "BIOMASS_Ec_iJO1366_core_53p95M": 1.0
+            },
             "result": {
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "passed",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "passed"
@@ -315,7 +321,10 @@
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_WT_53p95M and when the\nmodel is simulated on the         provided default medium a total of 0\nprecursors cannot be produced: []",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_core_53p95M and when the\nmodel is simulated on the         provided default medium a total of 0\nprecursors cannot be produced: []"
             },
-            "metric": 1.0,
+            "metric": {
+                "BIOMASS_Ec_iJO1366_WT_53p95M": 1.0,
+                "BIOMASS_Ec_iJO1366_core_53p95M": 1.0
+            },
             "result": {
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "passed",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "passed"
@@ -337,7 +346,10 @@
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_WT_53p95M and when the\nmodel is simulated in         complete medium a total of 0 precursors\ncannot be produced: []",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "Using the biomass reaction BIOMASS_Ec_iJO1366_core_53p95M and when the\nmodel is simulated in         complete medium a total of 0 precursors\ncannot be produced: []"
             },
-            "metric": 1.0,
+            "metric": {
+                "BIOMASS_Ec_iJO1366_WT_53p95M": 1.0,
+                "BIOMASS_Ec_iJO1366_core_53p95M": 1.0
+            },
             "result": {
                 "BIOMASS_Ec_iJO1366_WT_53p95M": "passed",
                 "BIOMASS_Ec_iJO1366_core_53p95M": "passed"

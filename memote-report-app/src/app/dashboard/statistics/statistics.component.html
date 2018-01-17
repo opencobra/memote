@@ -4,50 +4,53 @@
       <mat-accordion
       multi="true"
       displayMode="flat" >
+      <div *ngFor="let case of currentCard.associatedTests">
          <mat-expansion-panel
-         *ngFor="let test of currentCard.associatedTests"
+         *ngFor="let testId of data.byReg(case); let i = index"
          #expPanel
          class="mat-elevation-z0">
           <mat-expansion-panel-header class="mat-expansion-panel-header"
           collapsedHeight="auto"
           expandedHeight="auto"
           style="padding:0.05vh">
-              <mat-panel-description
-              *ngIf="data.byID(test).type !== 'object'; else forObject">
-              <div
-              fxFlex
-              fxLayout='column' fxLayoutAlign='center stretch'>
-                  <tr fxLayoutAlign='space-between center'>
-                    <td class="test-title"> {{ data.byID(test).title }} </td>
-                    <td>
-                      <app-coloured-score [testId]="test"></app-coloured-score>
-                    </td>
-                  </tr>
-               </div>
-              </mat-panel-description>
-            <ng-template #forObject>
-              <mat-panel-description fxLayout="column" fxLayoutAlign="start stretch">
-                <span class="test-title"> {{ data.byID(test).title }} </span>
-                <app-tabularize [testCase]="data.byID(test)"></app-tabularize>
-              </mat-panel-description>
+            <mat-panel-title
+            *ngIf="i == 0; else followingTitles">
+              <tr class="test-title">
+                {{ data.byID(testId)?.title }}
+              </tr>
+              <tr> {{ data.getParam(testId, 1) }} </tr>
+            </mat-panel-title>
+            <ng-template #followingTitles>
+              <mat-panel-title>
+                <tr> {{ data.getParam(testId, 1) }} </tr>
+              </mat-panel-title>
             </ng-template>
+              <mat-panel-description fxLayoutAlign='space-between center'>
+                    <td></td>
+                    <td>
+                      <app-coloured-score [testId]="testId"></app-coloured-score>
+                    </td>
+              </mat-panel-description>
           </mat-expansion-panel-header>
-          <div fxLayout='column'>
-          <div> {{ data.byID(test).summary }} </div>
-          <div *ngIf="data.byID(test).type === 'object'; else rawData">
-            <br>
-            <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-            {{ data.getString(data.byID(test).data) }}
-            </textarea>
-          </div>
-          <ng-template #rawData>
-            <br>
-            <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-            {{ data.getString(data.byID(test).data) }}
-            </textarea>
-          </ng-template>
+          <div fxLayout='column' flexLayoutAlign='space-between center'>
+            <div *ngIf="i == 0; else followingSummaries">
+              <p>{{ data.byID(testId)?.summary }}</p>
+              <p>{{ data.byID(testId)?.message }}</p>
+            </div>
+            <ng-template #followingSummaries>
+              <div>
+                <tr> {{ data.byID(testId)?.message }} </tr>
+              </div>
+            </ng-template>
+            <div>
+              <br>
+              <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+              {{ data.getString(data.byID(testId)?.data) }}
+              </textarea>
+            </div>
           </div>
         </mat-expansion-panel>
+      </div>
       </mat-accordion>
     </mat-card-content>
   </mat-card>
