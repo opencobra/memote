@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 BIOMASS_IDS = pytest.memote.biomass_ids
 
 
-@annotate(title="Presence of a Biomass Reaction", type="array")
+@annotate(title="Amount of Biomass Reactions", type="count")
 def test_biomass_presence():
     """
     Expect the model to contain at least one biomass reaction.
@@ -66,7 +66,7 @@ def test_biomass_presence():
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Consistency", type="object", data=dict(),
+@annotate(title="Biomass Consistency", type="number", data=dict(),
           message=dict())
 def test_biomass_consistency(read_only_model, reaction_id):
     """
@@ -90,7 +90,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production At Default State", type="object",
+@annotate(title="Biomass Production At Default State", type="number",
           data=dict(), message=dict())
 def test_biomass_default_production(model, reaction_id):
     """
@@ -103,14 +103,15 @@ def test_biomass_default_production(model, reaction_id):
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} this is the growth rate that can be
-        achieved when the model is simulated on the provided default medium: {}
+        """Using the biomass reaction {} this is the growth rate (1/h) that
+        can be achieved when the model is simulated on the provided
+        default medium: {}
         """.format(reaction_id, ann["data"][reaction_id]))
     assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production In Complete Medium", type="object",
+@annotate(title="Biomass Production In Complete Medium", type="count",
           data=dict(), message=dict())
 def test_biomass_open_production(model, reaction_id):
     """
@@ -132,7 +133,7 @@ def test_biomass_open_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Blocked Biomass Precursors At Default State", type="object",
+@annotate(title="Blocked Biomass Precursors At Default State", type="count",
           data=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
     """
@@ -150,16 +151,23 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
     ann["data"][reaction_id] = get_ids(
         biomass.find_blocked_biomass_precursors(reaction, read_only_model)
     )
+    ann["metric"][reaction_id] = len(
+        biomass.find_biomass_precursors(reaction)
+    ) / len(ann["data"][reaction_id])
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated on the
-        provided default medium a total of {} precursors cannot be produced: {}
-        """.format(reaction_id, len(ann["data"][reaction_id]),
-                   ann["data"][reaction_id]))
+        provided default medium a total of {} precursors
+        ({:.2%} of all precursors except h2o and atp) cannot be produced: {}
+        """.format(reaction_id,
+                   len(ann["data"][reaction_id]),
+                   ann["metric"][reaction_id],
+                   ann["data"][reaction_id]
+                   ))
     assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Blocked Biomass Precursors In Complete Medium", type="object",
+@annotate(title="Blocked Biomass Precursors In Complete Medium", type="count",
           data=dict(), message=dict())
 def test_biomass_precursors_open_production(model, reaction_id):
     """
@@ -181,15 +189,19 @@ def test_biomass_precursors_open_production(model, reaction_id):
     )
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated in
-        complete medium a total of {} precursors cannot be produced: {}
-        """.format(reaction_id, len(ann["data"][reaction_id]),
-                   ann["data"][reaction_id]))
+        complete medium a total of {} precursors
+        ({:.2%} of all precursors except h2o and atp) cannot be produced: {}
+        """.format(reaction_id,
+                   len(ann["data"][reaction_id]),
+                   ann["metric"][reaction_id],
+                   ann["data"][reaction_id]
+                   ))
     assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Growth-associated Maintenance in Biomass Reaction",
-          type="object", data=dict(), message=dict())
+          type="raw", data=dict(), message=dict())
 def test_gam_in_biomass(model, reaction_id):
     """
     Expect the biomass reactions to contain atp and adp.
@@ -209,7 +221,7 @@ def test_gam_in_biomass(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Unrealistic Growth Rate In Default Condition", type='object',
+@annotate(title="Unrealistic Growth Rate In Default Condition", type="raw",
           data=dict(), message=dict())
 def test_fast_growth_default(model, reaction_id):
     """
@@ -221,7 +233,7 @@ def test_fast_growth_default(model, reaction_id):
     http://www.pnnl.gov/science/highlights/highlight.asp?id=879
     """
     ann = test_fast_growth_default.annotation
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) <= 10.3972
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated on
         the provided default medium the growth rate amounts to {}""".format(
@@ -231,7 +243,7 @@ def test_fast_growth_default(model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Ratio of Direct Metabolites in Biomass Reaction",
-          type="object", data=dict(), message=dict(), metric=dict())
+          type="percent", data=dict(), message=dict(), metric=dict())
 def test_direct_metabolites_in_biomass(model, reaction_id):
     """
     Expect the biomass reactions to contain atp and adp.

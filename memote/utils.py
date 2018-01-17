@@ -30,7 +30,7 @@ LOGGER = logging.getLogger(__name__)
 
 LIST_SLICE = 5
 FLOAT_FORMAT = 7.2
-TYPES = frozenset(['array', 'length', 'number', 'object', 'string'])
+TYPES = frozenset(['count', 'number', 'raw', 'percent'])
 JSON_TYPES = (type(None), bool, int, float, str, list, set, dict)
 
 wrapper = TextWrapper(width=70)
@@ -69,32 +69,23 @@ def annotate(title, type, message=None, data=None, metric=1.0):
         A human-readable descriptive title of the test case.
     type : str
         A sting that determines how the result data is formatted in the report.
-        - 'array' : The tested quality is represented as a list, e.g. all
-          biomass reactions in the model. In the angular report, 'data' is
-          interpreted as a list. It is expected not to be None.
-        - 'length' : The tested quality is represented as the
-          length of a list, set or tuple, e.g. number of metabolites without
-          formula. In the angular report, 'data' is interpreted as a list. It
-          is expected not to be None.
-        - 'number' : The tested quality is represented as a percentage, e.g.
-          percentage of metabolites without charge. In the angular report,
-          'metric' is used and expected to be a floating point number.
-        - 'object' : Use only if the test case is parametrized i.e. if the
-          same basic test logic can be applied to several tested components,
-          such as testing for the presence of annotations for specific
-          databases for all metabolites. In the angular report, 'data' is
-          interpreted as a dictionary whose values can be dictionaries, lists,
-          strings, floats and integers. It is expected not to be None.
-        - 'string' : The tested quality is represented as a single string,
-          e.g. the ID of the model. In the angular report, 'data' is
-          interpreted as a string. It is expected not to be None.
+        It is expected not to be None.
+        - 'number' : 'data' is a single number which can be an integer or
+          float and should be represented as such.
+        - 'count' : 'data' is a list, set or tuple. Choosing 'count' will
+          display the length of that list e.g. number of metabolites without
+          formula.
+        - 'percent' : Instead of 'data' the content of 'metric' ought to be
+          displayed e.g. percentage of metabolites without charge.
+          'metric' is expected to be a floating point number.
+        - 'raw' : 'data' is ought to be displayed "as is" without formatting.
+          This option is appropriate for single strings or a boolean output.
     message : str
         A short written explanation that states and possibly explains the test
         result.
     data
         Raw data which the test case generates and assesses. Can be of the
-        following types: list, set, tuple, string, float, integer, boolean and
-        dictionary.
+        following types: list, set, tuple, string, float, integer, and boolean.
     metric: float
         A value x in the range of 0 <= x <= 1 which represents the fraction of
         'data' to the total in the model. For example, if 'data' are all

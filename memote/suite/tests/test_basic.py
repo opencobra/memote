@@ -24,7 +24,7 @@ import memote.support.helpers as helpers
 from memote.utils import annotate, get_ids, truncate, wrapper
 
 
-@annotate(title="Model Identifier", type="string")
+@annotate(title="Model Identifier", type="raw")
 def test_model_id_presence(read_only_model):
     """
     Expect that the model has an identifier.
@@ -39,7 +39,7 @@ def test_model_id_presence(read_only_model):
     assert bool(read_only_model.id)
 
 
-@annotate(title="Total Number of Genes", type="length")
+@annotate(title="Total Number of Genes", type="count")
 def test_genes_presence(read_only_model):
     """
     Expect that more than one gene is defined in the model.
@@ -57,7 +57,7 @@ def test_genes_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Reactions", type="length")
+@annotate(title="Total Number of Reactions", type="count")
 def test_reactions_presence(read_only_model):
     """
     Expect that more than one reaction is defined in the model.
@@ -73,7 +73,7 @@ def test_reactions_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Metabolites", type="length")
+@annotate(title="Total Number of Metabolites", type="count")
 def test_metabolites_presence(read_only_model):
     """
     Expect that more than one metabolite is defined in the model.
@@ -90,7 +90,7 @@ def test_metabolites_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Transport Reactions", type="length")
+@annotate(title="Total Number of Transport Reactions", type="count")
 def test_transport_reaction_presence(read_only_model):
     """
     Expect more than one transport reaction to be defined in the model.
@@ -117,7 +117,7 @@ def test_transport_reaction_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Metabolites without Formula", type="length")
+@annotate(title="Metabolites without Formula", type="count")
 def test_metabolites_formula_presence(read_only_model):
     """
     Expect all metabolites to have a formula.
@@ -136,7 +136,7 @@ def test_metabolites_formula_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolites without Charge", type="length")
+@annotate(title="Metabolites without Charge", type="count")
 def test_metabolites_charge_presence(read_only_model):
     """
     Expect all metabolites to have charge information.
@@ -155,7 +155,7 @@ def test_metabolites_charge_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without GPR", type="length")
+@annotate(title="Reactions without GPR", type="count")
 def test_gene_protein_reaction_rule_presence(read_only_model):
     """
     Expect all non-exchange reactions to have a GPR rule.
@@ -179,7 +179,7 @@ def test_gene_protein_reaction_rule_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Non-Growth Associated Maintenance Reaction", type="length")
+@annotate(title="Non-Growth Associated Maintenance Reaction", type="count")
 def test_ngam_presence(read_only_model):
     """
     Expect a single non growth-associated maintenance reaction.
@@ -197,7 +197,7 @@ def test_ngam_presence(read_only_model):
     assert len(ann["data"]) == 1, ann["message"]
 
 
-@annotate(title="Metabolic Coverage", type="number")
+@annotate(title="Metabolic Coverage", type="percent")
 def test_metabolic_coverage(read_only_model):
     """
     Expect a model to have a metabolic coverage >= 1.
@@ -217,7 +217,7 @@ def test_metabolic_coverage(read_only_model):
     assert ann["metric"] >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Compartments", type="length")
+@annotate(title="Total Number of Compartments", type="count")
 def test_compartments_presence(read_only_model):
     """
     Expect that more than two compartments are defined in the model.
@@ -241,7 +241,7 @@ def test_compartments_presence(read_only_model):
     assert len(ann["data"]) >= 3, ann["message"]
 
 
-@annotate(title="Number of Enzyme Complexes", type="length")
+@annotate(title="Number of Enzyme Complexes", type="count")
 def test_protein_complex_presence(read_only_model):
     """
     Expect that more than one enzyme complex is present in the model.
@@ -263,7 +263,7 @@ def test_protein_complex_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Purely Metabolic Reactions", type="length")
+@annotate(title="Number of Purely Metabolic Reactions", type="count")
 def test_find_pure_metabolic_reactions(read_only_model):
     """
     Expect at least one pure metabolic reaction to be defined in the model.
@@ -286,7 +286,7 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Transport Reactions", type="length")
+@annotate(title="Number of Transport Reactions", type="count")
 def test_find_transport_reactions(read_only_model):
     """Expect >= 1 transport reactions are present in the read_only_model."""
     ann = test_find_transport_reactions.annotation
@@ -300,7 +300,7 @@ def test_find_transport_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Fraction of Transport Reactions without GPR", type="length")
+@annotate(title="Fraction of Transport Reactions without GPR", type="count")
 def test_transport_reaction_gpr_presence(read_only_model):
     """
     Expect a small fraction of transport reactions not to have a GPR rule.
@@ -328,7 +328,7 @@ def test_transport_reaction_gpr_presence(read_only_model):
     assert len(ann["metric"]) < 0.2, ann["message"]
 
 
-@annotate(title="Number of Unique Metabolites", type="length")
+@annotate(title="Number of Unique Metabolites", type="count")
 def test_find_unique_metabolites(read_only_model):
     """
     Expect there to be less metabolites when removing compartment tag.
