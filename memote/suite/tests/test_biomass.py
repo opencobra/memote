@@ -177,7 +177,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
     model = helpers.open_boundaries(model)
     reaction = model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = get_ids(
-            biomass.find_blocked_biomass_precursors(reaction, model)
+        biomass.find_blocked_biomass_precursors(reaction, model)
     )
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated in
