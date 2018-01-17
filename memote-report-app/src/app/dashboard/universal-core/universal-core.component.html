@@ -22,61 +22,10 @@
         <h2>Scored Tests</h2>
         <div *ngFor="let section of scoreData.sections | keys">
           <h3> {{ scoreData.sections[section].title }}</h3>
-          <mat-accordion
-          multi="true"
-          displayMode="flat">
-             <div *ngFor="let case of scoreData.sections[section].cases">
-               <mat-expansion-panel
-               *ngFor="let testId of data.byReg(case); let i = index"
-               #expPanel
-               class="mat-elevation-z0">
-                  <mat-expansion-panel-header
-                  class="mat-expansion-panel-header"
-                  collapsedHeight="auto"
-                  expandedHeight="auto"
-                  style="padding:0.05vh">
-                    <mat-panel-title
-                    *ngIf="i == 0; else followingTitles">
-                      <tr class="test-title">
-                        {{ data.byID(testId)?.title }}
-                      </tr>
-                      <tr> {{ data.getParam(testId, 1) }} </tr>
-                    </mat-panel-title>
-                    <ng-template #followingTitles>
-                      <mat-panel-title>
-                        <tr> {{ data.getParam(testId, 1) }} </tr>
-                      </mat-panel-title>
-                    </ng-template>
-                        <mat-panel-description fxLayoutAlign='space-between center'>
-                        <td></td>
-                        <!-- This may be useful later when we get to the export! -->
-                        <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
-                        <td>
-                          <app-coloured-score [testId]="testId"></app-coloured-score>
-                        </td>
-                        </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <div fxLayout='column' flexLayoutAlign='space-between center'>
-                    <div *ngIf="i == 0; else followingSummaries">
-                      <p>{{ data.byID(testId)?.summary }}</p>
-                      <p>{{ data.byID(testId)?.message }}</p>
-                    </div>
-                    <ng-template #followingSummaries>
-                      <div>
-                        <tr> {{ data.byID(testId)?.message }} </tr>
-                      </div>
-                    </ng-template>
-                    <div>
-                      <br>
-                      <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-                      {{ data.getString(data.byID(testId)?.data) }}
-                      </textarea>
-                    </div>
-                  </div>
-              </mat-expansion-panel>
-            </div>
-          </mat-accordion>
+          <div *ngFor="let case of scoreData.sections[section].cases">
+            <app-tabularize [case]="case"></app-tabularize>
           </div>
+        </div>
       </div>
       </div>
 </mat-card-content>
