@@ -18,16 +18,16 @@
     color="primary"
     style="color:white">
       <!-- Hence for each test, determine now how the result ought to be formatted -->
-      <div *ngIf="data.byID(testId)?.type === 'length'">
+      <div *ngIf="data.byID(testId)?.type === 'count'">
         {{ data.byID(testId)?.data.length | number : '1.'}}
       </div>
       <div *ngIf="data.byID(testId)?.type === 'number'">
+        {{ data.byID(testId)?.data | number : '1.2-2'}}
+      </div>
+      <div *ngIf="data.byID(testId)?.type === 'percent'">
         {{ data.byID(testId)?.metric | number : '1.2-2'}}
       </div>
-      <div *ngIf="data.byID(testId)?.type === 'array' ||
-                  data.byID(testId)?.type === 'string' ||
-                  data.byID(testId)?.type === 'object' ||
-                  data.byID(testId)?.type === 'boolean'">
+      <div *ngIf="data.byID(testId)?.type === 'raw'">
         {{ data.byID(testId)?.data }}
       </div>
     </button>
