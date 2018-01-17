@@ -23,7 +23,7 @@
         <div *ngFor="let section of scoreData.sections | keys">
           <h3> {{ scoreData.sections[section].title }}</h3>
           <div *ngFor="let case of scoreData.sections[section].cases">
-            <app-tabularize [case]="case"></app-tabularize>
+            <app-accordion [case]="case"></app-accordion>
           </div>
         </div>
       </div>

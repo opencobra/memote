@@ -90,7 +90,7 @@ export class ReportDataService {
       }
     }
     // Build a list of IDs of tests that are scored. This is only used in the
-    //  logic of `coloured-score.component`.
+    //  logic of `result-button.component`.
     for (const section of Object.keys(this.scoredCard['sections'])) {
       if (this.scoredCard['sections'][section]['cases'] instanceof Array) {
       for (const testId of this.scoredCard['sections'][section]['cases']) {

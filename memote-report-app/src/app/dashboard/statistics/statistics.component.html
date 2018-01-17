@@ -2,7 +2,7 @@
   <mat-card-title>{{ currentCard.cardName }}</mat-card-title>
     <mat-card-content>
       <div *ngFor="let case of currentCard.associatedTests">
-         <app-tabularize [case]="case"></app-tabularize>
+         <app-accordion [case]="case"></app-accordion>
       </div>
     </mat-card-content>
   </mat-card>

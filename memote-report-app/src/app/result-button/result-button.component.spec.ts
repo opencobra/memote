@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TabularizeComponent } from './tabularize.component';
+import { ResultButtonComponent } from './result-button.component';
 
-describe('TabularizeComponent', () => {
-  let component: TabularizeComponent;
-  let fixture: ComponentFixture<TabularizeComponent>;
+describe('ResultButtonComponent', () => {
+  let component: ResultButtonComponent;
+  let fixture: ComponentFixture<ResultButtonComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TabularizeComponent ]
+      declarations: [ ResultButtonComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TabularizeComponent);
+    fixture = TestBed.createComponent(ResultButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

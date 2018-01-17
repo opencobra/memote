@@ -2,12 +2,12 @@ import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ReportDataService } from './../report-data.service';
 
 @Component({
-  selector: 'app-coloured-score',
-  templateUrl: './coloured-score.component.html',
-  styleUrls: ['./coloured-score.component.scss'],
+  selector: 'app-result-button',
+  templateUrl: './result-button.component.html',
+  styleUrls: ['./result-button.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ColouredScoreComponent implements OnInit {
+export class ResultButtonComponent implements OnInit {
   @Input() testId: string;
 
   constructor(private data: ReportDataService) {

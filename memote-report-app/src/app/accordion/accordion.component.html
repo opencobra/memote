@@ -40,14 +40,14 @@
                 {{ data.byID(testId)?.title }}
               </td>
               <td>
-                <app-coloured-score [testId]="testId"></app-coloured-score>
+                <app-result-button [testId]="testId"></app-result-button>
               </td>
             </mat-panel-title>
             <ng-template #noTitle>
               <mat-panel-title fxLayoutAlign='space-between center'>
                 <td style="padding-left:1vh"> {{ data.getParam(testId, 1) }} </td>
                 <td>
-                  <app-coloured-score [testId]="testId"></app-coloured-score>
+                  <app-result-button [testId]="testId"></app-result-button>
                 </td>
               </mat-panel-title>
             </ng-template>
