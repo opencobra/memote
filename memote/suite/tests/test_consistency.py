@@ -151,7 +151,9 @@ def test_blocked_reactions(read_only_model):
     attributed to scope or knowledge gaps.
     """
     ann = test_blocked_reactions.annotation
-    ann["data"] = get_ids(consistency.find_blocked_reactions(read_only_model))
+    ann["data"] = get_ids(
+        consistency.find_universally_blocked_reactions(read_only_model)
+    )
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) blocked reactions in
