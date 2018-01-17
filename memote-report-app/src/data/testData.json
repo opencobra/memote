@@ -2737,7 +2737,7 @@
             "result": "failed",
             "summary": "\n    Expect a small fraction of transport reactions not to have a GPR rule.\n\n    As it is hard to identify the exact transport processes within a cell,\n    transport reactions are often added purely for modeling purposes.\n    Highlighting where assumptions have been made vs where\n    there is proof may help direct the efforts to improve transport and\n    transport energetics of the tested metabolic model.\n    However, transport reactions without GPR may also be valid:\n    Diffusion, or known reactions with yet undiscovered genes likely lack GPR.\n    ",
             "title": "Fraction of Transport Reactions without GPR",
-            "type": "count"
+            "type": "percent"
         },
         "test_transport_reaction_presence": {
             "data": [
