@@ -346,7 +346,7 @@ def detect_energy_generating_cycles(model, metabolite_id):
         return []
 
 
-def find_mass_imbalanced_reactions(model):
+def find_mass_unbalanced_reactions(model):
     """
     Find metabolic reactions that are not mass balanced.
 
@@ -365,7 +365,7 @@ def find_mass_imbalanced_reactions(model):
         rxn for rxn in internal_rxns if not con_helpers.is_mass_balanced(rxn)]
 
 
-def find_charge_imbalanced_reactions(model):
+def find_charge_unbalanced_reactions(model):
     """
     Find metabolic reactions that are not charge balanced.
 

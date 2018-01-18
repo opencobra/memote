@@ -124,6 +124,18 @@ def converting_reactions(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def one_exchange(base):
+    rxn = cobra.Reaction('EX_abc_e')
+    rxn.add_metabolites(
+        {cobra.Metabolite(id="abc_e",
+                          compartment='e'): -1}
+    )
+    rxn.bounds = -1, 5
+    base.add_reaction(rxn)
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport", 3),
     ("abc_pump", 1),
@@ -153,3 +165,12 @@ def test_find_functional_units(gpr_str, expected):
 def test_find_converting_reactions(model, met_pair, expected):
     """Expect amount of converting reactions to be identified correctly."""
     assert len(helpers.find_converting_reactions(model, met_pair)) == expected
+
+
+@pytest.mark.parametrize("model, reaction_id, bounds", [
+    ("one_exchange", "EX_abc_e", (-1000, 1000)),
+], indirect=["model"])
+def test_open_boundaries(model, reaction_id, bounds):
+    """Expect amount of transporters to be identified correctly."""
+    model = helpers.open_boundaries(model)
+    assert model.reactions.get_by_id(reaction_id).bounds == bounds

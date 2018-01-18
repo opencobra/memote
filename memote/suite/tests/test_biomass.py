@@ -110,6 +110,28 @@ def test_biomass_default_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
+@annotate(title="Biomass Production In Complete Medium", type="object",
+          data=dict(), message=dict())
+def test_biomass_open_production(model, reaction_id):
+    """
+    Expect biomass production in complete medium.
+
+    Using flux balance analysis this test optimizes the model for growth using
+    a complete medium i.e. unconstrained boundary reactions. Any non-zero
+    growth rate is accepted to pass this test.
+    """
+    ann = test_biomass_open_production.annotation
+    model = helpers.open_boundaries(model)
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
+    ann["message"][reaction_id] = wrapper.fill(
+        """Using the biomass reaction {} this is the growth rate that can be
+        achieved when the model is simulated on a complete medium i.e.
+        with all the boundary reactions unconstrained: {}
+        """.format(reaction_id, ann["data"][reaction_id]))
+    assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
+
+
+@pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Blocked Biomass Precursors At Default State", type="object",
           data=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
@@ -152,13 +174,11 @@ def test_biomass_precursors_open_production(model, reaction_id):
     precursors.
     """
     ann = test_biomass_precursors_open_production.annotation
-    with model:
-        for exchange in model.exchanges:
-            exchange.bounds = (-1000, 1000)
-        reaction = model.reactions.get_by_id(reaction_id)
-        ann["data"][reaction_id] = get_ids(
-            biomass.find_blocked_biomass_precursors(reaction, model)
-        )
+    model = helpers.open_boundaries(model)
+    reaction = model.reactions.get_by_id(reaction_id)
+    ann["data"][reaction_id] = get_ids(
+        biomass.find_blocked_biomass_precursors(reaction, model)
+    )
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated in
         complete medium a total of {} precursors cannot be produced: {}

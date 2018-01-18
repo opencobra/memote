@@ -247,7 +247,7 @@ def is_mass_balanced(reaction):
     """Confirm that a reaction is mass balanced."""
     balance = defaultdict(int)
     for metabolite, coefficient in iteritems(reaction.metabolites):
-        if metabolite.elements is None:
+        if metabolite.elements is None or len(metabolite.elements) == 0:
             return False
         for element, amount in iteritems(metabolite.elements):
             balance[element] += coefficient * amount
