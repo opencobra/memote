@@ -30,6 +30,7 @@ import pytest
 import pip
 import ruamel.yaml as yaml
 
+from memote.version_info import PKG_ORDER
 from memote.support.helpers import find_biomass_reaction
 
 LOGGER = logging.getLogger(__name__)
@@ -90,9 +91,11 @@ class ResultCollectionPlugin(object):
         self._meta["platform"] = platform.system()
         self._meta["release"] = platform.release()
         self._meta["python"] = platform.python_version()
+        dependencies = frozenset(PKG_ORDER)
         self._meta["packages"] = dict(
             (dist.project_name, dist.version) for dist in
-            pip.get_installed_distributions())
+            pip.get_installed_distributions()
+            if dist.project_name in dependencies)
         self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
         if self.repo is not None:
             self._collect_git_info()

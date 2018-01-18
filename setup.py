@@ -20,89 +20,33 @@
 
 from __future__ import absolute_import
 
+import io
 import sys
+from warnings import warn
 
-from setuptools import find_packages, setup
+from setuptools import setup
+
 
 if sys.version_info[:2] == (3, 4):
-    warn("Support for Python 3.4 was dropped by pandas. Since cobrapy is a "
+    warn("Support for Python 3.4 was dropped by pandas. Since memote is a "
          "pure Python package you can still install it but will have to "
          "carefully manage your own pandas and numpy versions. We no longer "
          "include it in our automatic testing.")
 
-with open("README.rst") as readme_file:
-    readme = readme_file.read()
 
-setup_requirements = []
-# prevent pytest-runner from being installed on every invocation
-if set(['pytest', 'test', 'ptr']).intersection(sys.argv):
-    setup_requirements.append("pytest-runner")
+with io.open('requirements.txt') as file_handle:
+    requirements = file_handle.readlines()
 
-requirements = [
-    "pip",
-    "click",
-    "click-configfile",
-    "click-log",
-    "six",
-    "future",
-    "pytest>=3.1",
-    "gitpython",
-    "pandas>=0.20.1",
-    "dask>=0.14.3",
-    "cloudpickle",
-    "toolz",
-    "Jinja2",
-    "jinja2-ospath",
-    "cookiecutter",
-    "python-libsbml",
-    "cobra>=0.9.1",
-    "ruamel.yaml<0.15",
-    "plotly",
-    "travispy",
-    "pygithub",
-    "travis-encrypt",
-    "sympy",
-    "numpydoc"
-]
+with io.open('test_requirements.txt') as file_handle:
+    test_requirements = file_handle.readlines()
 
-test_requirements = [
-    "pytest>=3.1"
-    "pytest-raises"
-]
 
+# All other keys are defined in setup.cfg under [metadata] and [options].
 setup(
-    name="memote",
-    version="0.5.1",
-    description="the genome-scale metabolic model test suite",
-    long_description=readme,
-    author="Moritz E. Beber",
-    author_email="morbeb@biosustain.dtu.dk",
-    url="https://github.com/opencobra/memote",
-    packages=find_packages(),
-    include_package_data=True,
-    setup_requires=setup_requirements,
     install_requires=requirements,
     tests_require=test_requirements,
-    dependency_links=[],
     entry_points="""
         [console_scripts]
         memote=memote.suite.cli.runner:cli
-    """,
-    license="Apache Software License 2.0",
-    zip_safe=False,
-    keywords="memote",
-    classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Bio-Informatics",
-        "License :: OSI Approved :: Apache Software License",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6"
-    ]
+    """
 )

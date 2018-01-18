@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-from memote.suite.reporting.reports.report import Report
+from memote.suite.reporting.report import Report
 
 
 class DiffReport(Report):
