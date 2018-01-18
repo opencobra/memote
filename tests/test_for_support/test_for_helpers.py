@@ -172,6 +172,49 @@ def find_met_incorrect_xref(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def compartments_galore(base):
+    """
+    Provide a model with lots of fancy compartments.
+    """
+    test_cases = {'ce': 'cell envelope',
+                  'c': 'cytoplasm',
+                  'er': 'endoplasmic reticulum',
+                  'erm': 'endoplasmic reticulum membrane',
+                  'e': 'extracellular',
+                  'g': 'golgi',
+                  'gm': 'golgi membrane',
+                  'lp': 'lipid particle',
+                  'mm': 'mitochondrial membrane',
+                  'm': 'mitochondrion',
+                  'n': 'nucleus',
+                  'x': 'peroxisome',
+                  'vm': 'vacuolar membrane',
+                  'v': 'vacuole'}
+    id_names = 'ABCDEFGHIJKLMN'
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment=c) for
+         i, c in zip(id_names, test_cases.keys())])
+    base.compartments = test_cases
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def compartment_size(base):
+    """
+    Provide a model with different amounts metabolites for each compartment.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='c') for i in "ABCD"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='e') for i in "EFG"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='p') for i in "HI"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='v') for i in "JK"])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport", 3),
     ("abc_pump", 1),
@@ -223,18 +266,31 @@ def test_open_boundaries(model, reaction_id, bounds):
 ], indirect=["model"])
 def test_find_met_in_model(model, mnx_id, expected):
     """Expect the metabolite represented by mnxid to be found correctly."""
-    met = helpers.find_met_in_model(model, mnx_id)
+    met = helpers.find_met_in_model(model, mnx_id, 'c')
     assert met.id == expected
 
 
 @pytest.mark.parametrize("model, mnx_id", [
     pytest.param("find_met_incorrect_xref", "MNXM1",
-    marks=pytest.mark.raises(exception=RuntimeError)),
+                 marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM13",
                  marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM8",
                  marks=pytest.mark.raises(exception=RuntimeError))
 ], indirect=["model"])
-def test_find_met_in_model(model, mnx_id):
+def test_find_met_in_model_exceptions(model, mnx_id):
     """Expect the function to raise the correct exceptions."""
-    helpers.find_met_in_model(model, mnx_id)
+    helpers.find_met_in_model(model, mnx_id, 'c')
+
+
+@pytest.mark.parametrize("model, compartment_id, count", [
+    ("compartment_size", "c", 4),
+    ("compartment_size", "h", 0)
+], indirect=["model"])
+def test_find_metabolites_per_compartment(model, compartment_id, count):
+    """
+    Expect the amount of metabolites per compartment to be counted correctly.
+    """
+    assert len(
+        helpers.metabolites_per_compartment(model, compartment_id)
+    ) == count

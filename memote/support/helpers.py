@@ -41,6 +41,11 @@ LOGGER = logging.getLogger(__name__)
 # different namespaces.
 METANETX_SHORTLIST = pd.read_json("memote/support/data/met_id_shortlist.json")
 
+# Provide a compartment shortlist to identify specfic compartments whenever
+# necessary.
+COMPARTMENT_SHORTLIST = {'c': ['cytoplasm', 'cytosol', 'default'],
+                         'e': ['extracellular', 'extra']}
+
 
 def find_transported_elements(rxn):
     """
@@ -405,16 +410,82 @@ def open_boundaries(model):
         exchange.bounds = (-1000, 1000)
 
 
-def find_met_in_model(model, mnx_id):
+def metabolites_per_compartment(model, compartment_id):
     """
-    Identify certain metabolites in the model by looking IDs up in a shortlist.
+    Identify all metabolites that belong to a given compartment.
 
     Parameters
     ----------
-    mnxid : string
-        A cobrapy metabolic model
     model : cobra.Model
         A cobrapy metabolic model
+    compartment_id : string
+        Model specific compartment identifier.
+
+    Returns
+    -------
+    list
+        List of metabolites belonging to a given compartment.
+
+    """
+    return [met for
+            met in model.metabolites if
+            met.compartment == compartment_id]
+
+
+def find_compartment_id_in_model(model, compartment_id):
+    """
+    Identify a model compartment by looking up names in COMPARTMENT_SHORTLIST.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    compartment_id : string
+        Memote internal compartment identifier used to access compartment name
+        shortlist to look up potential compartment names.
+
+    Returns
+    -------
+    string
+        Compartment identifier in the model corresponding to compartment_id
+
+    """
+    if len(model.compartments) == 0:
+        raise RuntimeError(
+            "It was not possible to identify the "
+            "compartment {}, since the "
+            "model has no compartments at "
+            "all.".format(COMPARTMENT_SHORTLIST[compartment_id][0])
+        )
+
+    for name in COMPARTMENT_SHORTLIST[compartment_id]:
+        for c_id, c_name in model.compartments.items():
+            if c_name.lower() == name:
+                return c_id
+
+    if compartment_id == 'c':
+        return largest_compartment_id(model)
+    else:
+        raise RuntimeError(
+            "It was not possible to identify the "
+            "compartment {}. Are you sure it exists in the "
+            "model?".format(COMPARTMENT_SHORTLIST[compartment_id][0])
+        )
+
+
+def find_met_in_model(model, mnx_id, compartment_id):
+    """
+    Identify metabolites in the model by looking up IDs in METANETX_SHORTLIST.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    mnx_id : string
+        Memote internal MetaNetX metabolite identifier used to map between
+        cross-references in the METANETX_SHORTLIST.
+    compartment_id : string
+        ID of the compartment where the metabolites should be found it.
 
     Returns
     -------
@@ -425,7 +496,7 @@ def find_met_in_model(model, mnx_id):
         raise RuntimeError("{} is not in the MetaNetX Shortlist! Make sure "
                            "you typed the ID correctly, if yes, update the "
                            "shortlist by updating and re-running the script "
-                           "generate_mnx_shortlists.py.")
+                           "generate_mnx_shortlists.py.".format(mnx_id))
 
     if model.metabolites.query(mnx_id) and len(
         model.metabolites.query(mnx_id)
@@ -441,16 +512,16 @@ def find_met_in_model(model, mnx_id):
                     candidates.extend(
                         model.metabolites.query(regex, attribute='id'))
 
-    candidates_in_cytosol = \
-        [cand for cand in candidates if cand.compartment == 'c']
-    if len(candidates_in_cytosol) == 0:
+    candidates_in_compartment = \
+        [cand for cand in candidates if cand.compartment == compartment_id]
+    if len(candidates_in_compartment) == 0:
         raise RuntimeError("It was not possible to identify "
                            "any metabolite corresponding to the following "
                            "MetaNetX identifier: {}."
                            "Make sure that a cross-reference to this ID in "
                            "the MetaNetX Database exists for your "
                            "identifier namespace.".format(mnx_id))
-    elif len(candidates_in_cytosol) > 1:
+    elif len(candidates_in_compartment) > 1:
         raise RuntimeError("It was not possible to uniquely identify "
                            "a single metabolite corresponding to the "
                            "following MetaNetX identifier: {}."
@@ -460,4 +531,4 @@ def find_met_in_model(model, mnx_id):
                            "sure that you do not have duplicate metabolites "
                            "in the cytosol".format(mnx_id))
     else:
-        return candidates_in_cytosol[0]
+        return candidates_in_compartment[0]
