@@ -68,18 +68,18 @@ def test_register_with(func, func_name):
 
 
 @pytest.mark.parametrize("notes, func, summary", [
-    (dict(title="One", data=4, type="string"), one,
+    (dict(title="One", data=4, type="raw"), one,
      """One line."""),
-    (dict(title="Two", data="some text", type="string"), two,
+    (dict(title="Two", data="some text", type="raw"), two,
      """Two lines.
     Why?
     """),
-    (dict(title="Three", data=[2, 4, 51, 63], type="length"), three,
+    (dict(title="Three", data=[2, 4, 51, 63], type="count"), three,
      """
     Three lines.
     Why?
     """),
-    (dict(title="Four", data=None, type="array"), four,
+    (dict(title="Four", data=None, type="raw"), four,
      """
     Fourth summary.
 

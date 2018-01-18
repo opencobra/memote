@@ -376,15 +376,13 @@ def close_boundaries_sensibly(model):
         of each reaction set according to their reversibility.
 
     """
-    with model:
-        for rxn in model.reactions:
-            if rxn.reversibility:
-                rxn.bounds = -1, 1
-            else:
-                rxn.bounds = 0, 1
-        for exchange in model.exchanges:
-            exchange.bounds = (0, 0)
-        return model.copy()
+    for rxn in model.reactions:
+        if rxn.reversibility:
+            rxn.bounds = -1, 1
+        else:
+            rxn.bounds = 0, 1
+    for exchange in model.exchanges:
+        exchange.bounds = (0, 0)
 
 
 def open_boundaries(model):
@@ -402,7 +400,5 @@ def open_boundaries(model):
         A cobra model with all boundary reactions opened.
 
     """
-    with model:
-        for exchange in model.exchanges:
-            exchange.bounds = (-1000, 1000)
-        return model.copy()
+    for exchange in model.exchanges:
+        exchange.bounds = (-1000, 1000)

@@ -27,7 +27,7 @@ import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-@annotate(title="Metabolites without SBO-Term Annotation", type="length")
+@annotate(title="Metabolites without SBO-Term Annotation", type="count")
 def test_metabolite_sbo_presence(read_only_model):
     """Expect all metabolites to have a some form of SBO-Term annotation.
 
@@ -48,7 +48,7 @@ def test_metabolite_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without SBO-Term Annotation", type="length")
+@annotate(title="Reactions without SBO-Term Annotation", type="count")
 def test_reaction_sbo_presence(read_only_model):
     """Expect all reactions to have a some form of SBO-Term annotation.
 
@@ -69,7 +69,7 @@ def test_reaction_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Genes without SBO-Term Annotation", type="length")
+@annotate(title="Genes without SBO-Term Annotation", type="count")
 def test_gene_sbo_presence(read_only_model):
     """Expect all genes to have a some form of SBO-Term annotation.
 
@@ -90,7 +90,7 @@ def test_gene_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolic Reactions without SBO:0000176", type="length")
+@annotate(title="Metabolic Reactions without SBO:0000176", type="count")
 def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     """Expect all metabolic reactions to be annotated with SBO:0000176.
 
@@ -113,7 +113,7 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Transport Reactions without SBO:0000185", type="length")
+@annotate(title="Transport Reactions without SBO:0000185", type="count")
 def test_transport_reaction_specific_sbo_presence(read_only_model):
     """Expect all transport reactions to be annotated with SBO:0000185.
 
@@ -136,7 +136,7 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolites without SBO:0000247", type="length")
+@annotate(title="Metabolites without SBO:0000247", type="count")
 def test_metabolite_specific_sbo_presence(read_only_model):
     """Expect all metabolites to be annotated with SBO:0000247.
 
@@ -156,7 +156,7 @@ def test_metabolite_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Genes without SBO:0000243", type="length")
+@annotate(title="Genes without SBO:0000243", type="count")
 def test_gene_specific_sbo_presence(read_only_model):
     """Expect all genes to be annotated with SBO:0000243.
 
@@ -176,7 +176,7 @@ def test_gene_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Exchange reactions without SBO:0000627", type="length")
+@annotate(title="Exchange reactions without SBO:0000627", type="count")
 def test_exchange_specific_sbo_presence(read_only_model):
     """Expect all exchange reactions to be annotated with SBO:0000627.
 
@@ -208,7 +208,7 @@ def test_exchange_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Demand reactions without SBO:0000628", type="length")
+@annotate(title="Demand reactions without SBO:0000628", type="count")
 def test_demand_specific_sbo_presence(read_only_model):
     """Expect all demand reactions to be annotated with SBO:0000627.
 
@@ -239,7 +239,7 @@ def test_demand_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Sink reactions without SBO:0000632", type="length")
+@annotate(title="Sink reactions without SBO:0000632", type="count")
 def test_sink_specific_sbo_presence(read_only_model):
     """Expect all sink reactions to be annotated with SBO:0000632.
 
@@ -273,7 +273,7 @@ def test_sink_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Biomass reactions without SBO:0000629", type="length")
+@annotate(title="Biomass reactions without SBO:0000629", type="count")
 def test_biomass_specific_sbo_presence(read_only_model):
     """Expect all biomass reactions to be annotated with SBO:0000629.
 

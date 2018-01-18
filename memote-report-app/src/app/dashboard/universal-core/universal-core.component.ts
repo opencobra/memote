@@ -11,7 +11,7 @@ import { KeysPipe } from './../../keys.pipe';
 })
 export class UniversalCoreComponent implements OnInit {
   @Input() scoreData: Object;
-  panelOpenState: boolean = false;
+  panelOpenState: false;
 
   constructor(private data: ReportDataService) { }
 

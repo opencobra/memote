@@ -94,12 +94,12 @@ The following components are requirements of ``test_your_custom_case``:
     of ``data``! Choose it according to how you'd like the results to be
     displayed in the reports. For example: In the case above ``data``
     is a list, for instance it could be list of unbalanced reactions. If you choose
-    ``type="length"``, the report will display its length. With ``type="array"``
-    it will display the individual items of the list. If ``data`` is a
-    single string then ``type="string"`` is best. In case, you'd rather display
+    ``type="count"``, the report will display its length. If you would like to
+    display data 'as is' for instance when ``data`` is single string then
+    ``type="raw"`` is best. In case, you'd rather display
     the ``metric`` as opposed to the contents of ``data`` use
-    ``type="number"``. ``type="object"`` is only supported for parametrized
-    tests (see example below).
+    ``type="percent"``. ``type="number"`` is appropriate for displaying single
+    integer and float ``data``.
 
   - A human-readable, descriptive ``title`` that will be displayed in the report
     as opposed to the test function name ``test_your_custom_case`` which will
@@ -149,7 +149,7 @@ the metabolite annotations for each database.
 
     @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
     @annotate(title="Missing Metabolite Annotations Per Database",
-              type="object", message=dict(), data=dict(), metric=dict())
+              type="count", message=dict(), data=dict(), metric=dict())
     def test_metabolite_annotation_overview(read_only_model, db):
         """
         Expect all metabolites to have annotations from common databases.

@@ -12,89 +12,20 @@
         </div>
         <div fxFlex> Score per Category
         <div id="catScore">
-
+          TODO: Put a nice graph here!
         </div>
         </div>
       </div>
       <hr>
       <div>
       <div fxFlex>
-        <h3>Scored Tests</h3>
+        <h2>Scored Tests</h2>
         <div *ngFor="let section of scoreData.sections | keys">
-          <h4> {{ scoreData.sections[section].title }}</h4>
-          <mat-accordion
-          multi="true"
-          displayMode="flat">
-             <mat-expansion-panel
-             *ngFor="let case of scoreData.sections[section].cases"
-             #expPanel
-             class="mat-elevation-z0">
-              <mat-expansion-panel-header
-              class="mat-expansion-panel-header"
-              collapsedHeight="auto"
-              expandedHeight="auto"
-              style="padding:0.05vh">
-                <mat-panel-description
-                fxLayout="column" fxLayoutAlign='center stretch'
-                *ngIf="data.byID(case).type === 'object'; else singleButton">
-                  <tr fxLayout="column" fxLayoutAlign='center stretch'>
-                    <td class="test-title"> {{ data.byID(case).title }} </td>
-                    <app-tabularize
-                    [testCase]="data.byID(case)"
-                    [scored]="true">
-                    </app-tabularize>
-                  </tr>
-                  </mat-panel-description>
-                  <ng-template #singleButton>
-                    <mat-panel-description fxLayoutAlign='space-between center'>
-                    <td class="test-title"> {{ data.byID(case).title }} </td>
-                    <!-- This may be useful later when we get to the export! -->
-                    <!-- <td> {{expPanel.expanded? 'open' : 'closed'}} </td> -->
-                    <div *ngIf="data.byID(case).result === 'passed' || data.byID(case).result === 'failed'">
-                    <td>
-                      <app-coloured-score [metric]="data.byID(case).metric"></app-coloured-score>
-                    </td>
-                    </div>
-                    <div *ngIf="data.byID(case).result === 'skipped'">
-                      <td>
-                        <button
-                         mat-raised-button
-                         disabled
-                         style="color:black">
-                         Skipped
-                         </button>
-                       </td>
-                    </div>
-                    <div *ngIf="data.byID(case).result === 'error'">
-                      <td>
-                        <button
-                         mat-raised-button
-                         style="color:red;background-color:black">
-                         Errored
-                         </button>
-                       </td>
-                    </div>
-                    </mat-panel-description>
-              </ng-template>
-              </mat-expansion-panel-header>
-              <div fxLayout='column' flexLayoutAlign='space-between center'>
-              <div> {{ data.byID(case).summary }} </div>
-              <div *ngIf="data.byID(case).type === 'object'; else noObject">
-                <br>
-                <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-                {{ data.getString(data.byID(case).data) }}
-                </textarea>
-              </div>
-              <ng-template #noObject>
-                <br>
-                <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-                {{ data.getString(data.byID(case).data) }}
-                </textarea>
-              </ng-template>
-              </div>
-            </mat-expansion-panel>
-          </mat-accordion>
+          <h3> {{ scoreData.sections[section].title }}</h3>
+          <div *ngFor="let case of scoreData.sections[section].cases">
+            <app-accordion [case]="case"></app-accordion>
           </div>
+        </div>
       </div>
       </div>
 </mat-card-content>
