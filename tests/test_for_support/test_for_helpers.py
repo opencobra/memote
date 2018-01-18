@@ -137,7 +137,9 @@ def one_exchange(base):
 
 
 def find_met_id(base):
-    """Provide a model containing metabolite IDs from different namespaces."""
+    """
+    Provide a model with existing metabolite IDs from different namespaces.
+    """
     # ATP - BiGG ID
     a = cobra.Metabolite("atp_c", compartment='c')
     # GTP - Chebi ID
@@ -153,6 +155,20 @@ def find_met_id(base):
     # Coenzyme A - Seed ID
     g = cobra.Metabolite("cpd00010", compartment='c')
     base.add_metabolites([a, b, c, d, e, f, g])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def find_met_incorrect_xref(base):
+    """
+    Provide a model with metabolite IDs not in shortlist or wrong.
+    """
+    # Hydrogen - HMDB ID typo
+    a = cobra.Metabolite("HMDB59598", compartment='c')
+    # NADH and NAD - BiGG ID but
+    b = cobra.Metabolite("nad_c", compartment='c')
+    c = cobra.Metabolite("nad_e", compartment='c')
+    base.add_metabolites([a, b, c])
     return base
 
 
@@ -209,3 +225,16 @@ def test_find_met_in_model(model, mnx_id, expected):
     """Expect the metabolite represented by mnxid to be found correctly."""
     met = helpers.find_met_in_model(model, mnx_id)
     assert met.id == expected
+
+
+@pytest.mark.parametrize("model, mnx_id", [
+    pytest.param("find_met_incorrect_xref", "MNXM1",
+    marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM13",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM8",
+                 marks=pytest.mark.raises(exception=RuntimeError))
+], indirect=["model"])
+def test_find_met_in_model(model, mnx_id):
+    """Expect the function to raise the correct exceptions."""
+    helpers.find_met_in_model(model, mnx_id)

@@ -36,7 +36,8 @@ xref = pd.read_csv(
     "chem_xref.tsv",
     delim_whitespace=True,
     comment='#',
-    names=['XREF','MNX_ID','Evidence','Description'])
+    names=['XREF', 'MNX_ID', 'Evidence', 'Description'])
+
 
 def xref_splitter(xref):
     """
@@ -56,6 +57,7 @@ def xref_splitter(xref):
     elif 'MNX' in xref and ':' not in xref:
         return 'mnx'
 
+
 # In chem_xref.tsv, the xref entries are key value pairs separated by ':'
 # Such as: bigg:10fthf
 # Split xref strings in MNX dump to obtain database names.
@@ -72,13 +74,13 @@ xref['XREF'] = xref['XREF'].apply(lambda x: x.split(':')[1] if ':' in x else x)
 # MNX_ID    XREF_ID
 # MNXM0     chebi       [23367, 59999]
 #           metacyc     [UNKNOWN]
-groups = xref.groupby(['MNX_ID','XREF_ID'])
-xref = groups.apply(lambda x:list(x['XREF']))
+groups = xref.groupby(['MNX_ID', 'XREF_ID'])
+xref = groups.apply(lambda x: list(x['XREF']))
 
 # Make a separate column for every XREF_ID:
 # MNX_ID    chebi           metacyc
 # MNXM0     [23367, 59999]  [UNKNOWN]
-xref =xref.unstack('XREF_ID')
+xref = xref.unstack('XREF_ID')
 
 # Transpose the dataframe such that the index are now xref databases and the
 # column names are metanetx IDs.

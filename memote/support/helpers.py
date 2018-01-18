@@ -407,7 +407,7 @@ def open_boundaries(model):
 
 def find_met_in_model(model, mnx_id):
     """
-    Identifies certain metabolites in the model by looking IDs up in a shortlist.
+    Identify certain metabolites in the model by looking IDs up in a shortlist.
 
     Parameters
     ----------
@@ -421,6 +421,12 @@ def find_met_in_model(model, mnx_id):
     cobra.Metabolite
 
     """
+    if mnx_id not in METANETX_SHORTLIST.columns:
+        raise RuntimeError("{} is not in the MetaNetX Shortlist! Make sure "
+                           "you typed the ID correctly, if yes, update the "
+                           "shortlist by updating and re-running the script "
+                           "generate_mnx_shortlists.py.")
+
     if model.metabolites.query(mnx_id) and len(
         model.metabolites.query(mnx_id)
     ) == 1:
@@ -429,22 +435,29 @@ def find_met_in_model(model, mnx_id):
     candidates = []
     for value in METANETX_SHORTLIST[mnx_id]:
         if value:
-            print(value)
             for ident in value:
-                regex = re.compile('^{}'.format(ident))
-                print(ident)
+                regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
                 if model.metabolites.query(regex, attribute='id'):
                     candidates.extend(
                         model.metabolites.query(regex, attribute='id'))
 
     candidates_in_cytosol = \
         [cand for cand in candidates if cand.compartment == 'c']
-    if len(candidates_in_cytosol) != 1:
+    if len(candidates_in_cytosol) == 0:
         raise RuntimeError("It was not possible to identify "
-                           "a metabolite corresponding to the following "
+                           "any metabolite corresponding to the following "
                            "MetaNetX identifier: {}."
-                           "Make sure if the namespace you are using "
-                           "is listed as a cross-reference in the MetaNetX "
-                           "Database.".format(mnx_id))
+                           "Make sure that a cross-reference to this ID in "
+                           "the MetaNetX Database exists for your "
+                           "identifier namespace.".format(mnx_id))
+    elif len(candidates_in_cytosol) > 1:
+        raise RuntimeError("It was not possible to uniquely identify "
+                           "a single metabolite corresponding to the "
+                           "following MetaNetX identifier: {}."
+                           "Check that metabolite compartment tags are "
+                           "correct. Consider switching to a namespace scheme "
+                           "where identifiers are truly unique. Also make "
+                           "sure that you do not have duplicate metabolites "
+                           "in the cytosol".format(mnx_id))
     else:
         return candidates_in_cytosol[0]
