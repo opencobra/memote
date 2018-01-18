@@ -172,5 +172,5 @@ def test_find_converting_reactions(model, met_pair, expected):
 ], indirect=["model"])
 def test_open_boundaries(model, reaction_id, bounds):
     """Expect amount of transporters to be identified correctly."""
-    model = helpers.open_boundaries(model)
+    helpers.open_boundaries(model)
     assert model.reactions.get_by_id(reaction_id).bounds == bounds

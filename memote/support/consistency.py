@@ -311,7 +311,7 @@ def detect_energy_generating_cycles(model, metabolite_id):
     met = model.metabolites.get_by_id(metabolite_id)
     dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
     dissipation_rxn = Reaction('Dissipation')
-    model = helpers.close_boundaries_sensibly(model)
+    helpers.close_boundaries_sensibly(model)
     model.add_reactions([dissipation_rxn])
     if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
         # build nucleotide-type dissipation reaction
@@ -510,7 +510,7 @@ def find_metabolites_produced_with_closed_bounds(model):
 
     """
     mets_produced = list()
-    model = helpers.close_boundaries_sensibly(model)
+    helpers.close_boundaries_sensibly(model)
     for met in model.metabolites:
         with model:
             exch = model.add_boundary(
@@ -536,7 +536,7 @@ def find_metabolites_consumed_with_closed_bounds(model):
 
     """
     mets_consumed = list()
-    model = helpers.close_boundaries_sensibly(model)
+    helpers.close_boundaries_sensibly(model)
     for met in model.metabolites:
         with model:
             exch = model.add_boundary(

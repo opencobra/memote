@@ -122,7 +122,7 @@ def test_biomass_open_production(model, reaction_id):
     growth rate is accepted to pass this test.
     """
     ann = test_biomass_open_production.annotation
-    model = helpers.open_boundaries(model)
+    helpers.open_boundaries(model)
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate that can be
@@ -182,7 +182,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
     precursors.
     """
     ann = test_biomass_precursors_open_production.annotation
-    model = helpers.open_boundaries(model)
+    helpers.open_boundaries(model)
     reaction = model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = get_ids(
         biomass.find_blocked_biomass_precursors(reaction, model)
