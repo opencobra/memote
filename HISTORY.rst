@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 * Let Travis re-package the snapshot report with every release.
+* Add new module to test for the presence of SBO term annotations.
 
 0.5.0 (2018-01-16)
 ------------------
