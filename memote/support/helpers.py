@@ -32,8 +32,14 @@ with warnings.catch_warnings():
 
 from six import iteritems, itervalues
 from sympy import expand
+import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
+
+
+# Read the MetaNetX shortlist to identify specific metabolite IDs across
+# different namespaces.
+METANETX_SHORTLIST = pd.read_json("memote/support/data/met_id_shortlist.json")
 
 
 def find_transported_elements(rxn):
@@ -391,14 +397,54 @@ def open_boundaries(model):
 
     Parameters
     ----------
-    model : cobra.Model
-        A cobrapy metabolic model
-
-    Returns
-    -------
     cobra.Model
         A cobra model with all boundary reactions opened.
 
     """
     for exchange in model.exchanges:
         exchange.bounds = (-1000, 1000)
+
+
+def find_met_in_model(model, mnx_id):
+    """
+    Identifies certain metabolites in the model by looking IDs up in a shortlist.
+
+    Parameters
+    ----------
+    mnxid : string
+        A cobrapy metabolic model
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Returns
+    -------
+    cobra.Metabolite
+
+    """
+    if model.metabolites.query(mnx_id) and len(
+        model.metabolites.query(mnx_id)
+    ) == 1:
+        return model.metabolites.query(mnx_id)[0]
+
+    candidates = []
+    for value in METANETX_SHORTLIST[mnx_id]:
+        if value:
+            print(value)
+            for ident in value:
+                regex = re.compile('^{}'.format(ident))
+                print(ident)
+                if model.metabolites.query(regex, attribute='id'):
+                    candidates.extend(
+                        model.metabolites.query(regex, attribute='id'))
+
+    candidates_in_cytosol = \
+        [cand for cand in candidates if cand.compartment == 'c']
+    if len(candidates_in_cytosol) != 1:
+        raise RuntimeError("It was not possible to identify "
+                           "a metabolite corresponding to the following "
+                           "MetaNetX identifier: {}."
+                           "Make sure if the namespace you are using "
+                           "is listed as a cross-reference in the MetaNetX "
+                           "Database.".format(mnx_id))
+    else:
+        return candidates_in_cytosol[0]

@@ -136,6 +136,26 @@ def one_exchange(base):
     return base
 
 
+def find_met_id(base):
+    """Provide a model containing metabolite IDs from different namespaces."""
+    # ATP - BiGG ID
+    a = cobra.Metabolite("atp_c", compartment='c')
+    # GTP - Chebi ID
+    b = cobra.Metabolite("15996", compartment='c')
+    # CDP - Deprecated MetaNetX ID
+    c = cobra.Metabolite("MNXM90125", compartment='c')
+    # Asparagine - Kegg ID
+    d = cobra.Metabolite("C00152", compartment='c')
+    # Glycine - MetaCyc ID
+    e = cobra.Metabolite("GLY", compartment='c')
+    # Pyridoxal Phosphate - Current MetaNetX ID
+    f = cobra.Metabolite("MNXM161", compartment='c')
+    # Coenzyme A - Seed ID
+    g = cobra.Metabolite("cpd00010", compartment='c')
+    base.add_metabolites([a, b, c, d, e, f, g])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport", 3),
     ("abc_pump", 1),
@@ -174,3 +194,18 @@ def test_open_boundaries(model, reaction_id, bounds):
     """Expect amount of transporters to be identified correctly."""
     helpers.open_boundaries(model)
     assert model.reactions.get_by_id(reaction_id).bounds == bounds
+
+
+@pytest.mark.parametrize("model, mnx_id, expected", [
+    ("find_met_id", "MNXM3", "atp_c"),
+    ("find_met_id", "MNXM51", "15996"),
+    ("find_met_id", "MNXM220", "MNXM90125"),
+    ("find_met_id", "MNXM147", "C00152"),
+    ("find_met_id", "MNXM29", "GLY"),
+    ("find_met_id", "MNXM161", "MNXM161"),
+    ("find_met_id", "MNXM12", "cpd00010")
+], indirect=["model"])
+def test_find_met_in_model(model, mnx_id, expected):
+    """Expect the metabolite represented by mnxid to be found correctly."""
+    met = helpers.find_met_in_model(model, mnx_id)
+    assert met.id == expected

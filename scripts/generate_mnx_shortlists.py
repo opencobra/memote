@@ -104,4 +104,4 @@ shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
 df = xref[shortlist]
 
 # Saving the shortlist to memote/support/data
-df.to_csv('../memote/support/data/met_id_shortlist.csv')
+df.to_json('../memote/support/data/met_id_shortlist.json')
