@@ -43,8 +43,23 @@ METANETX_SHORTLIST = pd.read_json("memote/support/data/met_id_shortlist.json")
 
 # Provide a compartment shortlist to identify specfic compartments whenever
 # necessary.
-COMPARTMENT_SHORTLIST = {'c': ['cytoplasm', 'cytosol', 'default'],
-                         'e': ['extracellular', 'extra']}
+COMPARTMENT_SHORTLIST = {
+    'ce': ['cell envelope'],
+    'c': ['cytoplasm', 'cytosol', 'default'],
+    'er': ['endoplasmic reticulum'],
+    'erm': ['endoplasmic reticulum membrane'],
+    'e': ['extracellular', 'extra'],
+    'g': ['golgi'],
+    'gm': ['golgi membrane'],
+    'h': ['lipid particle'],
+    'lp': ['lipid particle'],
+    'mm': ['mitochondrial membrane'],
+    'm': ['mitochondrion'],
+    'n': ['nucleus'],
+    'p': ['periplasm'],
+    'x': ['peroxisome'],
+    'vm': ['vacuolar membrane'],
+    'v': ['vacuole']}
 
 
 def find_transported_elements(rxn):
@@ -432,6 +447,37 @@ def metabolites_per_compartment(model, compartment_id):
             met.compartment == compartment_id]
 
 
+def largest_compartment_id_met(model):
+    """
+    Return the ID of the compartment with the most metabolites.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Returns
+    -------
+    string
+        Compartment ID of the compartment with the most metabolites.
+
+    """
+    size = {
+        compartment_id: len(metabolites_per_compartment(
+            model, compartment_id)) for
+        compartment_id in model.compartments.keys()
+    }
+    candidate = sorted(size, key=size.get, reverse=True)[0]
+    tie = size.copy()
+    tie.pop('c')
+    if size['c'] not in tie.values():
+        return candidate
+    else:
+        raise RuntimeError("There is a tie for the largest compartment. "
+                           "Compartment {} and {} have equal amounts of "
+                           "metabolites.".format(compartment_id, ))
+
+
 def find_compartment_id_in_model(model, compartment_id):
     """
     Identify a model compartment by looking up names in COMPARTMENT_SHORTLIST.
@@ -450,6 +496,11 @@ def find_compartment_id_in_model(model, compartment_id):
         Compartment identifier in the model corresponding to compartment_id
 
     """
+    if compartment_id not in COMPARTMENT_SHORTLIST.keys():
+        raise RuntimeError("{} is not in the COMPARTMENT_SHORTLIST! Make sure "
+                           "you typed the ID correctly, if yes, update the "
+                           "shortlist manually.".format(compartment_id))
+
     if len(model.compartments) == 0:
         raise RuntimeError(
             "It was not possible to identify the "
@@ -458,19 +509,16 @@ def find_compartment_id_in_model(model, compartment_id):
             "all.".format(COMPARTMENT_SHORTLIST[compartment_id][0])
         )
 
+    if compartment_id in model.compartments.keys():
+        return compartment_id
+
     for name in COMPARTMENT_SHORTLIST[compartment_id]:
         for c_id, c_name in model.compartments.items():
             if c_name.lower() == name:
                 return c_id
 
     if compartment_id == 'c':
-        return largest_compartment_id(model)
-    else:
-        raise RuntimeError(
-            "It was not possible to identify the "
-            "compartment {}. Are you sure it exists in the "
-            "model?".format(COMPARTMENT_SHORTLIST[compartment_id][0])
-        )
+        return largest_compartment_id_met(model)
 
 
 def find_met_in_model(model, mnx_id, compartment_id):

@@ -173,29 +173,23 @@ def find_met_incorrect_xref(base):
 
 
 @register_with(MODEL_REGISTRY)
-def compartments_galore(base):
+def compartments1(base):
     """
-    Provide a model with lots of fancy compartments.
+    Provide a model with unconventional compartment names.
     """
-    test_cases = {'ce': 'cell envelope',
-                  'c': 'cytoplasm',
-                  'er': 'endoplasmic reticulum',
-                  'erm': 'endoplasmic reticulum membrane',
-                  'e': 'extracellular',
-                  'g': 'golgi',
-                  'gm': 'golgi membrane',
-                  'lp': 'lipid particle',
-                  'mm': 'mitochondrial membrane',
-                  'm': 'mitochondrion',
-                  'n': 'nucleus',
-                  'x': 'peroxisome',
-                  'vm': 'vacuolar membrane',
-                  'v': 'vacuole'}
-    id_names = 'ABCDEFGHIJKLMN'
-    base.add_metabolites(
-        [cobra.Metabolite(i, compartment=c) for
-         i, c in zip(id_names, test_cases.keys())])
-    base.compartments = test_cases
+    test_case = {'default': 'default',
+                 'c_15': 'some unknown name'}
+    base.add_metabolites( [cobra.Metabolite('A', compartment='default')])
+    base.compartments = test_case
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def no_compartments(base):
+    """
+    Provide a model with no compartments.
+    """
+    base.add_metabolites( [cobra.Metabolite('A')])
     return base
 
 
@@ -212,6 +206,30 @@ def compartment_size(base):
         [cobra.Metabolite(i, compartment='p') for i in "HI"])
     base.add_metabolites(
         [cobra.Metabolite(i, compartment='v') for i in "JK"])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def compartment_size_uncommon_keys(base):
+    """
+    Provide a model with different amounts metabolites for each compartment.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='ml') for i in "ABCD"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='om') for i in "EFG"])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def edge_case(base):
+    """
+    Provide an edge case where compartment detection fails.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='ml') for i in "ABC"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='om') for i in "DEF"])
     return base
 
 
@@ -283,6 +301,37 @@ def test_find_met_in_model_exceptions(model, mnx_id):
     helpers.find_met_in_model(model, mnx_id, 'c')
 
 
+@pytest.mark.parametrize("model, compartment_id, expected", [
+    ("compartments1", "c", "default"),
+    ("compartment_size", "c", "c"),
+    ("compartment_size_uncommon_keys", "c", "ml")
+], indirect=["model"])
+def test_find_compartment_id_in_model(model, compartment_id, expected):
+    """Expect the compartment ID of the model to be found correctly."""
+    comp_id = helpers.find_compartment_id_in_model(model, compartment_id)
+    assert comp_id == expected
+
+
+@pytest.mark.parametrize("model, compartment_id", [
+    pytest.param("no_compartments", "c",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("compartments1", "xx",
+                 marks=pytest.mark.raises(exception=RuntimeError))
+], indirect=["model"])
+def test_find_compartment_id_in_model(model, compartment_id):
+    """Expect the compartment ID of the model to be found correctly."""
+    helpers.find_compartment_id_in_model(model, compartment_id)
+
+
+@pytest.mark.parametrize("model", [
+    pytest.param("edge_case",
+                 marks=pytest.mark.raises(exception=RuntimeError))
+], indirect=["model"])
+def test_largest_compartment_id_met(model):
+    """Expect the compartment ID of the model to be found correctly."""
+    helpers.largest_compartment_id_met(model)
+
+
 @pytest.mark.parametrize("model, compartment_id, count", [
     ("compartment_size", "c", 4),
     ("compartment_size", "h", 0)
@@ -294,3 +343,13 @@ def test_find_metabolites_per_compartment(model, compartment_id, count):
     assert len(
         helpers.metabolites_per_compartment(model, compartment_id)
     ) == count
+
+
+@pytest.mark.parametrize("model, expected", [
+    ("compartment_size", "c")
+], indirect=["model"])
+def test_largest_compartment_id_met(model, expected):
+    """
+    Expect the ID of the compartment with most metabolites to be identified.
+    """
+    assert helpers.largest_compartment_id_met(model) == expected
