@@ -146,9 +146,15 @@ def find_reaction_tag_transporter(model):
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
-    atp_adp_rxns = helpers.find_converting_reactions(model, ["atp", "adp"])
-    gtp_gdp_rxns = helpers.find_converting_reactions(model, ["gtp", "gdp"])
-    ctp_cdp_rxns = helpers.find_converting_reactions(model, ["ctp", "cdp"])
+    atp_adp_rxns = helpers.find_converting_reactions(
+        model, ("MNXM3", "MNXM7")
+    )
+    gtp_gdp_rxns = helpers.find_converting_reactions(
+        model, ("MNXM51", "MNXM30")
+    )
+    ctp_cdp_rxns = helpers.find_converting_reactions(
+        model, ["MNXM63", "MNXM220"]
+    )
     energy_requiring = set().union(atp_adp_rxns, gtp_gdp_rxns, ctp_cdp_rxns)
 
     non_abc_transporters = set(transport_rxns).difference(energy_requiring)
@@ -182,9 +188,15 @@ def find_abc_tag_transporter(model):
 
     """
     transport_rxns = helpers.find_transport_reactions(model)
-    atp_adp_rxns = helpers.find_converting_reactions(model, ["atp", "adp"])
-    gtp_gdp_rxns = helpers.find_converting_reactions(model, ["gtp", "gdp"])
-    ctp_cdp_rxns = helpers.find_converting_reactions(model, ["ctp", "cdp"])
+    atp_adp_rxns = helpers.find_converting_reactions(
+        model, ("MNXM3", "MNXM7")
+    )
+    gtp_gdp_rxns = helpers.find_converting_reactions(
+        model, ("MNXM51", "MNXM30")
+    )
+    ctp_cdp_rxns = helpers.find_converting_reactions(
+        model, ["MNXM63", "MNXM220"]
+    )
     energy_requiring = set().union(atp_adp_rxns, gtp_gdp_rxns, ctp_cdp_rxns)
 
     abc_transporters = set(transport_rxns).intersection(energy_requiring)

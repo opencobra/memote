@@ -109,11 +109,11 @@ def energy_transfer(base):
 @register_with(MODEL_REGISTRY)
 def converting_reactions(base):
     """Provide a model with a couple of converting reaction."""
-    a = cobra.Metabolite("a_c")
-    b = cobra.Metabolite("b_c")
-    c = cobra.Metabolite("c_c")
-    c2 = cobra.Metabolite("c_e")
-    c3 = cobra.Metabolite("c_p")
+    a = cobra.Metabolite("atp_c", compartment="c")
+    b = cobra.Metabolite("adp_c", compartment="c")
+    c = cobra.Metabolite("gtp_c", compartment="c")
+    c2 = cobra.Metabolite("gtp_e", compartment="e")
+    c3 = cobra.Metabolite("gtp_p", compartment="p")
     rxn1 = cobra.Reaction("R1")
     rxn1.add_metabolites({a: -1, b: 1})
     rxn2 = cobra.Reaction("R2")
@@ -190,7 +190,7 @@ def no_compartments(base):
     """
     Provide a model with no compartments.
     """
-    base.add_metabolites( [cobra.Metabolite('A')])
+    base.add_metabolites( [cobra.Metabolite('MNXM161')])
     return base
 
 
@@ -257,8 +257,8 @@ def test_find_functional_units(gpr_str, expected):
 
 
 @pytest.mark.parametrize("model, met_pair, expected", [
-    ("converting_reactions", ("a", "b"), 2),
-    ("converting_reactions", ("c", "c"), 1)
+    ("converting_reactions", ("MNXM3", "MNXM7"), 2),
+    ("converting_reactions", ("MNXM51", "MNXM51"), 1)
 ], indirect=["model"])
 def test_find_converting_reactions(model, met_pair, expected):
     """Expect amount of converting reactions to be identified correctly."""
@@ -281,17 +281,25 @@ def test_open_boundaries(model, reaction_id, bounds):
     ("find_met_id", "MNXM147", "C00152"),
     ("find_met_id", "MNXM29", "GLY"),
     ("find_met_id", "MNXM161", "MNXM161"),
-    ("find_met_id", "MNXM12", "cpd00010")
+    ("find_met_id", "MNXM12", "cpd00010"),
+    ("no_compartments", "MNXM161", "MNXM161"),
 ], indirect=["model"])
-def test_find_met_in_model(model, mnx_id, expected):
+def test_find_met_in_model_accurate_results(model, mnx_id, expected):
     """Expect the metabolite represented by mnxid to be found correctly."""
     met = helpers.find_met_in_model(model, mnx_id, 'c')
     assert met.id == expected
 
 
+@pytest.mark.parametrize("model, mnx_id, expected", [
+    ("find_met_incorrect_xref", "MNXM1", None)
+], indirect=["model"])
+def test_find_met_in_model_no_result(model, mnx_id, expected):
+    """Expect the metabolite represented by mnxid not to be found."""
+    met = helpers.find_met_in_model(model, mnx_id, 'c')
+    assert met == expected
+
+
 @pytest.mark.parametrize("model, mnx_id", [
-    pytest.param("find_met_incorrect_xref", "MNXM1",
-                 marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM13",
                  marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM8",

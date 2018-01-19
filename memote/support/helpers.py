@@ -173,10 +173,10 @@ def find_converting_reactions(model, pair):
 
     """
     met_ids = [m.id for m in model.metabolites]
-    first = set(model.metabolites.get_by_id(m)
-                for m in met_ids if m.startswith(pair[0]))
-    second = set(model.metabolites.get_by_id(m)
-                 for m in met_ids if m.startswith(pair[1]))
+    first = set(find_met_in_model(model, pair[0], compartment)
+                for compartment in model.compartments.keys())
+    second = set(find_met_in_model(model, pair[1], compartment)
+                for compartment in model.compartments.keys())
 
     hits = list()
     for rxn in model.reactions:
@@ -560,15 +560,20 @@ def find_met_in_model(model, mnx_id, compartment_id):
                     candidates.extend(
                         model.metabolites.query(regex, attribute='id'))
 
-    candidates_in_compartment = \
-        [cand for cand in candidates if cand.compartment == compartment_id]
+    if len(model.compartments) == 0:
+        candidates_in_compartment = candidates
+    else:
+        candidates_in_compartment = \
+            [cand for cand in candidates if cand.compartment == compartment_id]
+
     if len(candidates_in_compartment) == 0:
-        raise RuntimeError("It was not possible to identify "
-                           "any metabolite corresponding to the following "
-                           "MetaNetX identifier: {}."
-                           "Make sure that a cross-reference to this ID in "
-                           "the MetaNetX Database exists for your "
-                           "identifier namespace.".format(mnx_id))
+        return None
+    #     raise RuntimeError("It was not possible to identify "
+    #                        "any metabolite corresponding to the following "
+    #                        "MetaNetX identifier: {}."
+    #                        "Make sure that a cross-reference to this ID in "
+    #                        "the MetaNetX Database exists for your "
+    #                        "identifier namespace.".format(mnx_id))
     elif len(candidates_in_compartment) > 1:
         raise RuntimeError("It was not possible to uniquely identify "
                            "a single metabolite corresponding to the "
