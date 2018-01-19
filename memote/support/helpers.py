@@ -563,9 +563,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                     if model.metabolites.query(regex, attribute='id'):
                         candidates.extend(
                             model.metabolites.query(regex, attribute='id'))
-    print "#"*200
-    print (candidates)
-    print "#" * 200
+
     if compartment_id == None:
         return candidates
 
