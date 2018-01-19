@@ -52,21 +52,28 @@ METANETX_SHORTLIST = pd.read_json(
 # necessary.
 COMPARTMENT_SHORTLIST = {
     'ce': ['cell envelope'],
-    'c': ['cytoplasm', 'cytosol', 'default'],
+    'c': ['cytoplasm', 'cytosol', 'default', 'in', 'intra cellular',
+          'intracellular', 'intracellular region', 'intracellular space'],
     'er': ['endoplasmic reticulum'],
     'erm': ['endoplasmic reticulum membrane'],
-    'e': ['extracellular', 'extra'],
-    'g': ['golgi'],
+    'e': ['extracellular', 'extraorganism', 'out', 'extracellular space',
+          'extra organism', 'extra cellular', 'extra-organism'],
+    'f': ['flagellum', 'bacterial-type flagellum'],
+    'g': ['golgi', 'golgi apparatus'],
     'gm': ['golgi membrane'],
-    'h': ['lipid particle'],
-    'lp': ['lipid particle'],
+    'h': ['chloroplast'],
+    'l': ['lysosome'],
+    'im': ['mitochondrial intermembrane space'],
     'mm': ['mitochondrial membrane'],
-    'm': ['mitochondrion'],
+    'm': ['mitochondrion', 'mitochondria'],
     'n': ['nucleus'],
-    'p': ['periplasm'],
-    'x': ['peroxisome'],
+    'p': ['periplasm', 'periplasmic space'],
+    'x': ['peroxisome', 'glyoxysome'],
+    'u': ['thylakoid'],
     'vm': ['vacuolar membrane'],
-    'v': ['vacuole']}
+    'v': ['vacuole'],
+    'w': ['cell wall'],
+    's': ['eyespot', 'eyespot apparatus', 'stigma']}
 
 
 def find_transported_elements(rxn):
