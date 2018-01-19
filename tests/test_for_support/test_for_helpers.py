@@ -136,6 +136,7 @@ def one_exchange(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
 def find_met_id(base):
     """
     Provide a model with existing metabolite IDs from different namespaces.
