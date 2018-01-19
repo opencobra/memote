@@ -180,7 +180,7 @@ def compartments1(base):
     """
     test_case = {'default': 'default',
                  'c_15': 'some unknown name'}
-    base.add_metabolites( [cobra.Metabolite('A', compartment='default')])
+    base.add_metabolites([cobra.Metabolite('A', compartment='default')])
     base.compartments = test_case
     return base
 
@@ -190,7 +190,7 @@ def no_compartments(base):
     """
     Provide a model with no compartments.
     """
-    base.add_metabolites( [cobra.Metabolite('MNXM161')])
+    base.add_metabolites([cobra.Metabolite('MNXM161')])
     return base
 
 
@@ -274,40 +274,39 @@ def test_open_boundaries(model, reaction_id, bounds):
     assert model.reactions.get_by_id(reaction_id).bounds == bounds
 
 
-@pytest.mark.parametrize("model, mnx_id, expected", [
-    ("find_met_id", "MNXM3", "atp_c"),
-    ("find_met_id", "MNXM51", "15996"),
-    ("find_met_id", "MNXM220", "MNXM90125"),
-    ("find_met_id", "MNXM147", "C00152"),
-    ("find_met_id", "MNXM29", "GLY"),
-    ("find_met_id", "MNXM161", "MNXM161"),
-    ("find_met_id", "MNXM12", "cpd00010"),
-    ("no_compartments", "MNXM161", "MNXM161"),
+@pytest.mark.parametrize("model, mnx_id, compartment_id, expected", [
+    ("find_met_id", "MNXM3", "c", "atp_c"),
+    ("find_met_id", "MNXM51", None, "15996"),
+    ("find_met_id", "MNXM220", None, "MNXM90125"),
+    ("find_met_id", "MNXM147", None, "C00152"),
+    ("find_met_id", "MNXM29", None, "GLY"),
+    ("find_met_id", "MNXM161", None, "MNXM161"),
+    ("find_met_id", "MNXM12", None, "cpd00010"),
+    ("no_compartments", "MNXM161", None, "MNXM161"),
 ], indirect=["model"])
-def test_find_met_in_model_accurate_results(model, mnx_id, expected):
+def test_find_met_in_model_accurate_results(
+    model, mnx_id, compartment_id, expected
+):
     """Expect the metabolite represented by mnxid to be found correctly."""
-    met = helpers.find_met_in_model(model, mnx_id, 'c')
-    assert met.id == expected
+    met = helpers.find_met_in_model(
+        model, mnx_id, compartment_id=compartment_id
+    )
+    assert met[0].id == expected
 
 
-@pytest.mark.parametrize("model, mnx_id, expected", [
-    ("find_met_incorrect_xref", "MNXM1", None)
-], indirect=["model"])
-def test_find_met_in_model_no_result(model, mnx_id, expected):
-    """Expect the metabolite represented by mnxid not to be found."""
-    met = helpers.find_met_in_model(model, mnx_id, 'c')
-    assert met == expected
-
-
-@pytest.mark.parametrize("model, mnx_id", [
-    pytest.param("find_met_incorrect_xref", "MNXM13",
+@pytest.mark.parametrize("model, mnx_id, compartment_id", [
+    pytest.param("find_met_incorrect_xref", "MNXM1", None,
                  marks=pytest.mark.raises(exception=RuntimeError)),
-    pytest.param("find_met_incorrect_xref", "MNXM8",
+    pytest.param("find_met_incorrect_xref", "MNXM13", None,
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM13", "c",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM8", "c",
                  marks=pytest.mark.raises(exception=RuntimeError))
 ], indirect=["model"])
-def test_find_met_in_model_exceptions(model, mnx_id):
+def test_find_met_in_model_exceptions(model, mnx_id, compartment_id):
     """Expect the function to raise the correct exceptions."""
-    helpers.find_met_in_model(model, mnx_id, 'c')
+    helpers.find_met_in_model(model, mnx_id, compartment_id=compartment_id)
 
 
 @pytest.mark.parametrize("model, compartment_id, expected", [
@@ -327,7 +326,7 @@ def test_find_compartment_id_in_model(model, compartment_id, expected):
     pytest.param("compartments1", "xx",
                  marks=pytest.mark.raises(exception=RuntimeError))
 ], indirect=["model"])
-def test_find_compartment_id_in_model(model, compartment_id):
+def test_find_compartment_id_in_model_exceptions(model, compartment_id):
     """Expect the compartment ID of the model to be found correctly."""
     helpers.find_compartment_id_in_model(model, compartment_id)
 

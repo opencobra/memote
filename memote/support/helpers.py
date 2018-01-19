@@ -21,6 +21,8 @@ from __future__ import absolute_import
 
 import logging
 import re
+import os
+
 from builtins import dict
 from collections import defaultdict
 import numpy as np
@@ -33,13 +35,18 @@ with warnings.catch_warnings():
 from six import iteritems, itervalues
 from sympy import expand
 import pandas as pd
+import memote.utils as utils
 
 LOGGER = logging.getLogger(__name__)
 
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-METANETX_SHORTLIST = pd.read_json("memote/support/data/met_id_shortlist.json")
+directory = os.path.dirname(__file__)
+METANETX_SHORTLIST = pd.read_json(
+    directory + "/data/met_id_shortlist.json"
+)
+
 
 # Provide a compartment shortlist to identify specfic compartments whenever
 # necessary.
@@ -156,7 +163,7 @@ def find_transport_reactions(model):
 
 def find_converting_reactions(model, pair):
     """
-    Find reactions which convert a given metabolite pair.
+    Find all reactions which convert a given metabolite pair.
 
     Parameters
     ----------
@@ -172,12 +179,10 @@ def find_converting_reactions(model, pair):
         side and the other on the right-hand side.
 
     """
-    met_ids = [m.id for m in model.metabolites]
     first = set(find_met_in_model(model, pair[0], compartment)
                 for compartment in model.compartments.keys())
     second = set(find_met_in_model(model, pair[1], compartment)
-                for compartment in model.compartments.keys())
-
+                 for compartment in model.compartments.keys())
     hits = list()
     for rxn in model.reactions:
         if len(first & set(rxn.reactants)) > 0 and len(
@@ -469,13 +474,14 @@ def largest_compartment_id_met(model):
     }
     candidate = sorted(size, key=size.get, reverse=True)[0]
     tie = size.copy()
-    tie.pop('c')
-    if size['c'] not in tie.values():
+    tie.pop(candidate)
+    cand_tie = sorted(tie, key=tie.get, reverse=True)[0]
+    if size[candidate] not in tie.values():
         return candidate
     else:
         raise RuntimeError("There is a tie for the largest compartment. "
                            "Compartment {} and {} have equal amounts of "
-                           "metabolites.".format(compartment_id, ))
+                           "metabolites.".format(candidate, cand_tie))
 
 
 def find_compartment_id_in_model(model, compartment_id):
@@ -521,7 +527,7 @@ def find_compartment_id_in_model(model, compartment_id):
         return largest_compartment_id_met(model)
 
 
-def find_met_in_model(model, mnx_id, compartment_id):
+def find_met_in_model(model, mnx_id, compartment_id=None):
     """
     Identify metabolites in the model by looking up IDs in METANETX_SHORTLIST.
 
@@ -532,12 +538,13 @@ def find_met_in_model(model, mnx_id, compartment_id):
     mnx_id : string
         Memote internal MetaNetX metabolite identifier used to map between
         cross-references in the METANETX_SHORTLIST.
-    compartment_id : string
-        ID of the compartment where the metabolites should be found it.
+    compartment_id : string, optional
+        ID of the specific compartment where the metabolites should be found.
+        Defaults to returning matching metabolites from all compartments.
 
     Returns
     -------
-    cobra.Metabolite
+    list of cobra.Metabolite
 
     """
     if mnx_id not in METANETX_SHORTLIST.columns:
@@ -546,42 +553,51 @@ def find_met_in_model(model, mnx_id, compartment_id):
                            "shortlist by updating and re-running the script "
                            "generate_mnx_shortlists.py.".format(mnx_id))
 
-    if model.metabolites.query(mnx_id) and len(
-        model.metabolites.query(mnx_id)
-    ) == 1:
-        return model.metabolites.query(mnx_id)[0]
-
     candidates = []
-    for value in METANETX_SHORTLIST[mnx_id]:
-        if value:
-            for ident in value:
-                regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
-                if model.metabolites.query(regex, attribute='id'):
-                    candidates.extend(
-                        model.metabolites.query(regex, attribute='id'))
 
-    if len(model.compartments) == 0:
-        candidates_in_compartment = candidates
+    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(mnx_id))
+    if model.metabolites.query(regex):
+        candidates = model.metabolites.query(regex)
+    else:
+        for value in METANETX_SHORTLIST[mnx_id]:
+            if value:
+                for ident in value:
+                    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
+                    if model.metabolites.query(regex):
+                        candidates.extend(
+                            model.metabolites.query(regex))
+
+    if compartment_id == None:
+        if len(candidates) > 0:
+            return candidates
+        else:
+            raise RuntimeError("It was not possible to identify "
+                           "any metabolite in the model corresponding to the "
+                           "following MetaNetX identifier: {}."
+                           "Make sure that a cross-reference to this ID in "
+                           "the MetaNetX Database exists for your "
+                           "identifier namespace.".format(mnx_id))
     else:
         candidates_in_compartment = \
             [cand for cand in candidates if cand.compartment == compartment_id]
 
     if len(candidates_in_compartment) == 0:
-        return None
-    #     raise RuntimeError("It was not possible to identify "
-    #                        "any metabolite corresponding to the following "
-    #                        "MetaNetX identifier: {}."
-    #                        "Make sure that a cross-reference to this ID in "
-    #                        "the MetaNetX Database exists for your "
-    #                        "identifier namespace.".format(mnx_id))
+        raise RuntimeError("It was not possible to identify "
+                           "any metabolite in compartment {} corresponding to "
+                           "the following MetaNetX identifier: {}."
+                           "Make sure that a cross-reference to this ID in "
+                           "the MetaNetX Database exists for your "
+                           "identifier namespace.".format(
+            compartment_id, mnx_id))
     elif len(candidates_in_compartment) > 1:
         raise RuntimeError("It was not possible to uniquely identify "
-                           "a single metabolite corresponding to the "
-                           "following MetaNetX identifier: {}."
+                           "a single metabolite in compartment {} that "
+                           "corresponds to the following MetaNetX "
+                           "identifier: {}."
+                           "Instead these candidates where found: {}."
                            "Check that metabolite compartment tags are "
                            "correct. Consider switching to a namespace scheme "
-                           "where identifiers are truly unique. Also make "
-                           "sure that you do not have duplicate metabolites "
-                           "in the cytosol".format(mnx_id))
+                           "where identifiers are truly unique.".format(
+            compartment_id, mnx_id, utils.get_ids(candidates_in_compartment)))
     else:
-        return candidates_in_compartment[0]
+        return candidates_in_compartment
