@@ -192,7 +192,6 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
-# TODO: Improve the heuristics of identifying the biomass reaction(s)!!!
 def find_biomass_reaction(model):
     """
     Return a list of the biomass reaction(s) of the model.
@@ -202,8 +201,32 @@ def find_biomass_reaction(model):
     model : cobra.Model
         The metabolic model under investigation.
 
+    Returns
+    -------
+    list of biomass reactions
+
     """
-    return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
+    buzzwords = ['biomass', 'growth', 'bof']
+
+    buzzword_matches = set([rxn for rxn in model.reactions if any(
+        string in rxn.id.lower() for string in buzzwords
+    )])
+
+    sbo_matches = set([rxn for rxn in model.reactions if
+                       rxn.annotation is not None and
+                       'SBO' in rxn.annotation and
+                       rxn.annotation['SBO'] == 'SBO:0000630'])
+
+    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'), re.IGNORECASE)
+    biomass_metabolite = model.metabolites.query(regex)
+    if biomass_metabolite == 1:
+        biomass_met_matches = set(
+            biomass_metabolite.reactions
+        ) - set(model.exchanges)
+    else:
+        biomass_met_matches = set()
+
+    return list(buzzword_matches | sbo_matches | biomass_met_matches)
 
 
 def df2dict(df):
@@ -564,7 +587,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                         candidates.extend(
                             model.metabolites.query(regex, attribute='id'))
 
-    if compartment_id == None:
+    if compartment_id is None:
         return candidates
 
     else:
@@ -577,8 +600,8 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                            "the following MetaNetX identifier: {}."
                            "Make sure that a cross-reference to this ID in "
                            "the MetaNetX Database exists for your "
-                           "identifier namespace.".format(
-            compartment_id, mnx_id))
+                           "identifier "
+                           "namespace.".format(compartment_id, mnx_id))
     elif len(candidates_in_compartment) > 1:
         raise RuntimeError("It was not possible to uniquely identify "
                            "a single metabolite in compartment {} that "
@@ -587,7 +610,12 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                            "Instead these candidates where found: {}."
                            "Check that metabolite compartment tags are "
                            "correct. Consider switching to a namespace scheme "
-                           "where identifiers are truly unique.".format(
-            compartment_id, mnx_id, utils.get_ids(candidates_in_compartment)))
+                           "where identifiers are truly "
+                           "unique.".format(compartment_id,
+                                            mnx_id,
+                                            utils.get_ids(
+                                                candidates_in_compartment
+                                            ))
+                           )
     else:
         return candidates_in_compartment

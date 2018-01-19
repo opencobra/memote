@@ -234,6 +234,49 @@ def edge_case(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def biomass_buzzwords(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    rxn1 = cobra.Reaction("BOF", name='Biomass')
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d:-1})
+    base.add_reactions([rxn1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_sbo(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    rxn1 = cobra.Reaction("R0001")
+    rxn1.annotation = {'SBO': 'SBO:0000630'}
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1})
+    base.add_reactions([rxn1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_metabolite(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    e = cobra.Metabolite("Biomass_c", compartment="c")
+    rxn1 = cobra.Reaction("R0001")
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1, e: 1})
+    rxn2 = cobra.Reaction("EX_Biomass")
+    rxn2.add_metabolites({e: -1})
+    base.add_reactions([rxn1, rxn2])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport", 3),
     ("abc_pump", 1),
@@ -361,3 +404,15 @@ def test_largest_compartment_id_met(model, expected):
     Expect the ID of the compartment with most metabolites to be identified.
     """
     assert helpers.largest_compartment_id_met(model) == expected
+
+
+@pytest.mark.parametrize("model, expected", [
+    ("biomass_buzzwords", 1),
+    ("biomass_sbo", 1),
+    ("biomass_metabolite", 1),
+], indirect=["model"])
+def test_find_biomass_reaction(model, expected):
+    """
+    Expect the biomass reaction to be identified correctly.
+    """
+    assert len(helpers.find_biomass_reaction(model)) == expected
