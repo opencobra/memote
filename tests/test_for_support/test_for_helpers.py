@@ -295,7 +295,7 @@ def test_find_met_in_model_accurate_results(
 
 
 @pytest.mark.parametrize("model, mnx_id, compartment_id", [
-    pytest.param("find_met_incorrect_xref", "MNXM1", None,
+    pytest.param("find_met_incorrect_xref", "MNXM1", "c",
                  marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM13", None,
                  marks=pytest.mark.raises(exception=RuntimeError)),

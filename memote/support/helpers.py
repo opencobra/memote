@@ -179,10 +179,8 @@ def find_converting_reactions(model, pair):
         side and the other on the right-hand side.
 
     """
-    first = set(find_met_in_model(model, pair[0], compartment)
-                for compartment in model.compartments.keys())
-    second = set(find_met_in_model(model, pair[1], compartment)
-                 for compartment in model.compartments.keys())
+    first = set(find_met_in_model(model, pair[0]))
+    second = set(find_met_in_model(model, pair[1]))
     hits = list()
     for rxn in model.reactions:
         if len(first & set(rxn.reactants)) > 0 and len(
@@ -554,7 +552,6 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                            "generate_mnx_shortlists.py.".format(mnx_id))
 
     candidates = []
-
     regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(mnx_id))
     if model.metabolites.query(regex):
         candidates = model.metabolites.query(regex)
@@ -563,20 +560,15 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
             if value:
                 for ident in value:
                     regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
-                    if model.metabolites.query(regex):
+                    if model.metabolites.query(regex, attribute='id'):
                         candidates.extend(
-                            model.metabolites.query(regex))
-
+                            model.metabolites.query(regex, attribute='id'))
+    print "#"*200
+    print (candidates)
+    print "#" * 200
     if compartment_id == None:
-        if len(candidates) > 0:
-            return candidates
-        else:
-            raise RuntimeError("It was not possible to identify "
-                           "any metabolite in the model corresponding to the "
-                           "following MetaNetX identifier: {}."
-                           "Make sure that a cross-reference to this ID in "
-                           "the MetaNetX Database exists for your "
-                           "identifier namespace.".format(mnx_id))
+        return candidates
+
     else:
         candidates_in_compartment = \
             [cand for cand in candidates if cand.compartment == compartment_id]
