@@ -147,12 +147,12 @@ def precursors_uptake_limited(base):
 
 @register_with(MODEL_REGISTRY)
 def precursors_blocked(base):
-    met_a = cobra.Metabolite("lipid_c")
-    met_b = cobra.Metabolite("protein_c")
-    met_c = cobra.Metabolite("rna_c")
-    met_a1 = cobra.Metabolite("lipid_e")
-    met_b1 = cobra.Metabolite("protein_e")
-    met_c1 = cobra.Metabolite("rna_e")
+    met_a = cobra.Metabolite("lipid_c", compartment='c')
+    met_b = cobra.Metabolite("protein_c", compartment='c')
+    met_c = cobra.Metabolite("rna_c", compartment='c')
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
+    met_b1 = cobra.Metabolite("protein_e", compartment='e')
+    met_c1 = cobra.Metabolite("rna_e", compartment='e')
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -172,12 +172,12 @@ def precursors_blocked(base):
 
 @register_with(MODEL_REGISTRY)
 def precursors_not_in_medium(base):
-    met_a = cobra.Metabolite("lipid_c")
-    met_b = cobra.Metabolite("protein_c")
-    met_c = cobra.Metabolite("rna_c")
-    met_a1 = cobra.Metabolite("lipid_e")
-    met_b1 = cobra.Metabolite("protein_e")
-    met_c1 = cobra.Metabolite("rna_e")
+    met_a = cobra.Metabolite("lipid_c", compartment='c')
+    met_b = cobra.Metabolite("protein_c", compartment='c')
+    met_c = cobra.Metabolite("rna_c", compartment='c')
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
+    met_b1 = cobra.Metabolite("protein_e", compartment='e')
+    met_c1 = cobra.Metabolite("rna_e", compartment='e')
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -214,8 +214,10 @@ def no_gam_in_biomass(base):
 
 
 @register_with(MODEL_REGISTRY)
-def direct_met_no_compartments(base):
-    base.add_metabolites([cobra.Metabolite(i) for i in "ABCDEFG"])
+def direct_met_single_compartment(base):
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
+    )
     base.add_reactions([cobra.Reaction(i)
                         for i in ["EX_A", "EX_C",
                                   "EX_E", "EX_G",
@@ -343,7 +345,7 @@ def test_fast_growth_default(model, boolean):
 
 
 @pytest.mark.parametrize("model, number", [
-    ("direct_met_no_compartments", 1),
+    ("direct_met_single_compartment", 1),
     ("precursors_producing", 0)
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):

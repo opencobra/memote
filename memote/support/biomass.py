@@ -48,7 +48,7 @@ def sum_biomass_weight(reaction):
                for (met, coef) in iteritems(reaction.metabolites)) / 1000.0
 
 
-def find_biomass_precursors(reaction):
+def find_biomass_precursors(model, reaction):
     """
     Return a list of all biomass precursors excluding ATP and H2O.
 
@@ -58,8 +58,20 @@ def find_biomass_precursors(reaction):
         The biomass reaction of the model under investigation.
 
     """
-    return [met for met in reaction.reactants
-            if met.id != 'atp_c' or met.id != 'h2o_c']
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+    try:
+        gam_reactants = set(
+            helpers.find_met_in_model(
+                model, "MNXM3", id_of_main_compartment)[0],
+            helpers.find_met_in_model(
+                model, "MNXM2", id_of_main_compartment)[0]
+        )
+    except:
+        gam_reactants = set()
+
+    biomass_precursors = set(reaction.reactants) - gam_reactants
+
+    return list(biomass_precursors)
 
 
 def find_blocked_biomass_precursors(reaction, model):
@@ -76,7 +88,7 @@ def find_blocked_biomass_precursors(reaction, model):
 
     """
     LOGGER.debug("Finding blocked biomass precursors")
-    precursors = find_biomass_precursors(reaction)
+    precursors = find_biomass_precursors(model, reaction)
     blocked_precursors = list()
     for precursor in precursors:
         with model:
@@ -134,7 +146,7 @@ def find_direct_metabolites(model, reaction):
     biomass_reactions = set(helpers.find_biomass_reaction(model))
 
     combined_set = transport_reactions | exchange_reactions | biomass_reactions
-    precursors = find_biomass_precursors(reaction)
+    precursors = find_biomass_precursors(model, reaction)
 
     return [met for met in precursors if met.reactions.issubset(combined_set)]
 

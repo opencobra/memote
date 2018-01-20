@@ -152,8 +152,8 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
         biomass.find_blocked_biomass_precursors(reaction, read_only_model)
     )
     ann["metric"][reaction_id] = len(
-        biomass.find_biomass_precursors(reaction)
-    ) / len(ann["data"][reaction_id])
+        ann["data"][reaction_id]
+    ) / len(biomass.find_biomass_precursors(read_only_model, reaction))
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated on the
         provided default medium a total of {} precursors
@@ -276,7 +276,7 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
     ann["data"][reaction_id] = [
         m.id for m in biomass.find_direct_metabolites(model, reaction)]
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
-        len(biomass.find_biomass_precursors(reaction))
+        len(biomass.find_biomass_precursors(model, reaction))
     ann["message"][reaction_id] = wrapper.fill(
         """{} contains a total of {} direct metabolites ({:.2%}). Specifically
         these are: {}.""".format(reaction_id,
