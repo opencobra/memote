@@ -197,8 +197,11 @@ def bundle_biomass_components(model, reaction):
         id_of_main_compartment = helpers.find_compartment_id_in_model(model,
                                                                       'c')
         gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", 'MNXM9']
-        gam = set([helpers.find_met_in_model(
-            model, met, id_of_main_compartment)[0] for met in gam_mets])
+        try:
+            gam = set([helpers.find_met_in_model(
+                model, met, id_of_main_compartment)[0] for met in gam_mets])
+        except:
+            gam = set()
         regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
                            re.IGNORECASE)
         biomass_metabolite = set(model.metabolites.query(regex))
