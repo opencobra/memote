@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import logging
+import re
 
 from six import iteritems
 from cobra.exceptions import Infeasible
@@ -136,3 +137,76 @@ def find_direct_metabolites(model, reaction):
     precursors = find_biomass_precursors(reaction)
 
     return [met for met in precursors if met.reactions.issubset(combined_set)]
+
+
+def bundle_biomass_components(model, reaction):
+    """
+    Return bundle biomass component reactions if it is not one lumped reaction.
+
+    There are two basic ways of specifying the biomass composition. The most
+    common is a single lumped reaction containing all biomass precursors.
+    Alternatively, the biomass equation can be split into several reactions
+    each focusing on a different macromolecular component for instance
+    a (1 gDW ash) + b (1 gDW phospholipids) + c (free fatty acids)+
+    d (1 gDW carbs) + e (1 gDW protein) + f (1 gDW RNA) + g (1 gDW DNA) +
+    h (vitamins/cofactors) + xATP + xH2O-> 1 gDCW biomass + xADP + xH + xPi.
+    This function aims to identify if the given biomass reaction 'reaction',
+    is a lumped all-in-one reaction, or whether it is just the final
+    composing reaction of all macromolecular components. It is important to
+    identify which other reaction belong to a given biomass reaction to be
+    able to identify universal biomass components or calculate detailed
+    precursor stoichiometries.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    reaction : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+
+    Returns
+    -------
+    list
+        One or more reactions that qualify as THE biomass equation together.
+
+    Notes
+    -----
+    Counting H2O, ADP, Pi, H, and ATP, the amount of metabolites in a split
+    reaction is comparatively low:
+    Any reaction with less or equal to 15 metabolites can
+    probably be counted as a split reaction containing Ash, Phospholipids,
+    Fatty Acids, Carbohydrates (i.e. cell wall components), Protein, RNA,
+    DNA, Cofactors and Vitamins, and Small Molecules. Any reaction with more
+    than or equal to 28 metabolites, however, (21 AA + 3 Nucleotides (4-ATP)
+    + 4 Deoxy-Nucleotides) can be considered a lumped reaction.
+    Anything in between will be treated conservatively as a lumped reaction.
+    For split reactions, after removing any of the metabolites associated with
+    growth-associated energy expenditure (H2O, ADP, Pi, H, and ATP), the
+    only remaining metabolites should be generalized macromolecule precursors
+    e.g. Protein, Phospholipids etc. Each of these have their own composing
+    reactions. Hence we include the reactions of these metabolites in the
+    set that ultimately makes up the returned list of reactions that together
+    make up the biomass equation.
+
+    """
+
+    if len(reaction.metabolites) >= 16:
+        return [reaction]
+
+    if len(reaction.metabolites) <= 15:
+        id_of_main_compartment = helpers.find_compartment_id_in_model(model,
+                                                                      'c')
+        gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", 'MNXM9']
+        gam = set([helpers.find_met_in_model(
+            model, met, id_of_main_compartment)[0] for met in gam_mets])
+        regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
+                           re.IGNORECASE)
+        biomass_metabolite = set(model.metabolites.query(regex))
+
+        macromolecules = set(reaction.metabolites) - gam - biomass_metabolite
+
+        bundled_reactions = set()
+        for met in macromolecules:
+            bundled_reactions = bundled_reactions | set(met.reactions)
+
+        return list(bundled_reactions)
