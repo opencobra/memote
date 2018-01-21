@@ -313,10 +313,8 @@ def essential_precursors_not_in_biomass(model, reaction):
         try:
             met = helpers.find_met_in_model(model, mnx_id, main_comp)[0]
             if met not in pooled_precursors:
-                print met.id
                 missing_essential_precursors.append(met.id)
         except RuntimeError:
-            print mnx_id
             missing_essential_precursors.append(mnx_id)
 
     return missing_essential_precursors
