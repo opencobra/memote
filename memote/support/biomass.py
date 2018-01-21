@@ -276,7 +276,10 @@ def essential_precursors_not_in_biomass(model, reaction):
     Returns
     -------
     list
-        Universal metabolites that are missing from the biomass reaction.
+        IDs of essential metabolites missing from the biomass reaction. The
+        IDS will appear in the models namespace if the metabolite exists, but
+        will be using the MetaNetX namespace if the metabolite does not exist
+        in the model.
 
     Notes
     -----

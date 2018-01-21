@@ -285,4 +285,50 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
                                  ann["data"][reaction_id]
                                  )
     )
-    assert ann["metric"] < 0.5, ann["message"][reaction_id]
+    assert ann["metric"][reaction_id] < 0.5, ann["message"][reaction_id]
+
+
+@pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
+@annotate(title="Number of Missing Essential Biomass Precursors",
+          type="count", data=dict(), message=dict(), metric=dict())
+def test_essential_precursors_not_in_biomass(model, reaction_id):
+    """
+    Expect the biomass reaction to contain all essential precursors.
+
+    There are universal components of life that make up the biomass of all
+    known organisms. These include all proteinogenic amino acids, deoxy- and
+    ribonucleotides, water and a range of metabolic cofactors.
+
+    This test reports the amount of biomass precursors that have been reported
+    to be essential constituents of the biomass equation. All of the following
+    precursors need to be included in the biomass reaction to pass the test:
+
+    Aminoacids:
+    trp__L, cys__L, his__L, tyr__L, met__L, phe__L, ser__L, pro__L, asp__L,
+    thr__L, gln__L, glu__L, ile__L, arg__L, lys__L, val__L, leu__L, ala__L,
+    gly, asn__L
+    DNA: datp, dctp, dttp, dgtp
+    RNA: atp, ctp, utp, gtp
+    Cofactors: nad, nadp, amet, fad, pydx5p, coa, thmpp, fmn and h2o
+
+    These metabolties were selected based on the results presented by
+    DOI:10.1016/j.ymben.2016.12.002
+    """
+    ann = test_essential_precursors_not_in_biomass.annotation
+    reaction = model.reactions.get_by_id(reaction_id)
+    ann["data"][reaction_id] = [
+        m for m in biomass.essential_precursors_not_in_biomass(
+            model, reaction
+        )]
+    ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
+        len(biomass.find_biomass_precursors(model, reaction))
+    ann["message"][reaction_id] = wrapper.fill(
+        """{} lacks a total of {} essential metabolites
+        ({:.2%} of all biomass precursors). Specifically
+        these are: {}.""".format(reaction_id,
+                                 len(ann["data"][reaction_id]),
+                                 ann["metric"],
+                                 ann["data"][reaction_id]
+                                 )
+    )
+    assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
