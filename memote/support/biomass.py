@@ -232,7 +232,6 @@ def bundle_biomass_components(model, reaction):
     make up the biomass equation.
 
     """
-
     if len(reaction.metabolites) >= 16:
         return [reaction]
 
