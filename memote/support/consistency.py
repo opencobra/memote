@@ -39,23 +39,23 @@ LOGGER = logging.getLogger(__name__)
 # metabolic networks: Identification and removal. PLoS Computational
 # Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 ENERGY_COUPLES = {
-    'atp_c': 'adp_c',
-    'ctp_c': 'cdp_c',
-    'gtp_c': 'gdp_c',
-    'utp_c': 'udp_c',
-    'itp_c': 'idp_c',
-    'nadph_c': 'nadp_c',
-    'nadh_c': 'nad_c',
-    'fadh2_c': 'fad_c',
-    'fmnh2_c': 'fmn_c',
-    'q8h2_c': 'q8_c',
-    'mql8_c': 'mqn8_c',
-    'mql6_c': 'mqn6_c',
-    'mql7_c': 'mqn7_c',
-    '2dmmql8_c': '2dmmq8_c',
-    'accoa_c': 'coa_c',
-    'glu__L_c': 'akg_c',
-    'h_p': 'h_c'
+    'MNXM3': 'MNXM7',
+    'MNXM63': 'MNXM220',
+    'MNXM51': 'MNXM30',
+    'MNXM121': 'MNXM17',
+    'MNXM423': 'MNXM495',
+    'MNXM6': 'MNXM5',
+    'MNXM10': 'MNXM8',
+    'MNXM38': 'MNXM33',
+    'MNXM208': 'MNXM119',
+    'MNXM191': 'MNXM232',
+    'MNXM223': 'MNXM509',
+    'MNXM7517': 'MNXM12235',
+    'MNXM12233': 'MNXM12236',
+    'MNXM558': 'MNXM2178',
+    'MNXM21': 'MNXM12',
+    'MNXM89557': 'MNXM20',
+    'MNXM1': 'MNXM1'
 }
 
 
