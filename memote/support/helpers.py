@@ -275,10 +275,11 @@ def find_demand_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if not rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in ['e'])]
+            any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_sink_reactions(model):
@@ -312,10 +313,11 @@ def find_sink_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in ['e'])]
+            any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_exchange_rxns(model):
@@ -348,9 +350,10 @@ def find_exchange_rxns(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if any(c in rxn.get_compartments() for c in ['e'])]
+            if any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_functional_units(gpr_str):
