@@ -241,8 +241,7 @@ def direct_met_single_compartment(base):
 def large_biomass_rxn(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS
     base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                        for i in esp_ids]
-                        )
+                         for i in esp_ids])
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     base.add_reactions([rxn_1])
@@ -254,8 +253,7 @@ def large_biomass_rxn(base):
 def essential_not_in_biomass(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS
     base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                        for i in esp_ids]
-                        )
+                         for i in esp_ids])
     esp_ids.pop(0)
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
@@ -268,8 +266,7 @@ def essential_not_in_biomass(base):
 def essential_not_in_model(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS[1:]
     base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                        for i in esp_ids]
-                        )
+                         for i in esp_ids])
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     base.add_reactions([rxn_1])

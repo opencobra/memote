@@ -79,7 +79,7 @@ def find_biomass_precursors(model, reaction):
             helpers.find_met_in_model(
                 model, "MNXM2", id_of_main_compartment)[0]
         )
-    except :
+    except RuntimeError:
         gam_reactants = set()
 
     biomass_precursors = set(reaction.reactants) - gam_reactants
@@ -146,7 +146,7 @@ def gam_in_biomass(model, reaction):
             helpers.find_met_in_model(
                 model, "MNXM9", id_of_main_compartment)[0]
         }
-    except:
+    except RuntimeError:
         return False
 
     return (
@@ -243,7 +243,7 @@ def bundle_biomass_components(model, reaction):
         try:
             gam = set([helpers.find_met_in_model(
                 model, met, id_of_main_compartment)[0] for met in gam_mets])
-        except:
+        except RuntimeError:
             gam = set()
         regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
                            re.IGNORECASE)
@@ -315,7 +315,7 @@ def essential_precursors_not_in_biomass(model, reaction):
             if met not in pooled_precursors:
                 print met.id
                 missing_essential_precursors.append(met.id)
-        except:
+        except RuntimeError:
             print mnx_id
             missing_essential_precursors.append(mnx_id)
 
