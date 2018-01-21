@@ -34,6 +34,19 @@ __all__ = (
 LOGGER = logging.getLogger(__name__)
 
 
+# 20 Amino Acids, 4 Deoxyribonucleotides, 4 Ribonucleotides,
+# 8 Cofactors, and H2O
+ESSENTIAL_PRECURSOR_IDS = \
+    ['MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61',
+     'MNXM97', 'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142',
+     'MNXM37', 'MNXM89557', 'MNXM231', 'MNXM70', 'MNXM78',
+     'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29', 'MNXM147',
+     'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
+     'MNXM3', 'MNXM51', 'MNXM63', 'MNXM121',
+     'MNXM8', 'MNXM5', 'MNXM16', 'MNXM33', 'MNXM161',
+     'MNXM12', 'MNXM256', 'MNXM119', 'MNXM2']
+
+
 def sum_biomass_weight(reaction):
     """
     Compute the sum of all reaction compounds.
@@ -66,7 +79,7 @@ def find_biomass_precursors(model, reaction):
             helpers.find_met_in_model(
                 model, "MNXM2", id_of_main_compartment)[0]
         )
-    except:
+    except :
         gam_reactants = set()
 
     biomass_precursors = set(reaction.reactants) - gam_reactants
@@ -243,3 +256,64 @@ def bundle_biomass_components(model, reaction):
             bundled_reactions = bundled_reactions | set(met.reactions)
 
         return list(bundled_reactions)
+
+
+def essential_precursors_not_in_biomass(model, reaction):
+    """
+    Return a list of essential precursors missing from the biomass reaction.
+
+    There are universal components of life that make up the biomass of all
+    known organisms. These include all proteinogenic amino acids, deoxy- and
+    ribonucleotides, water and a range of metabolic cofactors.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    reaction : cobra.core.reaction.Reaction
+        The biomass reaction of the model under investigation.
+
+    Returns
+    -------
+    list
+        Universal metabolites that are missing from the biomass reaction.
+
+    Notes
+    -----
+    "Answering the question of what to include in the core of a biomass o
+    bjective function is not always straightforward. One example is different
+    nucleotide forms, which, although inter-convertible, are essential for
+    cellular chemistry. We propose here that all essential and irreplaceable
+    molecules for metabolism should be included in the biomass functions of
+    genome scale metabolic models. In the special case of cofactors, when two
+    forms of the same cofactor take part in the same reactions (such as NAD
+    and NADH), only one form could be included for the sake of simplicity.
+    When a class of cofactors includes active and non-active interconvertible
+    forms, the active forms should be preferred. [1]_."
+
+    References
+    ----------
+    .. [1] Xavier, J. C., Patil, K. R., & Rocha, I. (2017). Integration of
+    Biomass Formulations of Genome-Scale Metabolic Models with Experimental
+    Data Reveals Universally Essential Cofactors in Prokaryotes. Metabolic
+    Engineering, 39(October 2016), 200–208.
+    http://doi.org/10.1016/j.ymben.2016.12.002
+
+    """
+    main_comp = helpers.find_compartment_id_in_model(model, 'c')
+    biomass_eq = bundle_biomass_components(model, reaction)
+    pooled_precursors = set(
+        [met for rxn in biomass_eq for met in rxn.metabolites])
+
+    missing_essential_precursors = []
+    for mnx_id in ESSENTIAL_PRECURSOR_IDS:
+        try:
+            met = helpers.find_met_in_model(model, mnx_id, main_comp)[0]
+            if met not in pooled_precursors:
+                print met.id
+                missing_essential_precursors.append(met.id)
+        except:
+            print mnx_id
+            missing_essential_precursors.append(mnx_id)
+
+    return missing_essential_precursors
