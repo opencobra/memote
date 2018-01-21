@@ -54,9 +54,7 @@ ENERGY_COUPLES = {
     'MNXM12233': 'MNXM12236',
     'MNXM558': 'MNXM2178',
     'MNXM21': 'MNXM12',
-    'MNXM89557': 'MNXM20',
-    'MNXM1': 'MNXM1'
-}
+    'MNXM89557': 'MNXM20'}
 
 
 def check_stoichiometric_consistency(model):
@@ -267,6 +265,12 @@ def find_elementary_leakage_modes(model, atol=1e-13):
         "Coming soon™ if considered useful.")
 
 
+# TODO: I had to remove the test for an infinite proton gradient i.e testing
+# if the model can somehow cycle h_c and h_p with closed bounds. This test
+# however is very specfic for the existence of a periplasm and since it is
+# not trivial to presuppose agnostically between which two compartments a
+# given model builds the PMF, I've removed this capability from this test.
+# It should be re-added though once we can identify prokaryotes vs eukaryotes.
 def detect_energy_generating_cycles(model, metabolite_id):
     u"""
     Detect erroneous energy-generating cycles for a a single metabolite.
@@ -308,30 +312,50 @@ def detect_energy_generating_cycles(model, metabolite_id):
      Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 
     """
-    met = model.metabolites.get_by_id(metabolite_id)
-    dissipation_product = model.metabolites.get_by_id(ENERGY_COUPLES[met.id])
+    main_comp = helpers.find_compartment_id_in_model(model, 'c')
+    met = helpers.find_met_in_model(model, metabolite_id, main_comp)[0]
+
     dissipation_rxn = Reaction('Dissipation')
-    helpers.close_boundaries_sensibly(model)
-    model.add_reactions([dissipation_rxn])
-    if met.id in ['atp_c', 'ctp_c', 'gtp_c', 'utp_c', 'itp_c']:
+    if metabolite_id in ['MNXM3', 'MNXM63', 'MNXM51', 'MNXM121', 'MNXM423']:
         # build nucleotide-type dissipation reaction
-        dissipation_rxn.reaction = "h2o_c --> h_c + pi_c"
-    elif met.id in ['nadph_c', 'nadh_c']:
+        dissipation_rxn.add_metabolites({
+            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
+            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1,
+            helpers.find_met_in_model(model, 'MNXM9', main_comp)[0]: 1,
+        })
+    elif metabolite_id in ['MNXM6', 'MNXM10']:
         # build nicotinamide-type dissipation reaction
-        dissipation_rxn.reaction = "--> h_c"
-    elif met.id in ['fadh2_c', 'fmnh2_c', 'q8h2_c', 'mql8_c',
-                    'mql6_c', 'mql7_c', 'dmmql8_c']:
+        dissipation_rxn.add_metabolites({
+            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1
+        })
+    elif metabolite_id in ['MNXM38', 'MNXM208', 'MNXM191', 'MNXM223',
+                           'MNXM7517', 'MNXM12233', 'MNXM558']:
         # build redox-partner-type dissipation reaction
-        dissipation_rxn.reaction = "--> 2 h_c"
-    elif met.id == 'accoa_c':
-        dissipation_rxn.reaction = "h2o_c --> h_c + ac_c"
-    elif met.id == 'glu__L_c':
-        dissipation_rxn.reaction = "h2o_c --> 2 h_c + nh3_c"
-    elif met.id == 'h_p':
-        pass
+        dissipation_rxn.add_metabolites({
+            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 2
+        })
+    elif metabolite_id == 'MNXM21':
+        dissipation_rxn.add_metabolites({
+            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
+            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1,
+            helpers.find_met_in_model(model, 'MNXM26', main_comp)[0]: 1,
+        })
+    elif metabolite_id == 'MNXM89557':
+        dissipation_rxn.add_metabolites({
+            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
+            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 2,
+            helpers.find_met_in_model(model, 'MNXM15', main_comp)[0]: 1,
+        })
+
+    dissipation_product = helpers.find_met_in_model(
+        model,
+        ENERGY_COUPLES[metabolite_id],
+        main_comp)[0]
 
     dissipation_rxn.add_metabolites(
-        {met.id: -1, dissipation_product: 1})
+        {met: -1, dissipation_product: 1})
+    helpers.close_boundaries_sensibly(model)
+    model.add_reactions([dissipation_rxn])
     model.objective = dissipation_rxn
     solution = model.optimize()
     if solution.status == 'infeasible':
