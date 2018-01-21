@@ -106,7 +106,7 @@ def find_blocked_biomass_precursors(reaction, model):
     return blocked_precursors
 
 
-def gam_in_biomass(reaction):
+def gam_in_biomass(model, reaction):
     """
     Return boolean if biomass reaction includes growth-associated maintenance.
 
@@ -116,11 +116,29 @@ def gam_in_biomass(reaction):
         The biomass reaction of the model under investigation.
 
     """
-    left = set(["atp_c", "h2o_c"])
-    right = set(["adp_c", "pi_c", "h_c"])
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+
+    try:
+        left = {
+            helpers.find_met_in_model(
+                model, "MNXM3", id_of_main_compartment)[0],
+            helpers.find_met_in_model(
+                model, "MNXM2", id_of_main_compartment)[0]
+        }
+        right = {
+            helpers.find_met_in_model(
+                model, "MNXM7", id_of_main_compartment)[0],
+            helpers.find_met_in_model(
+                model, "MNXM1", id_of_main_compartment)[0],
+            helpers.find_met_in_model(
+                model, "MNXM9", id_of_main_compartment)[0]
+        }
+    except:
+        return False
+
     return (
-        left.issubset(met.id for met in reaction.reactants) and
-        right.issubset(met.id for met in reaction.products))
+        left.issubset(set(reaction.reactants)) and
+        right.issubset(set(reaction.products)))
 
 
 def find_direct_metabolites(model, reaction):

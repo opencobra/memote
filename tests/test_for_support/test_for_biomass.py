@@ -197,13 +197,13 @@ def precursors_not_in_medium(base):
 
 @register_with(MODEL_REGISTRY)
 def no_gam_in_biomass(base):
-    met_a = cobra.Metabolite("lipid_c", "H744")
-    met_b = cobra.Metabolite("protein_c", "H119")
-    met_c = cobra.Metabolite("rna_c", "H496")
-    met_d = cobra.Metabolite("dna_c", "H483")
-    met_e = cobra.Metabolite("ash_c", "H80")
-    met_f = cobra.Metabolite("cellwall_c", "H177")
-    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
+    met_a = cobra.Metabolite("lipid_c", "H744", compartment="c")
+    met_b = cobra.Metabolite("protein_c", "H119", compartment="c")
+    met_c = cobra.Metabolite("rna_c", "H496", compartment="c")
+    met_d = cobra.Metabolite("dna_c", "H483", compartment="c")
+    met_e = cobra.Metabolite("ash_c", "H80", compartment="c")
+    met_f = cobra.Metabolite("cellwall_c", "H177", compartment="c")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
@@ -324,7 +324,7 @@ def test_gam_in_biomass(model, boolean):
     """Expect the biomass reactions to contain atp and adp."""
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        assert biomass.gam_in_biomass(rxn) is boolean
+        assert biomass.gam_in_biomass(model, rxn) is boolean
 
 
 @pytest.mark.parametrize("model, boolean", [
