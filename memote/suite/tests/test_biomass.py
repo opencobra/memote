@@ -213,7 +213,7 @@ def test_gam_in_biomass(model, reaction_id):
     """
     ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
-    ann["data"][reaction_id] = biomass.gam_in_biomass(reaction)
+    ann["data"][reaction_id] = biomass.gam_in_biomass(model, reaction)
     ann["message"][reaction_id] = wrapper.fill(
         """{} does not contain a term for growth-associated maintenance.
         """.format(reaction_id))
