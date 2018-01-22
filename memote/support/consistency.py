@@ -346,42 +346,32 @@ def detect_energy_generating_cycles(model, metabolite_id):
         return []
 
 
-def find_mass_unbalanced_reactions(model):
+def find_mass_unbalanced_reactions(reactions):
     """
     Find metabolic reactions that are not mass balanced.
 
-    This will exclude biomass, exchange and demand reactions as they are
-    unbalanced by definition. It will also fail all reactions where at
-    least one metabolite does not have a formula defined.
-
     Parameters
     ----------
-    model : cobra.Model
-        The metabolic model under investigation.
+    reactions : iterable
+        An iterable of ``cobra.Reaction``s.
 
     """
-    internal_rxns = con_helpers.get_internals(model)
     return [
-        rxn for rxn in internal_rxns if not con_helpers.is_mass_balanced(rxn)]
+        rxn for rxn in reactions if not con_helpers.is_mass_balanced(rxn)]
 
 
-def find_charge_unbalanced_reactions(model):
+def find_charge_unbalanced_reactions(reactions):
     """
     Find metabolic reactions that are not charge balanced.
 
-    This will exclude biomass, exchange and demand reactions as they are
-    unbalanced by definition. It will also fail all reactions where at
-    least one metabolite does not have a charge defined.
-
     Parameters
     ----------
-    model : cobra.Model
-        The metabolic model under investigation.
+    reactions : iterable
+        An iterable of ``cobra.Reaction``s.
 
     """
-    internal_rxns = con_helpers.get_internals(model)
     return [
-        rxn for rxn in internal_rxns if not con_helpers.is_charge_balanced(rxn)]
+        rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
 
 
 def find_universally_blocked_reactions(model):

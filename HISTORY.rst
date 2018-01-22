@@ -11,6 +11,7 @@ Next Release
   for the history and diff report.
 * Fix bug with test_blocked_reactions
 * Update the testData.json with data from the previous release
+* Fix a small bug with the metrics of mass/charge unbalanced reactions.
 
 0.5.0 (2018-01-16)
 ------------------
