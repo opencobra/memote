@@ -98,7 +98,6 @@ def test_metabolite_annotation_overview(read_only_model, db):
     ann = test_metabolite_annotation_overview.annotation
     ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
         read_only_model.metabolites, db))
-    # TODO: metric must also be a dict in this case.
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
     ann["message"][db] = wrapper.fill(
         """The following {} metabolites ({:.2%}) lack annotation for {}:
@@ -162,10 +161,19 @@ def test_metabolite_annotation_wrong_ids(read_only_model, db):
     URI, it merely controls that the regex patterns match the identifiers.
     """
     ann = test_metabolite_annotation_wrong_ids.annotation
+    ann["data"][db] = total = get_ids(
+        set(read_only_model.metabolites).difference(
+            annotation.generate_component_annotation_overview(
+                read_only_model.metabolites, db)))
+    ann["metric"][db] = 1.0
+    ann["message"][db] = wrapper.fill(
+        """There are no metabolite annotations for the {} database.
+        """.format(db))
+    assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
         annotation.generate_component_annotation_miriam_match(
             read_only_model.metabolites, "metabolites", db))
-    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
+    ann["metric"][db] = len(ann["data"][db]) / len(total)
     ann["message"][db] = wrapper.fill(
         """The provided metabolite annotations for the {} database do not match
         the regular expression patterns defined on identifiers.org. A total of
@@ -194,6 +202,15 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
     URI, it merely controls that the regex patterns match the identifiers.
     """
     ann = test_reaction_annotation_wrong_ids.annotation
+    ann["data"][db] = total = get_ids(
+        set(read_only_model.reactions).difference(
+            annotation.generate_component_annotation_overview(
+                read_only_model.reactions, db)))
+    ann["metric"][db] = 1.0
+    ann["message"][db] = wrapper.fill(
+        """There are no reaction annotations for the {} database.
+        """.format(db))
+    assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
         annotation.generate_component_annotation_miriam_match(
             read_only_model.reactions, "reactions", db))
@@ -234,7 +251,8 @@ def test_metabolite_id_namespace_consistency(read_only_model):
             identifiers. Please consider mapping your IDs from {} to BiGG
             """.format(largest)))
     # Assume that all identifiers match the largest namespace.
-    ann["data"] = overview[overview[largest]].index.tolist()
+    ann["data"] = list(set(get_ids(read_only_model.metabolites)).difference(
+        overview[overview[largest]].index.tolist()))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
         """{} metabolite identifiers ({:.2%}) do not match the largest found
@@ -270,7 +288,8 @@ def test_reaction_id_namespace_consistency(read_only_model):
             identifiers. Please consider mapping your IDs from {} to BiGG
             """.format(largest)))
     # Assume that all identifiers match the largest namespace.
-    ann["data"] = overview[overview[largest]].index.tolist()
+    ann["data"] = list(set(get_ids(read_only_model.reactions)).difference(
+        overview[overview[largest]].index.tolist()))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """{} reaction identifiers ({:.2%}) do not match the largest found

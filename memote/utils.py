@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 LIST_SLICE = 5
 FLOAT_FORMAT = 7.2
 TYPES = frozenset(['count', 'number', 'raw', 'percent'])
-JSON_TYPES = (type(None), bool, int, float, str, list, set, dict)
+JSON_TYPES = (type(None), bool, int, float, str, list, dict)
 
 wrapper = TextWrapper(width=70)
 
@@ -167,6 +167,5 @@ def log_json_incompatible_types(obj):
         if isinstance(value, dict):
             LOGGER.debug("%s:", key)
             log_json_incompatible_types(value)
-            continue
-        if not isinstance(value, JSON_TYPES):
+        elif not isinstance(value, JSON_TYPES):
             LOGGER.debug("%s: %s", key, type(value))
