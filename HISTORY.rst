@@ -12,6 +12,8 @@ Next Release
 * Fix bug with test_blocked_reactions
 * Update the testData.json with data from the previous release
 * Fix a small bug with the metrics of mass/charge unbalanced reactions.
+* Correctly invert the found identifiers in wrong annotations and namespace
+  consistency in order to report the correct results.
 
 0.5.0 (2018-01-16)
 ------------------
