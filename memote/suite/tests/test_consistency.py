@@ -23,6 +23,7 @@ import pytest
 
 import memote.support.consistency as consistency
 from memote.utils import annotate, truncate, get_ids, wrapper
+import memote.support.consistency_helpers as con_helpers
 
 
 @annotate(title="Stoichiometric Consistency", type="count")
@@ -98,6 +99,10 @@ def test_reaction_charge_balance(read_only_model):
     """
     Expect all reactions to be charge balanced.
 
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition. It will also fail all reactions where at
+    least one metabolite does not have a charge defined.
+
     In steady state, for each metabolite the sum of influx equals the sum
     of outflux. Hence the net charges of both sides of any model reaction have
     to be equal. Reactions where at least one metabolite does not have a
@@ -105,9 +110,10 @@ def test_reaction_charge_balance(read_only_model):
     metabolites participating in the reaction might be.
     """
     ann = test_reaction_charge_balance.annotation
+    internal_rxns = con_helpers.get_internals(read_only_model)
     ann["data"] = get_ids(
-        consistency.find_charge_unbalanced_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+        consistency.find_charge_unbalanced_reactions(internal_rxns))
+    ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge unbalanced with at
         least one of the metabolites not having a charge or the overall
@@ -121,6 +127,10 @@ def test_reaction_mass_balance(read_only_model):
     """
     Expect all reactions to be mass balanced.
 
+    This will exclude biomass, exchange and demand reactions as they are
+    unbalanced by definition. It will also fail all reactions where at
+    least one metabolite does not have a formula defined.
+
     In steady state, for each metabolite the sum of influx equals the sum
     of outflux. Hence the net masses of both sides of any model reaction have
     to be equal. Reactions where at least one metabolite does not have a
@@ -128,10 +138,11 @@ def test_reaction_mass_balance(read_only_model):
     metabolites participating in the reaction might be.
     """
     ann = test_reaction_mass_balance.annotation
+    internal_rxns = con_helpers.get_internals(read_only_model)
     ann["data"] = get_ids(
-        consistency.find_mass_unbalanced_reactions(read_only_model)
+        consistency.find_mass_unbalanced_reactions(internal_rxns)
     )
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are mass unbalanced with at least
         one of the metabolites not having a formula or the overall mass not

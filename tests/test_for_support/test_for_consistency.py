@@ -25,6 +25,7 @@ from cobra.exceptions import Infeasible
 
 import memote.support.consistency as consistency
 from memote.utils import register_with
+import memote.support.consistency_helpers as con_helpers
 
 MODEL_REGISTRY = dict()
 
@@ -332,7 +333,7 @@ def all_balanced(base):
 
 
 @register_with(MODEL_REGISTRY)
-def mass_imbalanced(base):
+def mass_unbalanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=2)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
     rxn1 = cobra.Reaction("RA1")
@@ -342,7 +343,7 @@ def mass_imbalanced(base):
 
 
 @register_with(MODEL_REGISTRY)
-def charge_imbalanced(base):
+def charge_unbalanced(base):
     met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
     met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
     rxn1 = cobra.Reaction("RA1")
@@ -587,27 +588,29 @@ def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
 
 @pytest.mark.parametrize("model, num", [
     ("all_balanced", 0),
-    ("mass_imbalanced", 0),
-    ("charge_imbalanced", 1),
+    ("mass_unbalanced", 0),
+    ("charge_unbalanced", 1),
     ("met_no_charge", 1),
     ("met_no_formula", 0)
 ], indirect=["model"])
-def test_find_charge_imbalanced_reactions(model, num):
+def test_find_charge_unbalanced_reactions(model, num):
     """Expect all reactions to be charge balanced."""
-    reactions = consistency.find_charge_unbalanced_reactions(model)
+    internal_rxns = con_helpers.get_internals(model)
+    reactions = consistency.find_charge_unbalanced_reactions(internal_rxns)
     assert len(reactions) == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("all_balanced", 0),
-    ("mass_imbalanced", 1),
-    ("charge_imbalanced", 0),
+    ("mass_unbalanced", 1),
+    ("charge_unbalanced", 0),
     ("met_no_charge", 0),
     ("met_no_formula", 1)
 ], indirect=["model"])
-def test_find_mass_imbalanced_reactions(model, num):
+def test_find_mass_unbalanced_reactions(model, num):
     """Expect all reactions to be mass balanced."""
-    reactions = consistency.find_mass_unbalanced_reactions(model)
+    internal_rxns = con_helpers.get_internals(model)
+    reactions = consistency.find_mass_unbalanced_reactions(internal_rxns)
     assert len(reactions) == num
 
 
