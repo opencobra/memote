@@ -213,27 +213,33 @@ def find_biomass_reaction(model):
     list of biomass reactions
 
     """
-    buzzwords = ['biomass', 'growth', 'bof']
-
-    buzzword_matches = set([rxn for rxn in model.reactions if any(
-        string in rxn.id.lower() for string in buzzwords
-    )])
-
     sbo_matches = set([rxn for rxn in model.reactions if
                        rxn.annotation is not None and
                        'SBO' in rxn.annotation and
                        rxn.annotation['SBO'] == 'SBO:0000630'])
 
-    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'), re.IGNORECASE)
-    biomass_metabolite = model.metabolites.query(regex)
-    if biomass_metabolite == 1:
+    if len(sbo_matches) > 0:
+        return list(sbo_matches)
+
+    buzzwords = ['biomass', 'growth', 'bof']
+
+    buzzword_matches = set([rxn for rxn in model.reactions if any(
+        string in rxn.id.lower() for string in buzzwords)])
+
+    biomass_met = []
+    for met in model.metabolites:
+        if met.id.lower().startswith('biomass') or met.name.lower().startswith(
+            'biomass'
+        ):
+            biomass_met.append(met)
+    if biomass_met == 1:
         biomass_met_matches = set(
-            biomass_metabolite.reactions
+            biomass_met.reactions
         ) - set(model.exchanges)
     else:
         biomass_met_matches = set()
 
-    return list(buzzword_matches | sbo_matches | biomass_met_matches)
+    return list(buzzword_matches | biomass_met_matches)
 
 
 def df2dict(df):
@@ -534,12 +540,12 @@ def find_compartment_id_in_model(model, compartment_id):
 
     """
     if compartment_id not in COMPARTMENT_SHORTLIST.keys():
-        raise RuntimeError("{} is not in the COMPARTMENT_SHORTLIST! Make sure "
-                           "you typed the ID correctly, if yes, update the "
-                           "shortlist manually.".format(compartment_id))
+        raise KeyError("{} is not in the COMPARTMENT_SHORTLIST! Make sure "
+                       "you typed the ID correctly, if yes, update the "
+                       "shortlist manually.".format(compartment_id))
 
     if len(model.compartments) == 0:
-        raise RuntimeError(
+        raise KeyError(
             "It was not possible to identify the "
             "compartment {}, since the "
             "model has no compartments at "

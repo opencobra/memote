@@ -235,26 +235,25 @@ def bundle_biomass_components(model, reaction):
     if len(reaction.metabolites) >= 16:
         return [reaction]
 
-    if len(reaction.metabolites) <= 15:
-        id_of_main_compartment = helpers.find_compartment_id_in_model(model,
-                                                                      'c')
-        gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", 'MNXM9']
-        try:
-            gam = set([helpers.find_met_in_model(
-                model, met, id_of_main_compartment)[0] for met in gam_mets])
-        except RuntimeError:
-            gam = set()
-        regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
-                           re.IGNORECASE)
-        biomass_metabolite = set(model.metabolites.query(regex))
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model,
+                                                                  'c')
+    gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", 'MNXM9']
+    try:
+        gam = set([helpers.find_met_in_model(
+            model, met, id_of_main_compartment)[0] for met in gam_mets])
+    except RuntimeError:
+        gam = set()
+    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
+                       re.IGNORECASE)
+    biomass_metabolite = set(model.metabolites.query(regex))
 
-        macromolecules = set(reaction.metabolites) - gam - biomass_metabolite
+    macromolecules = set(reaction.metabolites) - gam - biomass_metabolite
 
-        bundled_reactions = set()
-        for met in macromolecules:
-            bundled_reactions = bundled_reactions | set(met.reactions)
+    bundled_reactions = set()
+    for met in macromolecules:
+        bundled_reactions = bundled_reactions | set(met.reactions)
 
-        return list(bundled_reactions)
+    return list(bundled_reactions)
 
 
 def essential_precursors_not_in_biomass(model, reaction):

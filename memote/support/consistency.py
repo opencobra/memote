@@ -357,13 +357,9 @@ def detect_energy_generating_cycles(model, metabolite_id):
     helpers.close_boundaries_sensibly(model)
     model.add_reactions([dissipation_rxn])
     model.objective = dissipation_rxn
-    solution = model.optimize()
-    if solution.status == 'infeasible':
-        raise RuntimeError(
-            "The model cannot be solved as the solver status is"
-            "infeasible. This may be a bug."
-        )
-    elif solution.objective_value > 0.0:
+    solution = model.optimize(raise_error=True)
+
+    if solution.objective_value > 0.0:
         return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
             drop(["Dissipation"]).tolist()
     else:

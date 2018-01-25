@@ -242,7 +242,7 @@ def biomass_buzzwords(base):
     c = cobra.Metabolite("RNA_c", compartment="c")
     d = cobra.Metabolite("GAM_c", compartment="c")
     rxn1 = cobra.Reaction("BOF", name='Biomass')
-    rxn1.add_metabolites({a: -1, b: -1, c: -1, d:-1})
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1})
     base.add_reactions([rxn1])
     return base
 
@@ -365,9 +365,9 @@ def test_find_compartment_id_in_model(model, compartment_id, expected):
 
 @pytest.mark.parametrize("model, compartment_id", [
     pytest.param("no_compartments", "c",
-                 marks=pytest.mark.raises(exception=RuntimeError)),
+                 marks=pytest.mark.raises(exception=KeyError)),
     pytest.param("compartments1", "xx",
-                 marks=pytest.mark.raises(exception=RuntimeError))
+                 marks=pytest.mark.raises(exception=KeyError))
 ], indirect=["model"])
 def test_find_compartment_id_in_model_exceptions(model, compartment_id):
     """Expect the compartment ID of the model to be found correctly."""
@@ -378,7 +378,7 @@ def test_find_compartment_id_in_model_exceptions(model, compartment_id):
     pytest.param("edge_case",
                  marks=pytest.mark.raises(exception=RuntimeError))
 ], indirect=["model"])
-def test_largest_compartment_id_met(model):
+def test_largest_compartment_id_equal_sizes(model):
     """Expect the compartment ID of the model to be found correctly."""
     helpers.largest_compartment_id_met(model)
 

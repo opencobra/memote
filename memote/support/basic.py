@@ -123,9 +123,9 @@ def find_ngam(model):
     }
 
     candidates = [rxn for rxn in atp_adp_conv_rxns
-                  if set(rxn.reactants) == reactants and
-                  set(rxn.products) == products and
-                  rxn.reversibility is False]
+                  if rxn.reversibility is False and
+                  set(rxn.reactants) == reactants and
+                  set(rxn.products) == products]
 
     buzzwords = ['maintenance', 'atpm', 'requirement',
                  'ngam', 'non-growth', 'associated']

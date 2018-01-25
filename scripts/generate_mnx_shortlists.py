@@ -32,7 +32,7 @@ import pandas as pd
 # Read the database dumps in the correct format: remove comment lines, and
 # provide appropriate column names.
 
-xref = pd.read_csv(
+df = pd.read_csv(
     "chem_xref.tsv",
     delim_whitespace=True,
     comment='#',
@@ -57,6 +57,35 @@ def xref_splitter(xref):
     elif 'MNX' in xref and ':' not in xref:
         return 'mnx'
 
+
+# This is the current shortlist, expand this and rerun the script when adding
+# new code that requires the identification of key metabolites.
+# Included in the list below are energy metabolites, redox cofactors,
+# essential amino acids and some vitamins.
+shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
+             'MNXM121', 'MNXM17', 'MNXM423', 'MNXM495', 'MNXM2', 'MNXM9',
+             'MNXM1', 'MNXM10', 'MNXM8', 'MNXM5', 'MNXM6', 'MNXM21',
+             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM38', 'MNXM33',
+             'MNXM208',
+             'MNXM119', 'MNXM191', 'MNXM232', 'MNXM223', 'MNXM509',
+             'MNXM7517',
+             'MNXM12235', 'MNXM12233', 'MNXM12236', 'MNXM558', 'MNXM2178',
+             'MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61', 'MNXM97',
+             'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142', 'MNXM37', 'MNXM231',
+             'MNXM70', 'MNXM78', 'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29',
+             'MNXM147', 'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
+             'MNXM16',
+             'MNXM161', 'MNXM12', 'MNXM256']
+
+# Transpose and reshape the dataframe so that we can apply the shortlist
+# before the most intensive steps to reduce execution time.
+df = df.T
+df.columns = df.loc['MNX_ID']
+df = df.reindex(df.index.drop('MNX_ID'))
+
+# Slice the original xref dataframe to only include the shortlist metabolites.
+xref = df[shortlist]
+xref = xref.T.reset_index()
 
 # In chem_xref.tsv, the xref entries are key value pairs separated by ':'
 # Such as: bigg:10fthf
@@ -86,24 +115,5 @@ xref = xref.unstack('XREF_ID')
 # column names are metanetx IDs.
 xref = xref.T
 
-# This is the current shortlist, expand this and rerun the script when adding
-# new code that requires the identification of key metabolites.
-# Included in the list below are energy metabolites, redox cofactors,
-# essential amino acids and some vitamins.
-shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
-             'MNXM121', 'MNXM17', 'MNXM423', 'MNXM495', 'MNXM2', 'MNXM9',
-             'MNXM1', 'MNXM10', 'MNXM8', 'MNXM5', 'MNXM6', 'MNXM21',
-             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM38', 'MNXM33', 'MNXM208',
-             'MNXM119', 'MNXM191', 'MNXM232', 'MNXM223', 'MNXM509', 'MNXM7517',
-             'MNXM12235', 'MNXM12233', 'MNXM12236', 'MNXM558', 'MNXM2178',
-             'MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61', 'MNXM97',
-             'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142', 'MNXM37', 'MNXM231',
-             'MNXM70', 'MNXM78', 'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29',
-             'MNXM147', 'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344', 'MNXM16',
-             'MNXM161', 'MNXM12', 'MNXM256']
-
-# Slice the original xref dataframe to only include the shortlist metabolites.
-df = xref[shortlist]
-
 # Saving the shortlist to memote/support/data
-df.to_json('../memote/support/data/met_id_shortlist.json')
+xref.to_json('../memote/support/data/met_id_shortlist.json')
