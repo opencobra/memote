@@ -48,6 +48,9 @@ class ResultCollectionPlugin(object):
     (unless intended).
 
     """
+    # Match pytest test case names to decide whether they were parametrized.
+    # Seems brittle, can we do better?
+    _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
     def __init__(self, model, repository=None, branch=None, commit=None,
                  exclusive=None, skip=None, custom_config=None, **kwargs):
@@ -75,32 +78,13 @@ class ResultCollectionPlugin(object):
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
-        self._store = dict()
-        self._store["meta"] = self._meta = dict()
-        self._store["tests"] = self._cases = dict()
         self.repo = repository
         self.branch = branch
         self.commit = commit
-        self._param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
         self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
         self._skip = frozenset() if skip is None else frozenset(skip)
         self.custom_config = custom_config
-        self._collect_meta_info()
         self._read_organization()
-
-    def _collect_meta_info(self):
-        """Record environment information."""
-        self._meta["platform"] = platform.system()
-        self._meta["release"] = platform.release()
-        self._meta["python"] = platform.python_version()
-        dependencies = frozenset(PKG_ORDER)
-        self._meta["packages"] = dict(
-            (dist.project_name, dist.version) for dist in
-            pip.get_installed_distributions()
-            if dist.project_name in dependencies)
-        self._meta["timestamp"] = datetime.utcnow().isoformat(" ")
-        if self.repo is not None:
-            self._collect_git_info()
 
     def _collect_git_info(self):
         """Record repository meta information."""
@@ -225,33 +209,6 @@ class ResultCollectionPlugin(object):
         else:
             case["duration"] = report.duration
             case["result"] = report.outcome
-
-    def _determine_miscellaneous_tests(self):
-        """
-        Identify tests not explicitly configured in test organization.
-
-        List them as an additional card called `Misc`, which is where they will
-        now appear in the report.
-
-        """
-        tests_on_cards = set()
-        # Add scored tests to the set.
-        for card in itervalues(self._store['cards']['scored']['sections']):
-            cases = card.get('cases', None)
-            if cases is not None:
-                tests_on_cards.update(cases)
-        # Add all other tests.
-        for card, content in iteritems(self._store['cards']):
-            if card == 'scored':
-                continue
-            cases = content.get('cases', None)
-            if cases is not None:
-                tests_on_cards.update(cases)
-
-        self._store['cards'].setdefault('misc', dict())
-        self._store['cards']['misc']['title'] = 'Misc. Tests'
-        self._store['cards']['misc']['cases'] = list(
-            set(self._cases) - set(tests_on_cards))
 
     def _compute_score(self):
         """Calculate the overall test score."""

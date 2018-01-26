@@ -20,8 +20,9 @@
 from __future__ import absolute_import
 
 import logging
+import json
 from os.path import join
-from builtins import str
+from builtins import str, dict
 
 from memote.suite.reporting.report import Report
 # import memote.suite.reporting.plot as plt
@@ -73,6 +74,30 @@ class HistoryReport(Report):
         }.get(index, ValueError("Unknown index type '{}'.".format(index)))
         if isinstance(self.index, ValueError):
             raise self.index
+
+    def build_branch_structure(self):
+        """Inspect and record the repo's branches and their history."""
+        structure = dict()
+        structure["commits"] = commits = dict()
+        structure["branches"] = branches = dict()
+        skip = frozenset(["gh-pages"])
+        for branch in self.repo.refs:
+            LOGGER.debug(branch.name)
+            if branch.name in skip:
+                continue
+            branches[branch.name] = branch_history = list()
+            latest = branch.commit
+            history = [latest] + list(latest.iter_parents())
+            for commit in history:
+                branch_history.append(commit.hexsha)
+                if commit.hexsha not in commits:
+                    commits[commit.hexsha] = sub = dict()
+                    sub["timestamp"] = commit.authored_datetime.isoformat(" ")
+                    sub["author"] = commit.author.name
+                    sub["email"] = commit.author.email
+        LOGGER.debug(json.dumps(structure, indent=2))
+        # Reset by checking out the latest commit.
+        self.repo.commit(self.latest)
 
     def render_html(self):
         """

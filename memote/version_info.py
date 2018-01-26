@@ -14,7 +14,7 @@ import platform
 
 import pip
 
-__all__ = ("show_versions",)
+__all__ = ("show_versions", "PKG_ORDER")
 
 SYS_ORDER = [
     "OS",

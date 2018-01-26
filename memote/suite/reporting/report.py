@@ -19,10 +19,51 @@
 
 from __future__ import absolute_import
 
+from six import iteritems, itervalues
+
 
 class Report(object):
     """Determine the abstract report interface."""
 
+    def __init__(self, result, configuration):
+        """
+        Fuse a collective result with a report configuration.
+
+        Parameters
+        ----------
+        result : memote.MemoteResult
+        configuration : memote.MemoteConfiguration
+
+        """
+        self.result = result
+        self.config = configuration
+
     def render_html(self):
         """Render an HTML report."""
         raise NotImplementedError("Abstract method.")
+
+    def determine_miscellaneous_tests(self):
+        """
+        Identify tests not explicitly configured in test organization.
+
+        List them as an additional card called `Misc`, which is where they will
+        now appear in the report.
+
+        """
+        tests_on_cards = set()
+        # Add scored tests to the set.
+        for card in itervalues(self.config["cards"]["scored"]["sections"]):
+            cases = card.get("cases", [])
+            tests_on_cards.update(cases)
+        # Add all other tests.
+        for card, content in iteritems(self.config["cards"]):
+            if card == "scored":
+                continue
+            cases = content.get("cases", [])
+            tests_on_cards.update(cases)
+
+        self.config["cards"].setdefault("misc", dict())
+        self.config["cards"]["misc"]["title"] = "Misc. Tests"
+        self.config["cards"]["misc"]["cases"] = list(
+            set(self.result["tests"]) - set(tests_on_cards))
+
