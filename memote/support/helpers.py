@@ -21,6 +21,8 @@ from __future__ import absolute_import
 
 import logging
 import re
+import os
+
 from builtins import dict
 from collections import defaultdict
 import numpy as np
@@ -32,8 +34,46 @@ with warnings.catch_warnings():
 
 from six import iteritems, itervalues
 from sympy import expand
+import pandas as pd
+import memote.utils as utils
 
 LOGGER = logging.getLogger(__name__)
+
+
+# Read the MetaNetX shortlist to identify specific metabolite IDs across
+# different namespaces.
+directory = os.path.dirname(__file__)
+METANETX_SHORTLIST = pd.read_json(
+    directory + "/data/met_id_shortlist.json"
+)
+
+
+# Provide a compartment shortlist to identify specfic compartments whenever
+# necessary.
+COMPARTMENT_SHORTLIST = {
+    'ce': ['cell envelope'],
+    'c': ['cytoplasm', 'cytosol', 'default', 'in', 'intra cellular',
+          'intracellular', 'intracellular region', 'intracellular space'],
+    'er': ['endoplasmic reticulum'],
+    'erm': ['endoplasmic reticulum membrane'],
+    'e': ['extracellular', 'extraorganism', 'out', 'extracellular space',
+          'extra organism', 'extra cellular', 'extra-organism'],
+    'f': ['flagellum', 'bacterial-type flagellum'],
+    'g': ['golgi', 'golgi apparatus'],
+    'gm': ['golgi membrane'],
+    'h': ['chloroplast'],
+    'l': ['lysosome'],
+    'im': ['mitochondrial intermembrane space'],
+    'mm': ['mitochondrial membrane'],
+    'm': ['mitochondrion', 'mitochondria'],
+    'n': ['nucleus'],
+    'p': ['periplasm', 'periplasmic space'],
+    'x': ['peroxisome', 'glyoxysome'],
+    'u': ['thylakoid'],
+    'vm': ['vacuolar membrane'],
+    'v': ['vacuole'],
+    'w': ['cell wall'],
+    's': ['eyespot', 'eyespot apparatus', 'stigma']}
 
 
 def find_transported_elements(rxn):
@@ -130,7 +170,7 @@ def find_transport_reactions(model):
 
 def find_converting_reactions(model, pair):
     """
-    Find reactions which convert a given metabolite pair.
+    Find all reactions which convert a given metabolite pair.
 
     Parameters
     ----------
@@ -146,12 +186,8 @@ def find_converting_reactions(model, pair):
         side and the other on the right-hand side.
 
     """
-    met_ids = [m.id for m in model.metabolites]
-    first = set(model.metabolites.get_by_id(m)
-                for m in met_ids if m.startswith(pair[0]))
-    second = set(model.metabolites.get_by_id(m)
-                 for m in met_ids if m.startswith(pair[1]))
-
+    first = set(find_met_in_model(model, pair[0]))
+    second = set(find_met_in_model(model, pair[1]))
     hits = list()
     for rxn in model.reactions:
         if len(first & set(rxn.reactants)) > 0 and len(
@@ -163,7 +199,6 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
-# TODO: Improve the heuristics of identifying the biomass reaction(s)!!!
 def find_biomass_reaction(model):
     """
     Return a list of the biomass reaction(s) of the model.
@@ -173,8 +208,38 @@ def find_biomass_reaction(model):
     model : cobra.Model
         The metabolic model under investigation.
 
+    Returns
+    -------
+    list of biomass reactions
+
     """
-    return [rxn for rxn in model.reactions if "biomass" in rxn.id.lower()]
+    sbo_matches = set([rxn for rxn in model.reactions if
+                       rxn.annotation is not None and
+                       'SBO' in rxn.annotation and
+                       rxn.annotation['SBO'] == 'SBO:0000630'])
+
+    if len(sbo_matches) > 0:
+        return list(sbo_matches)
+
+    buzzwords = ['biomass', 'growth', 'bof']
+
+    buzzword_matches = set([rxn for rxn in model.reactions if any(
+        string in rxn.id.lower() for string in buzzwords)])
+
+    biomass_met = []
+    for met in model.metabolites:
+        if met.id.lower().startswith('biomass') or met.name.lower().startswith(
+            'biomass'
+        ):
+            biomass_met.append(met)
+    if biomass_met == 1:
+        biomass_met_matches = set(
+            biomass_met.reactions
+        ) - set(model.exchanges)
+    else:
+        biomass_met_matches = set()
+
+    return list(buzzword_matches | biomass_met_matches)
 
 
 def df2dict(df):
@@ -216,10 +281,11 @@ def find_demand_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if not rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in ['e'])]
+            any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_sink_reactions(model):
@@ -253,10 +319,11 @@ def find_sink_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
             if rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in ['e'])]
+            any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_exchange_rxns(model):
@@ -289,9 +356,10 @@ def find_exchange_rxns(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
+    extracellular = find_compartment_id_in_model(model, 'e')
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if any(c in rxn.get_compartments() for c in ['e'])]
+            if any(c in rxn.get_compartments() for c in [extracellular])]
 
 
 def find_functional_units(gpr_str):
@@ -391,14 +459,179 @@ def open_boundaries(model):
 
     Parameters
     ----------
-    model : cobra.Model
-        A cobrapy metabolic model
-
-    Returns
-    -------
     cobra.Model
         A cobra model with all boundary reactions opened.
 
     """
     for exchange in model.exchanges:
         exchange.bounds = (-1000, 1000)
+
+
+def metabolites_per_compartment(model, compartment_id):
+    """
+    Identify all metabolites that belong to a given compartment.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    compartment_id : string
+        Model specific compartment identifier.
+
+    Returns
+    -------
+    list
+        List of metabolites belonging to a given compartment.
+
+    """
+    return [met for
+            met in model.metabolites if
+            met.compartment == compartment_id]
+
+
+def largest_compartment_id_met(model):
+    """
+    Return the ID of the compartment with the most metabolites.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    Returns
+    -------
+    string
+        Compartment ID of the compartment with the most metabolites.
+
+    """
+    size = {
+        compartment_id: len(metabolites_per_compartment(
+            model, compartment_id)) for
+        compartment_id in model.compartments.keys()
+    }
+    candidate = sorted(size, key=size.get, reverse=True)[0]
+    tie = size.copy()
+    tie.pop(candidate)
+    cand_tie = sorted(tie, key=tie.get, reverse=True)[0]
+    if size[candidate] not in tie.values():
+        return candidate
+    else:
+        raise RuntimeError("There is a tie for the largest compartment. "
+                           "Compartment {} and {} have equal amounts of "
+                           "metabolites.".format(candidate, cand_tie))
+
+
+def find_compartment_id_in_model(model, compartment_id):
+    """
+    Identify a model compartment by looking up names in COMPARTMENT_SHORTLIST.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    compartment_id : string
+        Memote internal compartment identifier used to access compartment name
+        shortlist to look up potential compartment names.
+
+    Returns
+    -------
+    string
+        Compartment identifier in the model corresponding to compartment_id
+
+    """
+    if compartment_id not in COMPARTMENT_SHORTLIST.keys():
+        raise KeyError("{} is not in the COMPARTMENT_SHORTLIST! Make sure "
+                       "you typed the ID correctly, if yes, update the "
+                       "shortlist manually.".format(compartment_id))
+
+    if len(model.compartments) == 0:
+        raise KeyError(
+            "It was not possible to identify the "
+            "compartment {}, since the "
+            "model has no compartments at "
+            "all.".format(COMPARTMENT_SHORTLIST[compartment_id][0])
+        )
+
+    if compartment_id in model.compartments.keys():
+        return compartment_id
+
+    for name in COMPARTMENT_SHORTLIST[compartment_id]:
+        for c_id, c_name in model.compartments.items():
+            if c_name.lower() == name:
+                return c_id
+
+    if compartment_id == 'c':
+        return largest_compartment_id_met(model)
+
+
+def find_met_in_model(model, mnx_id, compartment_id=None):
+    """
+    Identify metabolites in the model by looking up IDs in METANETX_SHORTLIST.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+    mnx_id : string
+        Memote internal MetaNetX metabolite identifier used to map between
+        cross-references in the METANETX_SHORTLIST.
+    compartment_id : string, optional
+        ID of the specific compartment where the metabolites should be found.
+        Defaults to returning matching metabolites from all compartments.
+
+    Returns
+    -------
+    list of cobra.Metabolite
+
+    """
+    if mnx_id not in METANETX_SHORTLIST.columns:
+        raise RuntimeError("{} is not in the MetaNetX Shortlist! Make sure "
+                           "you typed the ID correctly, if yes, update the "
+                           "shortlist by updating and re-running the script "
+                           "generate_mnx_shortlists.py.".format(mnx_id))
+
+    candidates = []
+    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(mnx_id))
+    if model.metabolites.query(regex):
+        candidates = model.metabolites.query(regex)
+    else:
+        for value in METANETX_SHORTLIST[mnx_id]:
+            if value:
+                for ident in value:
+                    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
+                    if model.metabolites.query(regex, attribute='id'):
+                        candidates.extend(
+                            model.metabolites.query(regex, attribute='id'))
+
+    if compartment_id is None:
+        return candidates
+
+    else:
+        candidates_in_compartment = \
+            [cand for cand in candidates if cand.compartment == compartment_id]
+
+    if len(candidates_in_compartment) == 0:
+        raise RuntimeError("It was not possible to identify "
+                           "any metabolite in compartment {} corresponding to "
+                           "the following MetaNetX identifier: {}."
+                           "Make sure that a cross-reference to this ID in "
+                           "the MetaNetX Database exists for your "
+                           "identifier "
+                           "namespace.".format(compartment_id, mnx_id))
+    elif len(candidates_in_compartment) > 1:
+        raise RuntimeError("It was not possible to uniquely identify "
+                           "a single metabolite in compartment {} that "
+                           "corresponds to the following MetaNetX "
+                           "identifier: {}."
+                           "Instead these candidates where found: {}."
+                           "Check that metabolite compartment tags are "
+                           "correct. Consider switching to a namespace scheme "
+                           "where identifiers are truly "
+                           "unique.".format(compartment_id,
+                                            mnx_id,
+                                            utils.get_ids(
+                                                candidates_in_compartment
+                                            ))
+                           )
+    else:
+        return candidates_in_compartment
