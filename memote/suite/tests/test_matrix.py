@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division
 
 import memote.support.matrix as matrix
+from memote.utils import annotate, wrapper
 
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
