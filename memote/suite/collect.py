@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import, division
 
-import pdb
 import platform
 import logging
 import re
@@ -30,7 +29,7 @@ from datetime import datetime
 import pytest
 import pip
 import ruamel.yaml as yaml
-from numpy import asanyarray
+from numpy import array
 from six import iteritems, itervalues
 from pandas import DataFrame
 
@@ -261,9 +260,19 @@ class ResultCollectionPlugin(object):
         for test, result in iteritems(self._cases):
             # Test metric may be a dictionary for a parametrized test.
             metric = result["metric"]
-            if hasattr(metric, "values"):
-                metric = asanyarray(list(itervalues(metric)))
-                metric = metric.sum() / len(metric)
+            if hasattr(metric, "items"):
+                result["score"] = test_score = dict()
+                total = 0.0
+                for key, value in iteritems(metric):
+                    total += value
+                    test_score[key] = 1.0 - value
+                # For some reason there are parametrized tests without cases.
+                if len(metric) == 0:
+                    metric = 1.0
+                else:
+                    metric = total / len(metric)
+            else:
+                result["score"] = 1.0 - metric
             scores.at[test, "score"] -= metric
             scores.loc[test, :] *= self._store["weights"].get(test, 1.0)
         score = 0.0
@@ -273,8 +282,11 @@ class ResultCollectionPlugin(object):
             if cases is None:
                 continue
             weight = card.get("weight", 1.0)
-            score += scores.loc[cases, "score"].sum() * weight
-            maximum += scores.loc[cases, "max"].sum() * weight
+            card_score = scores.loc[cases, "score"].sum()
+            card_total = scores.loc[cases, "max"].sum()
+            card["score"] = card_score / card_total
+            score += card_score * weight
+            maximum += card_total * weight
         self._store["score"] = score / maximum
 
     @property
