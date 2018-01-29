@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division
 
+import pdb
 import platform
 import logging
 import re
@@ -227,7 +228,7 @@ class ResultCollectionPlugin(object):
             case["duration"] = report.duration
             case["result"] = report.outcome
 
-    def _determine_tests_not_on_cards(self):
+    def _determine_miscellaneous_tests(self):
         """
         Identify tests not explicitly configured in test organization.
 
@@ -238,12 +239,16 @@ class ResultCollectionPlugin(object):
         tests_on_cards = set()
         # Add scored tests to the set.
         for card in itervalues(self._store['cards']['scored']['sections']):
-            tests_on_cards.update(card['cases'])
+            cases = card.get('cases', None)
+            if cases is not None:
+                tests_on_cards.update(cases)
         # Add all other tests.
         for card, content in iteritems(self._store['cards']):
             if card == 'scored':
                 continue
-            tests_on_cards.update(content['cases'])
+            cases = content.get('cases', None)
+            if cases is not None:
+                tests_on_cards.update(cases)
 
         self._store['cards'].setdefault('misc', dict())
         self._store['cards']['misc']['title'] = 'Misc. Tests'
@@ -255,26 +260,27 @@ class ResultCollectionPlugin(object):
         scores = DataFrame({"score": 1.0, "max": 1.0}, index=list(self._cases))
         for test, result in iteritems(self._cases):
             # Test metric may be a dictionary for a parametrized test.
-            try:
-                metric = asanyarray(itervalues(result["metric"]))
+            metric = result["metric"]
+            if hasattr(metric, "values"):
+                metric = asanyarray(list(itervalues(metric)))
                 metric = metric.sum() / len(metric)
-            except TypeError:
-                metric = result["metric"]
             scores.at[test, "score"] -= metric
-            if test in self._store["weights"]:
-                scores[test] *= self._store["weights"][test]
+            scores.loc[test, :] *= self._store["weights"].get(test, 1.0)
         score = 0.0
         maximum = 0.0
         for card in itervalues(self._store['cards']['scored']['sections']):
+            cases = card.get("cases", None)
+            if cases is None:
+                continue
             weight = card.get("weight", 1.0)
-            score += scores.loc[card["cases"], "score"].sum() * weight
-            maximum += scores.loc[card["cases"], "max"].sum() * weight
+            score += scores.loc[cases, "score"].sum() * weight
+            maximum += scores.loc[cases, "max"].sum() * weight
         self._store["score"] = score / maximum
 
     @property
     def results(self):
         """Return the test results as a nested dictionary."""
-        self._determine_tests_not_on_cards()
+        self._determine_miscellaneous_tests()
         self._compute_score()
         return self._store
 
