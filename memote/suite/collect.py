@@ -29,7 +29,6 @@ from datetime import datetime
 import pytest
 import pip
 import ruamel.yaml as yaml
-from numpy import array
 from six import iteritems, itervalues
 from pandas import DataFrame
 
