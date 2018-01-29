@@ -17,7 +17,7 @@
 
 """Collect results for reporting model quality."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import platform
 import logging
@@ -29,6 +29,8 @@ from datetime import datetime
 import pytest
 import pip
 import ruamel.yaml as yaml
+from six import iteritems, itervalues
+from pandas import DataFrame
 
 from memote.version_info import PKG_ORDER
 from memote.support.helpers import find_biomass_reaction
@@ -126,6 +128,8 @@ class ResultCollectionPlugin(object):
 
     def _read_organization(self):
         """Read the test organization."""
+        # TODO: Move loading of config and custom config outside and merge
+        # them there.
         with open(join(dirname(__file__), "test_config.yml")) as file_h:
             self._store.update(yaml.load(file_h))
         if self.custom_config is not None:
@@ -222,7 +226,7 @@ class ResultCollectionPlugin(object):
             case["duration"] = report.duration
             case["result"] = report.outcome
 
-    def _determine_tests_not_on_cards(self):
+    def _determine_miscellaneous_tests(self):
         """
         Identify tests not explicitly configured in test organization.
 
@@ -230,42 +234,65 @@ class ResultCollectionPlugin(object):
         now appear in the report.
 
         """
-        tests_in_the_scored_card = list()
-        tests_in_unscored_cards = list()
-
-        try:
-            scored_sections = self._store['cards']['scored']['sections']
-        except ValueError:
-            LOGGER.error(
-                "Malformed config file! The config file does not appear to "
-                "be structured correctly.")
-
-        for section in scored_sections:
-            if scored_sections[section]['cases']:
-                for case in scored_sections[section].setdefault(
-                    'cases', list()
-                ):
-                    tests_in_the_scored_card.append(case)
-
-        for card in self._store['cards']:
-            if card is not 'scored':
-                for case in self._store['cards'][card].setdefault(
-                    'cases', list()
-                ):
-                    tests_in_unscored_cards.append(case)
+        tests_on_cards = set()
+        # Add scored tests to the set.
+        for card in itervalues(self._store['cards']['scored']['sections']):
+            cases = card.get('cases', None)
+            if cases is not None:
+                tests_on_cards.update(cases)
+        # Add all other tests.
+        for card, content in iteritems(self._store['cards']):
+            if card == 'scored':
+                continue
+            cases = content.get('cases', None)
+            if cases is not None:
+                tests_on_cards.update(cases)
 
         self._store['cards'].setdefault('misc', dict())
-        self._store['cards']['misc']['cases'] = list(
-            set(self._cases) -
-            set(tests_in_the_scored_card) -
-            set(tests_in_unscored_cards)
-        )
         self._store['cards']['misc']['title'] = 'Misc. Tests'
+        self._store['cards']['misc']['cases'] = list(
+            set(self._cases) - set(tests_on_cards))
+
+    def _compute_score(self):
+        """Calculate the overall test score."""
+        scores = DataFrame({"score": 1.0, "max": 1.0}, index=list(self._cases))
+        for test, result in iteritems(self._cases):
+            # Test metric may be a dictionary for a parametrized test.
+            metric = result["metric"]
+            if hasattr(metric, "items"):
+                result["score"] = test_score = dict()
+                total = 0.0
+                for key, value in iteritems(metric):
+                    total += value
+                    test_score[key] = 1.0 - value
+                # For some reason there are parametrized tests without cases.
+                if len(metric) == 0:
+                    metric = 1.0
+                else:
+                    metric = total / len(metric)
+            else:
+                result["score"] = 1.0 - metric
+            scores.at[test, "score"] -= metric
+            scores.loc[test, :] *= self._store["weights"].get(test, 1.0)
+        score = 0.0
+        maximum = 0.0
+        for card in itervalues(self._store['cards']['scored']['sections']):
+            cases = card.get("cases", None)
+            if cases is None:
+                continue
+            weight = card.get("weight", 1.0)
+            card_score = scores.loc[cases, "score"].sum()
+            card_total = scores.loc[cases, "max"].sum()
+            card["score"] = card_score / card_total
+            score += card_score * weight
+            maximum += card_total * weight
+        self._store["score"] = score / maximum
 
     @property
     def results(self):
         """Return the test results as a nested dictionary."""
-        self._determine_tests_not_on_cards()
+        self._determine_miscellaneous_tests()
+        self._compute_score()
         return self._store
 
     @pytest.fixture(scope="session")

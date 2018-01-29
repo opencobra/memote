@@ -62,6 +62,7 @@ Next Release
 * Add function, test and model test to identify missing essential precursors
   to the biomass reaction.
   The function is ``essential_precursors_not_in_biomass``
+* Record the score of individual test cases and sections in the result output.
 
 0.5.0 (2018-01-16)
 ------------------
