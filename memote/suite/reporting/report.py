@@ -19,23 +19,28 @@
 
 from __future__ import absolute_import
 
+import logging
+
+from pandas import DataFrame
 from six import iteritems, itervalues
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Report(object):
     """Determine the abstract report interface."""
 
-    def __init__(self, result, configuration):
+    def __init__(self, results, configuration):
         """
         Fuse a collective result with a report configuration.
 
         Parameters
         ----------
-        result : memote.MemoteResult
+        results : memote.MemoteResult
         configuration : memote.MemoteConfiguration
 
         """
-        self.result = result
+        self.result = results
         self.config = configuration
 
     def render_html(self):
@@ -53,17 +58,50 @@ class Report(object):
         tests_on_cards = set()
         # Add scored tests to the set.
         for card in itervalues(self.config["cards"]["scored"]["sections"]):
-            cases = card.get("cases", [])
-            tests_on_cards.update(cases)
+            tests_on_cards.update(card.get("cases", []))
         # Add all other tests.
         for card, content in iteritems(self.config["cards"]):
             if card == "scored":
                 continue
-            cases = content.get("cases", [])
-            tests_on_cards.update(cases)
+            tests_on_cards.update(content.get("cases", []))
 
         self.config["cards"].setdefault("misc", dict())
         self.config["cards"]["misc"]["title"] = "Misc. Tests"
         self.config["cards"]["misc"]["cases"] = list(
-            set(self.result["tests"]) - set(tests_on_cards))
+            set(self.result.cases) - set(tests_on_cards))
 
+    def compute_score(self):
+        """Calculate the overall test score."""
+        scores = DataFrame({"score": 1.0, "max": 1.0},
+                           index=list(self.result.cases))
+        for test, result in iteritems(self.result.cases):
+            # Test metric may be a dictionary for a parametrized test.
+            metric = result["metric"]
+            if hasattr(metric, "items"):
+                result["score"] = test_score = dict()
+                total = 0.0
+                for key, value in iteritems(metric):
+                    total += value
+                    test_score[key] = 1.0 - value
+                # For some reason there are parametrized tests without cases.
+                if len(metric) == 0:
+                    metric = 1.0
+                else:
+                    metric = total / len(metric)
+            else:
+                result["score"] = 1.0 - metric
+            scores.at[test, "score"] -= metric
+            scores.loc[test, :] *= self.config["weights"].get(test, 1.0)
+        score = 0.0
+        maximum = 0.0
+        for card in itervalues(self.config['cards']['scored']['sections']):
+            cases = card.get("cases", None)
+            if cases is None:
+                continue
+            weight = card.get("weight", 1.0)
+            card_score = scores.loc[cases, "score"].sum()
+            card_total = scores.loc[cases, "max"].sum()
+            card["score"] = card_score / card_total
+            score += card_score * weight
+            maximum += card_total * weight
+        self.result.store["score"] = score / maximum

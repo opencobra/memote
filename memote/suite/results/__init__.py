@@ -31,4 +31,5 @@ from __future__ import absolute_import
 
 from memote.suite.results.result import *
 from memote.suite.results.result_manager import *
+from memote.suite.results.sql_result_manager import *
 from memote.suite.results.result_history_manager import *

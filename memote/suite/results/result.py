@@ -19,23 +19,35 @@
 
 from __future__ import absolute_import
 
+import json
 import platform
+from builtins import open
 from datetime import datetime
 
 import pip
 
 from memote.version_info import PKG_ORDER
 
+__all__ = ("MemoteResult",)
+
 
 class MemoteResult(object):
     """Collect the metabolic model test suite results."""
 
-    def __init__(self, **kwargs):
-        """"""
+    def __init__(self, results=None, **kwargs):
+        """
+        Instantiate a result structure.
+
+        Parameters
+        ----------
+        results : dict
+            A memote results structure.
+        """
         super(MemoteResult, self).__init__(**kwargs)
-        self.store = dict()
-        self.store["meta"] = self.meta = dict()
-        self.store["tests"] = self.cases = dict()
+        self.store = dict() if results is None else results
+        self.meta = self.store.setdefault("meta", dict())
+        self.cases = self.store.setdefault("tests", dict())
+        self.record_environment()
 
     def record_environment(self):
         """Record environment information."""
@@ -49,3 +61,10 @@ class MemoteResult(object):
             pip.get_installed_distributions()
             if dist.project_name in dependencies)
 
+    @classmethod
+    def from_json(cls, filename):
+        """"""
+        # TODO: validate the read-in JSON maybe?
+        with open(filename) as file_handle:
+            content = json.load(file_handle)
+        return MemoteResult(results=content)

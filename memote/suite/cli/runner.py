@@ -44,6 +44,7 @@ import memote.suite.cli.callbacks as callbacks
 from memote import __version__
 from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
+from memote.suite.results import ResultManager, SQLResultManager
 
 LOGGER = logging.getLogger()
 click_log.basic_config(LOGGER)
@@ -85,30 +86,31 @@ def cli():
               help="Avoid checking the git repository status.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
-                   "Should be given as one continuous string.")
-@click.option("--exclusive", type=str, multiple=True,
+                   "Should be given as one continuous string in quotes.")
+@click.option("--exclusive", type=str, multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
                    "multiple times and takes precedence over '--skip'.")
-@click.option("--skip", type=str, multiple=True,
+@click.option("--skip", type=str, multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--custom", type=(click.Path(exists=True, file_okay=False),
-                                click.Path(exists=True, dir_okay=False)),
-              default=(None, None), show_default=True,
-              help="The absolute path to a directory containing custom test "
-                   "modules followed by the absolute path to a config file "
-                   "corresponding to the custom test modules. Please refer to "
-                   "the documentation for more information on the required "
-                   "file formats.")
+@click.option("--connection", default=None, show_default=True, metavar="URL",
+              help="An rfc1738 compatible database URL which will be used "
+                   "instead of JSON flat file storage. Overrides the "
+                   "filename and directory options.")
+@click.option("--custom-tests", type=click.Path(exists=True, file_okay=False),
+              multiple=True,
+              help="A path to a directory containing custom test "
+                   "modules. Please refer to the documentation for more "
+                   "information on how to write custom tests. May be "
+                   "specified multiple times.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL",
-                callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
 def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
-        skip, solver, custom):
+        skip, solver, connection, custom_tests):
     """
     Run the test suite and collect results.
 
@@ -123,16 +125,21 @@ def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
+    # Add further directories to search for tests.
+    pytest_args.extend(custom_tests)
     model.solver = solver
+    code, results = api.test_model(
+        model, filename, pytest_args=pytest_args, skip=skip,
+        exclusive=exclusive)
     if collect:
-        if repo is not None and directory is not None:
-            filename = join(directory,
-                            "{}.json".format(repo.active_branch.commit.hexsha))
-        code = api.test_model(model, filename, pytest_args=pytest_args,
-                              skip=skip, exclusive=exclusive, custom=custom)
-    else:
-        code = api.test_model(model, pytest_args=pytest_args, skip=skip,
-                              exclusive=exclusive, custom=custom)
+        if connection is None:
+            manager = ResultManager(directory)
+        else:
+            manager = SQLResultManager(connection)
+        if repo is None:
+            manager.store(results, filename=filename)
+        else:
+            manager.store(results, repo=repo)
     sys.exit(code)
 
 
@@ -165,6 +172,7 @@ def new(directory, replay):
 
 def _test_history(model, filename, pytest_args, skip):
     model = callbacks.validate_model(None, "model", model)
+    # TODO: This needs to be restructured to use an SQLite database.
     api.test_model(model, filename, pytest_args=pytest_args, skip=skip)
 
 

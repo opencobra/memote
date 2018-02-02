@@ -16,3 +16,5 @@ travispy
 pygithub
 travis-encrypt
 sympy
+sqlalchemy
+importlib_resources

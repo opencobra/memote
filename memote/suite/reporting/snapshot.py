@@ -37,23 +37,25 @@ LOGGER = logging.getLogger(__name__)
 class SnapshotReport(Report):
     """Render a one-time report from the given model results."""
 
-    def __init__(self, data, **kwargs):
+    def __init__(self, **kwargs):
         """Initialize the data."""
         super(SnapshotReport, self).__init__(**kwargs)
         with io.open(
             join(TEMPLATES_PATH, "snapshot.html"), encoding="utf-8"
         ) as file_path:
             self._template = Template(file_path.read())
-        self.data = data
 
     def render_html(self):
         """Render the snapshot report by writing JSON into the template."""
+        self.determine_miscellaneous_tests()
+        self.compute_score()
+        self.result.store.update(self.config)
         try:
             return self._template.safe_substitute(
-                results=json.dumps(self.data, sort_keys=False, indent=None,
-                                   separators=(",", ":")))
+                results=json.dumps(self.result.store, sort_keys=False,
+                                   indent=None, separators=(",", ":")))
         except TypeError:
-            log_json_incompatible_types(self.data)
+            log_json_incompatible_types(self.result.store)
 
         # TODO: Use compression of JSON in future.
         # return template.safe_substitute(

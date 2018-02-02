@@ -21,13 +21,17 @@ from __future__ import absolute_import
 
 import logging
 import sys
+from builtins import open
 
 import click
 import git
+import ruamel.yaml as yaml
+from importlib_resources import open_text
 
 import memote.suite.api as api
-from memote.suite.cli import CONTEXT_SETTINGS
+import memote.suite.reporting.templates as templates
 import memote.suite.cli.callbacks as callbacks
+from memote.suite.cli import CONTEXT_SETTINGS
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,15 +57,21 @@ def report():
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--custom", type=(click.Path(exists=True, file_okay=False),
-                                click.Path(exists=True, dir_okay=False)),
-              default=(None, None), show_default=True,
-              help="The absolute path to a directory containing custom test "
-                   "modules followed by the absolute path to a config file "
-                   "corresponding to the custom test modules. Please refer to "
-                   "the documentation for more information on the required "
-                   "file formats.")
-def snapshot(model, filename, pytest_args, solver, custom):
+@click.option("--custom-tests", type=click.Path(exists=True, file_okay=False),
+              multiple=True,
+              help="A path to a directory containing custom test "
+                   "modules. Please refer to the documentation for more "
+                   "information on how to write custom tests. May be "
+                   "specified multiple times.")
+@click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
+              multiple=True,
+              help="A path to a report configuration file that will be merged "
+                   "into the default configuration. It's primary use is to "
+                   "configure the placement and scoring of custom tests but "
+                   "it can also alter the default behavior. Please refer to "
+                   "the documentation for the expected YAML format used. This "
+                   "option can be specified multiple times.")
+def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -72,10 +82,25 @@ def snapshot(model, filename, pytest_args, solver, custom):
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(a.startswith("-v") for a in pytest_args):
         pytest_args.append("-vv")
+    # Add further directories to search for tests.
+    pytest_args.extend(custom_tests)
+    with open_text(templates, "test_config.yml") as file_handle:
+        LOGGER.debug("Loading default snapshot configuration.")
+        config = yaml.load(file_handle)
+    # Update the default test configuration with custom ones (if any).
+    for custom in custom_config:
+        # TODO: This will need merge nested `dict`s in future.
+        LOGGER.debug("Loading custom snapshot configuration '%s'.", custom)
+        try:
+            with open(custom) as file_handle:
+                config.update(yaml.load(file_handle))
+        except IOError as err:
+            LOGGER.error("Failed to load the custom configuration. Skipping.")
+            LOGGER.debug(str(err))
     model.solver = solver
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args,
-                                custom=custom)
-    api.snapshot_report(results, filename)
+    _, results = api.test_model(model, results=True, pytest_args=pytest_args)
+    # TODO: Merge configs.
+    api.snapshot_report(results, config, filename)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
