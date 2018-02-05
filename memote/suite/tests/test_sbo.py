@@ -37,7 +37,7 @@ def test_metabolite_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_metabolite_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "metabolites"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
@@ -58,7 +58,7 @@ def test_reaction_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_reaction_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "reactions"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
@@ -79,7 +79,7 @@ def test_gene_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_gene_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "genes"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
