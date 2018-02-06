@@ -23,7 +23,6 @@ import memote.support.basic as basic
 import memote.support.helpers as helpers
 import memote.support.sbo as sbo
 
-import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
@@ -37,7 +36,7 @@ def test_metabolite_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_metabolite_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "metabolites"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
@@ -58,7 +57,7 @@ def test_reaction_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_reaction_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "reactions"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
@@ -79,7 +78,7 @@ def test_gene_sbo_presence(read_only_model):
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
     """
     ann = test_gene_sbo_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_sbo_terms(
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "genes"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
@@ -126,7 +125,7 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_transport_reactions(read_only_model), "SBO:0000185"))
     ann["metric"] = len(ann["data"]) / len(
-        basic.find_transport_reactions(read_only_model))
+        helpers.find_transport_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all transport
         reactions) lack annotation with the SBO term "SBO:0000185" for
