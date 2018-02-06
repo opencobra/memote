@@ -125,7 +125,7 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_transport_reactions(read_only_model), "SBO:0000185"))
     ann["metric"] = len(ann["data"]) / len(
-        basic.find_transport_reactions(read_only_model))
+        helpers.find_transport_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all transport
         reactions) lack annotation with the SBO term "SBO:0000185" for
