@@ -63,6 +63,10 @@ Next Release
   to the biomass reaction.
   The function is ``essential_precursors_not_in_biomass``
 * Record the score of individual test cases and sections in the result output.
+* Correct the import of module 'annotation' with 'sbo' in `test_sbo.py`
+* Refactor sink_react_list to sink_reactions for improved readability
+* Allow `test_sink_specific_sbo_presence` to be skipped when no sink reactions
+  are present with a metric of 1.0
 
 0.5.0 (2018-01-16)
 ------------------
