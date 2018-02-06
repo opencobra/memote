@@ -19,6 +19,8 @@
 
 from __future__ import absolute_import, division
 
+import pytest
+
 import memote.support.basic as basic
 import memote.support.helpers as helpers
 import memote.support.sbo as sbo
@@ -261,8 +263,11 @@ def test_sink_specific_sbo_presence(read_only_model):
     ann = test_sink_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         helpers.find_sink_reactions(read_only_model), "SBO:0000632"))
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_sink_reactions(read_only_model))
+    try:
+        ann["metric"] = len(ann["data"]) / len(
+            helpers.find_sink_reactions(read_only_model))
+    except ZeroDivisionError:
+        pytest.skip()
     ann["message"] = wrapper.fill(
         """A total of {} genes ({:.2%} of all sink reactions) lack
         annotation with the SBO term "SBO:0000632" for
