@@ -261,11 +261,11 @@ def test_sink_specific_sbo_presence(read_only_model):
     organism's compartments.
     """
     ann = test_sink_specific_sbo_presence.annotation
-    sink_react_list = helpers.find_sink_reactions(read_only_model)
+    sink_reactions = helpers.find_sink_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        sink_react_list, "SBO:0000632"))
+        sink_reactions, "SBO:0000632"))
     try:
-        ann["metric"] = len(ann["data"]) / len(sink_react_list)
+        ann["metric"] = len(ann["data"]) / len(sink_reactions)
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "No sink reactions found."
