@@ -23,7 +23,6 @@ import memote.support.basic as basic
 import memote.support.helpers as helpers
 import memote.support.sbo as sbo
 
-import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
