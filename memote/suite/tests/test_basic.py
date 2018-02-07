@@ -325,7 +325,7 @@ def test_transport_reaction_gpr_presence(read_only_model):
         """There are a total of {} transport reactions ({:.2%} of all
         transport reactions) without GPR:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert len(ann["metric"]) < 0.2, ann["message"]
+    assert ann["metric"] < 0.2, ann["message"]
 
 
 @annotate(title="Number of Unique Metabolites", type="count")
