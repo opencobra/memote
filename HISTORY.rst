@@ -67,6 +67,8 @@ Next Release
 * Refactor sink_react_list to sink_reactions for improved readability
 * Allow `test_sink_specific_sbo_presence` to be skipped when no sink reactions
   are present with a metric of 1.0
+* Fix a bug that compared the length of a float to generate a metric in 
+  `test_basic.py` and generated a TypeError
 
 0.5.0 (2018-01-16)
 ------------------
