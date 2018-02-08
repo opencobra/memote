@@ -73,6 +73,11 @@ Next Release
   in `memote/support/biomass.py` from functioning due to a malformed set
 * In CONTRIBUTING.rst replace link to semantic commit guide by seesparkbox
   with link to guide by karma, due to error with sphinx linkcheck.
+* Fix a bug that prevented `find_biomass_precursors` from correctly
+  identifying `atp` and `h2o` metabolites in cobra model reactions
+* Fix improperly labeled sbo terms for biomass production in `biomass.py`
+  and `test_for_helpers.py`
+
 
 0.5.0 (2018-01-16)
 ------------------

@@ -216,7 +216,7 @@ def find_biomass_reaction(model):
     sbo_matches = set([rxn for rxn in model.reactions if
                        rxn.annotation is not None and
                        'SBO' in rxn.annotation and
-                       rxn.annotation['SBO'] == 'SBO:0000630'])
+                       rxn.annotation['SBO'] == 'SBO:0000629'])
 
     if len(sbo_matches) > 0:
         return list(sbo_matches)
