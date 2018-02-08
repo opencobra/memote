@@ -85,7 +85,7 @@ Ready to contribute? Here's how to set up `memote` for local development.
    pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub. Please use `semantic
-   commit messages <https://seesparkbox.com/foundry/semantic_commit_messages>`_::
+   commit messages <http://karma-runner.github.io/2.0/dev/git-commit-msg.html>`_::
 
     git add .
     git commit -m "fix: Your detailed description of your changes."
