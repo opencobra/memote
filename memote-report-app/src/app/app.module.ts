@@ -14,6 +14,7 @@ import { KeysPipe } from './keys.pipe';
 import { SystemInformationComponent } from './dashboard/system-information/system-information.component';
 import { AccordionComponent } from './accordion/accordion.component';
 import { ResultButtonComponent } from './result-button/result-button.component';
+import { VegaPlotComponent } from "./vega-plot/vega-plot.component";
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { ResultButtonComponent } from './result-button/result-button.component';
     KeysPipe,
     SystemInformationComponent,
     AccordionComponent,
-    ResultButtonComponent
+    ResultButtonComponent,
+    VegaPlotComponent
   ],
   imports: [
     BrowserModule,
