@@ -49,5 +49,5 @@ def number_independent_conservation_relations(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    n_matrix = con_helpers.nullspace(s_matrix)
-    return n_matrix.shape[1]
+    ln_matrix = con_helpers.nullspace(s_matrix.T)
+    return ln_matrix.shape[1]
