@@ -25,7 +25,7 @@ from memote.utils import annotate, wrapper
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
           type="percent"
-)
+          )
 def test_absolute_extreme_coefficient_ratio(model):
     """Show ratio of the absolute largest and smallest non-zero coefficients.
 
