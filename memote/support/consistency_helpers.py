@@ -134,6 +134,7 @@ def rank(A, atol=1e-13, rtol=0):
     numpy.linalg.matrix_rank
         matrix_rank is basically the same as this function, but it does not
         provide the option of the absolute tolerance.
+
     """
 
     A = np.atleast_2d(A)
@@ -196,6 +197,7 @@ def nullspace_basis(A, atol=1e-13, rtol=0):
         nullspace of `A`.  The columns of `ns` are a basis for the
         nullspace; each element in numpy.dot(A, ns) will be approximately
         zero.
+
     """
 
     A = np.atleast_2d(A)
