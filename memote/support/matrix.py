@@ -27,9 +27,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 def absolute_extreme_coefficient_ratio(model):
-    """
-    Return the absolute maximum & absolute non-zero minimum coefficients.
-    """
+    """Return the absolute maximum & absolute non-zero minimum coefficients."""
+
     # S-Matrix with absolute values:
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
@@ -43,9 +42,8 @@ def absolute_extreme_coefficient_ratio(model):
 
 
 def number_independent_conservation_relations(model):
-    """
-    Return the amount of conserved metabolic pools.
-    """
+    """Return the amount of conserved metabolic pools."""
+    
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
