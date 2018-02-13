@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 import numpy as np
+import memote.support.helpers as helpers
 import memote.support.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ def absolute_extreme_coefficient_ratio(model):
     return (absolute_max_coef, absolute_non_zero_min_coef)
 
 
+# TODO: Check to see if total S matrix can be used or if only internal S can
 def number_independent_conservation_relations(model):
     """Return the amount of conserved metabolic pools."""
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
@@ -49,8 +51,8 @@ def number_independent_conservation_relations(model):
     return ln_matrix.shape[1]
 
 
-def number_steady_state_solutions(model):
-    """Return the amount of steady-state solutions of this model."""
+def number_steady_state_flux_solutions(model):
+    """Return the amount of steady-state flux solutions of this model."""
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
@@ -63,7 +65,6 @@ def matrix_rank(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-
     return con_helpers.rank(s_matrix)
 
 
@@ -72,10 +73,23 @@ def degrees_of_freedom(model):
     Return the degrees of freedom, i.e. number of "free variables".
 
     This specifically refers to the dimensionality of the right nullspace
-    of the S matrix, as dim(N(S)) corresponds directly to the number of
-    free variables in the system. For more information, see:
+    of the S matrix, as dim(Null(S)) corresponds directly to the number of
+    free variables in the system. The forumla used calculates this using the 
+    rank-nullity theorem. For more information, see the links below.
 
-    doi: 10.1007/BF02614325
+    See Also:
+    ---------
+    doi: 
+    10.1007/BF02614325
+
+    linear algebra review:
+    https://see.stanford.edu/materials/lsoeldsee263/03-lin-alg.pdf
+
+    wikipedia link for quick reference: 
+    https://en.wikipedia.org/wiki/Rank%E2%80%93nullity_theorem
 
     """
-    return number_steady_state_solutions(model)
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+    return s_matrix.shape[1] - matrix_rank(model)
