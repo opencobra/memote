@@ -48,6 +48,7 @@ def number_independent_conservation_relations(model):
     ln_matrix = con_helpers.nullspace(s_matrix.T)
     return ln_matrix.shape[1]
 
+
 def number_steady_state_solutions(model):
     """Return the amount of steady-state solutions of this model."""
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
