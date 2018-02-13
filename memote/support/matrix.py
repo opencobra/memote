@@ -75,5 +75,6 @@ def degrees_of_freedom(model):
     free variables in the system. For more information, see:
 
     doi: 10.1007/BF02614325
+
     """
     return number_steady_state_solutions(model)
