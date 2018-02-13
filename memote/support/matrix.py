@@ -47,3 +47,33 @@ def number_independent_conservation_relations(model):
     )
     ln_matrix = con_helpers.nullspace(s_matrix.T)
     return ln_matrix.shape[1]
+
+def number_steady_state_solutions(model):
+    """Return the amount of steady-state solutions of this model."""
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+    n_matrix = con_helpers.nullspace(s_matrix)
+    return n_matrix.shape[1]
+
+
+def matrix_rank(model):
+    """Return the rank of the model's stoichiometric matrix."""
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+
+    return con_helpers.rank(s_matrix)
+
+
+def degrees_of_freedom(model):
+    """
+    Return the degrees of freedom, i.e. number of "free variables".
+
+    This specifically refers to the dimensionality of the right nullspace
+    of the S matrix, as dim(N(S)) corresponds directly to the number of
+    free variables in the system. For more information, see:
+
+    doi: 10.1007/BF02614325
+    """
+    return number_steady_state_solutions(model)
