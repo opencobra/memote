@@ -41,13 +41,12 @@ def absolute_extreme_coefficient_ratio(model):
     return (absolute_max_coef, absolute_non_zero_min_coef)
 
 
-# TODO: left-nullspace does not work for large networks, implement MCCA instead
 def number_independent_conservation_relations(model):
     """Return the amount of conserved metabolic pools."""
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    ln_matrix = con_helpers.nullspace(s_matrix.T)
+    ln_matrix = con_helpers.nullspace_basis(s_matrix.T)
     return ln_matrix.shape[1]
 
 
@@ -56,7 +55,7 @@ def number_steady_state_flux_solutions(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    n_matrix = con_helpers.nullspace(s_matrix)
+    n_matrix = con_helpers.nullspace_basis(s_matrix)
     return n_matrix.shape[1]
 
 
