@@ -55,7 +55,7 @@ def test_absolute_extreme_coefficient_ratio(model):
 def test_number_independent_conservation_relations(model):
     """Show number of independent conservation relations in the model.
 
-    This test will return the number of conservation relations, i.e. 
+    This test will return the number of conservation relations, i.e.
     conservation pools through the left null space of the S-Matrix.
 
     This test is not scored, as the dimension of the left null space
@@ -79,14 +79,14 @@ def test_number_steady_state_flux_solutions(model):
 
     This test is not scored, as the dimension of the null space depends on the
     S-Matrix constructed, which is system-specific.
-    """ 
+    """
     ann = test_number_steady_state_flux_solutions.annotation
     ann["data"] = matrix.number_steady_state_flux_solutions(model)
     ann["metric"] = ann["data"].shape[1]
     ann["message"] = wrapper.fill(
         """The number of independent steady-state flux solution vectors is {}
         """.format(ann["metric"]
-        ))
+                   ))
 
 
 @annotate(title="Rank of S-Matrix", type="number")
@@ -103,7 +103,7 @@ def test_matrix_rank(model):
     ann["metric"] = ann["data"]
     ann["message"] = wrapper.fill(
         """The rank of the S-Matrix is {}""".format(ann["metric"]
-        ))
+                                                    ))
 
 
 @annotate(title="Degrees of freedom of S-Matrix", type="number")
@@ -121,4 +121,4 @@ def test_degrees_of_freedom(model):
     ann["metric"] = ann["data"]
     ann["message"] = wrapper.fill(
         """The degrees of freedom of the S-Matrix is {}""".format(ann["metric"]
-        ))
+                                                                  ))

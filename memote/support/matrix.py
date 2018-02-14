@@ -21,7 +21,6 @@ from __future__ import absolute_import
 
 import logging
 import numpy as np
-import memote.support.helpers as helpers
 import memote.support.consistency_helpers as con_helpers
 
 LOGGER = logging.getLogger(__name__)
@@ -73,18 +72,18 @@ def degrees_of_freedom(model):
 
     This specifically refers to the dimensionality of the right nullspace
     of the S matrix, as dim(Null(S)) corresponds directly to the number of
-    free variables in the system. The forumla used calculates this using the 
+    free variables in the system. The forumla used calculates this using the
     rank-nullity theorem. For more information, see the links below.
 
     See Also:
     ---------
-    doi: 
+    doi:
     10.1007/BF02614325
 
     linear algebra review:
     https://see.stanford.edu/materials/lsoeldsee263/03-lin-alg.pdf
 
-    wikipedia link for quick reference: 
+    wikipedia link for quick reference:
     https://en.wikipedia.org/wiki/Rank%E2%80%93nullity_theorem
 
     """
