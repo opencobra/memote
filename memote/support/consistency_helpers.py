@@ -168,7 +168,7 @@ def nullspace_basis(A, atol=1e-13, rtol=0):
 
     Notes
     -----
-    Adapted from:
+    Adapted directly from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
 
     Parameters
