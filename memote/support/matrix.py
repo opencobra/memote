@@ -41,7 +41,7 @@ def absolute_extreme_coefficient_ratio(model):
     return (absolute_max_coef, absolute_non_zero_min_coef)
 
 
-# TODO: Check to see if total S matrix can be used or if only internal S can
+# TODO: left-nullspace does not work for large networks, implement MCCA instead
 def number_independent_conservation_relations(model):
     """Return the amount of conserved metabolic pools."""
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
