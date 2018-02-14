@@ -14,6 +14,7 @@ Next Release
 * Fix a small bug with the metrics of mass/charge unbalanced reactions.
 * Correctly invert the found identifiers in wrong annotations and namespace
   consistency in order to report the correct results.
+* Add tests for matrix consistency
 
 0.5.0 (2018-01-16)
 ------------------
