@@ -25,9 +25,10 @@ from memote.utils import annotate, wrapper
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
           type="percent"
-)
+          )
 def test_absolute_extreme_coefficient_ratio(model):
-    """Show ratio of the absolute largest and smallest non-zero coefficients.
+    """
+    Show ratio of the absolute largest and smallest non-zero coefficients.
 
     This test will return the absolute largest and smallest, non-zero
     coefficients from the S-Matrix. A large ratio of these values may point to
