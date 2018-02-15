@@ -45,5 +45,49 @@ def number_independent_conservation_relations(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    n_matrix = con_helpers.nullspace(s_matrix)
+    ln_matrix = con_helpers.nullspace_basis(s_matrix.T)
+    return ln_matrix.shape[1]
+
+
+def number_steady_state_flux_solutions(model):
+    """Return the amount of steady-state flux solutions of this model."""
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+    n_matrix = con_helpers.nullspace_basis(s_matrix)
     return n_matrix.shape[1]
+
+
+def matrix_rank(model):
+    """Return the rank of the model's stoichiometric matrix."""
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+    return con_helpers.rank(s_matrix)
+
+
+def degrees_of_freedom(model):
+    """
+    Return the degrees of freedom, i.e. number of "free variables".
+
+    This specifically refers to the dimensionality of the right nullspace
+    of the S matrix, as dim(Null(S)) corresponds directly to the number of
+    free variables in the system. The forumla used calculates this using the
+    rank-nullity theorem. For more information, see the links below.
+
+    See Also:
+    ---------
+    doi:
+    10.1007/BF02614325
+
+    linear algebra review slides:
+    https://see.stanford.edu/materials/lsoeldsee263/03-lin-alg.pdf
+
+    wikipedia link for quick reference:
+    https://en.wikipedia.org/wiki/Rank%E2%80%93nullity_theorem
+
+    """
+    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
+        model.metabolites, model.reactions
+    )
+    return s_matrix.shape[1] - matrix_rank(model)
