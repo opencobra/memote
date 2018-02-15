@@ -40,7 +40,9 @@ class SnapshotReport(Report):
     def __init__(self, data, **kwargs):
         """Initialize the data."""
         super(SnapshotReport, self).__init__(**kwargs)
-        with io.open(join(TEMPLATES_PATH, "snapshot.html")) as file_path:
+        with io.open(
+            join(TEMPLATES_PATH, "snapshot.html"), encoding="utf-8"
+        ) as file_path:
             self._template = Template(file_path.read())
         self.data = data
 

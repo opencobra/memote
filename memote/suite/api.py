@@ -117,7 +117,7 @@ def snapshot_report(results, filename):
     """
     report = SnapshotReport(results)
     LOGGER.info("Writing basic report '%s'.", filename)
-    with io.open(filename, "w") as file_h:
+    with io.open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
 
 
