@@ -119,6 +119,8 @@ Next Release
   exchange reactions, transporters and the biomass reaction itself.
 * Implement a test that checks for a low ratio of transport reactions without
   GPR relative to the total amount of transport reactions.
+* Fix UnicodeDecodeError when memote tries to open the html template for the
+  snapshot report.
 
 0.4.6 (2017-10-31)
 ------------------
