@@ -14,6 +14,69 @@ Next Release
 * Fix a small bug with the metrics of mass/charge unbalanced reactions.
 * Correctly invert the found identifiers in wrong annotations and namespace
   consistency in order to report the correct results.
+* Add a cross-reference shortlist using MetaNetX flatfiles
+* Add a script that can be used to add more metabolites and then to
+  re-generate the shortlist
+* Add helper function ``find_met_in_model`` which looks up a query metabolite
+  ID using the MNX namespace in the shortlist and:
+    - If no compartment is provided, returns a list of all possible candidates
+      metabolites
+    - If a compartment is provided, tries to return a list containing only
+      ONE corresponding metabolite.
+* Add helper function ``find_compartment_id_in_model`` to identify
+  compartments using an internal shortlist of possible compartment names.
+* Provide tests for each function
+* Refactor code to use these functions specifically:
+    - ``find_ngam``
+    - ``find_biomass_reaction``
+    - ``detect_energy_generating_cycles``
+    - ``find_exchange_rxns``
+    - ``find_demand_rxns``
+    - ``find_sink_rxns``
+    - ``gam_in_biomass``
+    - ``find_biomass_precursors``
+* Improve ``find_ngam`` in addition to agnostically looking for ATP hydrolysis
+  reactions, the test now also looks for a range of possible "buzzwords" in
+  the reaction NAME: ['maintenance', 'atpm', 'requirement', 'ngam',
+  'non-growth', 'associated']. One match suffices as a classification.
+* Improve ``find_biomass_reaction`` to look for three attributes in a biomass
+  reaction, one of which is sufficient to classify it as a biomass reaction:
+
+    1. "Buzzwords" in the reaction ID: ['biomass', 'growth', 'bof']
+    2. An annotation matching the SBO-Term SBO:0000630 specifically!
+    3. Containing a metabolite matching the regex:
+       ``^biomass(_[a-zA-Z]+?)*?$`` (case-insensitive)
+* Add function ``bundle_biomass_components`` to identify whether a given
+  biomass reaction is 'split' or 'lumped'. This function looks simply at the
+  size of the biomass reaction. Based on a guess-timated cut-off the reaction
+  is then classified. If it is 'lumped' it is returned without changes, if it
+  is 'split' the reactions of any non-energy precursor metabolite are returned
+  as well. This is based on the assumption that a 'split' biomass reaction has
+  the following structure:
+  a (1 gDW ash) + b (1 gDW phospholipids) + c (free fatty acids) +
+  d (1 gDW carbs) + e (1 gDW protein) + f (1 gDW RNA) + g (1 gDW DNA) +
+  h (vitamins/cofactors)-> 1 gDCW biomass.
+  We're supposing that for each macromolecule precursor metabolite there is a
+  single reaction defining its composition i.e. `e` = protein would have the
+  reaction: ` alanine + asparagine + ... + valine --> e`
+* Add function, test and model test to identify missing essential precursors
+  to the biomass reaction.
+  The function is ``essential_precursors_not_in_biomass``
+* Record the score of individual test cases and sections in the result output.
+* Correct the import of module 'annotation' with 'sbo' in `test_sbo.py`
+* Refactor sink_react_list to sink_reactions for improved readability
+* Allow `test_sink_specific_sbo_presence` to be skipped when no sink reactions
+  are present with a metric of 1.0
+* Fix a bug that compared the length of a float to generate a metric in
+  `test_basic.py` and generated a TypeError.
+* Fix a bug that prevented `find_biomass_precursors`
+  in `memote/support/biomass.py` from functioning due to a malformed set
+* In CONTRIBUTING.rst replace link to semantic commit guide by seesparkbox
+  with link to guide by karma, due to error with sphinx linkcheck.
+* Fix a bug that prevented `find_biomass_precursors` from correctly
+  identifying `atp` and `h2o` metabolites in cobra model reactions
+* Fix improperly labeled sbo terms for biomass production in `biomass.py`
+  and `test_for_helpers.py`
 * Add tests for matrix consistency
 
 0.5.0 (2018-01-16)

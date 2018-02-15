@@ -147,6 +147,8 @@ def produces_atp(base):
     base.add_boundary(base.metabolites.atp_c, type="sink")
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -170,6 +172,8 @@ def infeasible(base):
     base.add_boundary(base.metabolites.atp_c, type="sink")
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -193,6 +197,8 @@ def maintenance_present(base):
     base.add_boundary(base.metabolites.atp_c, type="sink")
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -224,6 +230,8 @@ def produces_nadh(base):
     base.add_boundary(base.metabolites.nad_c, type="sink")
     base.add_boundary(base.metabolites.nadh_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -242,6 +250,8 @@ def produces_fadh2(base):
     base.add_boundary(base.metabolites.fad_c, type="sink")
     base.add_boundary(base.metabolites.fadh2_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -262,6 +272,8 @@ def produces_accoa(base):
     base.add_boundary(base.metabolites.coa_c, type="sink")
     base.add_boundary(base.metabolites.accoa_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -282,24 +294,29 @@ def produces_glu(base):
     base.add_boundary(base.metabolites.akg_c, type="sink")
     base.add_boundary(base.metabolites.glu__L_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
-@register_with(MODEL_REGISTRY)
-def produces_h(base):
-    """Returns a simple model with an EGC producing h_p"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
-    base.add_reactions([ra, rb, rc])
-    ra.reaction = "a <--> b"
-    rb.reaction = "b <--> c"
-    rc.reaction = "h_p + a <--> c + h_c"
-    base.add_boundary(base.metabolites.a, type="sink")
-    base.add_boundary(base.metabolites.h_p, type="sink")
-    base.add_boundary(base.metabolites.h_c, type="sink")
-    base.add_boundary(base.metabolites.c, type="demand")
-    return base
+# TODO: Removed until detection of organism type is implemented.
+# @register_with(MODEL_REGISTRY)
+# def produces_h(base):
+#     """Returns a simple model with an EGC producing h_p"""
+#     ra = cobra.Reaction('A')
+#     rb = cobra.Reaction('B')
+#     rc = cobra.Reaction('C')
+#     base.add_reactions([ra, rb, rc])
+#     ra.reaction = "a <--> b"
+#     rb.reaction = "b <--> c"
+#     rc.reaction = "h_p + a <--> c + h_c"
+#     base.add_boundary(base.metabolites.a, type="sink")
+#     base.add_boundary(base.metabolites.h_p, type="sink")
+#     base.add_boundary(base.metabolites.h_c, type="sink")
+#     base.add_boundary(base.metabolites.c, type="demand")
+#     for met in base.metabolites:
+#         met.compartment = 'c'
+#     return base
 
 
 @register_with(MODEL_REGISTRY)
@@ -319,6 +336,8 @@ def no_atp(base):
     base.add_boundary(base.metabolites.atp_c, type="sink")
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
+    for met in base.metabolites:
+        met.compartment = 'c'
     return base
 
 
@@ -560,13 +579,12 @@ def test_find_inconsistent_min_stoichiometry(model, inconsistent):
 
 @pytest.mark.parametrize("model, metabolite_id", [
     # test control flow statements
-    ("produces_atp", 'atp_c'),
-    ("produces_accoa", 'accoa_c'),
-    ("produces_fadh2", "fadh2_c"),
-    ("produces_glu", "glu__L_c"),
-    ("produces_h", "h_p"),
-    ("produces_nadh", "nadh_c"),
-    ("maintenance_present", "atp_c"),
+    ("produces_atp", 'MNXM3'),
+    ("produces_accoa", 'MNXM21'),
+    ("produces_fadh2", "MNXM38"),
+    ("produces_glu", "MNXM89557"),
+    ("produces_nadh", "MNXM10"),
+    ("maintenance_present", "MNXM3"),
 ], indirect=["model"])
 def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
     """Expect that energy-generating cycles don't exist for metabolite ID."""
@@ -576,8 +594,8 @@ def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
 
 @pytest.mark.parametrize("model, metabolite_id, output", [
     # test for possible exceptions
-    ("no_atp", "atp_c", []),
-    ("infeasible", "atp_c", {'A', 'B', 'C'})
+    ("no_atp", "MNXM3", []),
+    ("infeasible", "MNXM3", {'A', 'B', 'C'})
 ], indirect=["model"])
 def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
                                                     output):

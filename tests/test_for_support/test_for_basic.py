@@ -161,12 +161,12 @@ def nonzero_constrained_rxn(base):
 @register_with(MODEL_REGISTRY)
 def ngam_present(base):
     """Provide a model with a correct NGAM reaction"""
-    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
-    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
-    met_i = cobra.Metabolite("h_c", "H")
-    met_j = cobra.Metabolite("h2o_c", "H2O")
-    met_k = cobra.Metabolite("pi_c", "HO4P")
-    rxn_1 = cobra.Reaction("ATPM")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment="c")
+    met_i = cobra.Metabolite("h_c", "H", compartment="c")
+    met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
+    met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
+    rxn_1 = cobra.Reaction("ATPM", name="non-growth associated maintenance")
     rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
                            met_j: -1, met_k: 1})
     rxn_1.lower_bound = 8.39
@@ -175,18 +175,23 @@ def ngam_present(base):
 
 
 @register_with(MODEL_REGISTRY)
-def simple_atp_hydrolysis(base):
-    """Provide a model with an ATP hydrolysis reaction"""
-    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3")
-    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2")
-    met_i = cobra.Metabolite("h_c", "H")
-    met_j = cobra.Metabolite("h2o_c", "H2O")
-    met_k = cobra.Metabolite("pi_c", "HO4P")
-    rxn_1 = cobra.Reaction("ATPM")
+def ngam_and_atpsynthase(base):
+    """Provide a model with an ATP hydrolysis and an NGAM reaction"""
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment="c")
+    met_i = cobra.Metabolite("h_e", "H", compartment="e")
+    met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
+    met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
+    met_l = cobra.Metabolite("h_c", "H", compartment="c")
+    rxn_1 = cobra.Reaction("ATPS", name="ATPase cytosolic")
     rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
                            met_j: -1, met_k: 1})
-    rxn_1.bounds = 0, 1000
-    base.add_reactions([rxn_1])
+    rxn_1.bounds = -1000, 1000
+    rxn_2 = cobra.Reaction("NGAM", name="non-growth associated maintenance")
+    rxn_2.add_metabolites({met_g: -1, met_h: 1, met_l: 1,
+                           met_j: -1, met_k: 1})
+    rxn_2.bounds = 0, 1000
+    base.add_reactions([rxn_1, rxn_2])
     return base
 
 
@@ -347,8 +352,7 @@ def test_find_unconstrained_reactions(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("ngam_present", 1),
-    ("simple_atp_hydrolysis", 0),
-    ("empty", 0)
+    ("ngam_and_atpsynthase", 1)
 ], indirect=["model"])
 def test_ngam_presence(model, num):
     """Expect a single non growth-associated maintenance reaction."""
@@ -376,7 +380,7 @@ def test_enzyme_complex_presence(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("simple_atp_hydrolysis", 1),
+    ("ngam_and_atpsynthase", 2),
     ("gpr_missing_with_exchange", 1),
     ("non_metabolic_reactions", 0)
 ], indirect=["model"])

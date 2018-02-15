@@ -109,11 +109,11 @@ def energy_transfer(base):
 @register_with(MODEL_REGISTRY)
 def converting_reactions(base):
     """Provide a model with a couple of converting reaction."""
-    a = cobra.Metabolite("a_c")
-    b = cobra.Metabolite("b_c")
-    c = cobra.Metabolite("c_c")
-    c2 = cobra.Metabolite("c_e")
-    c3 = cobra.Metabolite("c_p")
+    a = cobra.Metabolite("atp_c", compartment="c")
+    b = cobra.Metabolite("adp_c", compartment="c")
+    c = cobra.Metabolite("gtp_c", compartment="c")
+    c2 = cobra.Metabolite("gtp_e", compartment="e")
+    c3 = cobra.Metabolite("gtp_p", compartment="p")
     rxn1 = cobra.Reaction("R1")
     rxn1.add_metabolites({a: -1, b: 1})
     rxn2 = cobra.Reaction("R2")
@@ -133,6 +133,147 @@ def one_exchange(base):
     )
     rxn.bounds = -1, 5
     base.add_reaction(rxn)
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def find_met_id(base):
+    """
+    Provide a model with existing metabolite IDs from different namespaces.
+    """
+    # ATP - BiGG ID
+    a = cobra.Metabolite("atp_c", compartment='c')
+    # GTP - Chebi ID
+    b = cobra.Metabolite("15996", compartment='c')
+    # CDP - Deprecated MetaNetX ID
+    c = cobra.Metabolite("MNXM90125", compartment='c')
+    # Asparagine - Kegg ID
+    d = cobra.Metabolite("C00152", compartment='c')
+    # Glycine - MetaCyc ID
+    e = cobra.Metabolite("GLY", compartment='c')
+    # Pyridoxal Phosphate - Current MetaNetX ID
+    f = cobra.Metabolite("MNXM161", compartment='c')
+    # Coenzyme A - Seed ID
+    g = cobra.Metabolite("cpd00010", compartment='c')
+    base.add_metabolites([a, b, c, d, e, f, g])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def find_met_incorrect_xref(base):
+    """
+    Provide a model with metabolite IDs not in shortlist or wrong.
+    """
+    # Hydrogen - HMDB ID typo
+    a = cobra.Metabolite("HMDB59598", compartment='c')
+    # NADH and NAD - BiGG ID but
+    b = cobra.Metabolite("nad_c", compartment='c')
+    c = cobra.Metabolite("nad_e", compartment='c')
+    base.add_metabolites([a, b, c])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def compartments1(base):
+    """
+    Provide a model with unconventional compartment names.
+    """
+    test_case = {'default': 'default',
+                 'c_15': 'some unknown name'}
+    base.add_metabolites([cobra.Metabolite('A', compartment='default')])
+    base.compartments = test_case
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def no_compartments(base):
+    """
+    Provide a model with no compartments.
+    """
+    base.add_metabolites([cobra.Metabolite('MNXM161')])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def compartment_size(base):
+    """
+    Provide a model with different amounts metabolites for each compartment.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='c') for i in "ABCD"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='e') for i in "EFG"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='p') for i in "HI"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='v') for i in "JK"])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def compartment_size_uncommon_keys(base):
+    """
+    Provide a model with different amounts metabolites for each compartment.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='ml') for i in "ABCD"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='om') for i in "EFG"])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def edge_case(base):
+    """
+    Provide an edge case where compartment detection fails.
+    """
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='ml') for i in "ABC"])
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='om') for i in "DEF"])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_buzzwords(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    rxn1 = cobra.Reaction("BOF", name='Biomass')
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1})
+    base.add_reactions([rxn1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_sbo(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    rxn1 = cobra.Reaction("R0001")
+    rxn1.annotation = {'SBO': 'SBO:0000629'}
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1})
+    base.add_reactions([rxn1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_metabolite(base):
+    """Provide a model with a reaction that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    e = cobra.Metabolite("Biomass_c", compartment="c")
+    rxn1 = cobra.Reaction("R0001")
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1, e: 1})
+    rxn2 = cobra.Reaction("EX_Biomass")
+    rxn2.add_metabolites({e: -1})
+    base.add_reactions([rxn1, rxn2])
     return base
 
 
@@ -159,8 +300,8 @@ def test_find_functional_units(gpr_str, expected):
 
 
 @pytest.mark.parametrize("model, met_pair, expected", [
-    ("converting_reactions", ("a", "b"), 2),
-    ("converting_reactions", ("c", "c"), 1)
+    ("converting_reactions", ("MNXM3", "MNXM7"), 2),
+    ("converting_reactions", ("MNXM51", "MNXM51"), 1)
 ], indirect=["model"])
 def test_find_converting_reactions(model, met_pair, expected):
     """Expect amount of converting reactions to be identified correctly."""
@@ -174,3 +315,104 @@ def test_open_boundaries(model, reaction_id, bounds):
     """Expect amount of transporters to be identified correctly."""
     helpers.open_boundaries(model)
     assert model.reactions.get_by_id(reaction_id).bounds == bounds
+
+
+@pytest.mark.parametrize("model, mnx_id, compartment_id, expected", [
+    ("find_met_id", "MNXM3", "c", "atp_c"),
+    ("find_met_id", "MNXM51", None, "15996"),
+    ("find_met_id", "MNXM220", None, "MNXM90125"),
+    ("find_met_id", "MNXM147", None, "C00152"),
+    ("find_met_id", "MNXM29", None, "GLY"),
+    ("find_met_id", "MNXM161", None, "MNXM161"),
+    ("find_met_id", "MNXM12", None, "cpd00010"),
+    ("no_compartments", "MNXM161", None, "MNXM161"),
+], indirect=["model"])
+def test_find_met_in_model_accurate_results(
+    model, mnx_id, compartment_id, expected
+):
+    """Expect the metabolite represented by mnxid to be found correctly."""
+    met = helpers.find_met_in_model(
+        model, mnx_id, compartment_id=compartment_id
+    )
+    assert met[0].id == expected
+
+
+@pytest.mark.parametrize("model, mnx_id, compartment_id", [
+    pytest.param("find_met_incorrect_xref", "MNXM1", "c",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM13", None,
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM13", "c",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM8", "c",
+                 marks=pytest.mark.raises(exception=RuntimeError))
+], indirect=["model"])
+def test_find_met_in_model_exceptions(model, mnx_id, compartment_id):
+    """Expect the function to raise the correct exceptions."""
+    helpers.find_met_in_model(model, mnx_id, compartment_id=compartment_id)
+
+
+@pytest.mark.parametrize("model, compartment_id, expected", [
+    ("compartments1", "c", "default"),
+    ("compartment_size", "c", "c"),
+    ("compartment_size_uncommon_keys", "c", "ml")
+], indirect=["model"])
+def test_find_compartment_id_in_model(model, compartment_id, expected):
+    """Expect the compartment ID of the model to be found correctly."""
+    comp_id = helpers.find_compartment_id_in_model(model, compartment_id)
+    assert comp_id == expected
+
+
+@pytest.mark.parametrize("model, compartment_id", [
+    pytest.param("no_compartments", "c",
+                 marks=pytest.mark.raises(exception=KeyError)),
+    pytest.param("compartments1", "xx",
+                 marks=pytest.mark.raises(exception=KeyError))
+], indirect=["model"])
+def test_find_compartment_id_in_model_exceptions(model, compartment_id):
+    """Expect the compartment ID of the model to be found correctly."""
+    helpers.find_compartment_id_in_model(model, compartment_id)
+
+
+@pytest.mark.parametrize("model", [
+    pytest.param("edge_case",
+                 marks=pytest.mark.raises(exception=RuntimeError))
+], indirect=["model"])
+def test_largest_compartment_id_equal_sizes(model):
+    """Expect the compartment ID of the model to be found correctly."""
+    helpers.largest_compartment_id_met(model)
+
+
+@pytest.mark.parametrize("model, compartment_id, count", [
+    ("compartment_size", "c", 4),
+    ("compartment_size", "h", 0)
+], indirect=["model"])
+def test_find_metabolites_per_compartment(model, compartment_id, count):
+    """
+    Expect the amount of metabolites per compartment to be counted correctly.
+    """
+    assert len(
+        helpers.metabolites_per_compartment(model, compartment_id)
+    ) == count
+
+
+@pytest.mark.parametrize("model, expected", [
+    ("compartment_size", "c")
+], indirect=["model"])
+def test_largest_compartment_id_met(model, expected):
+    """
+    Expect the ID of the compartment with most metabolites to be identified.
+    """
+    assert helpers.largest_compartment_id_met(model) == expected
+
+
+@pytest.mark.parametrize("model, expected", [
+    ("biomass_buzzwords", 1),
+    ("biomass_sbo", 1),
+    ("biomass_metabolite", 1),
+], indirect=["model"])
+def test_find_biomass_reaction(model, expected):
+    """
+    Expect the biomass reaction to be identified correctly.
+    """
+    assert len(helpers.find_biomass_reaction(model)) == expected

@@ -72,11 +72,13 @@ def find_unconstrained_reactions(model):
 
 def find_ngam(model):
     u"""
-    Return a the non growth-associated maintenance reaction.
+    Return all potential non growth-associated maintenance reactions.
 
     From the list of all reactions that convert ATP to ADP select the reactions
-    that match a defined reaction string and whose lower bound is constrained
-    to be larger than zero.
+    that match a defined reaction string and whose metabolites are situated
+    within the main model compartment. The main model compartment is the
+    cytosol, and if that cannot be identified, the compartment with the most
+    metabolites.
 
     Parameters
     ----------
@@ -104,11 +106,38 @@ def find_ngam(model):
           http://doi.org/10.1038/nprot.2009.203
 
     """
-    atp_adp_conv_rxns = helpers.find_converting_reactions(model, ("atp", "adp"))
-    return [rxn for rxn in atp_adp_conv_rxns
-            if rxn.build_reaction_string() == 'atp_c + h2o_c --> '
-                                              'adp_c + h_c + pi_c' and not
-            rxn.lower_bound <= 0]
+    atp_adp_conv_rxns = helpers.find_converting_reactions(
+        model, ("MNXM3", "MNXM7")
+    )
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+
+    reactants = {
+        helpers.find_met_in_model(model, "MNXM3", id_of_main_compartment)[0],
+        helpers.find_met_in_model(model, "MNXM2", id_of_main_compartment)[0]
+    }
+
+    products = {
+        helpers.find_met_in_model(model, "MNXM7", id_of_main_compartment)[0],
+        helpers.find_met_in_model(model, "MNXM1", id_of_main_compartment)[0],
+        helpers.find_met_in_model(model, "MNXM9", id_of_main_compartment)[0]
+    }
+
+    candidates = [rxn for rxn in atp_adp_conv_rxns
+                  if rxn.reversibility is False and
+                  set(rxn.reactants) == reactants and
+                  set(rxn.products) == products]
+
+    buzzwords = ['maintenance', 'atpm', 'requirement',
+                 'ngam', 'non-growth', 'associated']
+
+    refined_candidates = [rxn for rxn in candidates if any(
+        string in rxn.name.lower() for string in buzzwords
+    )]
+
+    if refined_candidates:
+        return refined_candidates
+    else:
+        return candidates
 
 
 def calculate_metabolic_coverage(model):
