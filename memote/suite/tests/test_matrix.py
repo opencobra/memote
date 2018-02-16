@@ -45,8 +45,7 @@ def test_absolute_extreme_coefficient_ratio(model):
     ann["message"] = wrapper.fill(
         """The ratio of the absolute highest coefficient {} and the lowest,
         non-zero coefficient {} is: {}""".format(
-            ann["data"][0], ann["data"][1], ann['metric']
-        ))
+            ann["data"][0], ann["data"][1], ann['metric']))
     assert ann["metric"] < 1e9, ann["message"]
 
 
@@ -67,8 +66,7 @@ def test_number_independent_conservation_relations(model):
     ann["data"] = matrix.number_independent_conservation_relations(model)
     ann["message"] = wrapper.fill(
         """The number of independent conservation relations is {}""".format(
-            ann["data"]
-        ))
+            ann["data"]))
 
 
 @annotate(title="Number of steady-state flux solution vectors", type="number")
@@ -86,8 +84,7 @@ def test_number_steady_state_flux_solutions(model):
     ann["data"] = matrix.number_steady_state_flux_solutions(model)
     ann["message"] = wrapper.fill(
         """The number of independent steady-state flux solution vectors is {}
-        """.format(ann["data"]
-                   ))
+        """.format(ann["data"]))
 
 
 @annotate(title="Rank of S-Matrix", type="number")
@@ -103,8 +100,7 @@ def test_matrix_rank(model):
     ann = test_matrix_rank.annotation
     ann["data"] = matrix.matrix_rank(model)
     ann["message"] = wrapper.fill(
-        """The rank of the S-Matrix is {}""".format(ann["data"]
-                                                    ))
+        """The rank of the S-Matrix is {}""".format(ann["data"]))
 
 
 @annotate(title="Degrees of freedom of S-Matrix", type="number")
@@ -121,5 +117,4 @@ def test_degrees_of_freedom(model):
     ann = test_degrees_of_freedom.annotation
     ann["data"] = matrix.degrees_of_freedom(model)
     ann["message"] = wrapper.fill(
-        """The degrees of freedom of the S-Matrix is {}""".format(ann["data"]
-                                                                  ))
+        """The degrees of freedom of the S-Matrix is {}""".format(ann["data"]))
