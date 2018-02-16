@@ -285,13 +285,13 @@ texinfo_documents = [
 # -- sphinx-apidoc calling ---------------------------------------------
 
 
-def run_apidoc(_):
-    from sphinx.apidoc import main
+# def run_apidoc(_):
+#     from sphinx.apidoc import main
 
-    mod_path = join(PROJECT_ROOT, 'memote')
-    auto_path = join(dirname(__file__), '_autogen')
-    main([None, '-f', '-d', '2', '-e', '-o', auto_path, mod_path])
+    # mod_path = join(PROJECT_ROOT, 'memote')
+    # auto_path = join(dirname(__file__), '_autogen')
+    # main([None, '-f', '-d', '2', '-e', '-o', auto_path, mod_path])
 
 
-def setup(app):
-    app.connect('builder-inited', run_apidoc)
+# def setup(app):
+#     app.connect('builder-inited', run_apidoc)
