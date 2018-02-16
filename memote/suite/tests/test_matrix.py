@@ -24,8 +24,7 @@ from memote.utils import annotate, wrapper
 
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
-          type="percent"
-          )
+          type="percent")
 def test_absolute_extreme_coefficient_ratio(model):
     """
     Show ratio of the absolute largest and smallest non-zero coefficients.
@@ -50,8 +49,7 @@ def test_absolute_extreme_coefficient_ratio(model):
 
 
 @annotate(title="Number of independent conservation relations in model",
-          type="number"
-          )
+          type="number")
 def test_number_independent_conservation_relations(model):
     """
     Show number of independent conservation relations in the model.
