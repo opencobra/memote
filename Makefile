@@ -46,13 +46,13 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 lint: ## check style with flake8
-	flake8 memote tests
+	flake8 memote
 
 test: ## run tests quickly with the default Python
-	pytest tests/
+	pytest -v
 
 test-all: ## run tests on every Python version with tox
-	tox
+	detox
 
 coverage: ## check code coverage quickly with the default Python
 		coverage run --source memote `which py.test`
