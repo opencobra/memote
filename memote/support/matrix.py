@@ -74,15 +74,15 @@ def degrees_of_freedom(model):
     ------
     This specifically refers to the dimensionality of the right nullspace
     of the S matrix, as dim(Null(S)) corresponds directly to the number of
-    free variables in the system [1]. The forumla used calculates this using 
+    free variables in the system [1]. The forumla used calculates this using
     the rank-nullity theorem [2].
 
     References:
     -----------
-    .. [1] Fukuda, K. & Terlaky, T. Criss-cross methods: A fresh view on 
+    .. [1] Fukuda, K. & Terlaky, T. Criss-cross methods: A fresh view on
            pivot algorithms. Mathematical Programming 79, 369-395 (1997).
 
-    .. [2] Alama, J. The Rank+Nullity Theorem. Formalized Mathematics 15, 
+    .. [2] Alama, J. The Rank+Nullity Theorem. Formalized Mathematics 15,
            (2007).
 
     """
