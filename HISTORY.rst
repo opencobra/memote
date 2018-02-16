@@ -77,6 +77,8 @@ Next Release
   identifying `atp` and `h2o` metabolites in cobra model reactions
 * Fix improperly labeled sbo terms for biomass production in `biomass.py`
   and `test_for_helpers.py`
+* Add matrix conditioning functions in ``matrix.py`` which are used for 
+  model stoichiometric matrix testing in ``test_matrix.py``
 
 
 0.5.0 (2018-01-16)
