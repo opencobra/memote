@@ -32,10 +32,10 @@ def absolute_extreme_coefficient_ratio(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    abs_matrix, _, _ = abs(s_matrix)
+    abs_matrix = np.absolute(s_matrix)
 
-    absolute_max_coef = abs_matrix.max()
-    absolute_non_zero_min_coef = np.min(abs_matrix[np.nonzero(abs_matrix)])
+    absolute_max_coef = np.amax(abs_matrix)
+    absolute_non_zero_min_coef = abs_matrix[abs_matrix > 0].min()
 
     return (absolute_max_coef, absolute_non_zero_min_coef)
 
