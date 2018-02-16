@@ -70,21 +70,20 @@ def degrees_of_freedom(model):
     """
     Return the degrees of freedom, i.e. number of "free variables".
 
+    Notes:
+    ------
     This specifically refers to the dimensionality of the right nullspace
     of the S matrix, as dim(Null(S)) corresponds directly to the number of
-    free variables in the system. The forumla used calculates this using the
-    rank-nullity theorem. For more information, see the links below.
+    free variables in the system [1]. The forumla used calculates this using 
+    the rank-nullity theorem [2].
 
-    See Also:
-    ---------
-    doi:
-    10.1007/BF02614325
+    References:
+    -----------
+    .. [1] Fukuda, K. & Terlaky, T. Criss-cross methods: A fresh view on 
+       pivot algorithms. Mathematical Programming 79, 369-395 (1997).
 
-    linear algebra review slides:
-    https://see.stanford.edu/materials/lsoeldsee263/03-lin-alg.pdf
-
-    wikipedia link for quick reference:
-    https://en.wikipedia.org/wiki/Rank%E2%80%93nullity_theorem
+    .. [2] Alama, J. The Rank+Nullity Theorem. Formalized Mathematics 15, 
+       (2007).
 
     """
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
