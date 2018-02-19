@@ -100,7 +100,7 @@ def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
     Estimate the rank, i.e. the dimension of the column space, of a matrix.
 
     The algorithm used by this function is based on the singular value
-    decomposition of `A`.
+    decomposition of `stoichiometry_matrix`.
 
     Parameters
     ----------
@@ -140,10 +140,10 @@ def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
 
 def nullspace(stoichiometry_matrix, atol=1e-13, rtol=0):
     """
-    Compute an approximate basis for the nullspace of A.
+    Compute an approximate basis for the nullspace of a matrix.
 
     The algorithm used by this function is based on the singular value
-    decomposition of `A`.
+    decomposition of `stoichiometry_matrix`.
 
     Parameters
     ----------
