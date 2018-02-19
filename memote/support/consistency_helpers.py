@@ -95,7 +95,7 @@ def stoichiometry_matrix(metabolites, reactions):
     return matrix, met_index, rxn_index
 
 
-def rank(A, atol=1e-13, rtol=0):
+def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
     """
     Estimate the rank, i.e. the dimension of the column space, of a matrix.
 
@@ -104,9 +104,9 @@ def rank(A, atol=1e-13, rtol=0):
 
     Parameters
     ----------
-    A : ndarray
-        A should be at most 2-D.  A 1-D array with length n will be treated
-        as a 2-D with shape (1, n)
+    stoichiometry_matrix : ndarray
+        stoichiometry_matrix should be at most 2-D.  A 1-D array with length n
+        will be treated as a 2-D with shape (1, n)
     atol : float
         The absolute tolerance for a zero singular value.  Singular values
         smaller than `atol` are considered to be zero.
