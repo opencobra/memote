@@ -138,7 +138,7 @@ def rank(A, atol=1e-13, rtol=0):
     return rank
 
 
-def nullspace_basis(A, atol=1e-13, rtol=0):
+def nullspace(A, atol=1e-13, rtol=0):
     """
     Compute an approximate basis for the nullspace of A.
 
