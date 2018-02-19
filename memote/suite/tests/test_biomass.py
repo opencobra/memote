@@ -277,7 +277,7 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
         m.id for m in biomass.find_direct_metabolites(model, reaction)]
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
         len(biomass.find_biomass_precursors(model, reaction))
-    msg = wrapper.fill(
+    ann["message"][reaction_id] = wrapper.fill(
         """{} contains a total of {} direct metabolites ({:.2%}). Specifically
         these are: {}.""".format(reaction_id,
                                  len(ann["data"][reaction_id]),
@@ -285,7 +285,6 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
                                  ann["data"][reaction_id]
                                  )
     )
-    ann["message"][reaction_id] = msg
     assert ann["metric"][reaction_id] < 0.5, ann["message"][reaction_id]
 
 
@@ -323,7 +322,7 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
         )]
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
         len(biomass.find_biomass_precursors(model, reaction))
-    msg = wrapper.fill(
+    ann["message"][reaction_id] = wrapper.fill(
         """{} lacks a total of {} essential metabolites
         ({:.2%} of all biomass precursors). Specifically
         these are: {}.""".format(reaction_id,
@@ -332,5 +331,4 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
                                  ann["data"][reaction_id]
                                  )
     )
-    ann["message"][reaction_id] = msg
     assert len(ann["data"][reaction_id]) == 0, ann["message"][reaction_id]
