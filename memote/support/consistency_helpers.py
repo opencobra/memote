@@ -96,7 +96,8 @@ def stoichiometry_matrix(metabolites, reactions):
 
 
 def rank(A, atol=1e-13, rtol=0):
-    """Estimate the rank (i.e. the dimension of the column space) of a matrix.
+    """
+    Estimate the rank, i.e. the dimension of the column space, of a matrix.
 
     The algorithm used by this function is based on the singular value
     decomposition of `A`.
@@ -130,7 +131,6 @@ def rank(A, atol=1e-13, rtol=0):
         provide the option of the absolute tolerance.
 
     """
-
     A = np.atleast_2d(A)
     s = svd(A, compute_uv=False)
     tol = max(atol, rtol * s[0])
@@ -155,7 +155,8 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
 
 
 def nullspace_basis(A, atol=1e-13, rtol=0):
-    """Compute an approximate basis for the nullspace of A.
+    """
+    Compute an approximate basis for the nullspace of A.
 
     The algorithm used by this function is based on the singular value
     decomposition of `A`.
@@ -190,8 +191,8 @@ def nullspace_basis(A, atol=1e-13, rtol=0):
     -----
     Adapted from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-    """
 
+    """
     A = np.atleast_2d(A)
     u, s, vh = svd(A)
     tol = max(atol, rtol * s[0])
