@@ -166,7 +166,7 @@ def nullspace(stoichiometry_matrix, atol=1e-13, rtol=0):
     -------
     ns : ndarray
         If `stoichiometry_matrix` is an array with shape (m, k), then `ns` will
-        be an array with shape (k, n), where n is the estimated dimension of 
+        be an array with shape (k, n), where n is the estimated dimension of
         the nullspace of `A`.  The columns of `ns` are a basis for the
         nullspace; each element in numpy.dot(A, ns) will be approximately
         zero.
