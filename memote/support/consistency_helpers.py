@@ -138,22 +138,6 @@ def rank(A, atol=1e-13, rtol=0):
     return rank
 
 
-def nullspace(matrix, atol=1e-13, rtol=0.0):
-    """
-    Compute the nullspace of a 2D `numpy.array`.
-
-    Notes
-    -----
-    Adapted from:
-    https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-
-    """
-    matrix = np.atleast_2d(matrix)
-    _, s, vh = svd(matrix)
-    tol = max(atol, rtol * s[0])
-    return np.compress(s < tol, vh, axis=0).T
-
-
 def nullspace_basis(A, atol=1e-13, rtol=0):
     """
     Compute an approximate basis for the nullspace of A.
