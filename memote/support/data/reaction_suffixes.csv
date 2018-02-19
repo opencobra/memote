@@ -1,0 +1,9 @@
+# As defined on p. 11, S1, Thiele and Palsson (2010) Nature Protocols
+"type","suffix"
+"ABC transporter","abc"
+"transport","t"
+"reversible","r"
+"irreversible","i"
+"dehydrogenase","DH"
+"synthetase","S"
+"kinase","K"
