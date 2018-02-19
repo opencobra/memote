@@ -131,14 +131,14 @@ def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
         provide the option of the absolute tolerance.
 
     """
-    A = np.atleast_2d(A)
-    s = svd(A, compute_uv=False)
+    stoichiometry_matrix = np.atleast_2d(stoichiometry_matrix)
+    s = svd(stoichiometry_matrix, compute_uv=False)
     tol = max(atol, rtol * s[0])
     rank = int((s >= tol).sum())
     return rank
 
 
-def nullspace(A, atol=1e-13, rtol=0):
+def nullspace(stoichiometry_matrix, atol=1e-13, rtol=0):
     """
     Compute an approximate basis for the nullspace of A.
 
@@ -147,9 +147,9 @@ def nullspace(A, atol=1e-13, rtol=0):
 
     Parameters
     ----------
-    A : ndarray
-        A should be at most 2-D.  A 1-D array with length k will be treated
-        as a 2-D with shape (1, k)
+    stoichiometry_matrix : ndarray
+        stoichiometry_matrix should be at most 2-D.  A 1-D array with length k
+        will be treated as a 2-D with shape (1, k)
     atol : float
         The absolute tolerance for a zero singular value.  Singular values
         smaller than `atol` are considered to be zero.
@@ -165,9 +165,9 @@ def nullspace(A, atol=1e-13, rtol=0):
     Returns
     -------
     ns : ndarray
-        If `A` is an array with shape (m, k), then `ns` will be an array
-        with shape (k, n), where n is the estimated dimension of the
-        nullspace of `A`.  The columns of `ns` are a basis for the
+        If `stoichiometry_matrix` is an array with shape (m, k), then `ns` will
+        be an array with shape (k, n), where n is the estimated dimension of 
+        the nullspace of `A`.  The columns of `ns` are a basis for the
         nullspace; each element in numpy.dot(A, ns) will be approximately
         zero.
 
@@ -177,8 +177,8 @@ def nullspace(A, atol=1e-13, rtol=0):
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
 
     """
-    A = np.atleast_2d(A)
-    u, s, vh = svd(A)
+    stoichiometry_matrix = np.atleast_2d(stoichiometry_matrix)
+    u, s, vh = svd(stoichiometry_matrix)
     tol = max(atol, rtol * s[0])
     nnz = (s >= tol).sum()
     ns = vh[nnz:].conj().T
