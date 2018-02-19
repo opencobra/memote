@@ -45,7 +45,7 @@ def number_independent_conservation_relations(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    ln_matrix = con_helpers.nullspace_basis(s_matrix.T)
+    ln_matrix = con_helpers.nullspace(s_matrix.T)
     return ln_matrix.shape[1]
 
 
@@ -54,7 +54,7 @@ def number_steady_state_flux_solutions(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    n_matrix = con_helpers.nullspace_basis(s_matrix)
+    n_matrix = con_helpers.nullspace(s_matrix)
     return n_matrix.shape[1]
 
 
