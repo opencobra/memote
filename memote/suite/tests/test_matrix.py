@@ -25,7 +25,7 @@ from memote.utils import annotate, wrapper
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
           type="percent")
-def test_absolute_extreme_coefficient_ratio(model):
+def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     """
     Show ratio of the absolute largest and smallest non-zero coefficients.
 
@@ -39,13 +39,15 @@ def test_absolute_extreme_coefficient_ratio(model):
     data on solver performance becomes available.
     """
     ann = test_absolute_extreme_coefficient_ratio.annotation
-    ann["data"] = matrix.absolute_extreme_coefficient_ratio(model)
-    ann["metric"] = ann["data"][0] / ann["data"][1]
+    high, low = matrix.absolute_extreme_coefficient_ratio(model)
+    ann["data"] = high / low
+    # Inverse the Boolean: 0.0 = good; 1.0 = bad.
+    ann["metric"] = 1.0 - float(ann["data"] < threshold)
     ann["message"] = wrapper.fill(
-        """The ratio of the absolute highest coefficient {} and the lowest,
-        non-zero coefficient {} is: {}.""".format(
-            ann["data"][0], ann["data"][1], ann['metric']))
-    assert ann["metric"] < 1e9, ann["message"]
+        """The ratio of the absolute values of the largest coefficient {} and 
+        the lowest, non-zero coefficient {} is: {:.3G}.""".format(
+            high, low, ann["data"]))
+    assert ann["data"] < threshold, ann["message"]
 
 
 @annotate(title="Number of independent conservation relations in model",
