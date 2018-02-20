@@ -141,10 +141,12 @@ def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
 def nullspace(matrix, atol=1e-13, rtol=0.0):
     """
     Compute the nullspace of a 2D `numpy.array`.
+
     Notes
     -----
     Adapted from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
+
     """
     matrix = np.atleast_2d(matrix)
     _, sigma, vh = svd(matrix)
