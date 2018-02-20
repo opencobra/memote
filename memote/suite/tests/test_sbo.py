@@ -46,7 +46,7 @@ def test_metabolite_sbo_presence(read_only_model):
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
 @annotate(title="Reactions without SBO-Term Annotation", type="count")
@@ -67,7 +67,7 @@ def test_reaction_sbo_presence(read_only_model):
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.reactions), ann["message"]
 
 
 @annotate(title="Genes without SBO-Term Annotation", type="count")
@@ -88,7 +88,7 @@ def test_gene_sbo_presence(read_only_model):
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
 @annotate(title="Metabolic Reactions without SBO:0000176", type="count")
