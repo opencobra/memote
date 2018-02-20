@@ -17,7 +17,7 @@
 
 """Helper functions for stoichiometric consistency checks."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import logging
 from collections import defaultdict
@@ -95,6 +95,49 @@ def stoichiometry_matrix(metabolites, reactions):
     return matrix, met_index, rxn_index
 
 
+def rank(stoichiometry_matrix, atol=1e-13, rtol=0):
+    """
+    Estimate the rank, i.e. the dimension of the column space, of a matrix.
+
+    The algorithm used by this function is based on the singular value
+    decomposition of `stoichiometry_matrix`.
+
+    Parameters
+    ----------
+    stoichiometry_matrix : ndarray
+        stoichiometry_matrix should be at most 2-D.  A 1-D array with length n
+        will be treated as a 2-D with shape (1, n)
+    atol : float
+        The absolute tolerance for a zero singular value.  Singular values
+        smaller than `atol` are considered to be zero.
+    rtol : float
+        The relative tolerance.  Singular values less than rtol*smax are
+        considered to be zero, where smax is the largest singular value.
+
+    If both `atol` and `rtol` are positive, the combined tolerance is the
+    maximum of the two; that is::
+        tol = max(atol, rtol * smax)
+    Singular values smaller than `tol` are considered to be zero.
+
+    Returns
+    -------
+    rank : int
+        The estimated rank of the matrix.
+
+    See Also
+    --------
+    numpy.linalg.matrix_rank
+        matrix_rank is basically the same as this function, but it does not
+        provide the option of the absolute tolerance.
+
+    """
+    stoichiometry_matrix = np.atleast_2d(stoichiometry_matrix)
+    s = svd(stoichiometry_matrix, compute_uv=False)
+    tol = max(atol, rtol * s[0])
+    rank = int((s >= tol).sum())
+    return rank
+
+
 def nullspace(matrix, atol=1e-13, rtol=0.0):
     """
     Compute the nullspace of a 2D `numpy.array`.
@@ -106,9 +149,56 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
 
     """
     matrix = np.atleast_2d(matrix)
-    _, s, vh = svd(matrix)
+    _, sigma, vh = svd(matrix)
+    tol = max(atol, rtol * sigma[0])
+    return np.compress(sigma < tol, vh, axis=0).T
+
+
+def nullspace_basis(stoichiometry_matrix, atol=1e-13, rtol=0):
+    """
+    Compute an approximate basis for the nullspace of a matrix.
+
+    The algorithm used by this function is based on the singular value
+    decomposition of `stoichiometry_matrix`.
+
+    Parameters
+    ----------
+    stoichiometry_matrix : ndarray
+        stoichiometry_matrix should be at most 2-D.  A 1-D array with length k
+        will be treated as a 2-D with shape (1, k)
+    atol : float
+        The absolute tolerance for a zero singular value.  Singular values
+        smaller than `atol` are considered to be zero.
+    rtol : float
+        The relative tolerance.  Singular values less than rtol*smax are
+        considered to be zero, where smax is the largest singular value.
+
+    If both `atol` and `rtol` are positive, the combined tolerance is the
+    maximum of the two; that is::
+        tol = max(atol, rtol * smax)
+    Singular values smaller than `tol` are considered to be zero.
+
+    Returns
+    -------
+    ns : ndarray
+        If `stoichiometry_matrix` is an array with shape (m, k), then `ns` will
+        be an array with shape (k, n), where n is the estimated dimension of
+        the nullspace of `A`.  The columns of `ns` are a basis for the
+        nullspace; each element in numpy.dot(A, ns) will be approximately
+        zero.
+
+    Notes
+    -----
+    Adapted from:
+    https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
+
+    """
+    stoichiometry_matrix = np.atleast_2d(stoichiometry_matrix)
+    u, s, vh = svd(stoichiometry_matrix)
     tol = max(atol, rtol * s[0])
-    return np.compress(s < tol, vh, axis=0).T
+    nnz = (s >= tol).sum()
+    ns = vh[nnz:].conj().T
+    return ns
 
 
 def get_interface(model):

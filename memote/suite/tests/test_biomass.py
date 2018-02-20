@@ -134,7 +134,7 @@ def test_biomass_open_production(model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Blocked Biomass Precursors At Default State", type="count",
-          data=dict(), message=dict())
+          data=dict(), metric=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
     """
     Expect production of all biomass precursors in default medium.
@@ -168,7 +168,7 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Blocked Biomass Precursors In Complete Medium", type="count",
-          data=dict(), message=dict())
+          data=dict(), metric=dict(), message=dict())
 def test_biomass_precursors_open_production(model, reaction_id):
     """
     Expect precursor production in complete medium.
@@ -281,7 +281,7 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
         """{} contains a total of {} direct metabolites ({:.2%}). Specifically
         these are: {}.""".format(reaction_id,
                                  len(ann["data"][reaction_id]),
-                                 ann["metric"],
+                                 ann["metric"][reaction_id],
                                  ann["data"][reaction_id]
                                  )
     )
@@ -327,7 +327,7 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
         ({:.2%} of all biomass precursors). Specifically
         these are: {}.""".format(reaction_id,
                                  len(ann["data"][reaction_id]),
-                                 ann["metric"],
+                                 ann["metric"][reaction_id],
                                  ann["data"][reaction_id]
                                  )
     )

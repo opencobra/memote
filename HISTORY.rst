@@ -79,6 +79,8 @@ Next Release
   and `test_for_helpers.py`
 * Add matrix conditioning functions in ``matrix.py`` which are used for 
   model stoichiometric matrix testing in ``test_matrix.py``
+* Add missing rank and nullspace_basis functions in ``consistency_helpers.py``
+* Fix issue with improper string/dict formatting in ``test_biomass.py`` tests
 
 
 0.5.0 (2018-01-16)
