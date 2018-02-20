@@ -46,7 +46,7 @@ def test_metabolite_sbo_presence(read_only_model):
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
 @annotate(title="Reactions without SBO-Term Annotation", type="count")
@@ -61,13 +61,13 @@ def test_reaction_sbo_presence(read_only_model):
     ann = test_reaction_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "reactions"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {} reactions ({:.2%}) lack annotation with any type of
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.reactions), ann["message"]
 
 
 @annotate(title="Genes without SBO-Term Annotation", type="count")
@@ -82,13 +82,13 @@ def test_gene_sbo_presence(read_only_model):
     ann = test_gene_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "genes"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
     ann["message"] = wrapper.fill(
         """A total of {} genes ({:.2%}) lack annotation with any type of
         SBO term: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
 @annotate(title="Metabolic Reactions without SBO:0000176", type="count")
@@ -101,17 +101,17 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     metabolic reactions.
     """
     ann = test_metabolic_reaction_specific_sbo_presence.annotation
+    pure = basic.find_pure_metabolic_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        basic.find_pure_metabolic_reactions(read_only_model), "SBO:0000176"))
-    ann["metric"] = len(ann["data"]) / len(
-        basic.find_pure_metabolic_reactions(read_only_model))
+        pure, "SBO:0000176"))
+    ann["metric"] = len(ann["data"]) / len(pure)
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all purely metabolic
         reactions) lack annotation with the SBO term "SBO:0000176" for
         'biochemical reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(pure), ann["message"]
 
 
 @annotate(title="Transport Reactions without SBO:0000185", type="count")
@@ -124,17 +124,17 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     transport reactions.
     """
     ann = test_transport_reaction_specific_sbo_presence.annotation
+    transports = helpers.find_transport_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        helpers.find_transport_reactions(read_only_model), "SBO:0000185"))
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_transport_reactions(read_only_model))
+        transports, "SBO:0000185"))
+    ann["metric"] = len(ann["data"]) / len(transports)
     ann["message"] = wrapper.fill(
         """A total of {} metabolic reactions ({:.2%} of all transport
         reactions) lack annotation with the SBO term "SBO:0000185" for
         'biochemical reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(transports), ann["message"]
 
 
 @annotate(title="Metabolites without SBO:0000247", type="count")
@@ -154,7 +154,7 @@ def test_metabolite_specific_sbo_presence(read_only_model):
         'simple chemical': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
 @annotate(title="Genes without SBO:0000243", type="count")
@@ -174,7 +174,7 @@ def test_gene_specific_sbo_presence(read_only_model):
         'gene': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
 @annotate(title="Exchange reactions without SBO:0000627", type="count")
@@ -195,18 +195,18 @@ def test_exchange_specific_sbo_presence(read_only_model):
     metabolites are removed from or added to the extracellular
     environment only.
     """
-    ann = test_gene_specific_sbo_presence.annotation
+    ann = test_exchange_specific_sbo_presence.annotation
+    exchanges = helpers.find_exchange_rxns(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        helpers.find_exchange_rxns(read_only_model), "SBO:0000627"))
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_exchange_rxns(read_only_model))
+        exchanges, "SBO:0000627"))
+    ann["metric"] = len(ann["data"]) / len(exchanges)
     ann["message"] = wrapper.fill(
         """A total of {} exchange reactions ({:.2%} of all exchange reactions)
         lack annotation with the SBO term "SBO:0000627" for
         'exchange reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(exchanges), ann["message"]
 
 
 @annotate(title="Demand reactions without SBO:0000628", type="count")
@@ -227,17 +227,17 @@ def test_demand_specific_sbo_presence(read_only_model):
     reactions in that they are designated as irreversible.
     """
     ann = test_demand_specific_sbo_presence.annotation
+    demands = helpers.find_demand_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        helpers.find_demand_reactions(read_only_model), "SBO:0000628"))
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_demand_reactions(read_only_model))
+        demands, "SBO:0000628"))
+    ann["metric"] = len(ann["data"]) / len(demands)
     ann["message"] = wrapper.fill(
         """A total of {} genes ({:.2%} of all demand reactions) lack
         annotation with the SBO term "SBO:0000628" for
         'demand reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(demands), ann["message"]
 
 
 @annotate(title="Sink reactions without SBO:0000632", type="count")
@@ -261,11 +261,11 @@ def test_sink_specific_sbo_presence(read_only_model):
     organism's compartments.
     """
     ann = test_sink_specific_sbo_presence.annotation
-    sink_reactions = helpers.find_sink_reactions(read_only_model)
+    sinks = helpers.find_sink_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        sink_reactions, "SBO:0000632"))
+        sinks, "SBO:0000632"))
     try:
-        ann["metric"] = len(ann["data"]) / len(sink_reactions)
+        ann["metric"] = len(ann["data"]) / len(sinks)
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "No sink reactions found."
@@ -276,7 +276,7 @@ def test_sink_specific_sbo_presence(read_only_model):
         'sink reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(sinks), ann["message"]
 
 
 @annotate(title="Biomass reactions without SBO:0000629", type="count")
@@ -300,14 +300,14 @@ def test_biomass_specific_sbo_presence(read_only_model):
     this.
     """
     ann = test_biomass_specific_sbo_presence.annotation
+    biomass = helpers.find_biomass_reaction(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        helpers.find_biomass_reaction(read_only_model), "SBO:0000629"))
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_biomass_reaction(read_only_model))
+        biomass, "SBO:0000629"))
+    ann["metric"] = len(ann["data"]) / len(biomass)
     ann["message"] = wrapper.fill(
         """A total of {} biomass reactions ({:.2%} of all biomass reactions)
         lack annotation with the SBO term "SBO:0000629" for
         'biomass production': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == 0, ann["message"]
+    assert len(ann["data"]) == len(biomass), ann["message"]
