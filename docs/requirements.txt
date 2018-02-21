@@ -8,11 +8,9 @@ click-log
 plotly
 sympy
 colorama
-dask
 cobra
 future
 gitpython
-toolz
 click-configfile
 cloudpickle
 cookiecutter
