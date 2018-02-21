@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import
 
-import io
 import json
 import logging
 # from base64 import b64encode
@@ -40,8 +39,8 @@ class SnapshotReport(Report):
     def __init__(self, **kwargs):
         """Initialize the data."""
         super(SnapshotReport, self).__init__(**kwargs)
-        with io.open(
-            join(TEMPLATES_PATH, "snapshot.html"), encoding="utf-8"
+        with open(
+            join(TEMPLATES_PATH, "index.html"), encoding="utf-8"
         ) as file_path:
             self._template = Template(file_path.read())
 

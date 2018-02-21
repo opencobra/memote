@@ -27,8 +27,10 @@ import click
 import git
 import ruamel.yaml as yaml
 from importlib_resources import open_text
+from sqlalchemy.exc import ArgumentError
 
 import memote.suite.api as api
+import memote.suite.results as managers
 import memote.suite.reporting.templates as templates
 import memote.suite.cli.callbacks as callbacks
 from memote.suite.cli import CONTEXT_SETTINGS
@@ -79,9 +81,7 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
     if not any(a.startswith("--tb") for a in pytest_args):
-        pytest_args = ["--tb", "short"] + pytest_args
-    if not any(a.startswith("-v") for a in pytest_args):
-        pytest_args.append("-vv")
+        pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     with open_text(templates, "test_config.yml") as file_handle:
@@ -89,24 +89,24 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
         config = yaml.load(file_handle)
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
-        # TODO: This will need merge nested `dict`s in future.
+        # TODO: This will need to merge nested `dict`s in future.
         LOGGER.debug("Loading custom snapshot configuration '%s'.", custom)
         try:
             with open(custom) as file_handle:
                 config.update(yaml.load(file_handle))
         except IOError as err:
-            LOGGER.error("Failed to load the custom configuration. Skipping.")
+            LOGGER.error(
+                "Failed to load the custom configuration '%s'. Skipping.",
+                custom)
             LOGGER.debug(str(err))
     model.solver = solver
     _, results = api.test_model(model, results=True, pytest_args=pytest_args)
-    # TODO: Merge configs.
     api.snapshot_report(results, config, filename)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("directory", type=click.Path(exists=True, file_okay=False),
-                envvar="MEMOTE_DIRECTORY")
+@click.argument("location", envvar="MEMOTE_LOCATION")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
@@ -114,13 +114,15 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
               show_default=True,
               help="Use either commit hashes or time as the independent "
                    "variable for plots.")
-def history(directory, filename, index):
+def history(location, filename, index):
     """
     Generate a report over a model's git commit history.
 
     DIRECTORY: Expect JSON files corresponding to the branch's commit history
-    to be found here. Can also be supplied via the environment variable
+    to be found here. Or it can be an rfc1738 compatible database URL. Can
+    also be supplied via the environment variable
     MEMOTE_DIRECTORY or configured in 'setup.cfg' or 'memote.ini'.
+
     """
     try:
         repo = git.Repo()
@@ -129,7 +131,11 @@ def history(directory, filename, index):
             "The history report requires a git repository in order to check "
             "the current branch's commit history.")
         sys.exit(1)
-    api.history_report(repo, directory, filename, index)
+    try:
+        manager = managers.SQLResultManager(location)
+    except (AttributeError, ArgumentError):
+        manager = managers.RepoResultManager(location)
+    api.history_report(repo, manager, filename, index)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)

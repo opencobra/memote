@@ -77,13 +77,13 @@ def test_model(model, results=False, pytest_args=None,
         return code
 
 
-def snapshot_report(results, config=None, filename=None):
+def snapshot_report(result, config=None, filename=None):
     """
     Test a model and save a basic report.
 
     Parameters
     ----------
-    results : memote.MemoteResult
+    result : memote.MemoteResult
         Nested dictionary structure as returned from the test suite.
     config : dict, optional
         The final test report configuration.
@@ -95,13 +95,13 @@ def snapshot_report(results, config=None, filename=None):
         with open_text(templates, "test_config.yml") as file_handle:
             LOGGER.debug("Loading default snapshot configuration.")
             config = yaml.load(file_handle)
-    report = SnapshotReport(results=results, configuration=config)
+    report = SnapshotReport(result=result, configuration=config)
     LOGGER.info("Writing snapshot report to '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
 
 
-def history_report(repository, directory, filename, index="hash"):
+def history_report(repository, manager, filename, index="hash"):
     """
     Test a model and save a history report.
 
@@ -109,19 +109,17 @@ def history_report(repository, directory, filename, index="hash"):
     ----------
     repository : git.Repo, optional
         An instance of the working directory git repository.
-    directory : str or pathlib.Path
-        Use the JSON files in the directory that correspond to this git branch's
-        commit history to generate the report.
+    manager : memote.RepoResultManager
+        The manager grants access to previous results.
     filename : str or pathlib.Path
         A filename for the HTML report.
     index : {"hash", "time"}, optional
         The default horizontal axis type for all plots.
 
     """
-    raise NotImplementedError("Currently not functional.")
-    report = HistoryReport(repository, directory, index=index)
+    report = HistoryReport(repository, manager, index=index)
     LOGGER.info("Writing history report '%s'.", filename)
-    with open(filename, "w") as file_h:
+    with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
 
 

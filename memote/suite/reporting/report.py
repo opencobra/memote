@@ -30,17 +30,18 @@ LOGGER = logging.getLogger(__name__)
 class Report(object):
     """Determine the abstract report interface."""
 
-    def __init__(self, results, configuration):
+    def __init__(self, result, configuration, **kwargs):
         """
         Fuse a collective result with a report configuration.
 
         Parameters
         ----------
-        results : memote.MemoteResult
+        result : memote.MemoteResult
         configuration : memote.MemoteConfiguration
 
         """
-        self.result = results
+        super(Report, self).__init__(**kwargs)
+        self.result = result
         self.config = configuration
 
     def render_html(self):

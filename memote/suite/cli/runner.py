@@ -23,6 +23,7 @@ import io
 import os
 import sys
 import logging
+from functools import partial
 from os.path import join
 from multiprocessing import Process
 from getpass import getpass
@@ -35,6 +36,7 @@ import ruamel.yaml as yaml
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
+from sqlalchemy.exc import ArgumentError
 from travispy import TravisPy
 from travispy.errors import TravisError
 from travis.encrypt import encrypt_key, retrieve_public_key
@@ -44,7 +46,8 @@ import memote.suite.cli.callbacks as callbacks
 from memote import __version__
 from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
-from memote.suite.results import ResultManager, SQLResultManager
+from memote.suite.results import (
+    ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
 
 LOGGER = logging.getLogger()
 click_log.basic_config(LOGGER)
@@ -77,11 +80,11 @@ def cli():
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="result.json", show_default=True,
               help="Path for the collected results as JSON.")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False,
-                                             writable=True),
-              envvar="MEMOTE_DIRECTORY",
-              help="If invoked inside a git repository, write the test results"
-              " to this directory using the commit hash as the filename.")
+@click.option("--location", type=str, envvar="MEMOTE_LOCATION",
+              help="If invoked inside a git repository, try to interpret "
+              "the string as an rfc1738 compatible database URL which will be "
+              "used to store the test results. Otherwise write to this "
+              "directory using the commit hash as the filename.")
 @click.option("--ignore-git", is_flag=True, show_default=True,
               help="Avoid checking the git repository status.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
@@ -97,10 +100,6 @@ def cli():
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--connection", default=None, show_default=True, metavar="URL",
-              help="An rfc1738 compatible database URL which will be used "
-                   "instead of JSON flat file storage. Overrides the "
-                   "filename and directory options.")
 @click.option("--custom-tests", type=click.Path(exists=True, file_okay=False),
               multiple=True,
               help="A path to a directory containing custom test "
@@ -109,8 +108,8 @@ def cli():
                    "specified multiple times.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
-def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
-        skip, solver, connection, custom_tests):
+def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
+        skip, solver, custom_tests):
     """
     Run the test suite and collect results.
 
@@ -128,18 +127,21 @@ def run(model, collect, filename, directory, ignore_git, pytest_args, exclusive,
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     model.solver = solver
-    code, results = api.test_model(
-        model, filename, pytest_args=pytest_args, skip=skip,
+    if collect:
+        if repo is None:
+            manager = ResultManager()
+            store = partial(manager.store, filename=filename)
+        else:
+            try:
+                manager = SQLResultManager(location)
+            except (AttributeError, ArgumentError):
+                manager = RepoResultManager(location)
+            store = partial(manager.store, repo=repo)
+    code, result = api.test_model(
+        model=model, results=True, pytest_args=pytest_args, skip=skip,
         exclusive=exclusive)
     if collect:
-        if connection is None:
-            manager = ResultManager(directory)
-        else:
-            manager = SQLResultManager(connection)
-        if repo is None:
-            manager.store(results, filename=filename)
-        else:
-            manager.store(results, repo=repo)
+        store(result=result.store)
     sys.exit(code)
 
 
@@ -170,10 +172,13 @@ def new(directory, replay):
                  replay=replay)
 
 
-def _test_history(model, filename, pytest_args, skip):
+def _test_history(model, solver, manager, repo, commit, pytest_args, skip):
     model = callbacks.validate_model(None, "model", model)
+    model.solver = solver
     # TODO: This needs to be restructured to use an SQLite database.
-    api.test_model(model, filename, pytest_args=pytest_args, skip=skip)
+    _, result = api.test_model(
+        model, results=True, pytest_args=pytest_args, skip=skip)
+    manager.store(result.store, repo=repo, commit=commit)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -181,19 +186,20 @@ def _test_history(model, filename, pytest_args, skip):
 @click.option("--yes", "-y", is_flag=True, callback=callbacks.abort_if_false,
               expose_value=False, help="Confirm overwriting previous results.",
               prompt="Are you sure that you want to change history?")
-@click.option("--directory", type=click.Path(exists=True, file_okay=False,
-                                             writable=True),
-              envvar="MEMOTE_DIRECTORY",
+@click.option("--location", type=str, envvar="MEMOTE_LOCATION",
               help="Generated JSON files from the commit history will be "
                    "written to this directory.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
+@click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
+              default="glpk", show_default=True,
+              help="Set the solver to be used.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 @click.pass_context
-def history(context, model, directory, pytest_args, commits):
+def history(context, model, solver, location, pytest_args, commits):
     """
     Re-compute test results for the git branch history.
 
@@ -214,7 +220,6 @@ def history(context, model, directory, pytest_args, commits):
         pytest_args = ["--tb", "no"] + pytest_args
     try:
         repo = git.Repo()
-        branch = repo.active_branch
     # TODO: If no directory was given use system tempdir and create report in
     #  gh-pages.
     except git.InvalidGitRepositoryError:
@@ -222,24 +227,28 @@ def history(context, model, directory, pytest_args, commits):
             "The history requires a git repository in order to follow "
             "the current branch's commit history.")
         sys.exit(1)
+    try:
+        manager = SQLResultManager(location)
+    except (AttributeError, ArgumentError):
+        manager = RepoResultManager(location)
     if len(commits) > 0:
         # TODO: Convert hashes to `git.Commit` instances.
         raise NotImplementedError(u"Coming soon™.")
     else:
-        commits = list(branch.commit.iter_parents())
-        commits.insert(0, branch.commit)
+        history = HistoryManager(repo, manager)
+        history.build_branch_structure()
     skip = context.default_map.get("skip", [])
-    for commit in commits:
+    for commit in history.iter_commits():
         repo.git.checkout(commit)
+        # TODO: Skip this commit if model was not touched.
         LOGGER.info(
-            "Running the test suite for commit '{}'.".format(commit.hexsha))
-        filename = join(directory, "{}.json".format(commit.hexsha))
-        proc = Process(target=_test_history,
-                       args=(model, filename, pytest_args, skip))
+            "Running the test suite for commit '{}'.".format(commit))
+        proc = Process(
+            target=_test_history,
+            args=(model, solver, manager, repo, commit, pytest_args, skip))
         proc.start()
         proc.join()
-    repo.git.checkout(branch)
-    # repo.head.reset(index=True, working_tree=True)  # superfluous?
+    history.reset()
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)

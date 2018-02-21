@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provide the memote result managers for various storage backends."""
+"""Provide a memote result manager that is git aware and uses a SQL database."""
 
 from __future__ import absolute_import
 
@@ -23,52 +23,71 @@ import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 
-from memote.suite.results.result_manager import ResultManager
+from memote.suite.results.repo_result_manager import RepoResultManager
 from memote.suite.results.models import Result, Base
+
+__all__ = ("SQLResultManager",)
 
 LOGGER = logging.getLogger(__name__)
 
 Session = sessionmaker()
 
 
-class SQLResultManager(ResultManager):
+class SQLResultManager(RepoResultManager):
 
-    def __init__(self, connector, **kwargs):
+    def __init__(self, location, **kwargs):
         """
 
         Parameters
         ----------
-        connector : str
-            Database connection string.
+        location : str
+            A Database connection URL.
 
         """
-        super(ResultManager, self).__init__(**kwargs)
-        self.backend = create_engine(connector)
+        super(SQLResultManager, self).__init__(location=location, **kwargs)
+        self.backend = create_engine(self.backend)
         # Create the database and tables if it doesn't exist.
         Base.metadata.create_all(self.backend, checkfirst=True)
         self.session = Session(bind=self.backend)
 
-    def store(self, result, repo=None, commit=None, filename=None):
+    def store(self, result, repo, commit=None, **kwargs):
         """
-        Safe a result to the chosen backend attaching git information.
+        Store a result in a SQL database attaching git meta information.
 
         Parameters
         ----------
-        result : memote.MemoteResult
+        result : dict
+            The dictionary structure of a memote.MemoteResult.
         repo : git.Repo, optional
         commit : str, optional
             Unique hexsha of the desired commit.
-        filename : str, optional
-            Filename argument is ignored for SQL backend.
+        kwargs :
+            Ignored. Only exist to normalize function signature.
 
         """
-        result = Result(results=result.store)
-        if repo is not None:
-            git_info = self.record_git_info(repo, commit)
-            result.hexsha = git_info.hexsha,
-            result.author = git_info.author
-            result.email = git_info.email
-            result.authored_on = git_info.authored_on
+        git_info = self.record_git_info(repo, commit)
+        try:
+            result = self.session.query(Result.results). \
+                filter_by(hexsha=git_info.hexsha). \
+                one()
+            LOGGER.info("Updating result '%s'.", git_info.hexsha)
+        except NoResultFound:
+            result = Result(results=result)
+            LOGGER.info("Storing result '%s'.", git_info.hexsha)
+        result.hexsha = git_info.hexsha
+        result.author = git_info.author
+        result.email = git_info.email
+        result.authored_on = git_info.authored_on
         self.session.add(result)
         self.session.commit()
+
+    def load(self, repo, commit=None):
+        """"""
+        git_info = self.record_git_info(repo, commit)
+        LOGGER.info("Loading result from '%s'.", git_info.hexsha)
+        result = self.session.query(Result.results).\
+            filter_by(hexsha=git_info.hexsha).\
+            one()
+        return result.results

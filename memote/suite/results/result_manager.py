@@ -21,91 +21,54 @@ from __future__ import absolute_import
 
 import json
 import logging
-from collections import namedtuple
-from os.path import join
+from builtins import open
 
 from future.utils import raise_with_traceback
 
 from memote.utils import log_json_incompatible_types
+from memote.suite.results.result import MemoteResult
+
+__all__ = ("ResultManager",)
 
 LOGGER = logging.getLogger(__name__)
 
 
-GitInfo = namedtuple("GitInfo", ["hexsha", "author", "email", "authored_on"])
-
-
 class ResultManager(object):
 
-    def __init__(self, connector, **kwargs):
-        """
-
-        Parameters
-        ----------
-        connector : str
-            The directory for storing JSON files.
-
-        """
+    def __init__(self, **kwargs):
+        """ """
         super(ResultManager, self).__init__(**kwargs)
-        self.backend = connector
 
-    @staticmethod
-    def record_git_info(repo, commit=None):
+    def store(self, result, filename, pretty=True):
         """
-        Record git meta information.
-
-        Returns
-        -------
-        GitInfo
-            Git commit meta information.
-        """
-        if commit is None:
-            try:
-                commit = repo.active_branch.commit
-            except TypeError:
-                LOGGER.error(
-                    "Detached HEAD mode, please provide the commit hash.")
-        else:
-            commit = repo.commit(commit)
-        return GitInfo(
-            hexsha=commit.hexsha,
-            author=commit.author.name,
-            email=commit.author.email,
-            authored_on=commit.authored_datetime.isoformat(" ")
-        )
-
-    def store(self, result, repo=None, commit=None, filename=None):
-        """
-        Safe a result to the chosen backend attaching git information.
+        Write a result to the given file.
 
         Parameters
         ----------
-        result : memote.MemoteResult
-        repo : git.Repo, optional
-        commit : str, optional
-            Unique hexsha of the desired commit.
-        filename : str, optional
-            Store results directly to the given filename ignoring an existing
-            git repository.
+        result : dict
+            The dictionary structure of a memote.MemoteResult.
+        filename : str or pathlib.Path
+            Store results directly to the given filename.
+        pretty : bool, optional
+            Whether (default) or not to write JSON in a more legible format.
 
         """
-        if filename is not None:
-            storage = result.store
+        if pretty:
+            kwargs = dict(sort_keys=True, indent=2, separators=(",", ": "))
         else:
-            git_info = self.record_git_info(repo, commit)
-            storage = dict()
-            storage["results"] = result.store
-            storage["hexsha"] = git_info.hexsha
-            storage["author"] = git_info.author
-            storage["email"] = git_info.email
-            storage["authored_on"] = git_info.authored_on
-            filename = join(self.backend, "{}.json".format(git_info.hexsha))
-        with open(filename, "w") as file_handle:
+            kwargs = dict(sort_keys=False, indent=None, separators=(",", ":"))
+        LOGGER.info("Storing result in '%s'.", filename)
+        with open(filename, "w", encoding="utf-8") as file_handle:
             try:
-                return json.dump(storage, file_handle, sort_keys=True,
-                                 indent=2, separators=(",", ": "))
+                return json.dump(result, file_handle, **kwargs)
             except TypeError as error:
-                log_json_incompatible_types(storage)
+                log_json_incompatible_types(result)
                 raise_with_traceback(error)
 
-    def load(self, repo, commit):
-        pass
+    def load(self, filename):
+        """"""
+        # TODO: validate the read-in JSON maybe?
+        LOGGER.info("Loading result from '%s'.", filename)
+        with open(filename, encoding="utf-8") as file_handle:
+            content = json.load(file_handle)
+        return content

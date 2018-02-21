@@ -19,9 +19,7 @@
 
 from __future__ import absolute_import
 
-import json
 import platform
-from builtins import open
 from datetime import datetime
 
 import pip
@@ -60,11 +58,3 @@ class MemoteResult(object):
             (dist.project_name, dist.version) for dist in
             pip.get_installed_distributions()
             if dist.project_name in dependencies)
-
-    @classmethod
-    def from_json(cls, filename):
-        """"""
-        # TODO: validate the read-in JSON maybe?
-        with open(filename) as file_handle:
-            content = json.load(file_handle)
-        return MemoteResult(results=content)
