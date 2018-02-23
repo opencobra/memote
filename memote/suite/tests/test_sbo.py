@@ -40,12 +40,16 @@ def test_metabolite_sbo_presence(read_only_model):
     ann = test_metabolite_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "metabolites"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
-    ann["message"] = wrapper.fill(
-        """A total of {} metabolites ({:.2%}) lack annotation with any type of
-        SBO term: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+        ann["message"] = wrapper.fill(
+            """A total of {} metabolites ({:.2%}) lack annotation with any type of
+            SBO term: {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no metabolites."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
@@ -61,12 +65,16 @@ def test_reaction_sbo_presence(read_only_model):
     ann = test_reaction_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "reactions"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
-    ann["message"] = wrapper.fill(
-        """A total of {} reactions ({:.2%}) lack annotation with any type of
-        SBO term: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+        ann["message"] = wrapper.fill(
+            """A total of {} reactions ({:.2%}) lack annotation with any type of
+            SBO term: {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no reactions."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(read_only_model.reactions), ann["message"]
 
 
@@ -82,12 +90,16 @@ def test_gene_sbo_presence(read_only_model):
     ann = test_gene_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
         read_only_model, "genes"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
-    ann["message"] = wrapper.fill(
-        """A total of {} genes ({:.2%}) lack annotation with any type of
-        SBO term: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
+        ann["message"] = wrapper.fill(
+            """A total of {} genes ({:.2%}) lack annotation with any type of
+            SBO term: {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no genes."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
@@ -104,13 +116,17 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     pure = basic.find_pure_metabolic_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         pure, "SBO:0000176"))
-    ann["metric"] = len(ann["data"]) / len(pure)
-    ann["message"] = wrapper.fill(
-        """A total of {} metabolic reactions ({:.2%} of all purely metabolic
-        reactions) lack annotation with the SBO term "SBO:0000176" for
-        'biochemical reaction': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(pure)
+        ann["message"] = wrapper.fill(
+            """A total of {} metabolic reactions ({:.2%} of all purely metabolic
+            reactions) lack annotation with the SBO term "SBO:0000176" for
+            'biochemical reaction': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no metabolic reactions."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(pure), ann["message"]
 
 
@@ -127,13 +143,17 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     transports = helpers.find_transport_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         transports, "SBO:0000185"))
-    ann["metric"] = len(ann["data"]) / len(transports)
-    ann["message"] = wrapper.fill(
-        """A total of {} metabolic reactions ({:.2%} of all transport
-        reactions) lack annotation with the SBO term "SBO:0000185" for
-        'biochemical reaction': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(transports)
+        ann["message"] = wrapper.fill(
+            """A total of {} metabolic reactions ({:.2%} of all transport
+            reactions) lack annotation with the SBO term "SBO:0000185" for
+            'biochemical reaction': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no transport reactions."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(transports), ann["message"]
 
 
@@ -147,13 +167,17 @@ def test_metabolite_specific_sbo_presence(read_only_model):
     ann = test_metabolite_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         read_only_model.metabolites, "SBO:0000247"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
-    ann["message"] = wrapper.fill(
-        """A total of {} transport reactions ({:.2%} of all metabolites) lack
-        annotation with the SBO term "SBO:0000247" for
-        'simple chemical': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+        ann["message"] = wrapper.fill(
+            """A total of {} transport reactions ({:.2%} of all metabolites) lack
+            annotation with the SBO term "SBO:0000247" for
+            'simple chemical': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no metabolites."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
@@ -167,13 +191,17 @@ def test_gene_specific_sbo_presence(read_only_model):
     ann = test_gene_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         read_only_model.genes, "SBO:0000243"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
-    ann["message"] = wrapper.fill(
-        """A total of {} genes ({:.2%} of all genes) lack
-        annotation with the SBO term "SBO:0000243" for
-        'gene': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
+        ann["message"] = wrapper.fill(
+            """A total of {} genes ({:.2%} of all genes) lack
+            annotation with the SBO term "SBO:0000243" for
+            'gene': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no genes."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
@@ -199,13 +227,17 @@ def test_exchange_specific_sbo_presence(read_only_model):
     exchanges = helpers.find_exchange_rxns(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         exchanges, "SBO:0000627"))
-    ann["metric"] = len(ann["data"]) / len(exchanges)
-    ann["message"] = wrapper.fill(
-        """A total of {} exchange reactions ({:.2%} of all exchange reactions)
-        lack annotation with the SBO term "SBO:0000627" for
-        'exchange reaction': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(exchanges)
+        ann["message"] = wrapper.fill(
+            """A total of {} exchange reactions ({:.2%} of all exchange reactions)
+            lack annotation with the SBO term "SBO:0000627" for
+            'exchange reaction': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no exchange reactions."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(exchanges), ann["message"]
 
 
@@ -230,13 +262,17 @@ def test_demand_specific_sbo_presence(read_only_model):
     demands = helpers.find_demand_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         demands, "SBO:0000628"))
-    ann["metric"] = len(ann["data"]) / len(demands)
-    ann["message"] = wrapper.fill(
-        """A total of {} genes ({:.2%} of all demand reactions) lack
-        annotation with the SBO term "SBO:0000628" for
-        'demand reaction': {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+    try:
+        ann["metric"] = len(ann["data"]) / len(demands)
+        ann["message"] = wrapper.fill(
+            """A total of {} genes ({:.2%} of all demand reactions) lack
+            annotation with the SBO term "SBO:0000628" for
+            'demand reaction': {}""".format(
+                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "The model has no demand reactions."
+        pytest.skip(ann["message"])
     assert len(ann["data"]) == len(demands), ann["message"]
 
 
@@ -303,7 +339,12 @@ def test_biomass_specific_sbo_presence(read_only_model):
     biomass = helpers.find_biomass_reaction(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
         biomass, "SBO:0000629"))
-    ann["metric"] = len(ann["data"]) / len(biomass)
+    try:
+        ann["metric"] = len(ann["data"]) / len(biomass)
+    except ZeroDivisionError:
+        ann["metric"] = 1.0
+        ann["message"] = "No biomass reactions found."
+        pytest.skip(ann["message"])
     ann["message"] = wrapper.fill(
         """A total of {} biomass reactions ({:.2%} of all biomass reactions)
         lack annotation with the SBO term "SBO:0000629" for

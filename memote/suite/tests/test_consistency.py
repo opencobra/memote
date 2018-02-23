@@ -62,7 +62,7 @@ def test_stoichiometric_consistency(read_only_model):
 @annotate(title="Erroneous Energy-generating Cycles", type="count",
           data=dict(), message=dict())
 def test_detect_energy_generating_cycles(read_only_model, met):
-    """
+    u"""
     Expect that no energy metabolite can be produced out of nothing.
 
     When a model is not sufficiently constrained to account for the

@@ -21,12 +21,12 @@ from __future__ import absolute_import
 
 import json
 import logging
-from os.path import join
-from builtins import open
 from string import Template
 
+from importlib_resources import read_text
+
+import memote.suite.templates as templates
 from memote.utils import log_json_incompatible_types
-from memote.suite.reporting import TEMPLATES_PATH
 from memote.suite.results import HistoryManager
 
 LOGGER = logging.getLogger(__name__)
@@ -60,10 +60,8 @@ class HistoryReport(object):
 
         """
         super(HistoryReport, self).__init__(**kwargs)
-        with open(
-            join(TEMPLATES_PATH, "index.html"), encoding="utf-8"
-        ) as file_path:
-            self._template = Template(file_path.read())
+        self._template = Template(
+            read_text(templates, "index.html", encoding="utf-8"))
         self._repo = repository
         self._manager = manager
         self._history = HistoryManager(self._repo, self._manager)

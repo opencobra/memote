@@ -29,12 +29,7 @@ There are three types of reports that we support:
 
 from __future__ import absolute_import
 
-from os.path import join, dirname
-
-TEMPLATES_PATH = join(dirname(__file__), "templates")
-
-from memote.suite.reporting.snapshot import SnapshotReport
-from memote.suite.reporting.history import HistoryReport
-from memote.suite.reporting.diff import DiffReport
-
-__all__ = ("SnapshotReport", "DiffReport", "HistoryReport", "TEMPLATES_PATH")
+from memote.suite.reporting.config import *
+from memote.suite.reporting.snapshot import *
+from memote.suite.reporting.history import *
+from memote.suite.reporting.diff import *

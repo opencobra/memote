@@ -26,14 +26,13 @@ from builtins import open
 import click
 import git
 import ruamel.yaml as yaml
-from importlib_resources import open_text
 from sqlalchemy.exc import ArgumentError
 
 import memote.suite.api as api
 import memote.suite.results as managers
-import memote.suite.reporting.templates as templates
 import memote.suite.cli.callbacks as callbacks
 from memote.suite.cli import CONTEXT_SETTINGS
+from memote.suite.reporting import ReportConfiguration
 
 LOGGER = logging.getLogger(__name__)
 
@@ -84,16 +83,14 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
-    with open_text(templates, "test_config.yml") as file_handle:
-        LOGGER.debug("Loading default snapshot configuration.")
-        config = yaml.load(file_handle)
+    config = ReportConfiguration.load_default()
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         # TODO: This will need to merge nested `dict`s in future.
         LOGGER.debug("Loading custom snapshot configuration '%s'.", custom)
         try:
             with open(custom) as file_handle:
-                config.update(yaml.load(file_handle))
+                config.merge(yaml.load(file_handle))
         except IOError as err:
             LOGGER.error(
                 "Failed to load the custom configuration '%s'. Skipping.",

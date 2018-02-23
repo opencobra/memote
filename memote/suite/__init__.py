@@ -25,4 +25,6 @@ from __future__ import absolute_import
 
 from os.path import join, dirname
 
+import memote.suite.templates
+
 TEST_DIRECTORY = join(dirname(__file__), "tests")

@@ -261,7 +261,7 @@ def bundle_biomass_components(model, reaction):
 
 
 def essential_precursors_not_in_biomass(model, reaction):
-    """
+    u"""
     Return a list of essential precursors missing from the biomass reaction.
 
     There are universal components of life that make up the biomass of all
@@ -285,8 +285,8 @@ def essential_precursors_not_in_biomass(model, reaction):
 
     Notes
     -----
-    "Answering the question of what to include in the core of a biomass o
-    bjective function is not always straightforward. One example is different
+    "Answering the question of what to include in the core of a biomass
+    objective function is not always straightforward. One example is different
     nucleotide forms, which, although inter-convertible, are essential for
     cellular chemistry. We propose here that all essential and irreplaceable
     molecules for metabolism should be included in the biomass functions of

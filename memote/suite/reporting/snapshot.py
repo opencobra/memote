@@ -22,12 +22,13 @@ from __future__ import absolute_import
 import json
 import logging
 # from base64 import b64encode
-from os.path import join
 from string import Template
 # from zlib import compress
 
+from importlib_resources import read_text
+
+import memote.suite.templates as templates
 from memote.utils import log_json_incompatible_types
-from memote.suite.reporting import TEMPLATES_PATH
 from memote.suite.reporting.report import Report
 
 LOGGER = logging.getLogger(__name__)
@@ -49,10 +50,8 @@ class SnapshotReport(Report):
     def __init__(self, **kwargs):
         """Initialize the snapshot report."""
         super(SnapshotReport, self).__init__(**kwargs)
-        with open(
-            join(TEMPLATES_PATH, "index.html"), encoding="utf-8"
-        ) as file_path:
-            self._template = Template(file_path.read())
+        self._template = Template(
+            read_text(templates, "index.html", encoding="utf-8"))
 
     def render_html(self):
         """Render the snapshot report."""
