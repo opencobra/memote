@@ -40,6 +40,7 @@ class ResultCollectionPlugin(object):
     (unless intended).
 
     """
+
     # Match pytest test case names to decide whether they were parametrized.
     # Seems brittle, can we do better?
     _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")

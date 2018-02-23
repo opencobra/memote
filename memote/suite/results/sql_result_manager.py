@@ -25,7 +25,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
-from memote.suite.results.result import MemoteResult
 from memote.suite.results.repo_result_manager import RepoResultManager
 from memote.suite.results.models import Result, Base
 
@@ -37,9 +36,11 @@ Session = sessionmaker()
 
 
 class SQLResultManager(RepoResultManager):
+    """Manage storage of results to a database."""
 
-    def __init__(self, location, **kwargs):
+    def __init__(self, **kwargs):
         """
+        Initialize the repository aware database storage manager.
 
         Parameters
         ----------
@@ -47,13 +48,13 @@ class SQLResultManager(RepoResultManager):
             A Database connection URL.
 
         """
-        super(SQLResultManager, self).__init__(location=location, **kwargs)
-        self.backend = create_engine(self.backend)
+        super(SQLResultManager, self).__init__(**kwargs)
+        self._backend = create_engine(self._backend)
         # Create the database and tables if it doesn't exist.
-        Base.metadata.create_all(self.backend, checkfirst=True)
-        self.session = Session(bind=self.backend)
+        Base.metadata.create_all(self._backend, checkfirst=True)
+        self.session = Session(bind=self._backend)
 
-    def store(self, result, repo, commit=None, **kwargs):
+    def store(self, result, commit=None, **kwargs):
         """
         Store a result in a JSON file attaching git meta information.
 
@@ -61,14 +62,13 @@ class SQLResultManager(RepoResultManager):
         ----------
         result : memote.MemoteResult
             The dictionary structure of results.
-        repo : git.Repo, optional
         commit : str, optional
             Unique hexsha of the desired commit.
         kwargs :
             Passed to parent function.
 
         """
-        git_info = self.record_git_info(repo, commit)
+        git_info = self.record_git_info(commit)
         try:
             row = self.session.query(Result). \
                 filter_by(hexsha=git_info.hexsha). \
@@ -85,9 +85,9 @@ class SQLResultManager(RepoResultManager):
         self.session.add(row)
         self.session.commit()
 
-    def load(self, repo, commit=None):
-        """"""
-        git_info = self.record_git_info(repo, commit)
+    def load(self, commit=None):
+        """Load a result from the database."""
+        git_info = self.record_git_info(commit)
         LOGGER.info("Loading result from '%s'.", git_info.hexsha)
         result = self.session.query(Result.memote_result).\
             filter_by(hexsha=git_info.hexsha).\

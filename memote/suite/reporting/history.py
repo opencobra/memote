@@ -22,25 +22,34 @@ from __future__ import absolute_import
 import json
 import logging
 from os.path import join
-from builtins import str, open
+from builtins import open
 from string import Template
 
 from memote.utils import log_json_incompatible_types
 from memote.suite.reporting import TEMPLATES_PATH
 from memote.suite.results import HistoryManager
-from memote.suite.results import MemoteResult
 
 LOGGER = logging.getLogger(__name__)
 
 
 class HistoryReport(object):
-    """Render a rich report using the git repository history."""
+    """
+    Render a rich report using the git repository history.
+
+    Attributes
+    ----------
+    result : memote.MemoteResult
+        The dictionary structure of results.
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, repository, manager, index="time", **kwargs):
+    def __init__(self, repository, manager, **kwargs):
         """
-        Initialize the git history.
+        Initialize the git history report.
 
         Parameters
         ----------
@@ -48,9 +57,6 @@ class HistoryReport(object):
             An instance of the working directory git repository.
         manager : memote.RepoResultManager
             The manager grants access to previous results.
-        index : {'time', 'hash'}, optional
-            Whether to use time (the default) or commit hashes as the default
-            axis in plots.
 
         """
         super(HistoryReport, self).__init__(**kwargs)
@@ -58,21 +64,16 @@ class HistoryReport(object):
             join(TEMPLATES_PATH, "index.html"), encoding="utf-8"
         ) as file_path:
             self._template = Template(file_path.read())
-        self.index_dim = index.lower()
-        if self.index_dim not in self._valid_indexes:
-            raise ValueError(
-                "Given index '{0}' must be one of {1}."
-                "".format(self.index_dim, str(self._valid_indexes)))
-        self.repo = repository
-        self.manager = manager
-        self.history = HistoryManager(self.repo, self.manager)
+        self._repo = repository
+        self._manager = manager
+        self._history = HistoryManager(self._repo, self._manager)
 
     def collect_history(self):
-        # Iter over past extending lists in results merged with configs.
+        """Build the structure of results in terms of a commit history."""
         base = dict()
-        for branch, commits in self.history.iter_branches():
+        for branch, commits in self._history.iter_branches():
             for commit in commits:
-                result = self.history.get_result(commit, MemoteResult())
+                result = self._history.get_result(commit, )
                 for test in result.cases:
                     base.setdefault(test, dict()).setdefault("history", dict())
                     if "title" not in base[test]:
@@ -96,14 +97,9 @@ class HistoryReport(object):
         return base
 
     def render_html(self):
-        """
-        Render a rich report for the repository.
-
-        This is currently a stub while we convert from ``jinja2`` templates
-        to a full Angular based report.
-        """
-        self.history.build_branch_structure()
-        self.history.load_history()
+        """Render a rich report for the repository."""
+        self._history.build_branch_structure()
+        self._history.load_history()
         structure = self.collect_history()
         try:
             return self._template.safe_substitute(

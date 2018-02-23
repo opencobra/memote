@@ -22,8 +22,10 @@ from __future__ import absolute_import
 import logging
 import json
 
-from six import itervalues, iteritems, iterkeys
+from six import iteritems, iterkeys
 from sqlalchemy.orm.exc import NoResultFound
+
+from memote.suite.results import MemoteResult
 
 __all__ = ("HistoryManager",)
 
@@ -31,9 +33,21 @@ LOGGER = logging.getLogger(__name__)
 
 
 class HistoryManager(object):
+    """
+    Manage access to results in the commit history of a git repository.
+
+    Attributes
+    ----------
+    manager : memote.RepoResultManager
+        The manager for accessing individual results.
+    current : str
+        The name of the currently active branch.
+
+    """
 
     def __init__(self, repository, manager, **kwargs):
         """
+        Initialize a manager to access results in the git history.
 
         Parameters
         ----------
@@ -42,23 +56,23 @@ class HistoryManager(object):
 
         """
         super(HistoryManager, self).__init__(**kwargs)
-        self.repo = repository
+        self._repo = repository
         self.manager = manager
-        self.current = self.repo.active_branch
-        self.history = None
-        self.results = None
+        self._latest = self._repo.active_branch
+        self._history = None
+        self._results = None
 
     def reset(self):
-        # Reset by checking out the last branch.
-        self.repo.git.checkout(self.current)
+        """Reset the git repository to head of the previously active branch."""
+        self._repo.git.checkout(self._latest)
 
     def build_branch_structure(self):
         """Inspect and record the repo's branches and their history."""
-        self.history = dict()
-        self.history["commits"] = commits = dict()
-        self.history["branches"] = branches = dict()
+        self._history = dict()
+        self._history["commits"] = commits = dict()
+        self._history["branches"] = branches = dict()
         skip = frozenset(["gh-pages"])
-        for branch in self.repo.refs:
+        for branch in self._repo.refs:
             LOGGER.debug(branch.name)
             if branch.name in skip:
                 continue
@@ -72,14 +86,16 @@ class HistoryManager(object):
                     sub["timestamp"] = commit.authored_datetime.isoformat(" ")
                     sub["author"] = commit.author.name
                     sub["email"] = commit.author.email
-        LOGGER.debug("%s", json.dumps(self.history, indent=2))
+        LOGGER.debug("%s", json.dumps(self._history, indent=2))
         self.reset()
 
     def iter_branches(self):
-        return iteritems(self.history["branches"])
+        """Iterate over branch names and their commit histories."""
+        return iteritems(self._history["branches"])
 
     def iter_commits(self):
-        return iterkeys(self.history["commits"])
+        """Iterate over all commit hashes in the repository."""
+        return iterkeys(self._history["commits"])
 
     def load_history(self):
         """
@@ -88,18 +104,19 @@ class HistoryManager(object):
         Could be a bad idea in a far future.
 
         """
-        assert self.history is not None, \
+        assert self._history is not None, \
             "Please call the method `build_branch_structure` first."
-        self.results = dict()
-        all_commits = list(self.history["commits"])
+        self._results = dict()
+        all_commits = list(self._history["commits"])
         for commit in all_commits:
             try:
-                self.results[commit] = self.manager.load(self.repo, commit)
+                self._results[commit] = self.manager.load(self._repo, commit)
             except (IOError, NoResultFound) as err:
                 LOGGER.error("Could not load result '%s'.", commit)
                 LOGGER.debug("%s", str(err))
 
-    def get_result(self, commit, default=None):
-        assert self.results is not None, \
+    def get_result(self, commit, default=MemoteResult()):
+        """Return an individual result from the history if it exists."""
+        assert self._results is not None, \
             "Please call the method `load_history` first."
-        return self.results.get(commit, default)
+        return self._results.get(commit, default)

@@ -28,7 +28,17 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Report(object):
-    """Determine the abstract report interface."""
+    """
+    Determine the abstract report interface.
+
+    Attributes
+    ----------
+    result : memote.MemoteResult
+        The dictionary structure of results.
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
 
     def __init__(self, result, configuration, **kwargs):
         """
@@ -37,7 +47,9 @@ class Report(object):
         Parameters
         ----------
         result : memote.MemoteResult
+            The dictionary structure of results.
         configuration : memote.MemoteConfiguration
+            A memote configuration structure.
 
         """
         super(Report, self).__init__(**kwargs)
@@ -72,7 +84,7 @@ class Report(object):
             set(self.result.cases) - set(tests_on_cards))
 
     def compute_score(self):
-        """Calculate the overall test score."""
+        """Calculate the overall test score using the configuration."""
         scores = DataFrame({"score": 1.0, "max": 1.0},
                            index=list(self.result.cases))
         for test, result in iteritems(self.result.cases):

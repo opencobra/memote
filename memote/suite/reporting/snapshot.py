@@ -34,10 +34,20 @@ LOGGER = logging.getLogger(__name__)
 
 
 class SnapshotReport(Report):
-    """Render a one-time report from the given model results."""
+    """
+    Render a one-time report from the given model results.
+
+    Attributes
+    ----------
+    result : memote.MemoteResult
+        The dictionary structure of results.
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
 
     def __init__(self, **kwargs):
-        """Initialize the data."""
+        """Initialize the snapshot report."""
         super(SnapshotReport, self).__init__(**kwargs)
         with open(
             join(TEMPLATES_PATH, "index.html"), encoding="utf-8"
@@ -45,7 +55,7 @@ class SnapshotReport(Report):
             self._template = Template(file_path.read())
 
     def render_html(self):
-        """Render the snapshot report by writing JSON into the template."""
+        """Render the snapshot report."""
         self.determine_miscellaneous_tests()
         self.compute_score()
         self.result.update(self.config)

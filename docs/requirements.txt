@@ -17,3 +17,4 @@ cookiecutter
 pygithub
 travispy
 travis-encrypt
+importlib_resources

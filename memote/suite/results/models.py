@@ -48,6 +48,7 @@ class JSON(TypeDecorator):
     impl = UnicodeText
 
     def process_bind_param(self, value, dialect):
+        """Convert the value to a JSON encoded string before storing it."""
         try:
             return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
         except TypeError as error:
@@ -55,12 +56,19 @@ class JSON(TypeDecorator):
             raise_with_traceback(error)
 
     def process_result_value(self, value, dialect):
+        """Convert a JSON encoded string to a dictionary structure."""
         if value is not None:
             value = json.loads(value)
         return value
 
 
 class Result(Base):
+    """
+    Model a git based result for storage in a database.
+
+    The class attributes correspond both to the columns in the database table
+    and to instance attributes.
+    """
 
     __tablename__ = "results"
 

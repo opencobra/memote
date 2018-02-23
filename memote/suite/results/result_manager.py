@@ -38,9 +38,10 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ResultManager(object):
+    """Manage storage of results to JSON files."""
 
     def __init__(self, **kwargs):
-        """ """
+        """Initialize a JSON file storage manager."""
         super(ResultManager, self).__init__(**kwargs)
 
     @staticmethod
@@ -87,7 +88,7 @@ class ResultManager(object):
                 raise_with_traceback(error)
 
     def load(self, filename):
-        """"""
+        """Load a result from the given JSON file."""
         # TODO: validate the read-in JSON maybe?
         LOGGER.info("Loading result from '%s'.", filename)
         with open(filename, encoding="utf-8") as file_handle:

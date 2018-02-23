@@ -79,18 +79,18 @@ class TestResult(object):
         commit = models.Result(
             hexsha="abcdef",
             authored_on=timestamp,
-            results={"foo": "bar"}
+            memote_result={"foo": "bar"}
         )
         assert commit.hexsha == "abcdef"
         assert commit.authored_on == timestamp
-        assert commit.results == {"foo": "bar"}
+        assert commit.memote_result == {"foo": "bar"}
 
     def test_insert(self, session):
         timestamp = datetime.now()
         commit = models.Result(
             hexsha="abcdef",
             authored_on=timestamp,
-            results={"foo": "bar"}
+            memote_result={"foo": "bar"}
         )
         session.add(commit)
         session.commit()
@@ -108,12 +108,12 @@ class TestResult(object):
         commit_a = models.Result(
             hexsha=name_a,
             authored_on=timestamp,
-            results={"foo": "bar"}
+            memote_result={"foo": "bar"}
         )
         commit_b = models.Result(
             hexsha=name_b,
             authored_on=timestamp,
-            results={"foo": "bar"}
+            memote_result={"foo": "bar"}
         )
         session.add_all([commit_a, commit_b])
         session.commit()
