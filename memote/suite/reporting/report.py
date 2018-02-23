@@ -105,4 +105,4 @@ class Report(object):
             card["score"] = card_score / card_total
             score += card_score * weight
             maximum += card_total * weight
-        self.result.store["score"] = score / maximum
+        self.result["score"] = score / maximum

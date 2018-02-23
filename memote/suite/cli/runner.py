@@ -132,6 +132,10 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             manager = ResultManager()
             store = partial(manager.store, filename=filename)
         else:
+            if location is None:
+                LOGGER.critical(
+                    "Working with a repository requires a storage location.")
+                sys.exit(1)
             try:
                 manager = SQLResultManager(location)
             except (AttributeError, ArgumentError):
@@ -141,7 +145,7 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         model=model, results=True, pytest_args=pytest_args, skip=skip,
         exclusive=exclusive)
     if collect:
-        store(result=result.store)
+        store(result=result)
     sys.exit(code)
 
 
@@ -178,7 +182,7 @@ def _test_history(model, solver, manager, repo, commit, pytest_args, skip):
     # TODO: This needs to be restructured to use an SQLite database.
     _, result = api.test_model(
         model, results=True, pytest_args=pytest_args, skip=skip)
-    manager.store(result.store, repo=repo, commit=commit)
+    manager.store(result, repo=repo, commit=commit)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)

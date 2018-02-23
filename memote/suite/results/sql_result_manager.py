@@ -25,6 +25,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
+from memote.suite.results.result import MemoteResult
 from memote.suite.results.repo_result_manager import RepoResultManager
 from memote.suite.results.models import Result, Base
 
@@ -54,40 +55,44 @@ class SQLResultManager(RepoResultManager):
 
     def store(self, result, repo, commit=None, **kwargs):
         """
-        Store a result in a SQL database attaching git meta information.
+        Store a result in a JSON file attaching git meta information.
 
         Parameters
         ----------
-        result : dict
-            The dictionary structure of a memote.MemoteResult.
+        result : memote.MemoteResult
+            The dictionary structure of results.
         repo : git.Repo, optional
         commit : str, optional
             Unique hexsha of the desired commit.
         kwargs :
-            Ignored. Only exist to normalize function signature.
+            Passed to parent function.
 
         """
         git_info = self.record_git_info(repo, commit)
         try:
-            result = self.session.query(Result.results). \
+            row = self.session.query(Result). \
                 filter_by(hexsha=git_info.hexsha). \
                 one()
             LOGGER.info("Updating result '%s'.", git_info.hexsha)
+            row.memote_result = result
         except NoResultFound:
-            result = Result(results=result)
+            row = Result(memote_result=result)
             LOGGER.info("Storing result '%s'.", git_info.hexsha)
-        result.hexsha = git_info.hexsha
-        result.author = git_info.author
-        result.email = git_info.email
-        result.authored_on = git_info.authored_on
-        self.session.add(result)
+        row.hexsha = git_info.hexsha
+        row.author = git_info.author
+        row.email = git_info.email
+        row.authored_on = git_info.authored_on
+        self.session.add(row)
         self.session.commit()
 
     def load(self, repo, commit=None):
         """"""
         git_info = self.record_git_info(repo, commit)
         LOGGER.info("Loading result from '%s'.", git_info.hexsha)
-        result = self.session.query(Result.results).\
+        result = self.session.query(Result.memote_result).\
             filter_by(hexsha=git_info.hexsha).\
-            one()
-        return result.results
+            one().memote_result
+        # Add git info so the object is equivalent to the one returned by the
+        #  RepoResultManager.
+        self.add_git(result.meta, git_info)
+        return result

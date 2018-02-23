@@ -48,13 +48,13 @@ class SnapshotReport(Report):
         """Render the snapshot report by writing JSON into the template."""
         self.determine_miscellaneous_tests()
         self.compute_score()
-        self.result.store.update(self.config)
+        self.result.update(self.config)
         try:
             return self._template.safe_substitute(
-                results=json.dumps(self.result.store, sort_keys=False,
+                results=json.dumps(self.result, sort_keys=False,
                                    indent=None, separators=(",", ":")))
         except TypeError:
-            log_json_incompatible_types(self.result.store)
+            log_json_incompatible_types(self.result)
 
         # TODO: Use compression of JSON in future.
         # return template.safe_substitute(

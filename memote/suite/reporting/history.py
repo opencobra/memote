@@ -28,6 +28,7 @@ from string import Template
 from memote.utils import log_json_incompatible_types
 from memote.suite.reporting import TEMPLATES_PATH
 from memote.suite.results import HistoryManager
+from memote.suite.results import MemoteResult
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,37 +66,32 @@ class HistoryReport(object):
         self.repo = repository
         self.manager = manager
         self.history = HistoryManager(self.repo, self.manager)
-        # self.index = {
-        #     "time": "timestamp",
-        #     "hash": "commit_hash"
-        # }.get(index, ValueError("Unknown index type '{}'.".format(index)))
-        # if isinstance(self.index, ValueError):
-        #     raise self.index
 
     def collect_history(self):
         # Iter over past extending lists in results merged with configs.
         base = dict()
         for branch, commits in self.history.iter_branches():
             for commit in commits:
-                result = self.history.get_result(commit, dict())
-                for test in result["tests"]:
+                result = self.history.get_result(commit, MemoteResult())
+                for test in result.cases:
                     base.setdefault(test, dict()).setdefault("history", dict())
                     if "title" not in base[test]:
-                        base[test]["title"] = result["tests"][test]["title"]
+                        base[test]["title"] = result.cases[test]["title"]
                     if "summary" not in base[test]:
-                        base[test]["summary"] = result["tests"][test]["summary"]
-                    if isinstance(result["tests"][test]["metric"], dict):
-                        for param in result["tests"][test]["metric"]:
+                        base[test]["summary"] = result.cases[test]["summary"]
+                    metric = result.cases[test].get("metric")
+                    if isinstance(metric, dict):
+                        for param in metric:
                             base[test]["history"].setdefault(param, dict()). \
                                 setdefault(branch, list()).append({
                                     "commit": commit,
-                                    "metric": result["tests"][test]["metric"][param]
+                                    "metric": metric.get(param)
                                 })
                     else:
                         base[test]["history"].setdefault(branch, list()). \
                             append({
                                 "commit": commit,
-                                "metric": result["tests"][test]["metric"]
+                                "metric": metric
                             })
         return base
 

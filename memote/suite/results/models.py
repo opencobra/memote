@@ -69,4 +69,4 @@ class Result(Base):
     author = Column(Unicode(255), nullable=True)
     email = Column(Unicode(255), nullable=True)
     authored_on = Column(DateTime(), nullable=True)
-    results = Column(JSON(), nullable=False)
+    memote_result = Column(JSON(), nullable=False)

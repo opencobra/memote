@@ -76,34 +76,36 @@ class RepoResultManager(ResultManager):
         """"""
         return join(self.backend, "{}.json".format(git_info.hexsha))
 
-    def store(self, result, repo, commit=None, pretty=True):
+    @staticmethod
+    def add_git(meta, git_info):
+        meta["hexsha"] = git_info.hexsha
+        meta["author"] = git_info.author
+        meta["email"] = git_info.email
+        meta["authored_on"] = git_info.authored_on.isoformat(" ")
+
+    def store(self, result, repo, commit=None, **kwargs):
         """
         Store a result in a JSON file attaching git meta information.
 
         Parameters
         ----------
-        result : dict
-            The dictionary structure of a memote.MemoteResult.
+        result : memote.MemoteResult
+            The dictionary structure of results.
         repo : git.Repo, optional
         commit : str, optional
             Unique hexsha of the desired commit.
-        pretty : bool, optional
-            Whether (default) or not to write JSON in a more legible format.
+        kwargs :
+            Passed to parent function.
 
         """
         git_info = self.record_git_info(repo, commit)
-        storage = dict()
-        storage["results"] = result
-        storage["hexsha"] = git_info.hexsha
-        storage["author"] = git_info.author
-        storage["email"] = git_info.email
-        storage["authored_on"] = git_info.authored_on.isoformat(" ")
+        self.add_git(result.meta, git_info)
         filename = self.get_filename(git_info)
         super(RepoResultManager, self).store(
-            storage, filename=filename, pretty=pretty)
+            result, filename=filename, **kwargs)
 
     def load(self, repo, commit=None):
         """"""
         git_info = self.record_git_info(repo, commit)
         filename = self.get_filename(git_info)
-        return super(RepoResultManager, self).load(filename)["results"]
+        return super(RepoResultManager, self).load(filename)

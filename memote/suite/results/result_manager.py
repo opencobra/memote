@@ -21,11 +21,15 @@ from __future__ import absolute_import
 
 import json
 import logging
+import platform
 from builtins import open
+from datetime import datetime
 
+import pip
 from future.utils import raise_with_traceback
 
 from memote.utils import log_json_incompatible_types
+from memote.version_info import PKG_ORDER
 from memote.suite.results.result import MemoteResult
 
 __all__ = ("ResultManager",)
@@ -39,20 +43,37 @@ class ResultManager(object):
         """ """
         super(ResultManager, self).__init__(**kwargs)
 
-    def store(self, result, filename, pretty=True):
+    @staticmethod
+    def add_environment(meta):
+        """Record environment information."""
+        meta["timestamp"] = datetime.utcnow().isoformat(" ")
+        meta["platform"] = platform.system()
+        meta["release"] = platform.release()
+        meta["python"] = platform.python_version()
+        dependencies = frozenset(PKG_ORDER)
+        meta["packages"] = dict(
+            (dist.project_name, dist.version) for dist in
+            pip.get_installed_distributions()
+            if dist.project_name in dependencies)
+
+    def store(self, result, filename, env_info=True, pretty=True):
         """
         Write a result to the given file.
 
         Parameters
         ----------
-        result : dict
-            The dictionary structure of a memote.MemoteResult.
+        result : memote.MemoteResult
+            The dictionary structure of results.
         filename : str or pathlib.Path
             Store results directly to the given filename.
+        env_info : bool, optional
+            Add Python environment information to the result object.
         pretty : bool, optional
             Whether (default) or not to write JSON in a more legible format.
 
         """
+        if env_info:
+            self.add_environment(result.meta)
         if pretty:
             kwargs = dict(sort_keys=True, indent=2, separators=(",", ": "))
         else:
@@ -70,5 +91,5 @@ class ResultManager(object):
         # TODO: validate the read-in JSON maybe?
         LOGGER.info("Loading result from '%s'.", filename)
         with open(filename, encoding="utf-8") as file_handle:
-            content = json.load(file_handle)
-        return content
+            result = MemoteResult(json.load(file_handle))
+        return result
