@@ -73,7 +73,7 @@ release: clean ## package and upload a release
 
 reports:
 	$(MAKE) -C memote-report-app bundle
-	cp memote-report-app/build/index.html memote/suite/reporting/templates/index.html
+	cp memote-report-app/build/index.html memote/suite/templates/index.html
 
 dist: clean reports ## builds source and wheel package
 	python setup.py sdist bdist_wheel
