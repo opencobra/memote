@@ -25,11 +25,9 @@ cards:
       sbo:
         title: "SBO Terms"
         weight: 2.0
-        cases:
       sequence:
         title: "Sequence Cross References"
         weight: 2.0
-        cases:
       matrix:
         title: "Matrix Conditioning"
         weight: 1.0

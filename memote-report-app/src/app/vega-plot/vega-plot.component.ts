@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ElementRef } from '@angular/core';
-import { parse, View } from 'vega';
+import { parse, View } from 'vega-lib';
 import { ReportDataService } from '../report-data.service';
 import { spec } from './vega-plot.vega-spec';
 

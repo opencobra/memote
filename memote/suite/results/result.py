@@ -15,21 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Subpackage for creating visually pleasing reports of test results.
-
-There are three types of reports that we support:
-
-1. A one-time report of a model giving a good insight into its current state.
-2. A more elaborate report that makes use of the model development over time
-   (aka git history).
-3. A comparison report between two different versions of the same model or
-   across different models (similar to a diff).
-"""
+"""Provide a collective access to a test suite result.."""
 
 from __future__ import absolute_import
 
-from memote.suite.reporting.config import *
-from memote.suite.reporting.snapshot import *
-from memote.suite.reporting.history import *
-from memote.suite.reporting.diff import *
+__all__ = ("MemoteResult",)
+
+
+class MemoteResult(dict):
+    """Collect the metabolic model test suite results."""
+
+    def __init__(self, *args, **kwargs):
+        """
+        Instantiate a result structure.
+
+        Parameters
+        ----------
+        args :
+        kwargs :
+
+        """
+        super(MemoteResult, self).__init__(*args, **kwargs)
+        self.meta = self.setdefault("meta", dict())
+        self.cases = self.setdefault("tests", dict())

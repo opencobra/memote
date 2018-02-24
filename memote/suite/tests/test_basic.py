@@ -199,7 +199,7 @@ def test_ngam_presence(read_only_model):
 
 @annotate(title="Metabolic Coverage", type="percent")
 def test_metabolic_coverage(read_only_model):
-    """
+    u"""
     Expect a model to have a metabolic coverage >= 1.
 
     The degree of metabolic coverage indicates the modeling detail of a

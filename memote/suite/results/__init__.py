@@ -16,20 +16,21 @@
 # limitations under the License.
 
 """
-Subpackage for creating visually pleasing reports of test results.
+Provide the memote result object and managers for various situations.
 
-There are three types of reports that we support:
+* The ``MemoteResult` represents the collective result of running the
+  metabolic model test suite on a given model at a certain point in time.
+* The ``ResultManager`` and its subclasses knows how to store a
+``MemoteResult`` in various data backends (file, SQL, NoSQL).
+* The ``ResultHistoryManager`` uses the different ``ResultManager``s to
+  iterate over and collect a model's test result history.
 
-1. A one-time report of a model giving a good insight into its current state.
-2. A more elaborate report that makes use of the model development over time
-   (aka git history).
-3. A comparison report between two different versions of the same model or
-   across different models (similar to a diff).
 """
 
 from __future__ import absolute_import
 
-from memote.suite.reporting.config import *
-from memote.suite.reporting.snapshot import *
-from memote.suite.reporting.history import *
-from memote.suite.reporting.diff import *
+from memote.suite.results.result import *
+from memote.suite.results.result_manager import *
+from memote.suite.results.repo_result_manager import *
+from memote.suite.results.sql_result_manager import *
+from memote.suite.results.history_manager import *

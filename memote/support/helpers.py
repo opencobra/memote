@@ -281,11 +281,14 @@ def find_demand_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    extracellular = find_compartment_id_in_model(model, 'e')
+    try:
+        extracellular = find_compartment_id_in_model(model, 'e')
+    except KeyError:
+        extracellular = None
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if not rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in [extracellular])]
+            if not rxn.reversibility and
+            extracellular not in rxn.get_compartments()]
 
 
 def find_sink_reactions(model):
@@ -319,11 +322,14 @@ def find_sink_reactions(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    extracellular = find_compartment_id_in_model(model, 'e')
+    try:
+        extracellular = find_compartment_id_in_model(model, 'e')
+    except KeyError:
+        extracellular = None
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if rxn.reversibility and not
-            any(c in rxn.get_compartments() for c in [extracellular])]
+            if rxn.reversibility and
+            extracellular not in rxn.get_compartments()]
 
 
 def find_exchange_rxns(model):
@@ -356,10 +362,13 @@ def find_exchange_rxns(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    extracellular = find_compartment_id_in_model(model, 'e')
+    try:
+        extracellular = find_compartment_id_in_model(model, 'e')
+    except KeyError:
+        extracellular = None
     demand_and_exchange_rxns = set(model.exchanges)
     return [rxn for rxn in demand_and_exchange_rxns
-            if any(c in rxn.get_compartments() for c in [extracellular])]
+            if extracellular in rxn.get_compartments()]
 
 
 def find_functional_units(gpr_str):
@@ -504,11 +513,9 @@ def largest_compartment_id_met(model):
         Compartment ID of the compartment with the most metabolites.
 
     """
-    size = {
-        compartment_id: len(metabolites_per_compartment(
-            model, compartment_id)) for
-        compartment_id in model.compartments.keys()
-    }
+    size = {compartment_id: len(metabolites_per_compartment(
+                                model, compartment_id))
+            for compartment_id in model.compartments.keys()}
     candidate = sorted(size, key=size.get, reverse=True)[0]
     tie = size.copy()
     tie.pop(candidate)

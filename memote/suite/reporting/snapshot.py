@@ -19,41 +19,51 @@
 
 from __future__ import absolute_import
 
-import io
 import json
 import logging
 # from base64 import b64encode
-from os.path import join
 from string import Template
 # from zlib import compress
 
+from importlib_resources import read_text
+
+import memote.suite.templates as templates
 from memote.utils import log_json_incompatible_types
-from memote.suite.reporting import TEMPLATES_PATH
 from memote.suite.reporting.report import Report
 
 LOGGER = logging.getLogger(__name__)
 
 
 class SnapshotReport(Report):
-    """Render a one-time report from the given model results."""
+    """
+    Render a one-time report from the given model results.
 
-    def __init__(self, data, **kwargs):
-        """Initialize the data."""
+    Attributes
+    ----------
+    result : memote.MemoteResult
+        The dictionary structure of results.
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
+
+    def __init__(self, **kwargs):
+        """Initialize the snapshot report."""
         super(SnapshotReport, self).__init__(**kwargs)
-        with io.open(
-            join(TEMPLATES_PATH, "snapshot.html"), encoding="utf-8"
-        ) as file_path:
-            self._template = Template(file_path.read())
-        self.data = data
+        self._template = Template(
+            read_text(templates, "index.html", encoding="utf-8"))
 
     def render_html(self):
-        """Render the snapshot report by writing JSON into the template."""
+        """Render the snapshot report."""
+        self.determine_miscellaneous_tests()
+        self.compute_score()
+        self.result.update(self.config)
         try:
             return self._template.safe_substitute(
-                results=json.dumps(self.data, sort_keys=False, indent=None,
-                                   separators=(",", ":")))
+                results=json.dumps(self.result, sort_keys=False,
+                                   indent=None, separators=(",", ":")))
         except TypeError:
-            log_json_incompatible_types(self.data)
+            log_json_incompatible_types(self.result)
 
         # TODO: Use compression of JSON in future.
         # return template.safe_substitute(

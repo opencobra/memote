@@ -69,19 +69,10 @@ def test_test_model_result(model):
 @pytest.mark.parametrize("model", [
     "complete_failure",
 ], indirect=["model"])
-def test_test_model_file(model, tmpdir):
-    filename = str(tmpdir.join("result.json"))
-    api.test_model(model, filename)
-    assert exists(filename)
-
-
-@pytest.mark.parametrize("model", [
-    "complete_failure",
-], indirect=["model"])
-def test_basic_report_file(model, tmpdir):
+def test_snapshot_report_file(model, tmpdir):
     filename = str(tmpdir.join("index.html"))
     _, results = api.test_model(model, results=True)
-    api.snapshot_report(results, filename)
+    api.snapshot_report(results, filename=filename)
     assert exists(filename)
     # TODO: Perform some content checks here.
 

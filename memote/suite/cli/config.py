@@ -35,14 +35,14 @@ class ConfigSectionSchema(object):
         git = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
         model = Param(type=click.Path(exists=True, dir_okay=False))
-        directory = Param(type=click.Path(exists=True, file_okay=False,
-                                          writable=True))
+        location = Param(type=str)
         github_repository = Param(type=str)
         github_username = Param(type=str)
         exclusive = Param(type=str, multiple=True)
         skip = Param(type=str, multiple=True)
         solver = Param(type=click.Choice(["cplex", "glpk", "gurobi"]),
                        default="glpk")
+        connection = Param(type=str, default=None)
 
 
 class ConfigFileProcessor(ConfigFileReader):
