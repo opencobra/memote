@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import logging
+from builtins import open
 
 import ruamel.yaml as yaml
 from importlib_resources import open_text
@@ -47,12 +48,24 @@ class ReportConfiguration(dict):
         super(ReportConfiguration, self).__init__(*args, **kwargs)
 
     @classmethod
-    def load_default(cls):
-        """Load the default configuration packaged with memote."""
-        LOGGER.debug("Loading default snapshot configuration.")
-        with open_text(templates, "test_config.yml",
-                       encoding="utf-8") as file_handle:
-            content = yaml.load(file_handle)
+    def load(cls, filename=None):
+        """Load a test report configuration."""
+        if filename is None:
+            LOGGER.debug("Loading default configuration.")
+            with open_text(templates, "test_config.yml",
+                           encoding="utf-8") as file_handle:
+                content = yaml.load(file_handle)
+        else:
+            LOGGER.debug("Loading custom configuration '%s'.", filename)
+            try:
+                with open(filename, encoding="utf-8") as file_handle:
+                    content = yaml.load(file_handle)
+            except IOError as err:
+                LOGGER.error(
+                    "Failed to load the custom configuration '%s'. Skipping.",
+                    filename)
+                LOGGER.debug(str(err))
+                content = dict()
         return cls(content)
 
     def merge(self, other):

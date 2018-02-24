@@ -21,11 +21,9 @@ from __future__ import absolute_import
 
 import logging
 import sys
-from builtins import open
 
 import click
 import git
-import ruamel.yaml as yaml
 from sqlalchemy.exc import ArgumentError
 
 import memote.suite.api as api
@@ -83,19 +81,10 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
-    config = ReportConfiguration.load_default()
+    config = ReportConfiguration.load()
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
-        # TODO: This will need to merge nested `dict`s in future.
-        LOGGER.debug("Loading custom snapshot configuration '%s'.", custom)
-        try:
-            with open(custom) as file_handle:
-                config.merge(yaml.load(file_handle))
-        except IOError as err:
-            LOGGER.error(
-                "Failed to load the custom configuration '%s'. Skipping.",
-                custom)
-            LOGGER.debug(str(err))
+        config.merge(ReportConfiguration.load(custom))
     model.solver = solver
     _, results = api.test_model(model, results=True, pytest_args=pytest_args)
     api.snapshot_report(results, config, filename)
