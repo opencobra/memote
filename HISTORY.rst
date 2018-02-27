@@ -3,6 +3,10 @@ History
 
 Next Release
 ------------
+
+0.6.0 (2018-02-27)
+------------------
+
 * Let Travis re-package the snapshot report with every release.
 * Add new module to test for the presence of SBO term annotations.
 * Add a test for Biomass production in complete medium.
@@ -57,30 +61,34 @@ Next Release
   d (1 gDW carbs) + e (1 gDW protein) + f (1 gDW RNA) + g (1 gDW DNA) +
   h (vitamins/cofactors)-> 1 gDCW biomass.
   We're supposing that for each macromolecule precursor metabolite there is a
-  single reaction defining its composition i.e. `e` = protein would have the
-  reaction: ` alanine + asparagine + ... + valine --> e`
+  single reaction defining its composition i.e. ``e`` = protein would have the
+  reaction: ``alanine + asparagine + ... + valine --> e``
 * Add function, test and model test to identify missing essential precursors
   to the biomass reaction.
   The function is ``essential_precursors_not_in_biomass``
 * Record the score of individual test cases and sections in the result output.
-* Correct the import of module 'annotation' with 'sbo' in `test_sbo.py`
+* Correct the import of module 'annotation' with 'sbo' in ``test_sbo`.py`
 * Refactor sink_react_list to sink_reactions for improved readability
-* Allow `test_sink_specific_sbo_presence` to be skipped when no sink reactions
+* Allow ``test_sink_specific_sbo_presence`` to be skipped when no sink reactions
   are present with a metric of 1.0
 * Fix a bug that compared the length of a float to generate a metric in
-  `test_basic.py` and generated a TypeError.
-* Fix a bug that prevented `find_biomass_precursors`
-  in `memote/support/biomass.py` from functioning due to a malformed set
+  ``test_basic.py`` and generated a TypeError.
+* Fix a bug that prevented ``find_biomass_precursors``
+  in ``memote/support/biomass.py`` from functioning due to a malformed set
 * In CONTRIBUTING.rst replace link to semantic commit guide by seesparkbox
   with link to guide by karma, due to error with sphinx linkcheck.
-* Fix a bug that prevented `find_biomass_precursors` from correctly
-  identifying `atp` and `h2o` metabolites in cobra model reactions
-* Fix improperly labeled sbo terms for biomass production in `biomass.py`
-  and `test_for_helpers.py`
-* Add matrix conditioning functions in ``matrix.py`` which are used for 
+* Fix a bug that prevented ``find_biomass_precursors`` from correctly
+  identifying ``atp`` and ``h2o`` metabolites in cobra model reactions
+* Fix improperly labeled sbo terms for biomass production in ``biomass.py``
+  and ``test_for_helpers.py``.
+* Add matrix conditioning functions in ``matrix.py`` which are used for
   model stoichiometric matrix testing in ``test_matrix.py``
 * Add missing rank and nullspace_basis functions in ``consistency_helpers.py``
 * Fix issue with improper string/dict formatting in ``test_biomass.py`` tests
+* Re-organize the architecture to read in external configurations and add
+  custom tests.
+* Add an argument ``--location`` which replaces ``--directory`` which can be
+  used to set the directory or database where results should be stored.
 
 
 0.5.0 (2018-01-16)
