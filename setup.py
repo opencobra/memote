@@ -43,6 +43,7 @@ with io.open('test_requirements.txt') as file_handle:
 
 # All other keys are defined in setup.cfg under [metadata] and [options].
 setup(
+    version="0.6.0",
     install_requires=requirements,
     tests_require=test_requirements,
     entry_points="""
