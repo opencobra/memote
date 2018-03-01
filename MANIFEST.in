@@ -3,4 +3,4 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
-recursive-include memote *.py *.html *.yml
+recursive-include memote *.py *.html *.yml *.json *.csv

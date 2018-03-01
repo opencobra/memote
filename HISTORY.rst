@@ -4,6 +4,12 @@ History
 Next Release
 ------------
 
+0.6.1 (2018-03-01)
+------------------
+* Emergency fix for distributing required JSON file.
+
+
+
 0.6.0 (2018-02-27)
 ------------------
 

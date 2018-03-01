@@ -21,31 +21,27 @@ from __future__ import absolute_import
 
 import logging
 import re
-import os
-
 from builtins import dict
 from collections import defaultdict
-import numpy as np
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", UserWarning)
-    # ignore Gurobi warning
-    from cobra.exceptions import Infeasible
+from cobra.exceptions import Infeasible
 
+import numpy as np
+import pandas as pd
 from six import iteritems, itervalues
 from sympy import expand
-import pandas as pd
+from importlib_resources import open_text
+
 import memote.utils as utils
+import memote.support.data
 
 LOGGER = logging.getLogger(__name__)
 
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-directory = os.path.dirname(__file__)
-METANETX_SHORTLIST = pd.read_json(
-    directory + "/data/met_id_shortlist.json"
-)
+with open_text(memote.support.data, "met_id_shortlist.json",
+               encoding="utf-8") as file_handle:
+    METANETX_SHORTLIST = pd.read_json(file_handle)
 
 
 # Provide a compartment shortlist to identify specfic compartments whenever
