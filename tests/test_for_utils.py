@@ -96,7 +96,12 @@ def test_register_with(func, func_name):
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
     assert res.annotation["title"] == notes["title"]
-    assert res.annotation["summary"] == summary
+    if len(summary.split('\n')) == 0:
+        assert res.annotation["summary"] == summary
+    else:
+        trimmed_summary = summary.split(
+            "\n", 2)[2:] if summary[0] is "\n" else summary.split("\n", 1)[1:]
+        assert res.annotation["summary"] == trimmed_summary
     assert res.annotation["data"] is notes["data"]
     assert res.annotation["message"] is None
     assert res.annotation["type"] == notes["type"]
