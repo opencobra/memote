@@ -184,7 +184,7 @@ def extended_summary(func):
     Returns
     -------
     str
-        The exteneded summary of the docstring of func
+        The extended summary of the docstring of func
 
     """
     doc = NumpyDocString(func.__doc__)
