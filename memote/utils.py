@@ -191,6 +191,6 @@ def trim_description(func):
 
     """
     doc = func.__doc__
-    #Remove first 2 lines if first line is "\n", else remove only first line
-    trim = doc.split("\n",2)[2:] if doc[0] is "\n" else doc.split("\n",1)[1:]
+    # Remove first 2 lines if first line is "\n", else remove only first line
+    trim = doc.split("\n", 2)[2:] if doc[0] is "\n" else doc.split("\n", 1)[1:]
     return "".join(trim)
