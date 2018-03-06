@@ -181,7 +181,7 @@ def trim_description(func):
 
     Parameters
     ----------
-    function : func
+    func : function
         A scored or unscored test function used in `memote report snapshot`
 
     Returns
