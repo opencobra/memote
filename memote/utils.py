@@ -110,7 +110,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     def decorator(func):
         func.annotation = dict(
             title=title,
-            summary=func.__doc__,
+            summary=trim_description(func),
             message=message,
             data=data,
             type=type,
