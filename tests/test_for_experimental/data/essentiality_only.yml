@@ -1,0 +1,6 @@
+version: "0.1"
+essentiality:
+  path: "essentiality"
+  experiments:
+    core_deletion:
+      label: "Gene essentiality in default medium."

@@ -1,0 +1,41 @@
+{
+    "fields": [
+        {
+            "name": "reaction",
+            "title": "Exchange Reaction Identifier",
+            "description": "The exchange reaction identifiers must correspond to the metabolic model identifiers.",
+            "type": "string",
+            "constraints": {
+                "required": true
+            }
+        },
+        {
+            "name": "lower",
+            "title": "Lower Bound",
+            "description": "The lower bound for the exchange reaction. For models following common practices this is the flux providing the compound to the medium.",
+            "type": "number",
+            "constraints": {
+                "required": true,
+                "minimum": -1000,
+                "maximum": 0
+            }
+        },
+        {
+            "name": "upper",
+            "title": "Upper Bound",
+            "description": "The upper bound for the exchange reaction. For models following common practices this is the flux removing the compound from the medium.",
+            "type": "number",
+            "constraints": {
+                "required": true,
+                "minimum": 0,
+                "maximum": 1000
+            }
+        },
+        {
+            "name": "comment",
+            "title": "Comment",
+            "description": "Optional comment which is not processed further.",
+            "type": ["string", "null"]
+        }
+    ]
+}

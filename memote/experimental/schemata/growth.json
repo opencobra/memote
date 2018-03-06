@@ -1,0 +1,27 @@
+{
+    "fields": [
+        {
+            "name": "growth",
+            "title": "Growth Rate",
+            "description": "The measured growth rate of a strain.",
+            "type": "number",
+            "constraints": {
+                "required": true,
+                "minimum": 0,
+                "maximum": 10
+            }
+        },
+        {
+            "name": "medium",
+            "title": "Medium Composition",
+            "description": "The identifier of the medium composition used (if any).",
+            "type": "string"
+        },
+        {
+            "name": "comment",
+            "title": "Comment",
+            "description": "Optional comment which is not processed further.",
+            "type": "string"
+        }
+    ]
+}

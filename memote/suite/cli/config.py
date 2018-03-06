@@ -42,7 +42,8 @@ class ConfigSectionSchema(object):
         skip = Param(type=str, multiple=True)
         solver = Param(type=click.Choice(["cplex", "glpk", "gurobi"]),
                        default="glpk")
-        connection = Param(type=str, default=None)
+        experimental = Param(type=click.Path(exists=True, dir_okay=False),
+                             default=None)
 
 
 class ConfigFileProcessor(ConfigFileReader):

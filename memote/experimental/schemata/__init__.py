@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
+# Copyright 2018 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Ensure the expected functioning of ``memote.suite.cli.callbacks``."""
+"""Provide different schemata for goodtables validation."""
 
 from __future__ import absolute_import
-
-import memote.suite.cli.callbacks as callbacks
-
-
-def test_validate_model(model_file):
-    """Expect a valid returned model."""
-    model = callbacks.validate_model(None, "model", model_file)
-    assert model.id == "e_coli_core"
-    assert len(model.metabolites) == 72
-    assert len(model.reactions) == 95

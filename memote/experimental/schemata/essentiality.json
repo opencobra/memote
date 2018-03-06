@@ -1,0 +1,30 @@
+{
+    "fields": [
+        {
+            "name": "gene",
+            "title": "Gene Identifier",
+            "description": "The gene identifier must correspond to the metabolic model identifiers.",
+            "type": "string",
+            "constraints": {
+                "required": true
+            }
+        },
+        {
+            "name": "essential",
+            "title": "Gene Essentiality",
+            "description": "Whether or not a gene is (conditionally) essential.",
+            "type": "boolean",
+            "constraints": {
+                "required": true
+            },
+            "trueValues": ["true", "True", "TRUE", "1", "yes", "Yes", "YES"],
+            "falseValues": ["false", "False", "FALSE", "0", "no", "No", "NO"]
+        },
+        {
+            "name": "comment",
+            "title": "Comment",
+            "description": "Optional comment which is not processed further.",
+            "type": "string"
+        }
+    ]
+}

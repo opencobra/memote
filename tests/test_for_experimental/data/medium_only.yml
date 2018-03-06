@@ -1,0 +1,9 @@
+version: "0.1"
+medium:
+  path: "media/"
+  definitions:
+    glucose:
+      label: "So sweet!"
+    m9_fructose:
+      filename: "fructose.tsv"
+    pyruvate:

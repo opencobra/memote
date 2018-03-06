@@ -63,6 +63,9 @@ def report():
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
+              default=None, callback=callbacks.validate_experimental,
+              help="Define additional tests using experimental data.")
 @click.option("--custom-tests", type=click.Path(exists=True, file_okay=False),
               multiple=True,
               help="A path to a directory containing custom test "
@@ -78,7 +81,7 @@ def report():
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
 def snapshot(model, filename, pytest_args, exclusive, skip, solver,
-             custom_tests, custom_config):
+             experimental, custom_tests, custom_config):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -95,7 +98,8 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
         config.merge(ReportConfiguration.load(custom))
     model.solver = solver
     _, results = api.test_model(model, results=True, pytest_args=pytest_args,
-                                skip=skip, exclusive=exclusive)
+                                skip=skip, exclusive=exclusive,
+                                experimental=experimental)
     api.snapshot_report(results, config, filename)
 
 

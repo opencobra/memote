@@ -46,6 +46,7 @@ PKG_ORDER = [
     "travispy",
     "travis",
     "numpydoc"
+    "goodtables"
 ]
 
 

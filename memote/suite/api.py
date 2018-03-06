@@ -36,7 +36,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def test_model(model, results=False, pytest_args=None,
-               exclusive=None, skip=None):
+               exclusive=None, skip=None, experimental=None):
     """
     Test a model and optionally store results as JSON.
 
@@ -68,7 +68,8 @@ def test_model(model, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip)
+    plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip,
+                                    experimental_config=experimental)
     code = pytest.main(pytest_args, plugins=[plugin])
     if results:
         return code, plugin.results

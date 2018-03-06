@@ -750,3 +750,16 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                            )
     else:
         return candidates_in_compartment
+
+
+def find_objective_function(model):
+    """
+    Return reactions that are part of the objective function.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    return [rxn for rxn in model.reactions if rxn.objective_coefficient != 0]
