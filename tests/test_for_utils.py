@@ -101,7 +101,7 @@ def test_annotate(notes, func, summary):
     else:
         trimmed_summary = summary.split(
             "\n", 2)[2:] if summary[0] is "\n" else summary.split("\n", 1)[1:]
-        assert res.annotation["summary"] == trimmed_summary
+        assert res.annotation["summary"] == "".join(trimmed_summary)
     assert res.annotation["data"] is notes["data"]
     assert res.annotation["message"] is None
     assert res.annotation["type"] == notes["type"]
