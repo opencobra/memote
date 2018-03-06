@@ -169,3 +169,28 @@ def log_json_incompatible_types(obj):
             log_json_incompatible_types(value)
         elif not isinstance(value, JSON_TYPES):
             LOGGER.debug("%s: %s", key, type(value))
+
+
+def trim_description(func):
+    """
+    Trim the first line of a test function's docstring.
+
+    The first line of a docstring, while useful in describing expected function
+    behavior and output, is not appropriate for end users who wish to see a
+    narrative description of the test being run and its significance.
+
+    Parameters
+    ----------
+    function : func
+        A scored or unscored test function used in `memote report snapshot`
+
+    Returns
+    -------
+    str
+        The docstring of func with the first line removed
+
+    """
+    doc = func.__doc__
+    #Remove first 2 lines if first line is "\n", else remove only first line
+    trim = doc.split("\n",2)[2:] if doc[0] is "\n" else doc.split("\n",1)[1:]
+    return "".join(trim)
