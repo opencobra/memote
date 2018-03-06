@@ -18,3 +18,4 @@ travis-encrypt
 sympy
 sqlalchemy
 importlib_resources
+numpydoc

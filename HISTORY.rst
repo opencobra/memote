@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Test summary only displays extended narrative summmary describing test,
+  and not one-line summary describing expected function behavior/output
 
 0.6.1 (2018-03-01)
 ------------------

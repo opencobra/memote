@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 from builtins import dict, str
+from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
 
 __all__ = ("register_with", "annotate", "get_ids", "truncate",
@@ -110,7 +111,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     def decorator(func):
         func.annotation = dict(
             title=title,
-            summary=func.__doc__,
+            summary=extended_summary(func),
             message=message,
             data=data,
             type=type,
@@ -169,3 +170,22 @@ def log_json_incompatible_types(obj):
             log_json_incompatible_types(value)
         elif not isinstance(value, JSON_TYPES):
             LOGGER.debug("%s: %s", key, type(value))
+
+
+def extended_summary(func):
+    """
+    Show the extended summary of a function's docstring.
+
+    Parameters
+    ----------
+    func : function
+        A scored or unscored test function used in `memote report snapshot`
+
+    Returns
+    -------
+    str
+        The extended summary of the docstring of func
+
+    """
+    doc = NumpyDocString(func.__doc__)
+    return "\n".join(doc["Extended Summary"])

@@ -96,7 +96,7 @@ def test_register_with(func, func_name):
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
     assert res.annotation["title"] == notes["title"]
-    assert res.annotation["summary"] == summary
+    assert res.annotation["summary"] == utils.extended_summary(func)
     assert res.annotation["data"] is notes["data"]
     assert res.annotation["message"] is None
     assert res.annotation["type"] == notes["type"]

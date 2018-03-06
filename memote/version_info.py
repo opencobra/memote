@@ -44,7 +44,8 @@ PKG_ORDER = [
     "git",
     "github",
     "travispy",
-    "travis"
+    "travis",
+    "numpydoc"
 ]
 
 
