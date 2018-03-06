@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 from builtins import dict, str
+from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
 
 __all__ = ("register_with", "annotate", "get_ids", "truncate",
@@ -110,7 +111,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     def decorator(func):
         func.annotation = dict(
             title=title,
-            summary=trim_description(func),
+            summary=extended_summary(func),
             message=message,
             data=data,
             type=type,
@@ -171,14 +172,9 @@ def log_json_incompatible_types(obj):
             LOGGER.debug("%s: %s", key, type(value))
 
 
-def trim_description(func):
+def extended_summary(func):
     """
-    Trim the first line of a test function's multi-line docstring.
-
-    The first line of a docstring, while useful in describing expected function
-    behavior and output, is not appropriate for end users who wish to see a
-    narrative description of the test being run and its significance. If a
-    function only has a one-line docstring, it will returned as is.
+    Show the extended summary of a function's docstring.
 
     Parameters
     ----------
@@ -188,12 +184,8 @@ def trim_description(func):
     Returns
     -------
     str
-        The docstring of func with the first line removed
+        The exteneded summary of the docstring of func
 
     """
-    doc = func.__doc__
-    if len(doc.split('\n')) == 0:
-        return doc
-    # Remove first 2 lines if first line is "\n", else remove only first line
-    trim = doc.split("\n", 2)[2:] if doc[0] is "\n" else doc.split("\n", 1)[1:]
-    return "".join(trim)
+    doc = NumpyDocString(func.__doc__)
+    return "\n".join(doc["Extended Summary"])
