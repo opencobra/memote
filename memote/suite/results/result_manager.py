@@ -27,6 +27,7 @@ from datetime import datetime
 
 import pip
 from future.utils import raise_with_traceback
+import io
 
 from memote.utils import log_json_incompatible_types
 from memote.version_info import PKG_ORDER
@@ -76,11 +77,13 @@ class ResultManager(object):
         if env_info:
             self.add_environment(result.meta)
         if pretty:
-            kwargs = dict(sort_keys=True, indent=2, separators=(",", ": "), ensure_ascii=True)
+            kwargs = dict(sort_keys=True, indent=2,
+                          separators=(",", ": "), ensure_ascii=True)
         else:
-            kwargs = dict(sort_keys=False, indent=None, separators=(",", ":"), ensure_ascii=True)
+            kwargs = dict(sort_keys=False, indent=None,
+                          separators=(",", ":"), ensure_ascii=True)
         LOGGER.info("Storing result in '%s'.", filename)
-        with open(filename, "w", encoding="utf-8") as file_handle:
+        with io.open(filename, "w", encoding="utf-8") as file_handle:
             try:
                 return file_handle.write(
                     unicode(json.dumps(result, **kwargs)))
