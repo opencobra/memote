@@ -113,7 +113,7 @@ def test_biomass_default_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production In Complete Medium", type="count",
+@annotate(title="Biomass Production In Complete Medium", type="number",
           data=dict(), message=dict(), metric=dict())
 def test_biomass_open_production(model, reaction_id):
     """
