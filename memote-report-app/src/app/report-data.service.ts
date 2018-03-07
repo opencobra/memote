@@ -48,6 +48,15 @@ export class ReportDataService {
     return JSON.stringify(object);
   }
 
+  private errorFailsafe(data: TestResult) {
+    if (data.result !== 'skipped' && !data.data ){
+      data['result'] = 'error';
+      return data;
+    } else {
+      return data;
+    }
+  }
+
   private convertResults(data: Object): void {
     // Store each test result as a TestResult object in a central list.
     for (const test of Object.keys(data['tests'])){
@@ -55,24 +64,28 @@ export class ReportDataService {
         for (const param of Object.keys(data['tests'][test]['data'])) {
           const newID = test + ':' + param;
           this.allTests.push(
-            new TestResult(
-              newID,
-              {data: data['tests'][test]['data'][param],
-              duration: data['tests'][test]['duration'][param],
-              message: data['tests'][test]['message'][param],
-              metric: data['tests'][test]['metric'][param],
-              result: data['tests'][test]['result'][param],
-              summary: data['tests'][test]['summary'],
-              title: data['tests'][test]['title'],
-              type: data['tests'][test]['type']}
+            this.errorFailsafe(
+              new TestResult(
+                newID,
+                {data: data['tests'][test]['data'][param],
+                duration: data['tests'][test]['duration'][param],
+                message: data['tests'][test]['message'][param],
+                metric: data['tests'][test]['metric'][param],
+                result: data['tests'][test]['result'][param],
+                summary: data['tests'][test]['summary'],
+                title: data['tests'][test]['title'],
+                type: data['tests'][test]['type']}
+              )
             )
           );
         }
       } else {
       this.allTests.push(
-        new TestResult(
-          test,
-          data['tests'][test]));
+        this.errorFailsafe(
+          new TestResult(
+            test,
+            data['tests'][test]))
+        );
       }
     }
     // Extract metaddata information to be used in the metadata card
