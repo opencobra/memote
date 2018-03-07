@@ -22,12 +22,11 @@ from __future__ import absolute_import
 import json
 import logging
 import platform
-from builtins import open
+from builtins import open, str
 from datetime import datetime
 
 import pip
 from future.utils import raise_with_traceback
-import io
 
 from memote.utils import log_json_incompatible_types
 from memote.version_info import PKG_ORDER
@@ -83,10 +82,10 @@ class ResultManager(object):
             kwargs = dict(sort_keys=False, indent=None,
                           separators=(",", ":"), ensure_ascii=True)
         LOGGER.info("Storing result in '%s'.", filename)
-        with io.open(filename, "w", encoding="utf-8") as file_handle:
+        with open(filename, "w", encoding="utf-8") as file_handle:
             try:
                 return file_handle.write(
-                    unicode(json.dumps(result, **kwargs)))
+                    str(json.dumps(result, **kwargs)))
             except TypeError as error:
                 log_json_incompatible_types(result)
                 raise_with_traceback(error)
