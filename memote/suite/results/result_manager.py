@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import json
 import logging
 import platform
-from builtins import open, str
+from builtins import open
 from datetime import datetime
 
 import pip
