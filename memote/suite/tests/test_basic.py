@@ -211,6 +211,7 @@ def test_metabolic_coverage(read_only_model):
     gene products and their enzymatic transformations are ‘lumped’.
     """
     ann = test_metabolic_coverage.annotation
+    ann["data"] = (len(read_only_model.reactions), len(read_only_model.genes))
     ann["metric"] = basic.calculate_metabolic_coverage(read_only_model)
     ann["message"] = wrapper.fill(
         """The degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
