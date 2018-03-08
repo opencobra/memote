@@ -3,7 +3,7 @@ History
 
 Next Release
 ------------
-* Test summary only displays extended narrative summmary describing test,
+* Test summary only displays extended narrative summary describing test,
   and not one-line summary describing expected function behavior/output
 * Fix the following bugs:
     - Fix type annotation on the test for Biomass Production in Complete Medium
@@ -14,6 +14,9 @@ Next Release
     - Move Matrix statistics category to unscored side into their own card
     - Add a tuple of (number of reactions, number of genes) to the data
       annotation of the metabolic coverage test.
+* Add filter in ``report_data_service`` that changed the test result status to
+  "error" when the data attribute is ``null``, thus avoiding that the report
+  interface breaks when trying to access data.
 
 0.6.1 (2018-03-01)
 ------------------
