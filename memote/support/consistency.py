@@ -449,17 +449,10 @@ def find_stoichiometrically_balanced_cycles(model):
            http://doi.org/10.1038/nprot.2009.203
 
     """
-    try:
-        fva_result = flux_variability_analysis(model, loopless=False)
-        fva_result_loopless = flux_variability_analysis(model, loopless=True)
-    except Infeasible as err:
-        LOGGER.error("Failed to find stoichiometrically balanced cycles "
-                     "because '{}'. This may be a bug.".format(err))
-        return []
-    row_ids_max = fva_result[
-        fva_result.maximum != fva_result_loopless.maximum].index
-    row_ids_min = fva_result[
-        fva_result.minimum != fva_result_loopless.minimum].index
+    helpers.close_boundaries_sensibly(model)
+    fva_result = flux_variability_analysis(model, loopless=False)
+    row_ids_max = fva_result[fva_result["maximum"] == 1].index
+    row_ids_min = fva_result[fva_result["minimum"] == -1].index
     differential_fluxes = set(row_ids_min).union(set(row_ids_max))
     return [model.reactions.get_by_id(id) for id in differential_fluxes]
 
