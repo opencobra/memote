@@ -18,7 +18,7 @@ export class ReportDataService {
     // TODO: Might want to parse and decompress a string in future.
     // const data = JSON.parse((<any>window).data);
     this.convertResults((<any>window).data);
-    // this.http.get('/data/testData.json').subscribe(data => {this.convertResults(data); });
+    //this.http.get('/data/testData.json').subscribe(data => {this.convertResults(data); });
   }
 
   public byID(string) {
@@ -55,24 +55,25 @@ export class ReportDataService {
         for (const param of Object.keys(data['tests'][test]['data'])) {
           const newID = test + ':' + param;
           this.allTests.push(
-            new TestResult(
-              newID,
-              {data: data['tests'][test]['data'][param],
-              duration: data['tests'][test]['duration'][param],
-              message: data['tests'][test]['message'][param],
-              metric: data['tests'][test]['metric'][param],
-              result: data['tests'][test]['result'][param],
-              summary: data['tests'][test]['summary'],
-              title: data['tests'][test]['title'],
-              type: data['tests'][test]['type']}
-            )
-          );
+              new TestResult(
+                newID,
+                {data: data['tests'][test]['data'][param],
+                duration: data['tests'][test]['duration'][param],
+                message: data['tests'][test]['message'][param],
+                metric: data['tests'][test]['metric'][param],
+                result: data['tests'][test]['result'][param],
+                summary: data['tests'][test]['summary'],
+                title: data['tests'][test]['title'],
+                type: data['tests'][test]['type']}
+              )
+            );
         }
       } else {
       this.allTests.push(
-        new TestResult(
-          test,
-          data['tests'][test]));
+          new TestResult(
+            test,
+            data['tests'][test])
+      );
       }
     }
     // Extract metaddata information to be used in the metadata card

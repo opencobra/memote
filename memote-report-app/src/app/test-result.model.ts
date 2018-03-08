@@ -9,6 +9,14 @@ export class TestResult {
   public title: string;
   public type: string;
 
+  private errorFailsafe(result: string) {
+    if (this.result !== 'skipped' && !this.data ){
+      this.result = 'error';
+    } else {
+      this.result = result;
+    }
+  }
+  
   constructor(id: string, {data, duration, message, metric, result, summary, title, type}: {
       data: any, duration: number, message: string, metric: number,
       result: string, summary: string, title: string, type: string
@@ -18,7 +26,7 @@ export class TestResult {
         this.duration = duration;
         this.message = message;
         this.metric = metric;
-        this.result = result;
+        this.errorFailsafe(result);
         this.summary = summary;
         this.title = title;
         this.type = type;
