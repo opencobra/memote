@@ -10,6 +10,9 @@ cards:
         - test_find_disconnected
         - test_stoichiometric_consistency
         - test_reaction_charge_balance
+        - test_find_reactions_unbounded_flux_default_condition
+        - test_find_metabolites_produced_with_closed_bounds
+        - test_find_metabolites_consumed_with_closed_bounds
       annotation:
         title: "Annotation"
         weight: 1.0
@@ -25,18 +28,21 @@ cards:
       sbo:
         title: "SBO Terms"
         weight: 2.0
+        cases:
+        - test_metabolite_sbo_presence
+        - test_metabolite_specific_sbo_presence
+        - test_reaction_sbo_presence
+        - test_metabolic_reaction_specific_sbo_presence
+        - test_transport_reaction_specific_sbo_presence
+        - test_exchange_specific_sbo_presence
+        - test_demand_specific_sbo_presence
+        - test_sink_specific_sbo_presence
+        - test_gene_sbo_presence
+        - test_gene_specific_sbo_presence
+        - test_biomass_specific_sbo_presence
       sequence:
         title: "Sequence Cross References"
         weight: 2.0
-      matrix:
-        title: "Matrix Conditioning"
-        weight: 1.0
-        cases:
-        - test_absolute_extreme_coefficient_ratio
-        - test_number_independent_conservation_relations
-        - test_number_steady_state_flux_solutions
-        - test_matrix_rank
-        - test_degrees_of_freedom
   test_basic:
     title: "Basic Information"
     cases:
@@ -48,6 +54,7 @@ cards:
     - test_metabolic_coverage
     - test_ngam_presence
     - test_gene_protein_reaction_rule_presence
+    - test_transport_reaction_gpr_presence
     - test_metabolites_charge_presence
     - test_metabolites_formula_presence
     - test_transport_reaction_presence
@@ -65,13 +72,25 @@ cards:
     - test_biomass_precursors_open_production
     - test_gam_in_biomass
     - test_fast_growth_default
+    - test_direct_metabolites_in_biomass
+    - test_biomass_open_production
+    - test_essential_precursors_not_in_biomass
   test_consistency:
     title: "Stoichiometry Matrix"
     cases:
     - test_detect_energy_generating_cycles
+    - test_find_stoichiometrically_balanced_cycles
     - test_blocked_reactions
     - test_find_orphans
     - test_find_deadends
+  matrix:
+    title: "Matrix Conditioning"
+    cases:
+    - test_absolute_extreme_coefficient_ratio
+    - test_number_independent_conservation_relations
+    - test_number_steady_state_flux_solutions
+    - test_matrix_rank
+    - test_degrees_of_freedom
 weights:
   test_reaction_mass_balance: 1.0
   test_find_disconnected: 1.0

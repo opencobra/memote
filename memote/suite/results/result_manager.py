@@ -76,13 +76,15 @@ class ResultManager(object):
         if env_info:
             self.add_environment(result.meta)
         if pretty:
-            kwargs = dict(sort_keys=True, indent=2, separators=(",", ": "))
+            kwargs = dict(sort_keys=True, indent=2,
+                          separators=(",", ": "), ensure_ascii=False)
         else:
-            kwargs = dict(sort_keys=False, indent=None, separators=(",", ":"))
+            kwargs = dict(sort_keys=False, indent=None,
+                          separators=(",", ":"), ensure_ascii=False)
         LOGGER.info("Storing result in '%s'.", filename)
         with open(filename, "w", encoding="utf-8") as file_handle:
             try:
-                return json.dump(result, file_handle, **kwargs)
+                return file_handle.write(json.dumps(result, **kwargs))
             except TypeError as error:
                 log_json_incompatible_types(result)
                 raise_with_traceback(error)
