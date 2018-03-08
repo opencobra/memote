@@ -5,6 +5,15 @@ Next Release
 ------------
 * Test summary only displays extended narrative summmary describing test,
   and not one-line summary describing expected function behavior/output
+* Fix the following bugs:
+    - Fix type annotation on the test for Biomass Production in Complete Medium
+    - Fix TypeError when running memote new which was associated with unicode
+      and string formatting in py2.7
+    - Sort existing test results from misc into the respective categories
+      (by editing test_config.yml)
+    - Move Matrix statistics category to unscored side into their own card
+    - Add a tuple of (number of reactions, number of genes) to the data
+      annotation of the metabolic coverage test.
 
 0.6.1 (2018-03-01)
 ------------------
