@@ -182,11 +182,9 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
     constrained networks resulting in reactions that can carry flux when
     all the boundaries have been closed.
     """
-    # Skip inside function so it happens during call and not during setup.
-    # TODO: Consider using a timeout on the solver in future instead.
     ann = test_find_stoichiometrically_balanced_cycles.annotation
-    ann["data"] = get_ids(
-        consistency.find_stoichiometrically_balanced_cycles(read_only_model))
+    ann["data"] = consistency.find_stoichiometrically_balanced_cycles(
+        read_only_model)
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) reactions

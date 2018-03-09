@@ -421,13 +421,9 @@ def find_universally_blocked_reactions(model):
 
 def find_stoichiometrically_balanced_cycles(model):
     u"""
-    Find metabolic rxns in stoichiometrically balanced cycles (SBCs).
+    Find metabolic reactions in stoichiometrically balanced cycles (SBCs).
 
-    The flux distribution of nominal FVA is compared with loopless FVA
-    (loopless=True) to determine reactions that participate in loops, as
-    participation in loops would increase the flux through a given reactions
-    to the maximal bounds. This function then returns reactions where the
-    flux differs between the two FVA calculations.
+    Identify forward and reverse cycles by closing all exchanges and using FVA.
 
     Parameters
     ----------
@@ -451,10 +447,8 @@ def find_stoichiometrically_balanced_cycles(model):
     """
     helpers.close_boundaries_sensibly(model)
     fva_result = flux_variability_analysis(model, loopless=False)
-    row_ids_max = fva_result[fva_result["maximum"] == 1].index
-    row_ids_min = fva_result[fva_result["minimum"] == -1].index
-    differential_fluxes = set(row_ids_min).union(set(row_ids_max))
-    return [model.reactions.get_by_id(id) for id in differential_fluxes]
+    return fva_result.index[
+        (fva_result["minimum"] == -1) | (fva_result["maximum"] == 1)].tolist()
 
 
 def find_orphans(model):
