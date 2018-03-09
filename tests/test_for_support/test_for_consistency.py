@@ -409,6 +409,22 @@ def loopy_toy_model(base):
     base.reactions.VB.bounds = 0, 1
     return base
 
+@register_with(MODEL_REGISTRY)
+def loopless_toy_model(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["VA", "VB", "v1", "v2"]]
+                       )
+    base.reactions.VA.add_metabolites({"A": 1})
+    base.reactions.VB.add_metabolites({"C": -1})
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v1.bounds = -1000, 1000
+    base.reactions.v2.bounds = -1000, 1000
+    base.objective = 'VB'
+    base.reactions.VB.bounds = 0, 1
+    return base
+
 
 @register_with(MODEL_REGISTRY)
 def constrained_toy_model(base):
@@ -644,7 +660,7 @@ def test_blocked_reactions(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("loopy_toy_model", 3),
-    ("constrained_toy_model", 0),
+    ("loopless_toy_model", 0),
     ("infeasible_toy_model", 0),
 ], indirect=["model"])
 def test_find_stoichiometrically_balanced_cycles(model, num):

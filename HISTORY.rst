@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+
 * Test summary only displays extended narrative summary describing test,
   and not one-line summary describing expected function behavior/output
 * Fix the following bugs:
@@ -17,12 +18,12 @@ Next Release
 * Add filter in ``report_data_service`` that changed the test result status to
   "error" when the data attribute is ``null``, thus avoiding that the report
   interface breaks when trying to access data.
+* Add test for identifying stoichiometrically balanced cycles in models
 
 0.6.1 (2018-03-01)
 ------------------
+
 * Emergency fix for distributing required JSON file.
-
-
 
 0.6.0 (2018-02-27)
 ------------------
