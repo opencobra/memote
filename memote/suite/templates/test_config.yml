@@ -48,6 +48,7 @@ cards:
     cases:
     - test_find_unique_metabolites
     - test_find_transport_reactions
+    - test_find_constrained_transport_reactions
     - test_find_pure_metabolic_reactions
     - test_find_constrained_pure_metabolic_reactions
     - test_protein_complex_presence
