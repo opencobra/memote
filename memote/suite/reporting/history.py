@@ -32,13 +32,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class HistoryReport(object):
-    """
-    Render a rich report using the git repository history.
-
-    Attributes
-    ----------
-
-    """
+    """Render a rich report using the git repository history."""
 
     _valid_indexes = frozenset(["time", "hash"])
 
@@ -50,8 +44,8 @@ class HistoryReport(object):
         ----------
         history : memote.HistoryManager
             An instance that manages access to test results.
-    index : {"hash", "time"}, optional
-        The default horizontal axis type for all plots.
+        index : {"hash", "time"}, optional
+            The default horizontal axis type for all plots.
 
         """
         super(HistoryReport, self).__init__(**kwargs)
