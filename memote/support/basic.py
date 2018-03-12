@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import logging
+import cobra
 
 import memote.support.helpers as helpers
 
@@ -220,7 +221,7 @@ def find_pure_metabolic_reactions(model):
     return set(model.reactions) - (exchanges | transporters | biomass)
 
 
-def find_constrained_pure_metabolic_reactions(model):
+def find_constrained_pure_metabolic_reactions(model_or_rxns):
     """
     Return purely metabolic reactions with fixed constraints.
 
@@ -229,25 +230,37 @@ def find_constrained_pure_metabolic_reactions(model):
 
     Parameters
     ----------
-    model : cobra.Model
-        The metabolic model under investigation.
+    model_or_rxns : cobra.Model or set of cobra.Reaction
+        The metabolic model under investigation or a set of reactions from
+        the metabolic model under investigation.
 
     """
-    pmr = find_pure_metabolic_reactions(model)
+    pmr = None
+    if isinstance(model_or_rxns, cobra.core.Model):
+        pmr = find_pure_metabolic_reactions(model_or_rxns)
+    elif isinstance(model_or_rxns, set) and isinstance(list(model_or_rxns)[0],
+                                                       cobra.core.Reaction):
+        pmr = model_or_rxns
     return set([rxn for rxn in pmr if rxn.lower_bound > 0])
 
 
-def find_constrained_transport_reactions(model):
+def find_constrained_transport_reactions(model_or_rxns):
     """
     Return transport reactions with fixed constraints.
 
     Parameters
     ----------
-    model: cobra.Model
-        The metabolic model under investigation.
+    model_or_rxns : cobra.Model or set of cobra.Reaction
+        The metabolic model under investigation or a set of reactions from
+        the metabolic model under investigation.
 
     """
-    transporters = set(helpers.find_transport_reactions(model))
+    transporters = None
+    if isinstance(model_or_rxns, cobra.core.Model):
+        transporters = set(helpers.find_transport_reactions(model))
+    elif isinstance(model_or_rxns, set) and isinstance(list(model_or_rxns)[0],
+                                                       cobra.core.Reaction):
+        transporters = model_or_rxns
     return set([rxn for rxn in transporters if rxn.lower_bound > 0])
 
 
