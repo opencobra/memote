@@ -295,7 +295,7 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     If a reaction is neither a transport reaction, a biomass reaction nor a
     boundary reaction, it is counted as a purely metabolic reaction. This test
     requires the presence of metabolite formula to be able to identify
-    transport reactions. This test simply reports the number of purely 
+    transport reactions. This test simply reports the number of purely
     metabolic reactions that have fixed constraints and does not have any
     mandatory 'pass' criteria.
     """
@@ -304,9 +304,9 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
         basic.test_find_constrained_pure_metabolic_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) purely metabolic reactions have fixed 
-        constraints in the model, this excludes transporters, exchanges, or 
-        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"], 
+        """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
+        constraints in the model, this excludes transporters, exchanges, or
+        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"],
                                        truncate(ann["data"])))
 
 
