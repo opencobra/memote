@@ -287,7 +287,7 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Purely Metabolic Reactions with Constraints", 
+@annotate(title="Number of Purely Metabolic Reactions with Constraints",
           type="count")
 def test_find_constrained_pure_metabolic_reactions(read_only_model):
     """
@@ -304,7 +304,7 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     ann["data"] = get_ids(
         basic.test_find_constrained_pure_metabolic_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / \
-    len(basic.find_pure_metabolic_reactions(read_only_model))
+        len(basic.find_pure_metabolic_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
@@ -318,9 +318,10 @@ def test_find_constrained_transport_reactions(read_only_model):
     Expect zero or more transport reactions to have fixed constraints.
 
     Cellular metabolism in any organism usually involves the transport of
-    metabolites across a lipid bi-layer. Hence, this test checks that there is
-    at least one reaction, which transports metabolites from one compartment
-    to another.
+    metabolites across a lipid bi-layer. Hence, this test reports how many 
+    of these reactions, which transports metabolites from one compartment
+    to another, have fixed constraints. This test does not have any mandatory
+    'pass' criteria.
 
     A transport reaction is defined as follows:
     1. It contains metabolites from at least two compartments and
@@ -333,11 +334,10 @@ def test_find_constrained_transport_reactions(read_only_model):
     ann["data"] = get_ids(
         basic.test_find_constrained_transport_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / \
-    len(set(helpers.find_transport_reactions(model)))
+        len(set(helpers.find_transport_reactions(read_only_model)))
     ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
-        constraints in the model, this excludes transporters, exchanges, or
-        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"],
+        """A total of {:d} ({:.2%}) transport reactions have fixed
+        constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
                                        truncate(ann["data"])))
 
 
