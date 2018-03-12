@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 
 import logging
-import cobra
 
 import memote.support.helpers as helpers
 
