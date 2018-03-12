@@ -221,47 +221,14 @@ def find_pure_metabolic_reactions(model):
     return set(model.reactions) - (exchanges | transporters | biomass)
 
 
-def find_constrained_pure_metabolic_reactions(model_or_rxns):
-    """
-    Return purely metabolic reactions with fixed constraints.
-
-    Purely metabolic reactions in this case are defined as reactions that are
-    neither transporters, exchanges, nor pseudo.
-
-    Parameters
-    ----------
-    model_or_rxns : cobra.Model or set of cobra.Reaction
-        The metabolic model under investigation or a set of reactions from
-        the metabolic model under investigation.
-
-    """
-    pmr = None
-    if isinstance(model_or_rxns, cobra.core.Model):
-        pmr = find_pure_metabolic_reactions(model_or_rxns)
-    elif isinstance(model_or_rxns, set) and isinstance(list(model_or_rxns)[0],
-                                                       cobra.core.Reaction):
-        pmr = model_or_rxns
-    return set([rxn for rxn in pmr if rxn.lower_bound > 0])
-
-
-def find_constrained_transport_reactions(model_or_rxns):
-    """
-    Return transport reactions with fixed constraints.
-
-    Parameters
-    ----------
-    model_or_rxns : cobra.Model or set of cobra.Reaction
-        The metabolic model under investigation or a set of reactions from
-        the metabolic model under investigation.
-
-    """
-    transporters = None
-    if isinstance(model_or_rxns, cobra.core.Model):
-        transporters = set(helpers.find_transport_reactions(model))
-    elif isinstance(model_or_rxns, set) and isinstance(list(model_or_rxns)[0],
-                                                       cobra.core.Reaction):
-        transporters = model_or_rxns
-    return set([rxn for rxn in transporters if rxn.lower_bound > 0])
+def is_constrained_reaction(rxn):
+    """Return whether a reaction has fixed constraints."""
+    if rxn.reversibility:
+        return True if (
+            rxn.lower_bound != -1000 or rxn.upper_bound != 1000) else False
+    else:
+        return True if (
+            rxn.lower_bound != 0 or rxn.upper_bound != 1000) else False
 
 
 def find_unique_metabolites(model):
