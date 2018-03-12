@@ -237,6 +237,20 @@ def find_constrained_pure_metabolic_reactions(model):
     return set([rxn for rxn in pmr if rxn.lower_bound > 0])
 
 
+def find_constrained_transport_reactions(model):
+    """
+    Return transport reactions with fixed constraints.
+
+    Parameters
+    ----------
+    model: cobra.Model
+        The metabolic model under investigation.
+
+    """
+    transporters = set(helpers.find_transport_reactions(model))
+    return set([rxn for rxn in transporters if rxn.lower_bound > 0])
+
+
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     # TODO: BiGG specific (met_c).
