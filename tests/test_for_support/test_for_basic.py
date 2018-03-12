@@ -23,6 +23,7 @@ import cobra
 import pytest
 
 import memote.support.basic as basic
+import memote.support.helpers as helpers
 from memote.utils import register_with
 
 MODEL_REGISTRY = dict()
@@ -410,8 +411,11 @@ def test_find_pure_metabolic_reactions(model, num):
     ("non_metabolic_reactions", 0)
 ], indirect=["model"])
 def test_find_constrained_pure_metabolic_reactions(model, num):
-    """Expect num of contrained transport rxns to be identified correctly."""
-    assert len(basic.find_constrained_pure_metabolic_reactions(model)) == num
+    """Expect num of contrained metabolic rxns to be identified correctly."""
+    pmr = basic.find_pure_metabolic_reactions(model)
+    contrained_pmr = set(
+        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)])
+    assert len(contrained_pmr) == num
 
 
 @pytest.mark.parametrize("model, num", [
@@ -420,8 +424,11 @@ def test_find_constrained_pure_metabolic_reactions(model, num):
     ("ngam_and_atpsynthase", 0)
 ], indirect=["model"])
 def test_find_constrained_transport_reactions(model, num):
-    """Expect num of contrained metabolic rxns to be identified correctly."""
-    assert len(basic.find_constrained_transport_reactions(model)) == num
+    """Expect num of contrained transport rxns to be identified correctly."""
+    transporters = set(helpers.find_transport_reactions(model))
+    constrained_transporters = set(
+        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
+    assert len(constrained_transporters) == num
 
 
 @pytest.mark.parametrize("model, num", [

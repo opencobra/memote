@@ -302,14 +302,28 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     """
     ann = test_find_constrained_pure_metabolic_reactions.annotation
     pmr = basic.find_pure_metabolic_reactions(read_only_model)
-    ann["data"] = get_ids(
-        basic.test_find_constrained_pure_metabolic_reactions(pmr))
+    ann["data"] = get_ids(set(
+        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)]))
     ann["metric"] = len(ann["data"]) / len(pmr)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
         pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"],
                                        truncate(ann["data"])))
+
+
+@annotate(title="Number of Transport Reactions", type="count")
+def test_find_transport_reactions(read_only_model):
+    """Expect >= 1 transport reactions are present in the read_only_model."""
+    ann = test_find_transport_reactions.annotation
+    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) transport reactions are defined in the
+        model, this excludes purely metabolic reactions, exchanges, or
+        pseudo-reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
 
 
 @annotate(title="Number of Tranport Reactions with Constraints", type="count")
@@ -331,28 +345,14 @@ def test_find_constrained_transport_reactions(read_only_model):
     This test will not be able to identify transport via the PTS System.
     """
     ann = test_find_constrained_transport_reactions.annotation
-    transporters = set(helpers.find_transport_reactions(model))
-    ann["data"] = get_ids(
-        basic.test_find_constrained_transport_reactions(transporters))
+    transporters = set(helpers.find_transport_reactions(read_only_model))
+    ann["data"] = get_ids(set(
+        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)]))
     ann["metric"] = len(ann["data"]) / len(transporters)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) transport reactions have fixed
         constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
                                                truncate(ann["data"])))
-
-
-@annotate(title="Number of Transport Reactions", type="count")
-def test_find_transport_reactions(read_only_model):
-    """Expect >= 1 transport reactions are present in the read_only_model."""
-    ann = test_find_transport_reactions.annotation
-    ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
-    ann["message"] = wrapper.fill(
-        """A total of {:d} ({:.2%}) transport reactions are defined in the
-        model, this excludes purely metabolic reactions, exchanges, or
-        pseudo-reactions: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert len(ann["data"]) >= 1, ann["message"]
 
 
 @annotate(title="Fraction of Transport Reactions without GPR", type="percent")
