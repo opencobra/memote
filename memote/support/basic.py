@@ -220,6 +220,21 @@ def find_pure_metabolic_reactions(model):
     return set(model.reactions) - (exchanges | transporters | biomass)
 
 
+def find_constrained_pure_metabolic_reactions(model):
+    """
+    Return reactions with fixed constraints that are neither transporters, 
+    exchanges, nor pseudo.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    pmr = find_pure_metabolic_reactions(model)
+    return set([rxn for rxn in pmr if rxn.lower_bound > 0])
+
+
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     # TODO: BiGG specific (met_c).
