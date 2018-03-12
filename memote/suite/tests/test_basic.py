@@ -318,7 +318,7 @@ def test_find_constrained_transport_reactions(read_only_model):
     Expect zero or more transport reactions to have fixed constraints.
 
     Cellular metabolism in any organism usually involves the transport of
-    metabolites across a lipid bi-layer. Hence, this test reports how many 
+    metabolites across a lipid bi-layer. Hence, this test reports how many
     of these reactions, which transports metabolites from one compartment
     to another, have fixed constraints. This test does not have any mandatory
     'pass' criteria.
@@ -338,7 +338,7 @@ def test_find_constrained_transport_reactions(read_only_model):
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) transport reactions have fixed
         constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
-                                       truncate(ann["data"])))
+                                               truncate(ann["data"])))
 
 
 @annotate(title="Number of Transport Reactions", type="count")
