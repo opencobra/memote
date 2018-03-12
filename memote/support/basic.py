@@ -186,7 +186,7 @@ def calculate_metabolic_coverage(model):
 
 def find_protein_complexes(model):
     """
-    Find tuples of gene identifiers that constitute functional enzyme complexes.
+    Find tuples of gene identifiers that comprise functional enzyme complexes.
 
     Parameters
     ----------
@@ -222,8 +222,10 @@ def find_pure_metabolic_reactions(model):
 
 def find_constrained_pure_metabolic_reactions(model):
     """
-    Return reactions with fixed constraints that are neither transporters, 
-    exchanges, nor pseudo.
+    Return purely metabolic reactions with fixed constraints.
+
+    Purely metabolic reactions in this case are defined as reactions that are 
+    neither transporters, exchanges, nor pseudo.
 
     Parameters
     ----------
