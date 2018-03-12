@@ -287,6 +287,29 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
+@annotate(title="Number of Purely Metabolic Reactions", type="count")
+def test_find_constrained_pure_metabolic_reactions(read_only_model):
+    """
+    Expect zero or more purely metabolic reactions to have fixed constraints.
+
+    If a reaction is neither a transport reaction, a biomass reaction nor a
+    boundary reaction, it is counted as a purely metabolic reaction. This test
+    requires the presence of metabolite formula to be able to identify
+    transport reactions. This test simply reports the number of purely 
+    metabolic reactions that have fixed constraints and does not have any
+    mandatory 'pass' criteria.
+    """
+    ann = test_find_constrained_pure_metabolic_reactions.annotation
+    ann["data"] = get_ids(
+        basic.test_find_constrained_pure_metabolic_reactions(read_only_model))
+    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) purely metabolic reactions have fixed 
+        constraints in the model, this excludes transporters, exchanges, or 
+        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"], 
+                                       truncate(ann["data"])))
+
+
 @annotate(title="Number of Transport Reactions", type="count")
 def test_find_transport_reactions(read_only_model):
     """Expect >= 1 transport reactions are present in the read_only_model."""
