@@ -303,7 +303,8 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     ann = test_find_constrained_pure_metabolic_reactions.annotation
     ann["data"] = get_ids(
         basic.test_find_constrained_pure_metabolic_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["metric"] = len(ann["data"]) / \
+    len(basic.find_pure_metabolic_reactions(read_only_model))
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
@@ -331,7 +332,8 @@ def test_find_constrained_transport_reactions(read_only_model):
     ann = test_find_constrained_transport_reactions.annotation
     ann["data"] = get_ids(
         basic.test_find_constrained_transport_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["metric"] = len(ann["data"]) / \
+    len(set(helpers.find_transport_reactions(model)))
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
