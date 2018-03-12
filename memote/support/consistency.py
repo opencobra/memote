@@ -71,7 +71,7 @@ def check_stoichiometric_consistency(model):
     See [1]_ section 3.1 for a complete description of the algorithm.
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
            Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
@@ -122,7 +122,7 @@ def find_unconserved_metabolites(model):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
            Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
@@ -181,7 +181,7 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
            Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 

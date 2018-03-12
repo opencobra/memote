@@ -224,7 +224,7 @@ def find_constrained_pure_metabolic_reactions(model):
     """
     Return purely metabolic reactions with fixed constraints.
 
-    Purely metabolic reactions in this case are defined as reactions that are 
+    Purely metabolic reactions in this case are defined as reactions that are
     neither transporters, exchanges, nor pseudo.
 
     Parameters
