@@ -74,11 +74,7 @@ class RepoResultManager(ResultManager):
 
         """
         if commit is None:
-            try:
-                commit = self._repo.active_branch.commit
-            except TypeError:
-                LOGGER.error(
-                    "Detached HEAD mode, please provide the commit hash.")
+            commit = self._repo.head.commit
         else:
             commit = self._repo.commit(commit)
         return GitInfo(

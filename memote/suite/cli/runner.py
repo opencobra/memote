@@ -137,10 +137,10 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                     "Working with a repository requires a storage location.")
                 sys.exit(1)
             try:
-                manager = SQLResultManager(location)
+                manager = SQLResultManager(repository=repo, location=location)
             except (AttributeError, ArgumentError):
-                manager = RepoResultManager(location)
-            store = partial(manager.store, repo=repo)
+                manager = RepoResultManager(repository=repo, location=location)
+            store = manager.store
     code, result = api.test_model(
         model=model, results=True, pytest_args=pytest_args, skip=skip,
         exclusive=exclusive)
@@ -176,13 +176,13 @@ def new(directory, replay):
                  replay=replay)
 
 
-def _test_history(model, solver, manager, repo, commit, pytest_args, skip):
+def _test_history(model, solver, manager, commit, pytest_args, skip):
     model = callbacks.validate_model(None, "model", model)
     model.solver = solver
     # TODO: This needs to be restructured to use an SQLite database.
     _, result = api.test_model(
         model, results=True, pytest_args=pytest_args, skip=skip)
-    manager.store(result, repo=repo, commit=commit)
+    manager.store(result, commit=commit)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -232,14 +232,14 @@ def history(context, model, solver, location, pytest_args, commits):
             "the current branch's commit history.")
         sys.exit(1)
     try:
-        manager = SQLResultManager(location)
+        manager = SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
-        manager = RepoResultManager(location)
+        manager = RepoResultManager(repository=repo, location=location)
     if len(commits) > 0:
         # TODO: Convert hashes to `git.Commit` instances.
         raise NotImplementedError(u"Coming soon™.")
     else:
-        history = HistoryManager(repo, manager)
+        history = HistoryManager(repository=repo, manager=manager)
         history.build_branch_structure()
     skip = context.default_map.get("skip", [])
     for commit in history.iter_commits():
@@ -249,7 +249,7 @@ def history(context, model, solver, location, pytest_args, commits):
             "Running the test suite for commit '{}'.".format(commit))
         proc = Process(
             target=_test_history,
-            args=(model, solver, manager, repo, commit, pytest_args, skip))
+            args=(model, solver, manager, commit, pytest_args, skip))
         proc.start()
         proc.join()
     history.reset()

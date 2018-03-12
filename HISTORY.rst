@@ -19,6 +19,8 @@ Next Release
   "error" when the data attribute is ``null``, thus avoiding that the report
   interface breaks when trying to access data.
 * Add test for identifying stoichiometrically balanced cycles in models
+* Correct the arguments used for repositories such that ``memote run`` and
+  ``memote history`` work as expected inside of a repository.
 
 0.6.1 (2018-03-01)
 ------------------
