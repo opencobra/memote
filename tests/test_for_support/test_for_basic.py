@@ -250,6 +250,26 @@ def transport_gpr(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def transport_gpr_constrained(base):
+    """Provide a model with a constrained transport reaction without GPR."""
+    met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
+    met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
+    met_c = cobra.Metabolite("na_c", formula='Na', compartment="c")
+    met_d = cobra.Metabolite("na_e", formula='Na', compartment="e")
+    uni = cobra.Reaction("UNI")
+    uni.gene_reaction_rule="X and Y"
+    uni.add_metabolites({met_a: 1, met_b: -1})
+    anti = cobra.Reaction("ANTI")
+    anti.gene_reaction_rule = "W or V"
+    anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
+    sym = cobra.Reaction("SYM")
+    sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    sym.lower_bound = 8.39
+    base.add_reactions([uni, anti, sym])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -395,9 +415,9 @@ def test_find_constrained_pure_metabolic_reactions(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("ngam_present", 1),
-    ("ngam_and_atpsynthase", 0),
-    ("non_metabolic_reactions", 0)
+    ("transport_gpr_constrained", 1),
+    ("transport_gpr", 0),
+    ("ngam_and_atpsynthase", 0)
 ], indirect=["model"])
 def test_find_constrained_transport_reactions(model, num):
     """Expect num of contrained metabolic rxns to be identified correctly."""
