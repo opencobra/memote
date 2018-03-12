@@ -71,7 +71,8 @@ def check_stoichiometric_consistency(model):
     See [1]_ section 3.1 for a complete description of the algorithm.
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
@@ -121,7 +122,8 @@ def find_unconserved_metabolites(model):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
@@ -179,7 +181,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
 
 
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+           "Detection of Stoichiometric Inconsistencies in Biomolecular 
+           Models."
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
@@ -189,7 +192,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     unconserved_mets = find_unconserved_metabolites(model)
     LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
     internal_rxns = con_helpers.get_internals(model)
-    internal_mets = set(met for rxn in internal_rxns for met in rxn.metabolites)
+    internal_mets = set(
+        met for rxn in internal_rxns for met in rxn.metabolites)
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
