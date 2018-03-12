@@ -69,8 +69,8 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     title : str
         A human-readable descriptive title of the test case.
     type : str
-        A sting that determines how the result data is formatted in the report.
-        It is expected not to be None.
+        A string that determines how the result data is formatted in the 
+        report. It is expected not to be None.
         - 'number' : 'data' is a single number which can be an integer or
           float and should be represented as such.
         - 'count' : 'data' is a list, set or tuple. Choosing 'count' will
