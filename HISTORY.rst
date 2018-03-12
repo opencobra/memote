@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.6.2 (2018-03-12)
+------------------
+
 * Test summary only displays extended narrative summary describing test,
   and not one-line summary describing expected function behavior/output
 * Fix the following bugs:
@@ -47,7 +50,7 @@ Next Release
 * Add helper function ``find_met_in_model`` which looks up a query metabolite
   ID using the MNX namespace in the shortlist and:
     - If no compartment is provided, returns a list of all possible candidates
-      metabolites
+      metabolites.
     - If a compartment is provided, tries to return a list containing only
       ONE corresponding metabolite.
 * Add helper function ``find_compartment_id_in_model`` to identify
