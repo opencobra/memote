@@ -30,6 +30,7 @@ import memote.suite.templates as templates
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.reporting import SnapshotReport, HistoryReport
+from memote.suite.results import HistoryManager
 
 __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
@@ -117,7 +118,9 @@ def history_report(repository, manager, filename, index="hash"):
         The default horizontal axis type for all plots.
 
     """
-    report = HistoryReport(repository, manager, index=index)
+    report = HistoryReport(
+        history=HistoryManager(repository=repository, manager=manager),
+        index=index)
     LOGGER.info("Writing history report '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())

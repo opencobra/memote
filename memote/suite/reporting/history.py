@@ -27,44 +27,31 @@ from importlib_resources import read_text
 
 import memote.suite.templates as templates
 from memote.utils import log_json_incompatible_types
-from memote.suite.results import HistoryManager
 
 LOGGER = logging.getLogger(__name__)
 
 
 class HistoryReport(object):
-    """
-    Render a rich report using the git repository history.
-
-    Attributes
-    ----------
-    result : memote.MemoteResult
-        The dictionary structure of results.
-    configuration : memote.MemoteConfiguration
-        A memote configuration structure.
-
-    """
+    """Render a rich report using the git repository history."""
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, repository, manager, **kwargs):
+    def __init__(self, history, index="hash", **kwargs):
         """
         Initialize the git history report.
 
         Parameters
         ----------
-        repository : git.Repo
-            An instance of the working directory git repository.
-        manager : memote.RepoResultManager
-            The manager grants access to previous results.
+        history : memote.HistoryManager
+            An instance that manages access to test results.
+        index : {"hash", "time"}, optional
+            The default horizontal axis type for all plots.
 
         """
         super(HistoryReport, self).__init__(**kwargs)
         self._template = Template(
             read_text(templates, "index.html", encoding="utf-8"))
-        self._repo = repository
-        self._manager = manager
-        self._history = HistoryManager(self._repo, self._manager)
+        self._history = history
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""

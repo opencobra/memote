@@ -25,6 +25,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
+from memote.suite.results.result import MemoteResult
 from memote.suite.results.repo_result_manager import RepoResultManager
 from memote.suite.results.models import Result, Base
 
@@ -89,9 +90,10 @@ class SQLResultManager(RepoResultManager):
         """Load a result from the database."""
         git_info = self.record_git_info(commit)
         LOGGER.info("Loading result from '%s'.", git_info.hexsha)
-        result = self.session.query(Result.memote_result).\
-            filter_by(hexsha=git_info.hexsha).\
-            one().memote_result
+        result = MemoteResult(
+            self.session.query(Result.memote_result).
+            filter_by(hexsha=git_info.hexsha).
+            one().memote_result)
         # Add git info so the object is equivalent to the one returned by the
         #  RepoResultManager.
         self.add_git(result.meta, git_info)

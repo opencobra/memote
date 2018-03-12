@@ -118,9 +118,9 @@ def history(location, filename, index):
             "the current branch's commit history.")
         sys.exit(1)
     try:
-        manager = managers.SQLResultManager(location)
+        manager = managers.SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
-        manager = managers.RepoResultManager(location)
+        manager = managers.RepoResultManager(repository=repo, location=location)
     api.history_report(repo, manager, filename, index)
 
 

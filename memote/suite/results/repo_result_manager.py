@@ -134,4 +134,6 @@ class RepoResultManager(ResultManager):
         """Load a result from the storage directory."""
         git_info = self.record_git_info(commit)
         filename = self.get_filename(git_info)
-        return super(RepoResultManager, self).load(filename)
+        result = super(RepoResultManager, self).load(filename)
+        self.add_git(result.meta, git_info)
+        return result
