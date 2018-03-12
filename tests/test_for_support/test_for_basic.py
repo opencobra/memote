@@ -167,8 +167,7 @@ def ngam_present(base):
     met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
     met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
     rxn_1 = cobra.Reaction("ATPM", name="non-growth associated maintenance")
-    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
-                           met_j: -1, met_k: 1})
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1, met_j: -1, met_k: 1})
     rxn_1.lower_bound = 8.39
     base.add_reactions([rxn_1])
     return base
@@ -184,12 +183,10 @@ def ngam_and_atpsynthase(base):
     met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
     met_l = cobra.Metabolite("h_c", "H", compartment="c")
     rxn_1 = cobra.Reaction("ATPS", name="ATPase cytosolic")
-    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
-                           met_j: -1, met_k: 1})
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1, met_j: -1, met_k: 1})
     rxn_1.bounds = -1000, 1000
     rxn_2 = cobra.Reaction("NGAM", name="non-growth associated maintenance")
-    rxn_2.add_metabolites({met_g: -1, met_h: 1, met_l: 1,
-                           met_j: -1, met_k: 1})
+    rxn_2.add_metabolites({met_g: -1, met_h: 1, met_l: 1, met_j: -1, met_k: 1})
     rxn_2.bounds = 0, 1000
     base.add_reactions([rxn_1, rxn_2])
     return base
@@ -202,11 +199,9 @@ def sufficient_compartments(base):
     met_b = cobra.Metabolite("a_p", compartment="p")
     met_c = cobra.Metabolite("a_e", compartment="e")
     rxn_a_b = cobra.Reaction("AB")
-    rxn_a_b.add_metabolites({met_a: 1,
-                             met_b: -1})
+    rxn_a_b.add_metabolites({met_a: 1, met_b: -1})
     rxn_b_c = cobra.Reaction("BC")
-    rxn_b_c.add_metabolites({met_b: 1,
-                             met_c: -1})
+    rxn_b_c.add_metabolites({met_b: 1, met_c: -1})
     base.add_reactions([rxn_b_c, rxn_a_b])
     return base
 
@@ -217,8 +212,7 @@ def insufficient_compartments(base):
     met_a = cobra.Metabolite("a_c", compartment="c")
     met_c = cobra.Metabolite("a_e", compartment="e")
     rxn_a_c = cobra.Reaction("AC")
-    rxn_a_c.add_metabolites({met_a: 1,
-                             met_c: -1})
+    rxn_a_c.add_metabolites({met_a: 1, met_c: -1})
     base.add_reactions([rxn_a_c])
     return base
 
@@ -229,13 +223,26 @@ def non_metabolic_reactions(base):
     met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
     met_c = cobra.Metabolite("a_e", formula='CH4', compartment="e")
     rxn_a_c = cobra.Reaction("AC")
-    rxn_a_c.add_metabolites({met_a: 1,
-                             met_c: -1})
+    rxn_a_c.add_metabolites({met_a: 1, met_c: -1})
     biomass = cobra.Reaction("BIOMASS")
     ex_a = cobra.Reaction("EX_a_e")
     ex_a.add_metabolites({met_c: -1})
     base.add_reactions([rxn_a_c, biomass, ex_a])
     return base
+
+
+@register_with(MODEL_REGISTRY)
+def purely_metabolic_constrained_reactions(base):
+    """Provide a model of purely metabolic reactions with constrained bounds"""
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment="c")
+    met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
+    met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
+    met_l = cobra.Metabolite("h_c", "H", compartment="c")
+    rxn_1 = cobra.Reaction("ATPM", name="ATP maintenance requirement")
+    rxn_1.add_metabolites({met_h: 1.0, met_g: -1.0, met_j: -1.0, met_l: 1.0,
+                           met_k: 1.0})
+    base.add_reactions([rxn_1])
 
 
 @register_with(MODEL_REGISTRY)
@@ -387,6 +394,16 @@ def test_enzyme_complex_presence(model, num):
 def test_find_pure_metabolic_reactions(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_pure_metabolic_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("purely_metabolic_constrained_reactions", 1),
+    ("ngam_and_atpsynthase", 0),
+    ("non_metabolic_reactions", 0)
+], indirect=["model"])
+def test_find_constrained_pure_metabolic_reactions(model, num):
+    """Expect num of contrained metabolic rxns to be identified correctly."""
+    assert len(basic.find_constrained_pure_metabolic_reactions(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
