@@ -110,7 +110,7 @@ class HistoryManager(object):
         all_commits = list(self._history["commits"])
         for commit in all_commits:
             try:
-                self._results[commit] = self.manager.load(self._repo, commit)
+                self._results[commit] = self.manager.load(commit)
             except (IOError, NoResultFound) as err:
                 LOGGER.error("Could not load result '%s'.", commit)
                 LOGGER.debug("%s", str(err))
