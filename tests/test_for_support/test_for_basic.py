@@ -372,6 +372,8 @@ def test_enzyme_complex_presence(model, num):
     assert len(basic.find_protein_complexes(model)) == num
 
 
+# TODO: ngam_and_atpsynthase is not a proper positive control test model
+# It needs to be replaced with a new test.
 @pytest.mark.parametrize("model, num", [
     ("ngam_and_atpsynthase", 2),
     ("gpr_missing_with_exchange", 1),
@@ -388,8 +390,18 @@ def test_find_pure_metabolic_reactions(model, num):
     ("non_metabolic_reactions", 0)
 ], indirect=["model"])
 def test_find_constrained_pure_metabolic_reactions(model, num):
-    """Expect num of contrained metabolic rxns to be identified correctly."""
+    """Expect num of contrained transport rxns to be identified correctly."""
     assert len(basic.find_constrained_pure_metabolic_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("ngam_present", 1),
+    ("ngam_and_atpsynthase", 0),
+    ("non_metabolic_reactions", 0)
+], indirect=["model"])
+def test_find_constrained_transport_reactions(model, num):
+    """Expect num of contrained metabolic rxns to be identified correctly."""
+    assert len(basic.find_constrained_transport_reactions(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
