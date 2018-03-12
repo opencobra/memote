@@ -232,20 +232,6 @@ def non_metabolic_reactions(base):
 
 
 @register_with(MODEL_REGISTRY)
-def purely_metabolic_constrained_reactions(base):
-    """Provide a model of purely metabolic reactions with constrained bounds"""
-    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
-    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment="c")
-    met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
-    met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
-    met_l = cobra.Metabolite("h_c", "H", compartment="c")
-    rxn_1 = cobra.Reaction("ATPM", name="ATP maintenance requirement")
-    rxn_1.add_metabolites({met_h: 1.0, met_g: -1.0, met_j: -1.0, met_l: 1.0,
-                           met_k: 1.0})
-    base.add_reactions([rxn_1])
-
-
-@register_with(MODEL_REGISTRY)
 def transport_gpr(base):
     """Provide a model with a transport reaction without GPR."""
     met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
@@ -397,7 +383,7 @@ def test_find_pure_metabolic_reactions(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("purely_metabolic_constrained_reactions", 1),
+    ("ngam_present", 1),
     ("ngam_and_atpsynthase", 0),
     ("non_metabolic_reactions", 0)
 ], indirect=["model"])
