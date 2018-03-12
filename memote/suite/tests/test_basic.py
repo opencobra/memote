@@ -301,10 +301,10 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     mandatory 'pass' criteria.
     """
     ann = test_find_constrained_pure_metabolic_reactions.annotation
+    pmr = basic.find_pure_metabolic_reactions(read_only_model)
     ann["data"] = get_ids(
-        basic.test_find_constrained_pure_metabolic_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / \
-        len(basic.find_pure_metabolic_reactions(read_only_model))
+        basic.test_find_constrained_pure_metabolic_reactions(pmr))
+    ann["metric"] = len(ann["data"]) / len(pmr)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
@@ -331,10 +331,10 @@ def test_find_constrained_transport_reactions(read_only_model):
     This test will not be able to identify transport via the PTS System.
     """
     ann = test_find_constrained_transport_reactions.annotation
+    transporters = set(helpers.find_transport_reactions(model))
     ann["data"] = get_ids(
-        basic.test_find_constrained_transport_reactions(read_only_model))
-    ann["metric"] = len(ann["data"]) / \
-        len(set(helpers.find_transport_reactions(read_only_model)))
+        basic.test_find_constrained_transport_reactions(transporters))
+    ann["metric"] = len(ann["data"]) / len(transporters)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) transport reactions have fixed
         constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
