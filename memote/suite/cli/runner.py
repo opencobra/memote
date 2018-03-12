@@ -179,7 +179,6 @@ def new(directory, replay):
 def _test_history(model, solver, manager, commit, pytest_args, skip):
     model = callbacks.validate_model(None, "model", model)
     model.solver = solver
-    # TODO: This needs to be restructured to use an SQLite database.
     _, result = api.test_model(
         model, results=True, pytest_args=pytest_args, skip=skip)
     manager.store(result, commit=commit)
