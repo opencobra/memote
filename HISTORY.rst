@@ -7,6 +7,7 @@ Next Release
 * Add test for identifying purely metabolic reactions with fixed constraints in
   models
 * Add test for identifying transport reactions with fixed constraints in models
+* Add test for identifying reversible oxygen-containing reactions in models
 
 0.6.2 (2018-03-12)
 ------------------
