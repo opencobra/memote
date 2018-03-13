@@ -186,7 +186,7 @@ def calculate_metabolic_coverage(model):
 
 def find_protein_complexes(model):
     """
-    Find tuples of gene identifiers that constitute functional enzyme complexes.
+    Find tuples of gene identifiers that comprise functional enzyme complexes.
 
     Parameters
     ----------
@@ -218,6 +218,14 @@ def find_pure_metabolic_reactions(model):
     transporters = set(helpers.find_transport_reactions(model))
     biomass = set(helpers.find_biomass_reaction(model))
     return set(model.reactions) - (exchanges | transporters | biomass)
+
+
+def is_constrained_reaction(rxn):
+    """Return whether a reaction has fixed constraints."""
+    if rxn.reversibility:
+        return rxn.lower_bound > -1000 or rxn.upper_bound < 1000
+    else:
+        return rxn.lower_bound > 0 or rxn.upper_bound < 1000
 
 
 def find_unique_metabolites(model):

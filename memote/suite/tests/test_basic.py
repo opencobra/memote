@@ -21,7 +21,8 @@ from __future__ import absolute_import, division
 
 import memote.support.basic as basic
 import memote.support.helpers as helpers
-from memote.utils import annotate, get_ids, truncate, wrapper
+from memote.utils import (
+    annotate, get_ids, get_ids_and_bounds, truncate, wrapper)
 
 
 @annotate(title="Model Identifier", type="raw")
@@ -287,6 +288,31 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
+@annotate(title="Number of Purely Metabolic Reactions with Constraints",
+          type="count")
+def test_find_constrained_pure_metabolic_reactions(read_only_model):
+    """
+    Expect zero or more purely metabolic reactions to have fixed constraints.
+
+    If a reaction is neither a transport reaction, a biomass reaction nor a
+    boundary reaction, it is counted as a purely metabolic reaction. This test
+    requires the presence of metabolite formula to be able to identify
+    transport reactions. This test simply reports the number of purely
+    metabolic reactions that have fixed constraints and does not have any
+    mandatory 'pass' criteria.
+    """
+    ann = test_find_constrained_pure_metabolic_reactions.annotation
+    pmr = basic.find_pure_metabolic_reactions(read_only_model)
+    ann["data"] = get_ids_and_bounds(
+        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)])
+    ann["metric"] = len(ann["data"]) / len(pmr)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
+        constraints in the model, this excludes transporters, exchanges, or
+        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"],
+                                       truncate(ann["data"])))
+
+
 @annotate(title="Number of Transport Reactions", type="count")
 def test_find_transport_reactions(read_only_model):
     """Expect >= 1 transport reactions are present in the read_only_model."""
@@ -299,6 +325,35 @@ def test_find_transport_reactions(read_only_model):
         pseudo-reactions: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
+
+
+@annotate(title="Number of Tranport Reactions with Constraints", type="count")
+def test_find_constrained_transport_reactions(read_only_model):
+    """
+    Expect zero or more transport reactions to have fixed constraints.
+
+    Cellular metabolism in any organism usually involves the transport of
+    metabolites across a lipid bi-layer. Hence, this test reports how many
+    of these reactions, which transports metabolites from one compartment
+    to another, have fixed constraints. This test does not have any mandatory
+    'pass' criteria.
+
+    A transport reaction is defined as follows:
+    1. It contains metabolites from at least two compartments and
+    2. at least one metabolite undergoes no chemical conversion, i.e.,
+    the formula stays the same on both sides of the equation.
+
+    This test will not be able to identify transport via the PTS System.
+    """
+    ann = test_find_constrained_transport_reactions.annotation
+    transporters = helpers.find_transport_reactions(read_only_model)
+    ann["data"] = get_ids_and_bounds(
+        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
+    ann["metric"] = len(ann["data"]) / len(transporters)
+    ann["message"] = wrapper.fill(
+        """A total of {:d} ({:.2%}) transport reactions have fixed
+        constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
+                                               truncate(ann["data"])))
 
 
 @annotate(title="Fraction of Transport Reactions without GPR", type="percent")

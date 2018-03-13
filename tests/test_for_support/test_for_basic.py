@@ -23,6 +23,7 @@ import cobra
 import pytest
 
 import memote.support.basic as basic
+import memote.support.helpers as helpers
 from memote.utils import register_with
 
 MODEL_REGISTRY = dict()
@@ -167,8 +168,7 @@ def ngam_present(base):
     met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
     met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
     rxn_1 = cobra.Reaction("ATPM", name="non-growth associated maintenance")
-    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
-                           met_j: -1, met_k: 1})
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1, met_j: -1, met_k: 1})
     rxn_1.lower_bound = 8.39
     base.add_reactions([rxn_1])
     return base
@@ -184,12 +184,10 @@ def ngam_and_atpsynthase(base):
     met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
     met_l = cobra.Metabolite("h_c", "H", compartment="c")
     rxn_1 = cobra.Reaction("ATPS", name="ATPase cytosolic")
-    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1,
-                           met_j: -1, met_k: 1})
+    rxn_1.add_metabolites({met_g: -1, met_h: 1, met_i: 1, met_j: -1, met_k: 1})
     rxn_1.bounds = -1000, 1000
     rxn_2 = cobra.Reaction("NGAM", name="non-growth associated maintenance")
-    rxn_2.add_metabolites({met_g: -1, met_h: 1, met_l: 1,
-                           met_j: -1, met_k: 1})
+    rxn_2.add_metabolites({met_g: -1, met_h: 1, met_l: 1, met_j: -1, met_k: 1})
     rxn_2.bounds = 0, 1000
     base.add_reactions([rxn_1, rxn_2])
     return base
@@ -202,11 +200,9 @@ def sufficient_compartments(base):
     met_b = cobra.Metabolite("a_p", compartment="p")
     met_c = cobra.Metabolite("a_e", compartment="e")
     rxn_a_b = cobra.Reaction("AB")
-    rxn_a_b.add_metabolites({met_a: 1,
-                             met_b: -1})
+    rxn_a_b.add_metabolites({met_a: 1, met_b: -1})
     rxn_b_c = cobra.Reaction("BC")
-    rxn_b_c.add_metabolites({met_b: 1,
-                             met_c: -1})
+    rxn_b_c.add_metabolites({met_b: 1, met_c: -1})
     base.add_reactions([rxn_b_c, rxn_a_b])
     return base
 
@@ -217,8 +213,7 @@ def insufficient_compartments(base):
     met_a = cobra.Metabolite("a_c", compartment="c")
     met_c = cobra.Metabolite("a_e", compartment="e")
     rxn_a_c = cobra.Reaction("AC")
-    rxn_a_c.add_metabolites({met_a: 1,
-                             met_c: -1})
+    rxn_a_c.add_metabolites({met_a: 1, met_c: -1})
     base.add_reactions([rxn_a_c])
     return base
 
@@ -229,8 +224,7 @@ def non_metabolic_reactions(base):
     met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
     met_c = cobra.Metabolite("a_e", formula='CH4', compartment="e")
     rxn_a_c = cobra.Reaction("AC")
-    rxn_a_c.add_metabolites({met_a: 1,
-                             met_c: -1})
+    rxn_a_c.add_metabolites({met_a: 1, met_c: -1})
     biomass = cobra.Reaction("BIOMASS")
     ex_a = cobra.Reaction("EX_a_e")
     ex_a.add_metabolites({met_c: -1})
@@ -253,6 +247,26 @@ def transport_gpr(base):
     anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
     sym = cobra.Reaction("SYM")
     sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    base.add_reactions([uni, anti, sym])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def transport_gpr_constrained(base):
+    """Provide a model with a constrained transport reaction without GPR."""
+    met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
+    met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
+    met_c = cobra.Metabolite("na_c", formula='Na', compartment="c")
+    met_d = cobra.Metabolite("na_e", formula='Na', compartment="e")
+    uni = cobra.Reaction("UNI")
+    uni.gene_reaction_rule="X and Y"
+    uni.add_metabolites({met_a: 1, met_b: -1})
+    anti = cobra.Reaction("ANTI")
+    anti.gene_reaction_rule = "W or V"
+    anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
+    sym = cobra.Reaction("SYM")
+    sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    sym.lower_bound = 8.39
     base.add_reactions([uni, anti, sym])
     return base
 
@@ -379,6 +393,8 @@ def test_enzyme_complex_presence(model, num):
     assert len(basic.find_protein_complexes(model)) == num
 
 
+# TODO: ngam_and_atpsynthase is not a proper positive control test model
+# It needs to be replaced with a new test.
 @pytest.mark.parametrize("model, num", [
     ("ngam_and_atpsynthase", 2),
     ("gpr_missing_with_exchange", 1),
@@ -387,6 +403,32 @@ def test_enzyme_complex_presence(model, num):
 def test_find_pure_metabolic_reactions(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_pure_metabolic_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("ngam_present", 1),
+    ("ngam_and_atpsynthase", 0),
+    ("non_metabolic_reactions", 0)
+], indirect=["model"])
+def test_find_constrained_pure_metabolic_reactions(model, num):
+    """Expect num of contrained metabolic rxns to be identified correctly."""
+    pmr = basic.find_pure_metabolic_reactions(model)
+    contrained_pmr = set(
+        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)])
+    assert len(contrained_pmr) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("transport_gpr_constrained", 1),
+    ("transport_gpr", 0),
+    ("ngam_and_atpsynthase", 0)
+], indirect=["model"])
+def test_find_constrained_transport_reactions(model, num):
+    """Expect num of contrained transport rxns to be identified correctly."""
+    transporters = set(helpers.find_transport_reactions(model))
+    constrained_transporters = set(
+        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
+    assert len(constrained_transporters) == num
 
 
 @pytest.mark.parametrize("model, num", [

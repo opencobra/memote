@@ -24,8 +24,8 @@ from builtins import dict, str
 from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
 
-__all__ = ("register_with", "annotate", "get_ids", "truncate",
-           "log_json_incompatible_types")
+__all__ = ("register_with", "annotate", "get_ids", "get_ids_and_bounds",
+           "truncate", "wrapper", "log_json_incompatible_types")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -69,8 +69,8 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     title : str
         A human-readable descriptive title of the test case.
     type : str
-        A sting that determines how the result data is formatted in the report.
-        It is expected not to be None.
+        A string that determines how the result data is formatted in the
+        report. It is expected not to be None.
         - 'number' : 'data' is a single number which can be an integer or
           float and should be represented as such.
         - 'count' : 'data' is a list, set or tuple. Choosing 'count' will
@@ -123,6 +123,11 @@ def annotate(title, type, message=None, data=None, metric=1.0):
 def get_ids(iterable):
     """Retrieve the identifier of a number of objects."""
     return [element.id for element in iterable]
+
+
+def get_ids_and_bounds(iterable):
+    """Retrieve the identifier and bounds of a  number of objects."""
+    return [(elem.id, elem.lower_bound, elem.upper_bound) for elem in iterable]
 
 
 def truncate(sequence):
