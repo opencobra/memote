@@ -24,8 +24,8 @@ from builtins import dict, str
 from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
 
-__all__ = ("register_with", "annotate", "get_ids", "truncate",
-           "log_json_incompatible_types")
+__all__ = ("register_with", "annotate", "get_ids", "get_ids_and_bounds",
+           "truncate", "wrapper", "log_json_incompatible_types")
 
 LOGGER = logging.getLogger(__name__)
 
