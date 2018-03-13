@@ -21,7 +21,8 @@ from __future__ import absolute_import, division
 
 import memote.support.basic as basic
 import memote.support.helpers as helpers
-from memote.utils import annotate, get_ids, truncate, wrapper
+from memote.utils import annotate, get_ids, get_ids_and_bounds, truncate
+from memote.utils import wrapper
 
 
 @annotate(title="Model Identifier", type="raw")
