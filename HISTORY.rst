@@ -24,7 +24,6 @@ Next Release
 * Add test for identifying stoichiometrically balanced cycles in models
 * Correct the arguments used for repositories such that ``memote run`` and
   ``memote history`` work as expected inside of a repository.
-* Add test for identifying purely metabolic reaction with fixed constraints in
 * Add test for identifying purely metabolic reactions with fixed constraints in
   models
 * Add test for identifying transport reactions with fixed constraints in models
