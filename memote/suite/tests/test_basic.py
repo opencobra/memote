@@ -346,7 +346,7 @@ def test_find_constrained_transport_reactions(read_only_model):
     """
     ann = test_find_constrained_transport_reactions.annotation
     transporters = set(helpers.find_transport_reactions(read_only_model))
-    ann["data"] = get_ids(set(
+    ann["data"] = get_ids_and_bounds(set(
         [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)]))
     ann["metric"] = len(ann["data"]) / len(transporters)
     ann["message"] = wrapper.fill(
