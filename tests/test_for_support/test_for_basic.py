@@ -438,7 +438,7 @@ def test_find_constrained_transport_reactions(model, num):
 ], indirect=["model"])
 def test_find_reversible_oxygen_reactions(model, num):
     """Expect amount of reversible O2 reactions to be identified correctly."""
-    o2_rxns = basic.find_reversible_oxygen_reactions(read_only_model)
+    o2_rxns = basic.find_oxygen_reactions(read_only_model)
     rev_o2_rxns = [rxn for rxn in o2_rxns if rxn.reversibility]
     assert len(rev_o2_rxns) == num
 
