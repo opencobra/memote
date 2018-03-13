@@ -302,7 +302,7 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
     """
     ann = test_find_constrained_pure_metabolic_reactions.annotation
     pmr = basic.find_pure_metabolic_reactions(read_only_model)
-    ann["data"] = get_ids(set(
+    ann["data"] = get_ids_and_bounds(set(
         [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)]))
     ann["metric"] = len(ann["data"]) / len(pmr)
     ann["message"] = wrapper.fill(
