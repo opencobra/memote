@@ -432,6 +432,18 @@ def test_find_constrained_transport_reactions(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
+    ("transport_gpr_constrained", 1),
+    ("transport_gpr", 0),
+    ("ngam_and_atpsynthase", 0)
+], indirect=["model"])
+def test_find_reversible_oxygen_reactions(model, num):
+    """Expect amount of reversible O2 reactions to be identified correctly."""
+    o2_rxns = basic.find_reversible_oxygen_reactions(read_only_model)
+    rev_o2_rxns = [rxn for rxn in o2_rxns if rxn.reversibility]
+    assert len(rev_o2_rxns) == num
+
+
+@pytest.mark.parametrize("model, num", [
     ("sufficient_compartments", 1)
 ], indirect=["model"])
 def test_find_unique_metabolites(model, num):
