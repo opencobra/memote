@@ -228,6 +228,13 @@ def is_constrained_reaction(rxn):
         return rxn.lower_bound > 0 or rxn.upper_bound < 1000
 
 
+def find_oxygen_reactions(model):
+    """Return the directionality of oxygen-producing/-consuming reactions."""
+    #TODO: Change to use METAGENX/MNMX id instead
+    return set([rxn for met in model.metabolites for
+                rxn in met.reactions if met.formula == "O2"])
+
+
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     # TODO: BiGG specific (met_c).
