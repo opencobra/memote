@@ -223,11 +223,9 @@ def find_pure_metabolic_reactions(model):
 def is_constrained_reaction(rxn):
     """Return whether a reaction has fixed constraints."""
     if rxn.reversibility:
-        return True if (
-            rxn.lower_bound != -1000 or rxn.upper_bound != 1000) else False
+        return (rxn.lower_bound != -1000 or rxn.upper_bound != 1000)
     else:
-        return True if (
-            rxn.lower_bound != 0 or rxn.upper_bound != 1000) else False
+        return (rxn.lower_bound != 0 or rxn.upper_bound != 1000)
 
 
 def find_unique_metabolites(model):
