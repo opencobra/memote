@@ -384,6 +384,28 @@ def test_transport_reaction_gpr_presence(read_only_model):
     assert ann["metric"] < 0.2, ann["message"]
 
 
+@annotate(title="Number of Reversible Oxygen-Containing Reactions",
+          type="count")
+def test_find_reversible_oxygen_reactions(read_only_model):
+    """
+    Expect zero or more oxygen-containing reactions to be reversible.
+
+    The directionality of oxygen-producing/-consuming reactions affects the
+    model's ability to grow anaerobically i.e. create faux-anaerobic organisms.
+    This test reports how many of these oxygen-containing reactions are
+    reversible. This test does not have any mandatory 'pass' criteria.
+
+    """
+    ann = test_find_reversible_oxygen_reactions.annotation
+    o2_rxns = basic.find_oxygen_reactions(read_only_model)
+    ann["data"] = get_ids([rxn for rxn in o2_rxns if rxn.reversibility])
+    ann["metric"] = len(ann["data"]) / len(o2_rxns)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} reversible oxygen-containing reactions
+        ({:.2%} of all oxygen-containing reactions): {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+
+
 @annotate(title="Number of Unique Metabolites", type="count")
 def test_find_unique_metabolites(read_only_model):
     """

@@ -271,6 +271,34 @@ def transport_gpr_constrained(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def reversible_oxygen_flow(base):
+    """Provide a model with a reversible oxygen-containing reaction."""
+    met_a = cobra.Metabolite("o2s_e", formula="O2", compartment="e")
+    met_b = cobra.Metabolite("o2s_p", formula="O2", compartment="p")
+    rxn = cobra.Reaction("O2Stex")
+    rxn.add_metabolites({met_a: -1, met_b: 1})
+    rxn.lower_bound = -1000
+    rxn.upper_bound = 1000
+    base.add_reactions([rxn])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def non_reversible_oxygen_flow(base):
+    """Provide a model with a non-reversible oxygen-containing reaction."""
+    met_a = cobra.Metabolite("o2s_c", formula="O2", compartment="c")
+    met_b = cobra.Metabolite("o2_c", formula="O2", compartment="c")
+    met_c = cobra.Metabolite("h2o2_c", formula='H2O2', compartment="c")
+    met_i = cobra.Metabolite("h_c", "H", compartment="c")
+    rxn = cobra.Reaction("SPODM")
+    rxn.add_metabolites({met_a: -2, met_b: 1, met_c: 1, met_i: -2})
+    rxn.lower_bound = 0
+    rxn.upper_bound = 0
+    base.add_reactions([rxn])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -429,6 +457,18 @@ def test_find_constrained_transport_reactions(model, num):
     constrained_transporters = set(
         [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
     assert len(constrained_transporters) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("reversible_oxygen_flow", 1),
+    ("non_reversible_oxygen_flow", 0),
+    ("transport_gpr", 0)
+], indirect=["model"])
+def test_find_reversible_oxygen_reactions(model, num):
+    """Expect amount of reversible O2 reactions to be identified correctly."""
+    o2_rxns = basic.find_oxygen_reactions(model)
+    rev_o2_rxns = [rxn for rxn in o2_rxns if rxn.reversibility]
+    assert len(rev_o2_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [
