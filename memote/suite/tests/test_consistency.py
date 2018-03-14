@@ -17,7 +17,7 @@
 
 """Stoichiometric consistency tests for an instance of ``cobra.Model``."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import pytest
 

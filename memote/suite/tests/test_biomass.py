@@ -23,7 +23,7 @@ In the storage of test results we rely on the order of the biomass fixtures
 to remain the same as the parametrized test cases.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import logging
 
