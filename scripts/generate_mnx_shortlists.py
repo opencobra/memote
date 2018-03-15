@@ -75,7 +75,8 @@ shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
              'MNXM70', 'MNXM78', 'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29',
              'MNXM147', 'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
              'MNXM16',
-             'MNXM161', 'MNXM12', 'MNXM256']
+             'MNXM161', 'MNXM12', 'MNXM256',
+             'MNXM4']
 
 # Transpose and reshape the dataframe so that we can apply the shortlist
 # before the most intensive steps to reduce execution time.
