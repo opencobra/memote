@@ -62,20 +62,17 @@ class HistoryReport(object):
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
-        def get_specific_result_attribute_from_key(key):
-            """Collect a specific result attribute from each test case"""
-            value = result.cases[test].get(key)
-            if isinstance(value, dict):
-                for param in value:
-                    tests[test]["history"].setdefault(param, dict()). \
-                        setdefault(branch, list()).append({
-                            "commit": commit,
-                            key: value.get(param)})
-            else:
-                tests[test]["history"].setdefault(branch, list()). \
-                    append({
-                        "commit": commit,
-                        key: value})
+        def format_data(data):
+            """Format result data according to the user-defined type"""
+            # TODO Remove this failsafe once proper error handling is in place.
+            if type == "percent" or data == None:
+                # Return an empty list here to reduce the output file size.
+                # The angular report will ignore the `data` and instead display
+                # the `metric`.
+                return []
+            if type == "count":
+                return len(data)
+            return data
 
         base = dict()
         tests = base.setdefault("tests", dict())
@@ -91,9 +88,26 @@ class HistoryReport(object):
                         tests[test]["summary"] = result.cases[test]["summary"]
                     if "type" not in tests[test]:
                         tests[test]["type"] = result.cases[test]["type"]
-                    get_specific_result_attribute_from_key("metric")
-                    get_specific_result_attribute_from_key("data")
-                    get_specific_result_attribute_from_key("result")
+                    type = tests[test]["type"]
+
+                    metric = result.cases[test].get("metric")
+                    data = result.cases[test].get("data")
+                    res = result.cases[test].get("result")
+                    if isinstance(metric, dict):
+                        for param in metric:
+                            tests[test]["history"].setdefault(param, dict()). \
+                                setdefault(branch, list()).append({
+                                    "commit": commit,
+                                    "metric": metric.get(param),
+                                    "data": format_data(data.get(param)),
+                                    "result": res.get(param)})
+                    else:
+                        tests[test]["history"].setdefault(branch, list()). \
+                            append({
+                                "commit": commit,
+                                "metric": metric,
+                                "data": format_data(data),
+                                "result": res})
         return base
 
     def render_html(self):
