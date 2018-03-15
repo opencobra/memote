@@ -118,6 +118,7 @@ class HistoryReport(object):
         structure.update(self.config)
         try:
             return self._template.safe_substitute(
+                report_type = "history",
                 results=json.dumps(structure, sort_keys=False,
                                    indent=None, separators=(",", ":")))
         except TypeError:
