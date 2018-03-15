@@ -32,11 +32,18 @@ LOGGER = logging.getLogger(__name__)
 
 
 class HistoryReport(object):
-    """Render a rich report using the git repository history."""
+    """
+    Render a rich report using the git repository history.
+
+    Attributes
+    ----------
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+    """
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, history, index="hash", **kwargs):
+    def __init__(self, history, configuration, index="hash", **kwargs):
         """
         Initialize the git history report.
 
@@ -46,39 +53,47 @@ class HistoryReport(object):
             An instance that manages access to test results.
         index : {"hash", "time"}, optional
             The default horizontal axis type for all plots.
-
         """
         super(HistoryReport, self).__init__(**kwargs)
         self._template = Template(
             read_text(templates, "index.html", encoding="utf-8"))
         self._history = history
+        self.config = configuration
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
+        def get_specific_result_attribute_from_key(key):
+            """Collect a specific result attribute from each test case"""
+            value = result.cases[test].get(key)
+            if isinstance(value, dict):
+                for param in value:
+                    tests[test]["history"].setdefault(param, dict()). \
+                        setdefault(branch, list()).append({
+                            "commit": commit,
+                            key: value.get(param)})
+            else:
+                tests[test]["history"].setdefault(branch, list()). \
+                    append({
+                        "commit": commit,
+                        key: value})
+
         base = dict()
+        tests = base.setdefault("tests", dict())
         for branch, commits in self._history.iter_branches():
             for commit in commits:
                 result = self._history.get_result(commit, )
                 for test in result.cases:
-                    base.setdefault(test, dict()).setdefault("history", dict())
-                    if "title" not in base[test]:
-                        base[test]["title"] = result.cases[test]["title"]
-                    if "summary" not in base[test]:
-                        base[test]["summary"] = result.cases[test]["summary"]
-                    metric = result.cases[test].get("metric")
-                    if isinstance(metric, dict):
-                        for param in metric:
-                            base[test]["history"].setdefault(param, dict()). \
-                                setdefault(branch, list()).append({
-                                    "commit": commit,
-                                    "metric": metric.get(param)
-                                })
-                    else:
-                        base[test]["history"].setdefault(branch, list()). \
-                            append({
-                                "commit": commit,
-                                "metric": metric
-                            })
+                    tests.setdefault(test, dict()).setdefault(
+                        "history", dict())
+                    if "title" not in tests[test]:
+                        tests[test]["title"] = result.cases[test]["title"]
+                    if "summary" not in tests[test]:
+                        tests[test]["summary"] = result.cases[test]["summary"]
+                    if "type" not in tests[test]:
+                        tests[test]["type"] = result.cases[test]["type"]
+                    get_specific_result_attribute_from_key("metric")
+                    get_specific_result_attribute_from_key("data")
+                    get_specific_result_attribute_from_key("result")
         return base
 
     def render_html(self):
@@ -86,6 +101,7 @@ class HistoryReport(object):
         self._history.build_branch_structure()
         self._history.load_history()
         structure = self.collect_history()
+        structure.update(self.config)
         try:
             return self._template.safe_substitute(
                 results=json.dumps(structure, sort_keys=False,

@@ -102,7 +102,7 @@ def snapshot_report(result, config=None, filename=None):
         file_h.write(report.render_html())
 
 
-def history_report(repository, manager, filename, index="hash"):
+def history_report(repository, manager, filename, config=None, index="hash"):
     """
     Test a model and save a history report.
 
@@ -118,9 +118,13 @@ def history_report(repository, manager, filename, index="hash"):
         The default horizontal axis type for all plots.
 
     """
+    if config is None:
+        with open_text(templates, "test_config.yml") as file_handle:
+            LOGGER.debug("Loading default history configuration.")
+            config = yaml.load(file_handle)
     report = HistoryReport(
         history=HistoryManager(repository=repository, manager=manager),
-        index=index)
+        index=index, configuration=config)
     LOGGER.info("Writing history report '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
