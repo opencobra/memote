@@ -176,14 +176,10 @@ def find_direct_metabolites(model, reaction):
         that are taken up to be consumed by the biomass reaction only.
 
     """
-    transport_reactions = set(helpers.find_transport_reactions(model))
-    exchange_reactions = set(model.exchanges)
-    biomass_reactions = set(helpers.find_biomass_reaction(model))
-
-    combined_set = transport_reactions | exchange_reactions | biomass_reactions
+    tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model)
     precursors = find_biomass_precursors(model, reaction)
-
-    return [met for met in precursors if met.reactions.issubset(combined_set)]
+    return [met for met in precursors if
+            met.reactions.issubset(tra_bou_bio_rxns)]
 
 
 def bundle_biomass_components(model, reaction):
