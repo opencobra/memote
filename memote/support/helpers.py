@@ -367,6 +367,26 @@ def find_exchange_rxns(model):
             if extracellular in rxn.get_compartments()]
 
 
+def find_tra_bou_bio_reactions(model):
+    """
+    Return the set of all tranport, boundary, and biomass reactions in a model.
+
+    These reactions are incorporated in models simply for to allow
+    metabolites into the correct compartments for vital system reactions to
+    occur. As such, many tests do not look at these reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    """
+    exchanges = set(model.exchanges)
+    transporters = set(helpers.find_transport_reactions(model))
+    biomass = set(helpers.find_biomass_reaction(model))
+    return exchanges | transporters | biomass
+
+
 def find_functional_units(gpr_str):
     """
     Return an iterator of gene IDs grouped by boolean rules from the gpr_str.
