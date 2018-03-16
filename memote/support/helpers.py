@@ -626,7 +626,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
                            "a single metabolite in compartment {} that "
                            "corresponds to the following MetaNetX "
                            "identifier: {}."
-                           "Instead these candidates where found: {}."
+                           "Instead these candidates were found: {}."
                            "Check that metabolite compartment tags are "
                            "correct. Consider switching to a namespace scheme "
                            "where identifiers are truly "
