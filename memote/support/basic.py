@@ -230,9 +230,10 @@ def is_constrained_reaction(rxn):
 
 def find_oxygen_reactions(model):
     """Return the directionality of oxygen-producing/-consuming reactions."""
-    # TODO: Change to use METAGENX/MNMX id instead
-    return set([rxn for met in model.metabolites for
-                rxn in met.reactions if met.formula == "O2"])
+    o2_rxns1 = set([rxn for met in model.metabolites for
+                    rxn in met.reactions if met.formula == "O2"])
+    o2_rxns2 = set(helpers.find_met_in_model(model, "MNXM4"))
+    return set(o2_rxns1.union(o2_rxns2))
 
 
 def find_unique_metabolites(model):
