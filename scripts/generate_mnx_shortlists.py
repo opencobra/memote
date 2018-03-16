@@ -65,7 +65,7 @@ def xref_splitter(xref):
 shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
              'MNXM121', 'MNXM17', 'MNXM423', 'MNXM495', 'MNXM2', 'MNXM9',
              'MNXM1', 'MNXM10', 'MNXM8', 'MNXM5', 'MNXM6', 'MNXM21',
-             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM38', 'MNXM33',
+             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM20', 'MNXM38', 'MNXM33',
              'MNXM208',
              'MNXM119', 'MNXM191', 'MNXM232', 'MNXM223', 'MNXM509',
              'MNXM7517',
