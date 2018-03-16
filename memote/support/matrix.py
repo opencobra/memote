@@ -74,8 +74,8 @@ def degrees_of_freedom(model):
     ------
     This specifically refers to the dimensionality of the right nullspace
     of the S matrix, as dim(Null(S)) corresponds directly to the number of
-    free variables in the system [1]. The forumla used calculates this using
-    the rank-nullity theorem [2].
+    free variables in the system [1]_. The forumla used calculates this using
+    the rank-nullity theorem [2]_.
 
     References:
     -----------
