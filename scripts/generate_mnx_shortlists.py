@@ -65,7 +65,7 @@ def xref_splitter(xref):
 shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
              'MNXM121', 'MNXM17', 'MNXM423', 'MNXM495', 'MNXM2', 'MNXM9',
              'MNXM1', 'MNXM10', 'MNXM8', 'MNXM5', 'MNXM6', 'MNXM21',
-             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM38', 'MNXM33',
+             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM20', 'MNXM38', 'MNXM33',
              'MNXM208',
              'MNXM119', 'MNXM191', 'MNXM232', 'MNXM223', 'MNXM509',
              'MNXM7517',
@@ -75,7 +75,8 @@ shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
              'MNXM70', 'MNXM78', 'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29',
              'MNXM147', 'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
              'MNXM16',
-             'MNXM161', 'MNXM12', 'MNXM256']
+             'MNXM161', 'MNXM12', 'MNXM256',
+             'MNXM4']
 
 # Transpose and reshape the dataframe so that we can apply the shortlist
 # before the most intensive steps to reduce execution time.

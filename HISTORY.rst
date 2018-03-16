@@ -10,6 +10,7 @@ Next Release
 * Add test for identifying reversible oxygen-containing reactions in models
 * Add division import from __future__ to ``test_biomass`` and
   ``test_consistency`` where it was missing.
+* Add O2 to MetaNetX shortlist, allowing for easier identification
 * Allow tests and test module to be skipped or run exclusively when creating
   a snapshot report.
 
