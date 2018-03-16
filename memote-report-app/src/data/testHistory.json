@@ -2761,7 +2761,7 @@
                         {
                             "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
                             "metric": 1.0,
-                            "data":NaN,
+                            "data":[],
                             "result": "failed"
                         }
                     ],
@@ -2787,7 +2787,7 @@
                         {
                             "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
                             "metric": 1.0,
-                            "data":NaN,
+                            "data":[],
                             "result": "failed"
                         }
                     ]
