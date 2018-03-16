@@ -381,6 +381,7 @@ def find_tra_bou_bio_reactions(model):
         A cobrapy metabolic model
 
     """
+    # exchanges in this case also refer to sink and demand reactions
     exchanges = set(model.exchanges)
     transporters = set(helpers.find_transport_reactions(model))
     biomass = set(helpers.find_biomass_reaction(model))
