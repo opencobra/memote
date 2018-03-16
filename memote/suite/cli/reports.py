@@ -53,6 +53,13 @@ def report():
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
+@click.option("--exclusive", type=str, multiple=True, metavar="TEST",
+              help="The name of a test or test module to be run exclusively. "
+                   "All other tests are skipped. This option can be used "
+                   "multiple times and takes precedence over '--skip'.")
+@click.option("--skip", type=str, multiple=True, metavar="TEST",
+              help="The name of a test or test module to be skipped. This "
+                   "option can be used multiple times.")
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
@@ -70,7 +77,8 @@ def report():
                    "it can also alter the default behavior. Please refer to "
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
-def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
+def snapshot(model, filename, pytest_args, exclusive, skip, solver,
+             custom_tests, custom_config):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -86,7 +94,8 @@ def snapshot(model, filename, pytest_args, solver, custom_tests, custom_config):
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
     model.solver = solver
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args)
+    _, results = api.test_model(model, results=True, pytest_args=pytest_args,
+                                skip=skip, exclusive=exclusive)
     api.snapshot_report(results, config, filename)
 
 
