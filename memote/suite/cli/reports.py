@@ -129,8 +129,9 @@ def history(location, filename, index):
     try:
         manager = managers.SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
-        manager = managers.RepoResultManager(repository=repo, location=location)
-    api.history_report(repo, manager, filename, index)
+        manager = managers.RepoResultManager(
+            repository=repo, location=location)
+    api.history_report(repo, manager, filename, index=index)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)

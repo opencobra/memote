@@ -102,7 +102,7 @@ def snapshot_report(result, config=None, filename=None):
         file_h.write(report.render_html())
 
 
-def history_report(repository, manager, filename, config=None, index="hash"):
+def history_report(repository, manager, filename, index="hash", config=None):
     """
     Test a model and save a history report.
 
@@ -124,7 +124,7 @@ def history_report(repository, manager, filename, config=None, index="hash"):
             config = yaml.load(file_handle)
     report = HistoryReport(
         history=HistoryManager(repository=repository, manager=manager),
-        index=index, configuration=config)
+        configuration=config, index=index)
     LOGGER.info("Writing history report '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
