@@ -15,10 +15,12 @@ export class ReportDataService {
   constructor(private http: HttpClient) {}
 
   public loadResults(): void {
+    if ((<any>window).reportType === 'history') { console.log('This works'); } else {
     // TODO: Might want to parse and decompress a string in future.
     // const data = JSON.parse((<any>window).data);
     this.convertResults((<any>window).data);
-    //this.http.get('/data/testData.json').subscribe(data => {this.convertResults(data); });
+    // this.http.get('/data/testData.json').subscribe(data => {this.convertResults(data); });
+  }
   }
 
   public byID(string) {
