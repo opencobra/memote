@@ -8,7 +8,7 @@ import { TestHistory } from './test-history.model';
 @Injectable()
 export class ReportDataService {
   metaData: any;
-  allTests: Object[] = [];
+  allTests: any[] = [];
   scoredCard: Object;
   statisticsCards: ResultCard[] = [];
   scoredTests: string[] = [];
@@ -37,7 +37,7 @@ export class ReportDataService {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
         this.http.get('/data/testHistory.json')
-        .subscribe(data => {this.convertResults(data); });
+        .subscribe(data => {this.convertHistoryResults(data); });
         break;
       }
   }
@@ -112,7 +112,7 @@ export class ReportDataService {
           this.allTests.push(
               new TestHistory(
                 newID,
-                {history: data['tests'][test]['data'][param],
+                {history: data['tests'][test]['history'][param],
                 summary: data['tests'][test]['summary'],
                 title: data['tests'][test]['title'],
                 type: data['tests'][test]['type']}
