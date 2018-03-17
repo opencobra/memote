@@ -80,8 +80,7 @@ class HistoryReport(object):
             for commit in commits:
                 result = self._history.get_result(commit, )
                 for test in result.cases:
-                    tests.setdefault(test, dict()).setdefault(
-                        "history", dict())
+                    tests.setdefault(test, dict())
                     if "title" not in tests[test]:
                         tests[test]["title"] = result.cases[test]["title"]
                     if "summary" not in tests[test]:
@@ -89,25 +88,27 @@ class HistoryReport(object):
                     if "type" not in tests[test]:
                         tests[test]["type"] = result.cases[test]["type"]
                     type = tests[test]["type"]
-
                     metric = result.cases[test].get("metric")
                     data = result.cases[test].get("data")
                     res = result.cases[test].get("result")
                     if isinstance(metric, dict):
+                        tests[test].setdefault("history", dict())
                         for param in metric:
-                            tests[test]["history"].setdefault(param, dict()). \
-                                setdefault(branch, list()).append({
+                            tests[test]["history"].setdefault(param, list()). \
+                                append({
+                                    "branch": branch,
                                     "commit": commit,
                                     "metric": metric.get(param),
                                     "data": format_data(data.get(param)),
                                     "result": res.get(param)})
                     else:
-                        tests[test]["history"].setdefault(branch, list()). \
-                            append({
-                                "commit": commit,
-                                "metric": metric,
-                                "data": format_data(data),
-                                "result": res})
+                        tests[test].setdefault("history", list())
+                        tests[test]["history"].append({
+                                                "branch": branch,
+                                                "commit": commit,
+                                                "metric": metric,
+                                                "data": format_data(data),
+                                                "result": res})
         return base
 
     def render_html(self):
