@@ -293,8 +293,7 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
             """{} contains a total of {} direct metabolites ({:.2%}).
             Specifically these are: {}.""".format(
                 reaction_id, len(ann["data"][reaction_id]),
-                ann["metric"][reaction_id], ann["data"][reaction_id])
-            )
+                ann["metric"][reaction_id], ann["data"][reaction_id]))
         assert ann["metric"][reaction_id] < 0.5, ann["message"][reaction_id]
 
 
