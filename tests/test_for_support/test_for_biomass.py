@@ -214,7 +214,7 @@ def no_gam_in_biomass(base):
 
 
 @register_with(MODEL_REGISTRY)
-def direct_met_single_compartment(base):
+def direct_met_no_growth(base):
     base.add_metabolites(
         [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
     )
@@ -233,6 +233,31 @@ def direct_met_single_compartment(base):
     base.reactions.E2F.add_metabolites({"E": -1, "F": 1})
     base.reactions.biomass.add_metabolites(
         {"B": -1, "D": -1, "F": -1, "G": -1}
+    )
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def direct_met_false_positive_single_compartment(base):
+    base.add_metabolites(
+        [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
+    )
+    base.add_metabolites([cobra.Metabolite("G_e", compartment='e')])
+    base.add_reactions([cobra.Reaction(i)
+                        for i in ["EX_A", "EX_C",
+                                  "EX_E", "EX_G",
+                                  "A2B", "C2D",
+                                  "E2F", "biomass"]]
+                       )
+    base.reactions.EX_A.add_metabolites({"A": 1})
+    base.reactions.EX_C.add_metabolites({"C": -1})
+    base.reactions.EX_E.add_metabolites({"E": -1})
+    base.reactions.EX_G.add_metabolites({"G": -1, "G_e": 1})
+    base.reactions.A2B.add_metabolites({"A": -1, "B": 1})
+    base.reactions.C2D.add_metabolites({"C": -1, "D": 1})
+    base.reactions.E2F.add_metabolites({"E": -1, "F": 1})
+    base.reactions.biomass.add_metabolites(
+        {"B": -1, "D": -1, "F": -1, "G_e": -1}
     )
     return base
 
@@ -370,7 +395,7 @@ def test_fast_growth_default(model, boolean):
 
 
 @pytest.mark.parametrize("model, number", [
-    ("direct_met_single_compartment", 1),
+    ("direct_met_false_positive_single_compartment", 0),
     ("precursors_producing", 0)
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):
