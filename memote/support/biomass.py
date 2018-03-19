@@ -190,7 +190,7 @@ def find_direct_metabolites(model, reaction):
 
     solution = model.optimize()
     if solution.objective_value is 0:
-        raise ValueError()
+        raise ValueError("objective value is zero. Model witll not grow.")
 
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
