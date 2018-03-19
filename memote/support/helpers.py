@@ -367,7 +367,7 @@ def find_exchange_rxns(model):
             if extracellular in rxn.get_compartments()]
 
 
-def find_tra_bou_bio_reactions(model):
+def find_tra_bou_bio_reactions(model, biomass=None):
     """
     Return the set of all tranport, boundary, and biomass reactions in a model.
 
@@ -380,11 +380,14 @@ def find_tra_bou_bio_reactions(model):
     model : cobra.Model
         A cobrapy metabolic model
 
+    biomass : list or cobra.Reaction, optional
+        A list of cobrapy biomass reactions
+
     """
     # exchanges in this case also refer to sink and demand reactions
     exchanges = set(model.exchanges)
     transporters = set(find_transport_reactions(model))
-    biomass = set(find_biomass_reaction(model))
+    biomass = set(find_biomass_reaction(model))if biomass is None else pass
     return exchanges | transporters | biomass
 
 
