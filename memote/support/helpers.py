@@ -387,7 +387,8 @@ def find_tra_bou_bio_reactions(model, biomass=None):
     # exchanges in this case also refer to sink and demand reactions
     exchanges = set(model.exchanges)
     transporters = set(find_transport_reactions(model))
-    biomass = set(find_biomass_reaction(model))if biomass is None else pass
+    if biomass is None:
+        biomass = set(find_biomass_reaction(model))
     return exchanges | transporters | biomass
 
 
