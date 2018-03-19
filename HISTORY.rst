@@ -15,6 +15,7 @@ Next Release
   a snapshot report.
 * Fix some typos
 * Add history report view and connect it to `memote report history` call.
+* find_direct_metabolites now detects and removes false_positives
 
 0.6.2 (2018-03-12)
 ------------------
