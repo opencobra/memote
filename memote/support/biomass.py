@@ -180,7 +180,7 @@ def find_direct_metabolites(model, reaction):
 
     """
     biomass_rxns = set(helpers.find_biomass_reaction(model))
-    tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model)
+    tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model, biomass_rxns)
     precursors = find_biomass_precursors(model, reaction)
     tra_bou_bio_mets = [met for met in precursors if
                         met.reactions.issubset(tra_bou_bio_rxns)]
