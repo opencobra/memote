@@ -184,14 +184,14 @@ def find_direct_metabolites(model, reaction):
     precursors = find_biomass_precursors(model, reaction)
     tra_bou_bio_mets = [met for met in precursors if
                         met.reactions.issubset(tra_bou_bio_rxns)]
+    rxns_of_interest = set([rxn for met in tra_bou_bio_mets
+                            for rxn in met.reactions
+                            if rxn not in biomass_rxns])
 
     solution = model.optimize()
     if solution.objective_value is 0:
         raise ValueError()
 
-    rxns_of_interest = set([rxn for met in tra_bou_bio_mets
-                            for rxn in met.reactions
-                            if rxn not in biomass_rxns])
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
 
