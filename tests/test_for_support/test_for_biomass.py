@@ -263,6 +263,31 @@ def direct_met_false_positive_single_compartment(base):
 
 
 @register_with(MODEL_REGISTRY)
+def only_direct_mets(base):
+    met_a = cobra.Metabolite("a_c", compartment='c', formula="COOH")
+    met_b = cobra.Metabolite("b_c", compartment='c', formula="NO2")
+    met_c = cobra.Metabolite("c_c", compartment='c', formula="HCl")
+    met_a1 = cobra.Metabolite("a_e", compartment='e', formula="COOH")
+    met_b1 = cobra.Metabolite("b_e", compartment='e', formula="NO2")
+    met_c1 = cobra.Metabolite("c_e", compartment='e', formula="HCl")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def large_biomass_rxn(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS
     base.add_metabolites([cobra.Metabolite(i, compartment='c')
@@ -395,6 +420,7 @@ def test_fast_growth_default(model, boolean):
 
 
 @pytest.mark.parametrize("model, number", [
+    ("only_direct_mets", 3),
     ("direct_met_false_positive_single_compartment", 0),
     ("precursors_producing", 0)
 ], indirect=["model"])
