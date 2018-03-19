@@ -71,7 +71,7 @@ def find_biomass_precursors(model, reaction):
         The biomass reaction of the model under investigation.
 
     """
-    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+   id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
     gam_reactants = set()
     try:
         gam_reactants.update([
@@ -178,8 +178,11 @@ def find_direct_metabolites(model, reaction):
     """
     tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model)
     precursors = find_biomass_precursors(model, reaction)
-    return [met for met in precursors if
-            met.reactions.issubset(tra_bou_bio_rxns)]
+    # TODO: get fluxes and determine if net flux matches reactants or products
+    # and use that to determine if false positive or not.
+    tra_bou_bio_mets =  [met for met in precursors if
+                         met.reactions.issubset(tra_bou_bio_rxns)]
+    solution = model.optimize()
 
 
 def bundle_biomass_components(model, reaction):
