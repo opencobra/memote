@@ -22,9 +22,12 @@ from __future__ import absolute_import
 import logging
 import re
 
+import pandas as pd
+
 from six import iteritems
 from cobra.exceptions import Infeasible
 
+from memote.utils import get_ids
 import memote.support.helpers as helpers
 
 __all__ = (
@@ -71,7 +74,7 @@ def find_biomass_precursors(model, reaction):
         The biomass reaction of the model under investigation.
 
     """
-   id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
     gam_reactants = set()
     try:
         gam_reactants.update([
@@ -176,13 +179,27 @@ def find_direct_metabolites(model, reaction):
         that are taken up to be consumed by the biomass reaction only.
 
     """
+    biomass_rxns = helpers.find_biomass_reaction(model)
     tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model)
     precursors = find_biomass_precursors(model, reaction)
-    # TODO: get fluxes and determine if net flux matches reactants or products
-    # and use that to determine if false positive or not.
-    tra_bou_bio_mets =  [met for met in precursors if
-                         met.reactions.issubset(tra_bou_bio_rxns)]
+    tra_bou_bio_mets = [met for met in precursors if
+                        met.reactions.issubset(tra_bou_bio_rxns)]
+
     solution = model.optimize()
+    rxns_of_interest = set([rxn for met in tra_bou_bio_mets
+                            for rxn in met.reactions
+                            if rxn not in biomass_rxns])
+    tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
+    flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
+
+    for met in tra_bou_bio_mets:
+        for rxn in met.reactions:
+            if met in rxn.reactants and rxn not in biomass_rxns:
+                flux_sum[met] += -1 * float(tra_bou_bio_fluxes[get_ids([rxn])])
+            elif met in rxn.products and rxn not in biomass_rxns:
+                flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
+
+    return [met for met in flux_sum.T.loc[flux_sum.T['sum'] > 0].index]
 
 
 def bundle_biomass_components(model, reaction):
