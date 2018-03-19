@@ -186,6 +186,9 @@ def find_direct_metabolites(model, reaction):
                         met.reactions.issubset(tra_bou_bio_rxns)]
 
     solution = model.optimize()
+    if solution.objective_value is 0:
+        raise ValueError()
+
     rxns_of_interest = set([rxn for met in tra_bou_bio_mets
                             for rxn in met.reactions
                             if rxn not in biomass_rxns])
