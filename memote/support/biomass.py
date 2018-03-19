@@ -179,7 +179,7 @@ def find_direct_metabolites(model, reaction):
         that are taken up to be consumed by the biomass reaction only.
 
     """
-    biomass_rxns = helpers.find_biomass_reaction(model)
+    biomass_rxns = set(helpers.find_biomass_reaction(model))
     tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model)
     precursors = find_biomass_precursors(model, reaction)
     tra_bou_bio_mets = [met for met in precursors if
