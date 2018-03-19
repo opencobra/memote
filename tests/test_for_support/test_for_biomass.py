@@ -422,7 +422,8 @@ def test_fast_growth_default(model, boolean):
 @pytest.mark.parametrize("model, number", [
     ("only_direct_mets", 3),
     ("direct_met_false_positive_single_compartment", 0),
-    ("precursors_producing", 0)
+    ("precursors_producing", 0),
+    ("direct_met_no_growth", 0)
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):
     """Expect the appropriate amount of direct metabolites to be found."""
