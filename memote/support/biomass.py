@@ -195,7 +195,11 @@ def find_direct_metabolites(model, reaction):
     for met in tra_bou_bio_mets:
         for rxn in met.reactions:
             if met in rxn.reactants and rxn not in biomass_rxns:
-                flux_sum[met] += -1 * float(tra_bou_bio_fluxes[get_ids([rxn])])
+                flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
+                products = [p for p in rxn.products
+                            if p in tra_bou_bio_mets and p in precursors]
+                for p in products:
+                    flux_sum[p] += -float(tra_bou_bio_fluxes[get_ids([rxn])])
             elif met in rxn.products and rxn not in biomass_rxns:
                 flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
 
