@@ -19,7 +19,10 @@ export const specMetric = {
     {
       'name': 'type',
       'value': 'metric',
-      'description': 'This keyword describes which data is displayed on the y-axis.'
+      'description': 'This keyword describes which data is displayed on the y-axis.',
+      // 'update': ' ("value" === "metric") ? \
+      // domain("y", {"data": "scores", "field": "metric"})' : \
+      // domain("y", {"data": "scores", "field": "data"})'
     },
   ],
 
@@ -95,6 +98,8 @@ export const specMetric = {
           'stroke': 'color',
           'title': 'Branches',
           'padding': 4,
+          'orient': 'left',
+          'offset': 30,
           'encode': {
             'symbols': {
               'name': 'legendSymbol',
