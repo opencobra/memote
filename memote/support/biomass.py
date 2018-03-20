@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import logging
 import re
 
+import numpy as np
 import pandas as pd
 
 from six import iteritems
@@ -195,15 +196,47 @@ def find_direct_metabolites(model, reaction):
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
 
+    # for met in tra_bou_bio_mets:
+    #     for rxn in met.reactions:
+    #         if met in rxn.reactants and rxn not in biomass_rxns:
+    #             flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
+    #             products = [p for p in rxn.products if p in tra_bou_bio_mets]
+    #             for p in products:
+    #                 flux_sum[p] += -float(tra_bou_bio_fluxes[get_ids([rxn])])
+    #         elif met in rxn.products and rxn not in biomass_rxns:
+    #             flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
+    main_comp = helpers.find_compartment_id_in_model(model, 'c')
+    exc_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
         for rxn in met.reactions:
-            if met in rxn.reactants and rxn not in biomass_rxns:
-                flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
-                products = [p for p in rxn.products if p in tra_bou_bio_mets]
-                for p in products:
-                    flux_sum[p] += -float(tra_bou_bio_fluxes[get_ids([rxn])])
-            elif met in rxn.products and rxn not in biomass_rxns:
-                flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
+            not_biomass_rxn = rxn not in biomass_rxns
+            extracellular = met.compartment == exc_space
+            # if reactant metabolite in "e"
+            if met in rxn.reactants and not_biomass_rxn and extracellular:
+                product_comps = set([p.compartment for p in rxn.products])
+                # e reactant, no product (outward flux)
+                if len(product_comps) == 0:
+                    flux_sum[met] += -float(
+                        tra_bou_bio_fluxes[get_ids([rxn])])
+                # e reactant, c product (inward flux)
+                elif main_comp in product_comps:
+                    flux_sum[met] += float(
+                        tra_bou_bio_fluxes[get_ids([rxn])])
+            # if product metabolite in "e"
+            elif met in rxn.products and not_biomass_rxn and extracellular:
+                reactant_comps = set([p.compartment for p in rxn.reactants])
+                # e product, no reactant (inward flux)
+                if len(reactant_comps) == 0:
+                    flux_sum[met] += float(
+                        tra_bou_bio_fluxes[get_ids([rxn])])
+                # e product, c reactant (outward flux)
+                elif main_comp in reactant_comps:
+                    flux_sum[met] += -float(
+                        tra_bou_bio_fluxes[get_ids([rxn])])
+            # for all non-e metabolites
+            elif not_biomass_rxn and not extracellular:
+                flux_sum[met] += np.abs(
+                    float(tra_bou_bio_fluxes[get_ids([rxn])]))
 
     return [met for met in flux_sum.T.loc[flux_sum.T['sum'] > 0].index]
 
