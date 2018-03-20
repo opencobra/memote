@@ -239,26 +239,28 @@ def direct_met_no_growth(base):
 
 @register_with(MODEL_REGISTRY)
 def direct_met_false_positive_single_compartment(base):
-    base.add_metabolites(
-        [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
-    )
-    base.add_metabolites([cobra.Metabolite("G_e", compartment='e')])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["EX_A", "EX_C",
-                                  "EX_E", "EX_G",
-                                  "A2B", "C2D",
-                                  "E2F", "biomass"]]
-                       )
-    base.reactions.EX_A.add_metabolites({"A": 1})
-    base.reactions.EX_C.add_metabolites({"C": -1})
-    base.reactions.EX_E.add_metabolites({"E": -1})
-    base.reactions.EX_G.add_metabolites({"G": -1, "G_e": 1})
-    base.reactions.A2B.add_metabolites({"A": -1, "B": 1})
-    base.reactions.C2D.add_metabolites({"C": -1, "D": 1})
-    base.reactions.E2F.add_metabolites({"E": -1, "F": 1})
-    base.reactions.biomass.add_metabolites(
-        {"B": -1, "D": -1, "F": -1, "G_e": -1}
-    )
+    met_a = cobra.Metabolite("lipid_c", compartment='c')
+    met_b = cobra.Metabolite("protein_c", compartment='c')
+    met_c = cobra.Metabolite("rna_c", compartment='c')
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
+    met_b1 = cobra.Metabolite("protein_e", compartment='e')
+    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    a2b = cobra.Reaction("A2B", lower_bound=-1000, upper_bound=1000)
+    a2b.add_metabolites({met_a: 1, met_b: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3, a2b])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
     return base
 
 
