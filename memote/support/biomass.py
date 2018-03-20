@@ -190,7 +190,7 @@ def find_direct_metabolites(model, reaction):
                             if rxn not in biomass_rxns])
 
     solution = model.optimize()
-    if solution.objective_value is 0:
+    if solution.objective_value == 0:
         raise ValueError("objective value is zero. Model will not grow.")
 
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
