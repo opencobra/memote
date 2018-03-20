@@ -434,8 +434,9 @@ def test_find_direct_metabolites(model, number):
     pytest.mark("FBA optimizes to zero, no growth",
         marks=pytest.mark.raises(exception=ValueError))
 ], indirect="model")
-def test_find_direct_metabolites_errors(model, number):
+def test_find_direct_metabolites_errors(model):
     """Expect the appropriate amount of direct metabolites to be found."""
+    biomass.find_direct_metabolites(model)
 
 
 @pytest.mark.parametrize("model, number", [
