@@ -431,7 +431,7 @@ def test_find_direct_metabolites(model, number):
         assert len(biomass.find_direct_metabolites(model, rxn)) is number
 
 @pytest.mark.parametrize("model", [
-    pytest.mark("FBA optimizes to zero, no growth",
+    pytest.param("FBA optimizes to zero, no growth",
         marks=pytest.mark.raises(exception=ValueError))
 ], indirect="model")
 def test_find_direct_metabolites_errors(model):
