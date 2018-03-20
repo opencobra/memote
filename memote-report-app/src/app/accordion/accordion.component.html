@@ -71,7 +71,7 @@
             <ng-template #vegaPlot>
               <br>
                 <div>
-                  <app-vega-plot [type]="data.byID(testId)?.type" [plotData]="data.byID(testId)?.history"></app-vega-plot>
+                  <app-vega-plot [testId]="testId"></app-vega-plot>
                 </div>
             </ng-template>
           </div>

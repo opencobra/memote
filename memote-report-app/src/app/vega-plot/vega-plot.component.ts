@@ -3,6 +3,7 @@ import { ElementRef } from '@angular/core';
 import { parse, View } from 'vega-lib';
 import { ReportDataService } from '../report-data.service';
 import { specMetric } from './vega-plot.metric-spec';
+import { TestHistory } from './../test-history.model';
 
 @Component({
   selector: 'app-vega-plot',
@@ -11,9 +12,9 @@ import { specMetric } from './vega-plot.metric-spec';
   encapsulation: ViewEncapsulation.None
 })
 export class VegaPlotComponent implements OnInit {
-  // @Input() testId: string;
-  @Input() plotData: object[];
-  @Input() type: string;
+  @Input() testId: string;
+  testObject: TestHistory;
+  type: string;
   nativeElement: any;
 
   constructor(private data: ReportDataService, private elementRef: ElementRef) {
@@ -21,11 +22,19 @@ export class VegaPlotComponent implements OnInit {
   }
 
   public initialize() {
+    this.testObject = this.data.byID(this.testId);
+    this.type = this.testObject.type;
+
     // Initialize the vega plot
-    specMetric.data[0]['values'] = this.plotData;
+    if (['count', 'raw', 'number'].includes(this.type)) {
+      this.type = 'data';
+    } else {
+      this.type = 'metric';
+    }
+    specMetric.data[0]['values'] = this.testObject.history;
     const view = new View(parse(specMetric))
       .renderer('svg')
-      .signal('type', 'data')
+      .signal('type', this.type)
       .initialize(this.nativeElement)
       .hover()
       .run();
