@@ -13,6 +13,7 @@ export class ReportDataService {
   statisticsCards: ResultCard[] = [];
   scoredTests: string[] = [];
   reportType: string;
+  allExpandState = false;
 
   constructor(private http: HttpClient) {}
 
@@ -43,6 +44,10 @@ export class ReportDataService {
       }
   }
 }
+
+  public togglePanel() {
+    this.allExpandState = !this.allExpandState;
+  }
 
   public byID(string) {
     return this.allTests.find(x => x.id === string);

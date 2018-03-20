@@ -1,5 +1,6 @@
 <div *ngIf="data.byReg(case).length > 1">
   <mat-expansion-panel
+  [expanded]="data.allExpandState"
   #expPanel
   class="mat-elevation-z0">
      <mat-expansion-panel-header
@@ -27,6 +28,7 @@
        <mat-expansion-panel
        *ngFor="let testId of data.byReg(case); let i = index"
        #expPanel
+       [expanded]="data.allExpandState"
        class="mat-elevation-z0">
           <mat-expansion-panel-header
           class="mat-expansion-panel-header"
