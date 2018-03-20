@@ -196,15 +196,6 @@ def find_direct_metabolites(model, reaction):
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
 
-    # for met in tra_bou_bio_mets:
-    #     for rxn in met.reactions:
-    #         if met in rxn.reactants and rxn not in biomass_rxns:
-    #             flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
-    #             products = [p for p in rxn.products if p in tra_bou_bio_mets]
-    #             for p in products:
-    #                 flux_sum[p] += -float(tra_bou_bio_fluxes[get_ids([rxn])])
-    #         elif met in rxn.products and rxn not in biomass_rxns:
-    #             flux_sum[met] += float(tra_bou_bio_fluxes[get_ids([rxn])])
     main_comp = helpers.find_compartment_id_in_model(model, 'c')
     exc_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
