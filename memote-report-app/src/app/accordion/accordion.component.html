@@ -62,12 +62,18 @@
                 <tr> {{ data.byID(testId)?.message }} </tr>
               </div>
             </ng-template>
-            <div>
+            <div *ngIf="data.reportType != 'history'; else vegaPlot">
               <br>
               <textarea rows="4" style="overflow-wrap: break-word; width:100%">
                 {{ data.getString(data.byID(testId)?.data) }}
               </textarea>
             </div>
+            <ng-template #vegaPlot>
+              <br>
+                <div>
+                  <app-vega-plot [type]="data.byID(testId)?.type" [plotData]="data.byID(testId)?.history"></app-vega-plot>
+                </div>
+            </ng-template>
           </div>
       </mat-expansion-panel>
   </mat-accordion>

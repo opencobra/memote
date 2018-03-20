@@ -38,6 +38,7 @@ export class ReportDataService {
         // app resorts to displaying the test data.
         this.http.get('/data/testHistory.json')
         .subscribe(data => {this.convertHistoryResults(data); });
+        this.reportType = 'history';
         break;
       }
   }
@@ -106,7 +107,13 @@ export class ReportDataService {
   private convertHistoryResults(data: Object): void {
     // Store each test history result as a TestHistory object in a central list.
     for (const test of Object.keys(data['tests'])){
-      if (data['tests'][test]['history'] instanceof Object) {
+      if (data['tests'][test]['history'] instanceof Array) {
+        this.allTests.push(
+          new TestHistory(
+            test,
+            data['tests'][test])
+      );
+      } else {
         for (const param of Object.keys(data['tests'][test]['history'])) {
           const newID = test + ':' + param;
           this.allTests.push(
@@ -119,12 +126,6 @@ export class ReportDataService {
               )
             );
         }
-      } else {
-      this.allTests.push(
-          new TestHistory(
-            test,
-            data['tests'][test])
-      );
     }
   }
   this.distributeCardsToSections(data);
