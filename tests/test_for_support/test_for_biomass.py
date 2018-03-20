@@ -430,13 +430,16 @@ def test_find_direct_metabolites(model, number):
     for rxn in biomass_rxns:
         assert len(biomass.find_direct_metabolites(model, rxn)) is number
 
+
 @pytest.mark.parametrize("model", [
-    pytest.param("FBA optimizes to zero, no growth",
-        marks=pytest.mark.raises(exception=ValueError))
-], indirect="model")
+    pytest.param("direct_met_no_growth",
+                 marks=pytest.mark.raises(exception=ValueError))
+], indirect=["model"])
 def test_find_direct_metabolites_errors(model):
     """Expect the appropriate amount of direct metabolites to be found."""
-    biomass.find_direct_metabolites(model)
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        biomass.find_direct_metabolites(model, rxn)
 
 
 @pytest.mark.parametrize("model, number", [
