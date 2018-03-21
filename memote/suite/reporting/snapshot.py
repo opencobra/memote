@@ -60,7 +60,7 @@ class SnapshotReport(Report):
         self.result.update(self.config)
         try:
             return self._template.safe_substitute(
-                report_type = "snapshot",
+                report_type="snapshot",
                 results=json.dumps(self.result, sort_keys=False,
                                    indent=None, separators=(",", ":")))
         except TypeError:

@@ -63,9 +63,9 @@ class HistoryReport(object):
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
         def format_data(data):
-            """Format result data according to the user-defined type"""
+            """Format result data according to the user-defined type."""
             # TODO Remove this failsafe once proper error handling is in place.
-            if type == "percent" or data == None:
+            if type == "percent" or data is None:
                 # Return an empty list here to reduce the output file size.
                 # The angular report will ignore the `data` and instead display
                 # the `metric`.
@@ -104,11 +104,11 @@ class HistoryReport(object):
                     else:
                         tests[test].setdefault("history", list())
                         tests[test]["history"].append({
-                                                "branch": branch,
-                                                "commit": commit,
-                                                "metric": metric,
-                                                "data": format_data(data),
-                                                "result": res})
+                            "branch": branch,
+                            "commit": commit,
+                            "metric": metric,
+                            "data": format_data(data),
+                            "result": res})
         return base
 
     def render_html(self):
@@ -119,7 +119,7 @@ class HistoryReport(object):
         structure.update(self.config)
         try:
             return self._template.safe_substitute(
-                report_type = "history",
+                report_type="history",
                 results=json.dumps(structure, sort_keys=False,
                                    indent=None, separators=(",", ":")))
         except TypeError:
