@@ -39,6 +39,7 @@ class HistoryReport(object):
     ----------
     configuration : memote.MemoteConfiguration
         A memote configuration structure.
+
     """
 
     _valid_indexes = frozenset(["time", "hash"])
@@ -53,6 +54,7 @@ class HistoryReport(object):
             An instance that manages access to test results.
         index : {"hash", "time"}, optional
             The default horizontal axis type for all plots.
+
         """
         super(HistoryReport, self).__init__(**kwargs)
         self._template = Template(
