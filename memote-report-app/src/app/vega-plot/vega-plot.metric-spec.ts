@@ -1,17 +1,26 @@
 export const specMetric = {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
-  "width": 300,
-  "height": 150,
+  "width": 350,
+  "height": 200,
   "padding": 0,
   "signals": [
     {
-      "name": "clicked",
-      "value": null,
+      "name": "shift", "value": false,
+      "on": [
+        {
+          "events": "@legendSymbol:click, @legendLabel:click",
+          "update": "event.shiftKey",
+          "force":  true
+        }
+      ]
+    },
+    {
+      "name": "clicked", "value": null,
       "on": [
         {
           "events": "@legendSymbol:click, @legendLabel:click",
           "update": "{value: datum.value}",
-          "force": true
+          "force":  true
         }
       ]
     },
@@ -24,106 +33,7 @@ export const specMetric = {
   "data": [
     {
       "name": "scores",
-      "values": [
-        {
-          "commit": "095aeaa8d998fdec3ce34e99bf1bd56bd443087e",
-          "metric": 0.02280501710376283,
-          "data": 20,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "2bdf753982b7e4e0fd61421828aa0c4a26722988",
-          "metric": 0.022598870056497175,
-          "data": 20,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "54032275776f2810b78af11b960cc65bb6c2b002",
-          "metric": 0.022650056625141562,
-          "data": 20,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
-          "metric": 0.024968789013732832,
-          "data": 20,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "4da7d0de7823f1b179dd70e2e295eff6f7960fa0",
-          "metric": 0.04962779156327544,
-          "data": 40,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "0089055223ebabc54385a9d5fbe5eb03837e902d",
-          "metric": 0.048327137546468404,
-          "data": 39,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "c453461bccc9de73f0a94f1e53ae3b24eabe59c3",
-          "metric": 0.048327137546468404,
-          "data": 39,
-          "result": "failed",
-          "branch": "origin/master"
-        },
-        {
-          "commit": "095aeaa8d998fdec3ce34e99bf1bd56bd443087e",
-          "metric": 0.02280501710376283,
-          "data": 20,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "2bdf753982b7e4e0fd61421828aa0c4a26722988",
-          "metric": 0.022598870056497175,
-          "data": 20,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "54032275776f2810b78af11b960cc65bb6c2b002",
-          "metric": 0.022650056625141562,
-          "data": 20,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
-          "metric": 0.024968789013732832,
-          "data": 20,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "4da7d0de7823f1b179dd70e2e295eff6f7960fa0",
-          "metric": 0.04962779156327544,
-          "data": 40,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "0089055223ebabc54385a9d5fbe5eb03837e902d",
-          "metric": 0.048327137546468404,
-          "data": 39,
-          "result": "failed",
-          "branch": "master"
-        },
-        {
-          "commit": "c453461bccc9de73f0a94f1e53ae3b24eabe59c3",
-          "metric": 0.048327137546468404,
-          "data": 39,
-          "result": "failed",
-          "branch": "master"
-        }
-      ]
+      "values": []
     },
     {
       "name": "selected",
@@ -159,7 +69,7 @@ export const specMetric = {
     {
       "name": "color",
       "type": "ordinal",
-      "range": {"scheme": "redyellowblue-10"},
+      "range": ["#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
       "domain": {
         "data": "scores",
         "field": "branch"
@@ -211,62 +121,49 @@ export const specMetric = {
         }
       },
       "legends": [
-        {
-          "stroke": "color",
-          "title": "Branches",
-          "padding": 4,
-          "orient": "left",
-          "offset": 30,
-          "encode": {
-            "symbols": {
-              "name": "legendSymbol",
-              "interactive": true,
-              "enter": {
+    {
+      "stroke": "color",
+      "title": "Branches",
+      "padding": 4,
+      "orient": "left",
+      "offset": 30,
+      "encode": {
+        "symbols": {
+          "name": "legendSymbol",
+          "interactive": true,
+          "enter": {
                 "cursor": {
                   "value": "pointer"
                 }
-              },
-              "update": {
-                "strokeWidth": {
-                  "value": 2
-                },
-                "size": {
-                  "value": 50
-                },
-                "opacity": [
-                  {
-                    "test": "!length(data('selected')) || indata('selected', 'value', datum.branch)",
-                    "value": 1
-                  },
-                  {
-                    "value": 0.15
-                  }
-                ]
-              }
-            },
-            "labels": {
-              "name": "legendLabel",
-              "interactive": true,
-              "enter": {
+          },
+          "update": {
+            "fill": {"value": "transparent"},
+            "strokeWidth": {"value": 2},
+            "opacity": [
+              {"test": "!length(data('selected')) || indata('selected', 'value', datum.value)", "value": 0.7},
+              {"value": 0.15}
+            ],
+            "size": {"value": 64}
+          }
+        },
+        "labels": {
+          "name": "legendLabel",
+          "interactive": true,
+          "enter": {
                 "cursor": {
                   "value": "pointer"
                 }
-              },
-              "update": {
-                "opacity": [
-                  {
-                    "test": "!length(data('selected')) || indata('selected', 'value', datum.branch)",
-                    "value": 1
-                  },
-                  {
-                    "value": 0.15
-                  }
-                ]
-              }
-            }
+          },
+          "update": {
+            "opacity": [
+              {"test": "!length(data('selected')) || indata('selected', 'value', datum.value)", "value": 1},
+              {"value": 0.25}
+            ]
           }
         }
-      ],
+      }
+    }
+  ],
       "marks": [
         {
           "type": "line",
@@ -327,7 +224,7 @@ export const specMetric = {
                 "field": "branch"
               },
               "size": {
-                "value": 80
+                "value": 90
               },
               "tooltip": {
                 "scale": "x",
@@ -335,12 +232,6 @@ export const specMetric = {
               }
             },
             "update": {
-              "stroke": {
-                "value": "#000"
-              },
-              "strokeWidth": {
-                "value": 1
-              },
               "opacity": [
                 {
                   "test": "!length(data('selected')) || indata('selected', 'value', datum.branch)",
