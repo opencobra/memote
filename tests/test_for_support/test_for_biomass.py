@@ -280,7 +280,7 @@ def only_direct_mets_with_false_positive_candidate_product(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     EX_a1 = cobra.Reaction("EX_lipid_e", lower_bound=-1000, upper_bound=1000)
-    EX_lipid_e.add_metabolites({met_a1: 1})
+    EX_a1.add_metabolites({met_a1: 1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3, EX_a1])
     base.add_boundary(met_b1)
     base.add_boundary(met_c1)
