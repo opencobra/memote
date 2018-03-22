@@ -197,11 +197,11 @@ def find_direct_metabolites(model, reaction):
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
 
     main_comp = helpers.find_compartment_id_in_model(model, 'c')
-    exc_space = helpers.find_compartment_id_in_model(model, 'e')
+    ext_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
         for rxn in met.reactions:
             not_biomass_rxn = rxn not in biomass_rxns
-            extracellular = met.compartment == exc_space
+            extracellular = met.compartment == ext_space
             # if reactant metabolite in "e"
             if met in rxn.reactants and not_biomass_rxn and extracellular:
                 product_comps = set([p.compartment for p in rxn.products])
