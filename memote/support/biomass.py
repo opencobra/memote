@@ -215,7 +215,9 @@ def find_direct_metabolites(model, reaction):
     # The following is to detect false positives.
     # As mentioned previously, these false positives exists in the "e"
     # compartment with flux from the "c" compartment and are part of the
-    # biomass reaction(s).
+    # biomass reaction(s). It sums fluxes positively or negatively depending
+    # on if direct metabolites in the "e" compartment are defined as reactants
+    # or products in various reactions.
     main_comp = helpers.find_compartment_id_in_model(model, 'c')
     ext_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
