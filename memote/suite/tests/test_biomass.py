@@ -291,9 +291,11 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
             len(biomass.find_biomass_precursors(model, reaction))
         ann["message"][reaction_id] = wrapper.fill(
             """{} contains a total of {} direct metabolites ({:.2%}).
-            Specifically these are: {}.""".format(
-                reaction_id, len(ann["data"][reaction_id]),
-                ann["metric"][reaction_id], ann["data"][reaction_id]))
+            Specifically these are: {}.
+            """.format(reaction_id,
+                       len(ann["data"][reaction_id]),
+                       ann["metric"][reaction_id],
+                       ann["data"][reaction_id]))
         assert ann["metric"][reaction_id] < 0.5, ann["message"][reaction_id]
 
 
