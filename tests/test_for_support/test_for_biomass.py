@@ -238,7 +238,7 @@ def direct_met_no_growth(base):
 
 
 @register_with(MODEL_REGISTRY)
-def direct_met_false_positive_single_compartment(base):
+def only_direct_mets_with_false_positive_candidate(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
     met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
     met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
@@ -421,7 +421,7 @@ def test_fast_growth_default(model, boolean):
 
 @pytest.mark.parametrize("model, number", [
     ("only_direct_mets", 3),
-    ("direct_met_false_positive_single_compartment", 3),
+    ("only_direct_mets_with_false_positive_candidate", 3),
     ("precursors_producing", 0)
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):
