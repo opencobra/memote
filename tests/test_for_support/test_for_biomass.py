@@ -146,6 +146,31 @@ def precursors_uptake_limited(base):
 
 
 @register_with(MODEL_REGISTRY)
+def precursors_uptake_limited_in_alien_species(base):
+    met_a = cobra.Metabolite("lipid_c", compartment="alien_c")
+    met_b = cobra.Metabolite("protein_c", compartment="alien_c")
+    met_c = cobra.Metabolite("rna_c", compartment="alien_c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="alien_e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="alien_e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="alien_e")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def precursors_blocked(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c')
     met_b = cobra.Metabolite("protein_c", compartment='c')
@@ -204,6 +229,24 @@ def no_gam_in_biomass(base):
     met_e = cobra.Metabolite("ash_c", "H80", compartment="c")
     met_f = cobra.Metabolite("cellwall_c", "H177", compartment="c")
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
+    # Reactions
+    rxn_1 = cobra.Reaction("BIOMASS_TEST")
+    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
+                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
+                           met_g: -0.032})
+    base.add_reactions([rxn_1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def no_gam_in_biomass_in_alien_species(base):
+    met_a = cobra.Metabolite("lipid_c", "H744", compartment="alien_c")
+    met_b = cobra.Metabolite("protein_c", "H119", compartment="alien_c")
+    met_c = cobra.Metabolite("rna_c", "H496", compartment="alien_c")
+    met_d = cobra.Metabolite("dna_c", "H483", compartment="alien_c")
+    met_e = cobra.Metabolite("ash_c", "H80", compartment="alien_c")
+    met_f = cobra.Metabolite("cellwall_c", "H177", compartment="alien_c")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="alien_c")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
@@ -508,7 +551,7 @@ def test_gam_in_biomass(model, boolean):
 @pytest.mark.parametrize("model, boolean", [
     ("precursors_producing", False),
     ("precursors_not_in_medium", True),
-    ("precursors_uptake_limited", True)
+    ("precursors_uptake_limited", True),
 ], indirect=["model"])
 def test_fast_growth_default(model, boolean):
     """
@@ -529,7 +572,7 @@ def test_fast_growth_default(model, boolean):
     ("only_direct_mets_false_positive_candidate_EX_product_T_reactant", 3),
     ("only_direct_mets_false_positive_candidate_EX_product_T_product", 3),
     ("direct_mets_with_false_positive", 2),
-    ("precursors_producing", 0)
+    ("precursors_producing", 0),
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):
     """Expect the appropriate amount of direct metabolites to be found."""
@@ -540,7 +583,11 @@ def test_find_direct_metabolites(model, number):
 
 @pytest.mark.parametrize("model", [
     pytest.param("direct_met_no_growth",
-                 marks=pytest.mark.raises(exception=ValueError))
+                 marks=pytest.mark.raises(exception=ValueError)),
+    pytest.param("precursors_uptake_limited",
+                 marks=pytest.mark.raises(exception=KeyError)),
+    pytest.param("precursors_uptake_limited_in_alien_species",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
 ], indirect=["model"])
 def test_find_direct_metabolites_errors(model):
     """Expect the appropriate amount of direct metabolites to be found."""
