@@ -238,7 +238,32 @@ def direct_met_no_growth(base):
 
 
 @register_with(MODEL_REGISTRY)
-def only_direct_mets_with_false_positive_candidate_reactant(base):
+def only_direct_mets_false_positive_candidate_EX_reactant_T_product(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: -1, met_a1: 1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_reactant_T_reactant(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
     met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
     met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
@@ -263,7 +288,7 @@ def only_direct_mets_with_false_positive_candidate_reactant(base):
 
 
 @register_with(MODEL_REGISTRY)
-def only_direct_mets_with_false_positive_candidate_product(base):
+def only_direct_mets_false_positive_candidate_EX_product_T_reactant(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
     met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
     met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
@@ -275,6 +300,32 @@ def only_direct_mets_with_false_positive_candidate_product(base):
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
     rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
     rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    EX_a1 = cobra.Reaction("EX_lipid_e", lower_bound=-1000, upper_bound=1000)
+    EX_a1.add_metabolites({met_a1: 1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3, EX_a1])
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_product_T_product(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: -1, met_a1: 1})
     rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
     rxn2.add_metabolites({met_b: 1, met_b1: -1})
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
@@ -473,8 +524,10 @@ def test_fast_growth_default(model, boolean):
 
 @pytest.mark.parametrize("model, number", [
     ("only_direct_mets", 3),
-    ("only_direct_mets_with_false_positive_candidate_reactant", 3),
-    ("only_direct_mets_with_false_positive_candidate_product", 3),
+    ("only_direct_mets_false_positive_candidate_EX_reactant_T_product", 3),
+    ("only_direct_mets_false_positive_candidate_EX_reactant_T_reactant", 3),
+    ("only_direct_mets_false_positive_candidate_EX_product_T_reactant", 3),
+    ("only_direct_mets_false_positive_candidate_EX_product_T_product", 3),
     ("direct_mets_with_false_positive", 2),
     ("precursors_producing", 0)
 ], indirect=["model"])
