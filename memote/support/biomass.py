@@ -191,7 +191,11 @@ def find_direct_metabolites(model, reaction):
 
     solution = model.optimize()
     if solution.objective_value == 0:
-        raise ValueError("objective value is zero. Model will not grow.")
+        LOGGER.error("Failed to generate a non-zero objective value with "
+                     "flux balance analysis. This may be a bug.")
+        raise ValueError("The flux balance analysis on this model returned an "
+                         "objective value of zero. Make sure the model can "
+                         "grow! Check if the constraints are not too strict!")
 
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
