@@ -166,6 +166,18 @@ def find_direct_metabolites(model, reaction):
     """
     Return list of possible direct biomass precursor metabolites.
 
+    Direct metabolites are metabolites that are involved only in transport
+    and/or boundary reactions, as well as the biomass reaction(s).
+    This function detects and excludes false positives from being part of the
+    count of direct metabolites. A false positive is specifically defined as
+    a metabolite that is taken up by the biomass reaction, and only involved
+    in tranposrt and/or boundary reactions, but is transported from the cytosol
+    into the extracellular space where it isomerizes and is taken up by the
+    biomass reaction. Oftentimes, the isomerization reaction is not part of the
+    model, and so such a metabolite is wrongly identified as a direct
+    metabolite. The most common examples of this occur in various E. coli
+    models.
+
     Parameters
     ----------
     model : cobra.Model
@@ -200,35 +212,42 @@ def find_direct_metabolites(model, reaction):
     tra_bou_bio_fluxes = solution.fluxes[get_ids(rxns_of_interest)]
     flux_sum = pd.DataFrame(index=tra_bou_bio_mets, columns=["sum"], data=0).T
 
+    # The following is to detect false positives.
+    # As mentioned previously, these false positives exists in the "e"
+    # compartment with flux from the "c" compartment and are part of the
+    # biomass reaction(s).
     main_comp = helpers.find_compartment_id_in_model(model, 'c')
     ext_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
         for rxn in met.reactions:
             not_biomass_rxn = rxn not in biomass_rxns
             extracellular = met.compartment == ext_space
-            # if reactant metabolite in "e"
+            # if the metabolite is in the "e" compartment and a reactant,
+            # sum the fluxes accordingly (outward=negative, inward=positive)
             if met in rxn.reactants and not_biomass_rxn and extracellular:
                 product_comps = set([p.compartment for p in rxn.products])
-                # e reactant, no product (outward flux)
+                # if the reaction has no product (outward flux)
                 if len(product_comps) == 0:
                     flux_sum[met] += -float(
                         tra_bou_bio_fluxes[get_ids([rxn])])
-                # e reactant, c product (inward flux)
+                # if the reaction has a product in "c" (inward flux)
                 elif main_comp in product_comps:
                     flux_sum[met] += float(
                         tra_bou_bio_fluxes[get_ids([rxn])])
-            # if product metabolite in "e"
+            # if the metabolite is in the "e" compartment and a product,
+            # sum the fluxes accordingly (outward=negative, inward=positive)
             elif met in rxn.products and not_biomass_rxn and extracellular:
                 reactant_comps = set([p.compartment for p in rxn.reactants])
-                # e product, no reactant (inward flux)
+                # if the reaction has no reactant (inward flux)
                 if len(reactant_comps) == 0:
                     flux_sum[met] += float(
                         tra_bou_bio_fluxes[get_ids([rxn])])
-                # e product, c reactant (outward flux)
+                # if the reaction has a reactant in "c" (outward flux)
                 elif main_comp in reactant_comps:
                     flux_sum[met] += -float(
                         tra_bou_bio_fluxes[get_ids([rxn])])
-            # for all non-e metabolites
+            # for all non-e metabolites (cannot be false positives, flux is 
+            # automatically non-negative)
             elif not_biomass_rxn and not extracellular:
                 flux_sum[met] += np.abs(
                     float(tra_bou_bio_fluxes[get_ids([rxn])]))
