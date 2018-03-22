@@ -248,7 +248,7 @@ def find_direct_metabolites(model, reaction):
                 elif main_comp in reactant_comps:
                     flux_sum[met] += -float(
                         tra_bou_bio_fluxes[get_ids([rxn])])
-            # for all non-e metabolites (cannot be false positives, flux is 
+            # for all non-e metabolites (cannot be false positives, flux is
             # automatically non-negative)
             elif not_biomass_rxn and not extracellular:
                 flux_sum[met] += np.abs(
