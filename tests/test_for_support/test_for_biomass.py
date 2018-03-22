@@ -239,12 +239,12 @@ def direct_met_no_growth(base):
 
 @register_with(MODEL_REGISTRY)
 def direct_met_false_positive_single_compartment(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c')
-    met_b = cobra.Metabolite("protein_c", compartment='c')
-    met_c = cobra.Metabolite("rna_c", compartment='c')
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
-    met_b1 = cobra.Metabolite("protein_e", compartment='e')
-    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
