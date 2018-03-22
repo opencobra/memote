@@ -263,7 +263,7 @@ def only_direct_mets_with_false_positive_candidate_reactant(base):
 
 
 @register_with(MODEL_REGISTRY)
-def only_direct_mets_with_false_positive_candidate_product():
+def only_direct_mets_with_false_positive_candidate_product(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
     met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
     met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
