@@ -194,17 +194,33 @@ def find_direct_metabolites(model, reaction):
     """
     biomass_rxns = set(helpers.find_biomass_reaction(model))
     tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model, biomass_rxns)
-    precursors = find_biomass_precursors(model, reaction)
-    tra_bou_bio_mets = [met for met in precursors if
-                        met.reactions.issubset(tra_bou_bio_rxns)]
-    rxns_of_interest = set([rxn for met in tra_bou_bio_mets
-                            for rxn in met.reactions
-                            if rxn not in biomass_rxns])
+    try:
+        precursors = find_biomass_precursors(model, reaction)
+        main_comp = helpers.find_compartment_id_in_model(model, 'c')
+        ext_space = helpers.find_compartment_id_in_model(model, 'e')
+    except KeyError as k:
+        LOGGER.error("Failed to properly identify cytosolic and extracellular "
+                     "compartments.")
+        raise KeyError("The cytosolic and/or extracellular compartments could "
+                       "not be identified. "
+                       "find_compartment_id_in_model: " + str(k))
+    except RuntimeError as r:
+        LOGGER.error("Failed to properly identify cytosolic and extracellular "
+                     "compartments.")
+        raise RuntimeError("The cytosolic and/or extracellular compartments "
+                           "could not be identified. "
+                           "largest_compartment_id_met: " + str(r))
+    else:
+        tra_bou_bio_mets = [met for met in precursors if
+                            met.reactions.issubset(tra_bou_bio_rxns)]
+        rxns_of_interest = set([rxn for met in tra_bou_bio_mets
+                                for rxn in met.reactions
+                                if rxn not in biomass_rxns])
 
     solution = model.optimize()
     if solution.objective_value == 0:
         LOGGER.error("Failed to generate a non-zero objective value with "
-                     "flux balance analysis. This may be a bug.")
+                     "flux balance analysis.")
         raise ValueError("The flux balance analysis on this model returned an "
                          "objective value of zero. Make sure the model can "
                          "grow! Check if the constraints are not too strict!")
@@ -218,8 +234,6 @@ def find_direct_metabolites(model, reaction):
     # biomass reaction(s). It sums fluxes positively or negatively depending
     # on if direct metabolites in the "e" compartment are defined as reactants
     # or products in various reactions.
-    main_comp = helpers.find_compartment_id_in_model(model, 'c')
-    ext_space = helpers.find_compartment_id_in_model(model, 'e')
     for met in tra_bou_bio_mets:
         for rxn in met.reactions:
             not_biomass_rxn = rxn not in biomass_rxns
