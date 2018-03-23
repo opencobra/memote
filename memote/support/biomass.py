@@ -198,18 +198,18 @@ def find_direct_metabolites(model, reaction):
         precursors = find_biomass_precursors(model, reaction)
         main_comp = helpers.find_compartment_id_in_model(model, 'c')
         ext_space = helpers.find_compartment_id_in_model(model, 'e')
-    except KeyError as k:
+    except KeyError as err:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
         raise KeyError("The cytosolic and/or extracellular compartments could "
                        "not be identified. "
-                       "find_compartment_id_in_model: " + str(k))
-    except RuntimeError as r:
+                       "find_compartment_id_in_model: " + str(err))
+    except RuntimeError as err:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
         raise RuntimeError("The cytosolic and/or extracellular compartments "
                            "could not be identified. "
-                           "largest_compartment_id_met: " + str(r))
+                           "largest_compartment_id_met: " + str(err))
     else:
         tra_bou_bio_mets = [met for met in precursors if
                             met.reactions.issubset(tra_bou_bio_rxns)]
