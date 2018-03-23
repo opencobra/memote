@@ -367,7 +367,7 @@ def find_exchange_rxns(model):
             if extracellular in rxn.get_compartments()]
 
 
-def find_tra_bou_bio_reactions(model, biomass=None):
+def find_interchange_biomass_reactions(model, biomass=None):
     """
     Return the set of all tranport, boundary, and biomass reactions in a model.
 
