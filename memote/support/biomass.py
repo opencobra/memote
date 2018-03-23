@@ -194,7 +194,8 @@ def find_direct_metabolites(model, reaction):
 
     """
     biomass_rxns = set(helpers.find_biomass_reaction(model))
-    tra_bou_bio_rxns = helpers.find_tra_bou_bio_reactions(model, biomass_rxns)
+    tra_bou_bio_rxns = helpers.find_interchange_biomass_reactions(model,
+                                                                  biomass_rxns)
     try:
         precursors = find_biomass_precursors(model, reaction)
         main_comp = helpers.find_compartment_id_in_model(model, 'c')
