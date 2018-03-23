@@ -214,7 +214,8 @@ def find_pure_metabolic_reactions(model):
         The metabolic model under investigation.
 
     """
-    return set(model.reactions) - helpers.find_tra_bou_bio_reactions(model)
+    return set(model.reactions) - helpers.find_interchange_biomass_reactions(
+        model)
 
 
 def is_constrained_reaction(rxn):
