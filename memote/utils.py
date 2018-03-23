@@ -127,7 +127,8 @@ def get_ids(iterable):
 
 def get_ids_and_bounds(iterable):
     """Retrieve the identifier and bounds of a  number of objects."""
-    return [(elem.id, elem.lower_bound, elem.upper_bound) for elem in iterable]
+    return ["{0.lower_bound} <= {0.id} <= {0.upper_bound}".format(elem) for
+            elem in iterable]
 
 
 def truncate(sequence):
