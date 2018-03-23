@@ -199,12 +199,12 @@ def find_direct_metabolites(model, reaction):
         precursors = find_biomass_precursors(model, reaction)
         main_comp = helpers.find_compartment_id_in_model(model, 'c')
         ext_space = helpers.find_compartment_id_in_model(model, 'e')
-    except KeyError as err:
+    except KeyError:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
         raise_with_traceback(KeyError("The cytosolic and/or extracellular "
                                       "compartments could not be identified."))
-    except RuntimeError as err:
+    except RuntimeError:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
         raise_with_traceback(RuntimeError("The cytosolic and/or extracellular "
