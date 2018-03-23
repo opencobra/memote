@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 
 from six import iteritems
+from future.utils import raise_with_traceback
 from cobra.exceptions import Infeasible
 
 from memote.utils import get_ids
@@ -201,15 +202,14 @@ def find_direct_metabolites(model, reaction):
     except KeyError as err:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
-        raise KeyError("The cytosolic and/or extracellular compartments could "
-                       "not be identified. "
-                       "find_compartment_id_in_model: " + str(err))
+        raise_with_traceback(KeyError("The cytosolic and/or extracellular "
+                                      "compartments could not be identified."))
     except RuntimeError as err:
         LOGGER.error("Failed to properly identify cytosolic and extracellular "
                      "compartments.")
-        raise RuntimeError("The cytosolic and/or extracellular compartments "
-                           "could not be identified. "
-                           "largest_compartment_id_met: " + str(err))
+        raise_with_traceback(RuntimeError("The cytosolic and/or extracellular "
+                                          "compartments could not be "
+                                          "identified."))
     else:
         tra_bou_bio_mets = [met for met in precursors if
                             met.reactions.issubset(tra_bou_bio_rxns)]
