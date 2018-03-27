@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import cobra
 import pytest
 import numpy as np
+from cobra.exceptions import OptimizationError
 from optlang.interface import OPTIMAL
 
 import memote.support.helpers as helpers
@@ -583,7 +584,7 @@ def test_find_direct_metabolites(model, number):
 
 @pytest.mark.parametrize("model", [
     pytest.param("direct_met_no_growth",
-                 marks=pytest.mark.raises(exception=ValueError)),
+                 marks=pytest.mark.raises(exception=OptimizationError)),
     pytest.param("precursors_uptake_limited",
                  marks=pytest.mark.raises(exception=KeyError)),
     pytest.param("precursors_uptake_limited_in_alien_species",
