@@ -23,14 +23,12 @@ import logging
 from builtins import open
 
 import pytest
-import ruamel.yaml as yaml
-from importlib_resources import open_text
 
-import memote.suite.templates as templates
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.reporting import SnapshotReport, HistoryReport
 from memote.suite.results import HistoryManager
+from memote.suite.reporting import (
+    SnapshotReport, HistoryReport, ReportConfiguration)
 
 __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
@@ -93,16 +91,14 @@ def snapshot_report(result, config=None, filename=None):
 
     """
     if config is None:
-        with open_text(templates, "test_config.yml") as file_handle:
-            LOGGER.debug("Loading default snapshot configuration.")
-            config = yaml.load(file_handle)
+        config = ReportConfiguration.load()
     report = SnapshotReport(result=result, configuration=config)
     LOGGER.info("Writing snapshot report to '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())
 
 
-def history_report(repository, manager, filename, index="hash"):
+def history_report(repository, manager, filename, index="hash", config=None):
     """
     Test a model and save a history report.
 
@@ -116,11 +112,15 @@ def history_report(repository, manager, filename, index="hash"):
         A filename for the HTML report.
     index : {"hash", "time"}, optional
         The default horizontal axis type for all plots.
+    config : dict, optional
+        The final test report configuration.
 
     """
+    if config is None:
+        config = ReportConfiguration.load()
     report = HistoryReport(
         history=HistoryManager(repository=repository, manager=manager),
-        index=index)
+        configuration=config, index=index)
     LOGGER.info("Writing history report '%s'.", filename)
     with open(filename, "w", encoding="utf-8") as file_h:
         file_h.write(report.render_html())

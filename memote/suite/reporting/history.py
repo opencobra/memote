@@ -32,11 +32,19 @@ LOGGER = logging.getLogger(__name__)
 
 
 class HistoryReport(object):
-    """Render a rich report using the git repository history."""
+    """
+    Render a rich report using the git repository history.
+
+    Attributes
+    ----------
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, history, index="hash", **kwargs):
+    def __init__(self, history, configuration, index="hash", **kwargs):
         """
         Initialize the git history report.
 
@@ -52,33 +60,57 @@ class HistoryReport(object):
         self._template = Template(
             read_text(templates, "index.html", encoding="utf-8"))
         self._history = history
+        self.config = configuration
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
+        def format_data(data):
+            """Format result data according to the user-defined type."""
+            # TODO Remove this failsafe once proper error handling is in place.
+            if type == "percent" or data is None:
+                # Return an empty list here to reduce the output file size.
+                # The angular report will ignore the `data` and instead display
+                # the `metric`.
+                return []
+            if type == "count":
+                return len(data)
+            return data
+
         base = dict()
+        tests = base.setdefault("tests", dict())
         for branch, commits in self._history.iter_branches():
             for commit in commits:
                 result = self._history.get_result(commit, )
                 for test in result.cases:
-                    base.setdefault(test, dict()).setdefault("history", dict())
-                    if "title" not in base[test]:
-                        base[test]["title"] = result.cases[test]["title"]
-                    if "summary" not in base[test]:
-                        base[test]["summary"] = result.cases[test]["summary"]
+                    tests.setdefault(test, dict())
+                    if "title" not in tests[test]:
+                        tests[test]["title"] = result.cases[test]["title"]
+                    if "summary" not in tests[test]:
+                        tests[test]["summary"] = result.cases[test]["summary"]
+                    if "type" not in tests[test]:
+                        tests[test]["type"] = result.cases[test]["type"]
+                    type = tests[test]["type"]
                     metric = result.cases[test].get("metric")
+                    data = result.cases[test].get("data")
+                    res = result.cases[test].get("result")
                     if isinstance(metric, dict):
+                        tests[test].setdefault("history", dict())
                         for param in metric:
-                            base[test]["history"].setdefault(param, dict()). \
-                                setdefault(branch, list()).append({
+                            tests[test]["history"].setdefault(param, list()). \
+                                append({
+                                    "branch": branch,
                                     "commit": commit,
-                                    "metric": metric.get(param)
-                                })
+                                    "metric": metric.get(param),
+                                    "data": format_data(data.get(param)),
+                                    "result": res.get(param)})
                     else:
-                        base[test]["history"].setdefault(branch, list()). \
-                            append({
-                                "commit": commit,
-                                "metric": metric
-                            })
+                        tests[test].setdefault("history", list())
+                        tests[test]["history"].append({
+                            "branch": branch,
+                            "commit": commit,
+                            "metric": metric,
+                            "data": format_data(data),
+                            "result": res})
         return base
 
     def render_html(self):
@@ -86,8 +118,10 @@ class HistoryReport(object):
         self._history.build_branch_structure()
         self._history.load_history()
         structure = self.collect_history()
+        structure.update(self.config)
         try:
             return self._template.safe_substitute(
+                report_type="history",
                 results=json.dumps(structure, sort_keys=False,
                                    indent=None, separators=(",", ":")))
         except TypeError:

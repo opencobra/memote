@@ -109,7 +109,15 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
               show_default=True,
               help="Use either commit hashes or time as the independent "
                    "variable for plots.")
-def history(location, filename, index):
+@click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
+              multiple=True,
+              help="A path to a report configuration file that will be merged "
+                   "into the default configuration. It's primary use is to "
+                   "configure the placement and scoring of custom tests but "
+                   "it can also alter the default behavior. Please refer to "
+                   "the documentation for the expected YAML format used. This "
+                   "option can be specified multiple times.")
+def history(location, filename, index, custom_config):
     """
     Generate a report over a model's git commit history.
 
@@ -129,8 +137,13 @@ def history(location, filename, index):
     try:
         manager = managers.SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
-        manager = managers.RepoResultManager(repository=repo, location=location)
-    api.history_report(repo, manager, filename, index)
+        manager = managers.RepoResultManager(
+            repository=repo, location=location)
+    config = ReportConfiguration.load()
+    # Update the default test configuration with custom ones (if any).
+    for custom in custom_config:
+        config.merge(ReportConfiguration.load(custom))
+    api.history_report(repo, manager, filename, index=index, config=config)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
