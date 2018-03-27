@@ -23,10 +23,7 @@ import logging
 from builtins import open
 
 import pytest
-import ruamel.yaml as yaml
-from importlib_resources import open_text
 
-import memote.suite.templates as templates
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.results import HistoryManager
