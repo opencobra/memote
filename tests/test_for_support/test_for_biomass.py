@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import cobra
 import pytest
 import numpy as np
+from cobra.exceptions import OptimizationError
 from optlang.interface import OPTIMAL
 
 import memote.support.helpers as helpers
@@ -146,6 +147,31 @@ def precursors_uptake_limited(base):
 
 
 @register_with(MODEL_REGISTRY)
+def precursors_uptake_limited_in_alien_species(base):
+    met_a = cobra.Metabolite("lipid_c", compartment="alien_c")
+    met_b = cobra.Metabolite("protein_c", compartment="alien_c")
+    met_c = cobra.Metabolite("rna_c", compartment="alien_c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="alien_e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="alien_e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="alien_e")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def precursors_blocked(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c')
     met_b = cobra.Metabolite("protein_c", compartment='c')
@@ -214,7 +240,25 @@ def no_gam_in_biomass(base):
 
 
 @register_with(MODEL_REGISTRY)
-def direct_met_single_compartment(base):
+def no_gam_in_biomass_in_alien_species(base):
+    met_a = cobra.Metabolite("lipid_c", "H744", compartment="alien_c")
+    met_b = cobra.Metabolite("protein_c", "H119", compartment="alien_c")
+    met_c = cobra.Metabolite("rna_c", "H496", compartment="alien_c")
+    met_d = cobra.Metabolite("dna_c", "H483", compartment="alien_c")
+    met_e = cobra.Metabolite("ash_c", "H80", compartment="alien_c")
+    met_f = cobra.Metabolite("cellwall_c", "H177", compartment="alien_c")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="alien_c")
+    # Reactions
+    rxn_1 = cobra.Reaction("BIOMASS_TEST")
+    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
+                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
+                           met_g: -0.032})
+    base.add_reactions([rxn_1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def direct_met_no_growth(base):
     base.add_metabolites(
         [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
     )
@@ -234,6 +278,159 @@ def direct_met_single_compartment(base):
     base.reactions.biomass.add_metabolites(
         {"B": -1, "D": -1, "F": -1, "G": -1}
     )
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_reactant_T_product(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: -1, met_a1: 1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_reactant_T_reactant(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_product_T_reactant(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    EX_a1 = cobra.Reaction("EX_lipid_e", lower_bound=-1000, upper_bound=1000)
+    EX_a1.add_metabolites({met_a1: 1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3, EX_a1])
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets_false_positive_candidate_EX_product_T_product(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: -1, met_a1: 1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    EX_a1 = cobra.Reaction("EX_lipid_e", lower_bound=-1000, upper_bound=1000)
+    EX_a1.add_metabolites({met_a1: 1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3, EX_a1])
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def direct_mets_with_false_positive(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: -1, met_a1: 1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    br_a = cobra.Reaction("boundary_lipid_c", lower_bound=1, upper_bound=1000)
+    br_a.add_metabolites({met_a: 1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3, br_a])
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def only_direct_mets(base):
+    met_a = cobra.Metabolite("a_c", compartment='c', formula="COOH")
+    met_b = cobra.Metabolite("b_c", compartment='c', formula="NO2")
+    met_c = cobra.Metabolite("c_c", compartment='c', formula="HCl")
+    met_a1 = cobra.Metabolite("a_e", compartment='e', formula="COOH")
+    met_b1 = cobra.Metabolite("b_e", compartment='e', formula="NO2")
+    met_c1 = cobra.Metabolite("c_e", compartment='e', formula="HCl")
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a1)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
     return base
 
 
@@ -355,7 +552,7 @@ def test_gam_in_biomass(model, boolean):
 @pytest.mark.parametrize("model, boolean", [
     ("precursors_producing", False),
     ("precursors_not_in_medium", True),
-    ("precursors_uptake_limited", True)
+    ("precursors_uptake_limited", True),
 ], indirect=["model"])
 def test_fast_growth_default(model, boolean):
     """
@@ -370,14 +567,34 @@ def test_fast_growth_default(model, boolean):
 
 
 @pytest.mark.parametrize("model, number", [
-    ("direct_met_single_compartment", 1),
-    ("precursors_producing", 0)
+    ("only_direct_mets", 3),
+    ("only_direct_mets_false_positive_candidate_EX_reactant_T_product", 3),
+    ("only_direct_mets_false_positive_candidate_EX_reactant_T_reactant", 3),
+    ("only_direct_mets_false_positive_candidate_EX_product_T_reactant", 3),
+    ("only_direct_mets_false_positive_candidate_EX_product_T_product", 3),
+    ("direct_mets_with_false_positive", 2),
+    ("precursors_producing", 0),
 ], indirect=["model"])
 def test_find_direct_metabolites(model, number):
     """Expect the appropriate amount of direct metabolites to be found."""
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
         assert len(biomass.find_direct_metabolites(model, rxn)) is number
+
+
+@pytest.mark.parametrize("model", [
+    pytest.param("direct_met_no_growth",
+                 marks=pytest.mark.raises(exception=OptimizationError)),
+    pytest.param("precursors_uptake_limited",
+                 marks=pytest.mark.raises(exception=KeyError)),
+    pytest.param("precursors_uptake_limited_in_alien_species",
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+], indirect=["model"])
+def test_find_direct_metabolites_errors(model):
+    """Expect the appropriate amount of direct metabolites to be found."""
+    biomass_rxns = helpers.find_biomass_reaction(model)
+    for rxn in biomass_rxns:
+        biomass.find_direct_metabolites(model, rxn)
 
 
 @pytest.mark.parametrize("model, number", [

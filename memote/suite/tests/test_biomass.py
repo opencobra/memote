@@ -29,6 +29,7 @@ import logging
 
 import pytest
 import numpy as np
+from cobra.exceptions import OptimizationError
 
 import memote.support.biomass as biomass
 import memote.support.helpers as helpers
@@ -278,18 +279,23 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
     # TODO: Update the threshold as soon as we have an overview of the average!
     ann = test_direct_metabolites_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
-    ann["data"][reaction_id] = [
-        m.id for m in biomass.find_direct_metabolites(model, reaction)]
+    try:
+        ann["data"][reaction_id] = get_ids(
+            biomass.find_direct_metabolites(model, reaction))
+    except OptimizationError:
+        ann["data"][reaction_id] = []
+        ann["metric"][reaction_id] = 1.0
+        ann["message"][reaction_id] = "This model does not grow."
+        pytest.skip(ann["message"])
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
         len(biomass.find_biomass_precursors(model, reaction))
     ann["message"][reaction_id] = wrapper.fill(
-        """{} contains a total of {} direct metabolites ({:.2%}). Specifically
-        these are: {}.""".format(reaction_id,
-                                 len(ann["data"][reaction_id]),
-                                 ann["metric"][reaction_id],
-                                 ann["data"][reaction_id]
-                                 )
-    )
+        """{} contains a total of {} direct metabolites ({:.2%}).
+        Specifically these are: {}.
+        """.format(reaction_id,
+                   len(ann["data"][reaction_id]),
+                   ann["metric"][reaction_id],
+                   ann["data"][reaction_id]))
     assert ann["metric"][reaction_id] < 0.5, ann["message"][reaction_id]
 
 

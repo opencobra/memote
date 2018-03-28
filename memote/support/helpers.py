@@ -23,26 +23,27 @@ import logging
 import re
 from builtins import dict
 from collections import defaultdict
-from cobra.exceptions import Infeasible
+from operator import itemgetter
+
 
 import numpy as np
 import pandas as pd
 from six import iteritems, itervalues
 from sympy import expand
 from importlib_resources import open_text
+from cobra.exceptions import Infeasible
+from pylru import lrudecorator
 
 import memote.utils as utils
 import memote.support.data
 
 LOGGER = logging.getLogger(__name__)
 
-
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
 with open_text(memote.support.data, "met_id_shortlist.json",
                encoding="utf-8") as file_handle:
     METANETX_SHORTLIST = pd.read_json(file_handle)
-
 
 # Provide a compartment shortlist to identify specfic compartments whenever
 # necessary.
@@ -186,6 +187,7 @@ def find_converting_reactions(model, pair):
     second = set(find_met_in_model(model, pair[1]))
     hits = list()
     for rxn in model.reactions:
+        # FIXME: Use `set.issubset` much more idiomatic.
         if len(first & set(rxn.reactants)) > 0 and len(
                 second & set(rxn.products)) > 0:
             hits.append(rxn)
@@ -195,6 +197,7 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
+@lrudecorator(size=2)
 def find_biomass_reaction(model):
     """
     Return a list of the biomass reaction(s) of the model.
@@ -367,6 +370,31 @@ def find_exchange_rxns(model):
             if extracellular in rxn.get_compartments()]
 
 
+def find_interchange_biomass_reactions(model, biomass=None):
+    """
+    Return the set of all tranport, boundary, and biomass reactions in a model.
+
+    These reactions are incorporated in models simply for to allow
+    metabolites into the correct compartments for vital system reactions to
+    occur. As such, many tests do not look at these reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        A cobrapy metabolic model
+
+    biomass : list or cobra.Reaction, optional
+        A list of cobrapy biomass reactions
+
+    """
+    # exchanges in this case also refer to sink and demand reactions
+    exchanges = set(model.exchanges)
+    transporters = set(find_transport_reactions(model))
+    if biomass is None:
+        biomass = set(find_biomass_reaction(model))
+    return exchanges | transporters | biomass
+
+
 def find_functional_units(gpr_str):
     """
     Return an iterator of gene IDs grouped by boolean rules from the gpr_str.
@@ -489,9 +517,8 @@ def metabolites_per_compartment(model, compartment_id):
         List of metabolites belonging to a given compartment.
 
     """
-    return [met for
-            met in model.metabolites if
-            met.compartment == compartment_id]
+    return [met for met in model.metabolites
+            if met.compartment == compartment_id]
 
 
 def largest_compartment_id_met(model):
@@ -509,19 +536,17 @@ def largest_compartment_id_met(model):
         Compartment ID of the compartment with the most metabolites.
 
     """
-    size = {compartment_id: len(metabolites_per_compartment(
-                                model, compartment_id))
-            for compartment_id in model.compartments.keys()}
-    candidate = sorted(size, key=size.get, reverse=True)[0]
-    tie = size.copy()
-    tie.pop(candidate)
-    cand_tie = sorted(tie, key=tie.get, reverse=True)[0]
-    if size[candidate] not in tie.values():
-        return candidate
-    else:
+    # Sort compartments by decreasing size and extract the largest two.
+    candidate, second = sorted(
+        ((c, len(metabolites_per_compartment(model, c)))
+         for c in model.compartments), reverse=True, key=itemgetter(1))[:2]
+    # Compare the size of the compartments.
+    if candidate[1] == second[1]:
         raise RuntimeError("There is a tie for the largest compartment. "
                            "Compartment {} and {} have equal amounts of "
-                           "metabolites.".format(candidate, cand_tie))
+                           "metabolites.".format(candidate[0], second[0]))
+    else:
+        return candidate[0]
 
 
 def find_compartment_id_in_model(model, compartment_id):

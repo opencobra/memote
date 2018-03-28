@@ -19,3 +19,4 @@ sympy
 sqlalchemy
 importlib_resources
 numpydoc
+pylru

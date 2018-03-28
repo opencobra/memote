@@ -214,10 +214,8 @@ def find_pure_metabolic_reactions(model):
         The metabolic model under investigation.
 
     """
-    exchanges = set(model.exchanges)
-    transporters = set(helpers.find_transport_reactions(model))
-    biomass = set(helpers.find_biomass_reaction(model))
-    return set(model.reactions) - (exchanges | transporters | biomass)
+    return set(model.reactions) - helpers.find_interchange_biomass_reactions(
+        model)
 
 
 def is_constrained_reaction(rxn):

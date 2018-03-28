@@ -22,8 +22,10 @@ from __future__ import absolute_import
 import logging
 import re
 
+import numpy as np
 from six import iteritems
-from cobra.exceptions import Infeasible
+from future.utils import raise_with_traceback
+from cobra.exceptions import Infeasible, OptimizationError
 
 import memote.support.helpers as helpers
 
@@ -32,7 +34,6 @@ __all__ = (
     "find_blocked_biomass_precursors")
 
 LOGGER = logging.getLogger(__name__)
-
 
 # 20 Amino Acids, 4 Deoxyribonucleotides, 4 Ribonucleotides,
 # 8 Cofactors, and H2O
@@ -158,16 +159,30 @@ def gam_in_biomass(model, reaction):
         right.issubset(set(reaction.products)))
 
 
-def find_direct_metabolites(model, reaction):
+def find_direct_metabolites(model, reaction, tolerance=1E-06):
     """
     Return list of possible direct biomass precursor metabolites.
+
+    Direct metabolites are metabolites that are involved only in transport
+    and/or boundary reactions, as well as the biomass reaction(s).
+    This function detects and excludes false positives from being part of the
+    count of direct metabolites. A false positive is specifically defined as
+    a metabolite that is taken up by the biomass reaction, and only involved
+    in transport and/or boundary reactions, but is transported from the cytosol
+    into the extracellular space where it isomerizes and is taken up by the
+    biomass reaction. Such isomerization reactions are frequently not part of
+    the model thus a metabolite is wrongly identified as a direct
+    metabolite. The most common examples of this occur in various E. coli
+    models.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    reaction : cobra.core.reaction.Reaction
+    reaction : cobra.Reaction
         The biomass reaction of the model under investigation.
+    tolerance : float, optional
+        Tolerance below which values will be regarded as zero.
 
     Returns
     -------
@@ -176,14 +191,108 @@ def find_direct_metabolites(model, reaction):
         that are taken up to be consumed by the biomass reaction only.
 
     """
-    transport_reactions = set(helpers.find_transport_reactions(model))
-    exchange_reactions = set(model.exchanges)
-    biomass_reactions = set(helpers.find_biomass_reaction(model))
+    biomass_rxns = set(helpers.find_biomass_reaction(model))
+    tra_bou_bio_rxns = helpers.find_interchange_biomass_reactions(
+        model, biomass_rxns)
+    try:
+        precursors = find_biomass_precursors(model, reaction)
+        main_comp = helpers.find_compartment_id_in_model(model, 'c')
+        ext_space = helpers.find_compartment_id_in_model(model, 'e')
+    except KeyError:
+        LOGGER.error("Failed to properly identify cytosolic and extracellular "
+                     "compartments.")
+        raise_with_traceback(KeyError("The cytosolic and/or extracellular "
+                                      "compartments could not be identified."))
+    except RuntimeError:
+        LOGGER.error("Failed to properly identify cytosolic and extracellular "
+                     "compartments.")
+        raise_with_traceback(RuntimeError("The cytosolic and/or extracellular "
+                                          "compartments could not be "
+                                          "identified."))
+    else:
+        tra_bou_bio_mets = [met for met in precursors if
+                            met.reactions.issubset(tra_bou_bio_rxns)]
+        rxns_of_interest = set([rxn for met in tra_bou_bio_mets
+                                for rxn in met.reactions
+                                if rxn not in biomass_rxns])
 
-    combined_set = transport_reactions | exchange_reactions | biomass_reactions
-    precursors = find_biomass_precursors(model, reaction)
+    solution = model.optimize(raise_error=True)
+    if np.isclose(solution.objective_value, 0, atol=tolerance):
+        LOGGER.error("Failed to generate a non-zero objective value with "
+                     "flux balance analysis.")
+        raise OptimizationError(
+            "The flux balance analysis on this model returned an "
+            "objective value of zero. Make sure the model can "
+            "grow! Check if the constraints are not too strict!")
 
-    return [met for met in precursors if met.reactions.issubset(combined_set)]
+    tra_bou_bio_fluxes = {r: solution[r.id] for r in rxns_of_interest}
+    met_flux_sum = {m: 0 for m in tra_bou_bio_mets}
+
+    return detect_false_positive_direct_metabolites(
+        tra_bou_bio_mets, biomass_rxns, main_comp, ext_space,
+        tra_bou_bio_fluxes, met_flux_sum)
+
+
+def detect_false_positive_direct_metabolites(
+        candidates, biomass_reactions, cytosol, extra, reaction_fluxes,
+        metabolite_fluxes):
+    """
+    Weed out false positive direct metabolites.
+
+    False positives exists in the extracellular
+    compartment with flux from the cytosolic compartment and are part of the
+    biomass reaction(s). It sums fluxes positively or negatively depending
+    on if direct metabolites in the extracellular compartment are defined as
+    reactants or products in various reactions.
+
+    Parameters
+    ----------
+    candidates : list of cobra.Metabolite
+        Candidate direct metabolites.
+    biomass_reactions : set of cobra.Reaction
+        The biomass reactions. Usually one or two.
+    cytosol : str
+        The identifier of the cytosolic compartment.
+    extra : str
+        The identifier of the extracellular compartment.
+
+    Returns
+    -------
+    list
+        Definitive list of direct metabolites, i.e., biomass precursors
+        that are taken up to be consumed by the biomass reaction only.
+
+    """
+    for met in candidates:
+        is_internal = met.compartment != extra
+        for rxn in met.reactions:
+            if rxn in biomass_reactions:
+                continue
+            # Internal metabolites can not be false positives.
+            if is_internal:
+                metabolite_fluxes[met] += abs(reaction_fluxes[rxn])
+                continue
+            # if the metabolite is in the "e" compartment and a reactant,
+            # sum the fluxes accordingly (outward=negative, inward=positive)
+            if met in rxn.reactants:
+                product_comps = set([p.compartment for p in rxn.products])
+                # if the reaction has no product (outward flux)
+                if len(product_comps) == 0:
+                    metabolite_fluxes[met] += -reaction_fluxes[rxn]
+                # if the reaction has a product in "c" (inward flux)
+                elif cytosol in product_comps:
+                    metabolite_fluxes[met] += reaction_fluxes[rxn]
+            # if the metabolite is in the "e" compartment and a product,
+            # sum the fluxes accordingly (outward=negative, inward=positive)
+            elif met in rxn.products:
+                reactant_comps = set([p.compartment for p in rxn.reactants])
+                # if the reaction has no reactant (inward flux)
+                if len(reactant_comps) == 0:
+                    metabolite_fluxes[met] += reaction_fluxes[rxn]
+                # if the reaction has a reactant in "c" (outward flux)
+                elif cytosol in reactant_comps:
+                    metabolite_fluxes[met] += -reaction_fluxes[rxn]
+    return [m for m, f in iteritems(metabolite_fluxes) if f > 0]
 
 
 def bundle_biomass_components(model, reaction):
