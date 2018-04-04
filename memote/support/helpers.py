@@ -141,7 +141,7 @@ def find_transport_reactions(model):
         pass
 
 
-def find_transport_reactions_with_formulae(model):
+def find_transport_reactions_with_formulae(model, rxn):
     """
     Return a list of all transport reactions.
 
@@ -161,37 +161,36 @@ def find_transport_reactions_with_formulae(model):
 
     """
     transport_reactions = []
-    for rxn in model.reactions:
-        # Collecting criteria to classify transporters by.
-        rxn_reactants = set([met.formula for met in rxn.reactants])
-        rxn_products = set([met.formula for met in rxn.products])
-        # Looking for formulas that stay the same on both side of the reaction.
-        transported_mets = \
-            [formula for formula in rxn_reactants if formula in rxn_products]
-        # Collect information on the elemental differences between
-        # compartments in the reaction.
-        delta_dicts = find_transported_elements(rxn)
-        non_zero_array = [v for (k, v) in iteritems(delta_dicts) if v != 0]
-        # Weeding out reactions such as oxidoreductases where no net
-        # transport of Hydrogen is occurring, but rather just an exchange of
-        # electrons or charges effecting a change in protonation.
-        if set(transported_mets) != set('H') and list(
-            delta_dicts.keys()
-        ) == ['H']:
-            pass
-        # All other reactions for which the amount of transported elements is
-        # not zero, which are not part of the model's exchange nor
-        # biomass reactions, are defined as transport reactions.
-        # This includes reactions where the transported metabolite reacts with
-        # a carrier molecule.
-        elif sum(non_zero_array) and rxn not in model.exchanges and \
-                rxn not in find_biomass_reaction(model):
-            transport_reactions.append(rxn)
+    # Collecting criteria to classify transporters by.
+    rxn_reactants = set([met.formula for met in rxn.reactants])
+    rxn_products = set([met.formula for met in rxn.products])
+    # Looking for formulas that stay the same on both side of the reaction.
+    transported_mets = \
+        [formula for formula in rxn_reactants if formula in rxn_products]
+    # Collect information on the elemental differences between
+    # compartments in the reaction.
+    delta_dicts = find_transported_elements(rxn)
+    non_zero_array = [v for (k, v) in iteritems(delta_dicts) if v != 0]
+    # Weeding out reactions such as oxidoreductases where no net
+    # transport of Hydrogen is occurring, but rather just an exchange of
+    # electrons or charges effecting a change in protonation.
+    if set(transported_mets) != set('H') and list(
+        delta_dicts.keys()
+    ) == ['H']:
+        pass
+    # All other reactions for which the amount of transported elements is
+    # not zero, which are not part of the model's exchange nor
+    # biomass reactions, are defined as transport reactions.
+    # This includes reactions where the transported metabolite reacts with
+    # a carrier molecule.
+    elif sum(non_zero_array) and rxn not in model.exchanges and \
+            rxn not in find_biomass_reaction(model):
+        transport_reactions.append(rxn)
 
     return transport_reactions
 
 
-def find_transport_reactions_with_annotations(model):
+def find_transport_reactions_with_annotations(model, rxn):
     """
     Return a list of all transport reactions.
 
@@ -211,22 +210,21 @@ def find_transport_reactions_with_annotations(model):
 
     """
     transport_reactions = []
-    for rxn in model.reactions:
-        reactants = set([(k, tuple(v)) for met in rxn.reactants
-                         for k, v in iteritems(met.annotation)
-                         if met.id is not "H"])
-        products = set([(k, tuple(v)) for met in rxn.products
-                        for k, v in iteritems(met.annotation)
-                        if met.id is not "H"])
-        # Find intersection between reactant annotations and
-        # product annotations to find common metabolites between them,
-        # satisfying the requirements for a transport reaction. Reactions such
-        # as those involving oxidoreductases (where no net transport of
-        # Hydrogen is occurring, but rather just an exchange of electrons or
-        # charges effecting a change in protonation) are weeded out.
-        transported_mets = reactants & products
-        if len(transported_mets) > 0:
-            transport_reactions.append[rxn]
+    reactants = set([(k, tuple(v)) for met in rxn.reactants
+                     for k, v in iteritems(met.annotation)
+                     if met.id is not "H"])
+    products = set([(k, tuple(v)) for met in rxn.products
+                    for k, v in iteritems(met.annotation)
+                    if met.id is not "H"])
+    # Find intersection between reactant annotations and
+    # product annotations to find common metabolites between them,
+    # satisfying the requirements for a transport reaction. Reactions such
+    # as those involving oxidoreductases (where no net transport of
+    # Hydrogen is occurring, but rather just an exchange of electrons or
+    # charges effecting a change in protonation) are weeded out.
+    transported_mets = reactants & products
+    if len(transported_mets) > 0:
+        transport_reactions.append[rxn]
 
     return transport_reactions
 
