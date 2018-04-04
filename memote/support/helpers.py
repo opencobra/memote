@@ -165,6 +165,46 @@ def find_transport_reactions(model):
     return transport_reactions
 
 
+def find_transport_reactions_with_annotations(model):
+    """
+    Return a list of all transport reactions.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Notes
+    -----
+    A transport reaction is defined as follows:
+    1. It contains metabolites from at least 2 compartments and
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
+    the formula stays the same on both sides of the equation.
+
+    This function will not identify transport via the PTS System.
+
+    """
+    transport_reactions = []
+    for rxn in model.reactions:
+        reactants = set([(k, tuple(v)) for met in rxn.reactants
+                         for k, v in iteritems(met.annotation)
+                         if met.id is not "H"])
+        products = set([(k, tuple(v)) for met in rxn.products
+                        for k, v in iteritems(met.annotation)
+                        if met.id is not "H"])
+        # Find intersection between reactant annotations and
+        # product annotations to find common metabolites between them,
+        # satisfying the requirements for a transport reaction. Reactions such
+        # as those involving oxidoreductases (where no net transport of
+        # Hydrogen is occurring, but rather just an exchange of electrons or
+        # charges effecting a change in protonation) are weeded out.
+        transported_mets = reactants & products
+        if len(transported_mets) > 0:
+            transport_reactions.append[rxn]
+
+    return transport_reactions
+
+
 def find_converting_reactions(model, pair):
     """
     Find all reactions which convert a given metabolite pair.
