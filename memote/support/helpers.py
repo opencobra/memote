@@ -115,7 +115,7 @@ def find_transported_elements(rxn):
     return delta_dict
 
 
-def find_transport_reactions(model):
+def find_transport_reactions_with_formulae(model):
     """
     Return a list of all transport reactions.
 
