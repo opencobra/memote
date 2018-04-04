@@ -142,24 +142,23 @@ def find_transport_reactions(model):
         find_transport_reactions_with_annotations(model, rxn,
                                                   transport_reactions)
 
+    return set(transport_reactions)
+
 
 def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
     """
-    Return a list of all transport reactions.
+    Append to a list of all transport reactions if rxn is a transport reaction.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
-    Notes
-    -----
-    A transport reaction is defined as follows:
-    1. It contains metabolites from at least 2 compartments and
-    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
-    the formula stays the same on both sides of the equation.
+    rxn: cobra.Reaction
+        The metabolic reaction under investigation.
 
-    This function will not identify transport via the PTS System.
+    transport_reactions: list
+        A list of all transport reactions.
 
     """
     transport_reactions = []
@@ -192,21 +191,18 @@ def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
 
 def find_transport_reactions_with_annotations(model, rxn, transport_reactions):
     """
-    Return a list of all transport reactions.
+    Append to a list of all transport reactions if rxn is a transport reaction.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
-    Notes
-    -----
-    A transport reaction is defined as follows:
-    1. It contains metabolites from at least 2 compartments and
-    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
-    the formula stays the same on both sides of the equation.
+    rxn: cobra.Reaction
+        The metabolic reaction under investigation.
 
-    This function will not identify transport via the PTS System.
+    transport_reactions: list
+        A list of all transport reactions.
 
     """
     reactants = set([(k, tuple(v)) for met in rxn.reactants
