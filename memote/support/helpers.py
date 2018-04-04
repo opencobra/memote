@@ -138,7 +138,8 @@ def find_transport_reactions(model):
     transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
         - set(find_biomass_reaction(model))
     for rxn in transport_rxn_candidates:
-        pass
+        find_transport_reactions_with_formulae
+        find_transport_reactions_with_annotations
 
 
 def find_transport_reactions_with_formulae(model, rxn):
