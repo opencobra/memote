@@ -138,11 +138,12 @@ def find_transport_reactions(model):
     transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
         - set(find_biomass_reaction(model))
     for rxn in transport_rxn_candidates:
-        find_transport_reactions_with_formulae
-        find_transport_reactions_with_annotations
+        find_transport_reactions_with_formulae(model, rxn, transport_reactions)
+        find_transport_reactions_with_annotations(model, rxn,
+                                                  transport_reactions)
 
 
-def find_transport_reactions_with_formulae(model, rxn):
+def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
     """
     Return a list of all transport reactions.
 
@@ -188,10 +189,8 @@ def find_transport_reactions_with_formulae(model, rxn):
             rxn not in find_biomass_reaction(model):
         transport_reactions.append(rxn)
 
-    return transport_reactions
 
-
-def find_transport_reactions_with_annotations(model, rxn):
+def find_transport_reactions_with_annotations(model, rxn, transport_reactions):
     """
     Return a list of all transport reactions.
 
@@ -210,7 +209,6 @@ def find_transport_reactions_with_annotations(model, rxn):
     This function will not identify transport via the PTS System.
 
     """
-    transport_reactions = []
     reactants = set([(k, tuple(v)) for met in rxn.reactants
                      for k, v in iteritems(met.annotation)
                      if met.id is not "H"])
@@ -225,9 +223,7 @@ def find_transport_reactions_with_annotations(model, rxn):
     # charges effecting a change in protonation) are weeded out.
     transported_mets = reactants & products
     if len(transported_mets) > 0:
-        transport_reactions.append[rxn]
-
-    return transport_reactions
+        transport_reactions.append(rxn)
 
 
 def find_converting_reactions(model, pair):
