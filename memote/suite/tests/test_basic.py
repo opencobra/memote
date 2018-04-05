@@ -322,7 +322,7 @@ def test_find_transport_reactions(read_only_model):
     metabolites across a lipid bi-layer. This test reports how many
     of these reactions, which transports metabolites from one compartment
     to another, are present in the model, as at least one transport reaction
-    must be present for cells to take up food and nutrients and/or excrete 
+    must be present for cells to take up food and nutrients and/or excrete
     waste.
 
     A transport reaction is defined as follows:
