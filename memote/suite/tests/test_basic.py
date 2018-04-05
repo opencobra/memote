@@ -342,8 +342,6 @@ def test_find_constrained_transport_reactions(read_only_model):
     1. It contains metabolites from at least two compartments and
     2. at least one metabolite undergoes no chemical conversion, i.e.,
     the formula stays the same on both sides of the equation.
-
-    This test will not be able to identify transport via the PTS System.
     """
     ann = test_find_constrained_transport_reactions.annotation
     transporters = helpers.find_transport_reactions(read_only_model)

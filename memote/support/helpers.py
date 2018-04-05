@@ -131,8 +131,6 @@ def find_transport_reactions(model):
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
     the formula stays the same on both sides of the equation.
 
-    This function will not identify transport via the PTS System.
-
     """
     transport_reactions = []
     transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
