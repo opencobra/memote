@@ -134,10 +134,10 @@ def find_transport_reactions(model):
     A notable exception is transport via PTS, which is defined as follows:
     1. The transported metabolite(s) come from the ``e`` compartment into the
     ``c`` compartment and
-    2. the metabolite in the ``e`` compartment enters into the ``c`` 
+    2. the metabolite in the ``e`` compartment enters into the ``c``
     compartment through the exchange of a phosphate.
 
-    An example of tranport via PTS would be 
+    An example of tranport via PTS would be
     pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
 
     Transport via PTS is only detected when a formula field exists for all
