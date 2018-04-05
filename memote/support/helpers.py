@@ -131,14 +131,33 @@ def find_transport_reactions(model):
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
     the formula stays the same on both sides of the equation.
 
+    A notable exception is transport via PTS, which is defined as follows:
+    1. The transported metabolite(s) come from the ``e`` compartment into the
+    ``c`` compartment and
+    2. the metabolite in the ``e`` compartment enters into the ``c`` 
+    compartment through the exchange of a phosphate.
+
+    An example of tranport via PTS would be 
+    pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
+
+    Transport via PTS is only detected when a formula field exists for all
+    metabolites in a particular reaction. If this is not the case, transport
+    reactions are identified through annotations, which cannot detect transport
+    via PTS.
+
     """
     transport_reactions = []
     transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
         - set(find_biomass_reaction(model))
     for rxn in transport_rxn_candidates:
-        find_transport_reactions_with_formulae(model, rxn, transport_reactions)
-        find_transport_reactions_with_annotations(model, rxn,
-                                                  transport_reactions)
+        # Check if metabolites have formula field
+        rxn_metabolites = set([met.formula for met in rxn.metabolites])
+        if None in rxn_metabolites or len(rxn_metabolites) == 0:
+            find_transport_reactions_with_annotations(
+                model, rxn, transport_reactions)
+        else:
+            find_transport_reactions_with_formulae(
+                model, rxn, transport_reactions)
 
     return set(transport_reactions)
 
