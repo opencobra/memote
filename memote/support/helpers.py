@@ -161,7 +161,6 @@ def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
         A list of all transport reactions.
 
     """
-    transport_reactions = []
     # Collecting criteria to classify transporters by.
     rxn_reactants = set([met.formula for met in rxn.reactants])
     rxn_products = set([met.formula for met in rxn.products])
@@ -207,10 +206,10 @@ def find_transport_reactions_with_annotations(model, rxn, transport_reactions):
     """
     reactants = set([(k, tuple(v)) for met in rxn.reactants
                      for k, v in iteritems(met.annotation)
-                     if met.id is not "H"])
+                     if met.id is not "H" and k is not None and v is not None])
     products = set([(k, tuple(v)) for met in rxn.products
                     for k, v in iteritems(met.annotation)
-                    if met.id is not "H"])
+                    if met.id is not "H" and k is not None and v is not None])
     # Find intersection between reactant annotations and
     # product annotations to find common metabolites between them,
     # satisfying the requirements for a transport reaction. Reactions such
