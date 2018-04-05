@@ -149,6 +149,19 @@ def find_transport_reactions(model):
     transport_reactions = []
     transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
         - set(find_biomass_reaction(model))
+    # Add all labeled transport reactions
+    sbo_matches = set([rxn for rxn in transport_rxn_candidates if
+                       rxn.annotation is not None and
+                       'SBO' in rxn.annotation and
+                       (rxn.annotation['SBO'] == 'SBO:0000655' or
+                        rxn.annotation['SBO'] == 'SBO:0000654' or
+                        rxn.annotation['SBO'] == 'SBO:0000660' or
+                        rxn.annotation['SBO'] == 'SBO:0000659' or
+                        rxn.annotation['SBO'] == 'SBO:0000657' or
+                        rxn.annotation['SBO'] == 'SBO:0000658')])
+    if len(sbo_matches) > 0:
+        transport_reactions += list(sbo_matches)
+    # Find unlabeled transport reactions via formula or annotation checks
     for rxn in transport_rxn_candidates:
         # Check if metabolites have formula field
         rxn_metabolites = set([met.formula for met in rxn.metabolites])
