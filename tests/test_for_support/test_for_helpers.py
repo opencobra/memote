@@ -166,12 +166,11 @@ def phosphotransferase_system_annotations(base):
     pep = cobra.Metabolite("pep_c", compartment="c")
     pyr = cobra.Metabolite("pyr_c", compartment="c")
     malt = cobra.Metabolite(",malt_e", compartment="e")
-    malt6p = cobra.Metabolite(
-        "malt6p_c", formula='C12H21O14P', compartment="c"
-    )
+    malt6p = cobra.Metabolite("malt6p_c", compartment="c")
     pep.annotation["formula"] = "C3H2O6P"
     pyr.annotation["formula"] = "C3H3O3"
     malt.annotation["formula"] = "C12H22O11"
+    malt6p.annotation["formula"] = "C12H21O14P"
     pst = cobra.Reaction("PST")
     pst.add_metabolites({pep: -1, malt: -1, pyr: 1, malt6p: 1})
     base.add_reactions([pst])
