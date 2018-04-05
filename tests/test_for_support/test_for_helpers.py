@@ -108,7 +108,7 @@ def abc_pump_annotations(base):
 
 
 @register_with(MODEL_REGISTRY)
-def proton_pump(base):
+def proton_pump_formulae(base):
     """Provide a model with an ABC proton pump reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
     adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
@@ -124,7 +124,29 @@ def proton_pump(base):
 
 
 @register_with(MODEL_REGISTRY)
-def phosphotransferase_system(base):
+def proton_pump_annotations(base):
+    """Provide a model with an ABC proton pump reaction."""
+    atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
+    adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
+    h_c = cobra.Metabolite("h_c", formula='H', compartment="c")
+    pi = cobra.Metabolite("pi_c", formula='HO4P', compartment="c")
+    h2o = cobra.Metabolite("h2o_c", formula='H2O', compartment="c")
+    h_p = cobra.Metabolite("h_p", formula='H', compartment="p")
+    atp.annotation["formula"] = "C10H12N5O13P3"
+    adp.annotation["formula"] = "C10H12N5O10P2"
+    h_c.annotation["formula"] = "H"
+    pi.annotation["formula"] = "HO4P"
+    h2o.annotation["formula"] = "H2O"
+    h_p.annotation["formula"] = "H"
+    pump = cobra.Reaction("PUMP")
+    pump.add_metabolites({h_c: -4, adp: -1, pi: -1,
+                          atp: 1, h2o: 1, h_p: 3})
+    base.add_reactions([pump])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def phosphotransferase_system_formulae(base):
     """Provide a model with a PTS transport reaction."""
     pep = cobra.Metabolite("pep_c", formula='C3H2O6P', compartment="c")
     pyr = cobra.Metabolite("pyr_c", formula='C3H3O3', compartment="c")
@@ -139,12 +161,47 @@ def phosphotransferase_system(base):
 
 
 @register_with(MODEL_REGISTRY)
-def energy_transfer(base):
+def phosphotransferase_system_annotations(base):
+    """Provide a model with a PTS transport reaction."""
+    pep = cobra.Metabolite("pep_c", compartment="c")
+    pyr = cobra.Metabolite("pyr_c", compartment="c")
+    malt = cobra.Metabolite(",malt_e", compartment="e")
+    malt6p = cobra.Metabolite(
+        "malt6p_c", formula='C12H21O14P', compartment="c"
+    )
+    pep.annotation["formula"] = "C3H2O6P"
+    pyr.annotation["formula"] = "C3H3O3"
+    malt.annotation["formula"] = "C12H22O11"
+    pst = cobra.Reaction("PST")
+    pst.add_metabolites({pep: -1, malt: -1, pyr: 1, malt6p: 1})
+    base.add_reactions([pst])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def energy_transfer_formulae(base):
     """Provide a model with a membrane-spanning electron transfer reaction."""
     cytaox = cobra.Metabolite("cytaox_c", formula='X', compartment="c")
     cytared = cobra.Metabolite("cytared_c", formula='XH2', compartment="c")
     cytbox = cobra.Metabolite("cytbox_m", formula='X', compartment="m")
     cytbred = cobra.Metabolite("cytbred_m", formula='XH2', compartment="m")
+    et = cobra.Reaction("ET")
+    et.add_metabolites({cytaox: -1, cytbred: -1, cytared: 1, cytbox: 1})
+    base.add_reactions([et])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def energy_transfer_annotations(base):
+    """Provide a model with a membrane-spanning electron transfer reaction."""
+    cytaox = cobra.Metabolite("cytaox_c", compartment="c")
+    cytared = cobra.Metabolite("cytared_c", compartment="c")
+    cytbox = cobra.Metabolite("cytbox_m", compartment="m")
+    cytbred = cobra.Metabolite("cytbred_m", compartment="m")
+    cytaox.annotation["formula"] = "X"
+    cytared.annotation["formula"] = "XH2"
+    cytbox.annotation["formula"] = "X"
+    cytbred.annotation["formula"] = "XH2"
     et = cobra.Reaction("ET")
     et.add_metabolites({cytaox: -1, cytbred: -1, cytared: 1, cytbox: 1})
     base.add_reactions([et])
@@ -324,10 +381,15 @@ def biomass_metabolite(base):
 
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport_formulae", 3),
+    ("uni_anti_symport_annotations", 3),
     ("abc_pump_formulae", 1),
-    ("proton_pump", 1),
-    ("energy_transfer", 0),
-    ("phosphotransferase_system", 1)
+    ("abc_pump_annotations", 1),
+    ("proton_pump_formulae", 1),
+    ("proton_pump_annotations", 1),
+    ("energy_transfer_formulae", 0),
+    ("energy_transfer_annotations", 0),
+    ("phosphotransferase_system_formulae", 1)
+    ("phosphotransferase_system_annotations", 1)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
     """Expect amount of transporters to be identified correctly."""
