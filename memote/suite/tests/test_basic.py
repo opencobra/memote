@@ -315,7 +315,16 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
 
 @annotate(title="Number of Transport Reactions", type="count")
 def test_find_transport_reactions(read_only_model):
-    """Expect >= 1 transport reactions are present in the read_only_model."""
+    """
+    Expect >= 1 transport reactions are present in the read_only_model.
+
+    Cellular metabolism in any organism usually involves the transport of
+    metabolites across a lipid bi-layer. This test reports how many
+    of these reactions, which transports metabolites from one compartment
+    to another, are present in the model, as at least one transport reaction
+    must be present for cells to take up food and nutrients and/or excrete 
+    waste.
+    """
     ann = test_find_transport_reactions.annotation
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
@@ -339,9 +348,23 @@ def test_find_constrained_transport_reactions(read_only_model):
     'pass' criteria.
 
     A transport reaction is defined as follows:
-    1. It contains metabolites from at least two compartments and
-    2. at least one metabolite undergoes no chemical conversion, i.e.,
+    1. It contains metabolites from at least 2 compartments and
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
     the formula stays the same on both sides of the equation.
+
+    A notable exception is transport via PTS, which is defined as follows:
+    1. The transported metabolite(s) come from the ``e`` compartment into the
+    ``c`` compartment and
+    2. the metabolite in the ``e`` compartment enters into the ``c``
+    compartment through the exchange of a phosphate.
+
+    An example of tranport via PTS would be
+    pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
+
+    Transport via PTS is only detected when a formula field exists for all
+    metabolites in a particular reaction. If this is not the case, transport
+    reactions are identified through annotations, which cannot detect transport
+    via PTS.
     """
     ann = test_find_constrained_transport_reactions.annotation
     transporters = helpers.find_transport_reactions(read_only_model)
