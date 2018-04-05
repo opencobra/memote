@@ -475,7 +475,7 @@ def biomass_metabolite(base):
     ("proton_pump_annotations", 1),
     ("energy_transfer_formulae", 0),
     ("energy_transfer_annotations", 0),
-    ("phosphotransferase_system_formulae",),
+    ("phosphotransferase_system_formulae", 0),
     ("phosphotransferase_system_annotations", 0)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
