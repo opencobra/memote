@@ -29,7 +29,7 @@ MODEL_REGISTRY = dict()
 
 
 @register_with(MODEL_REGISTRY)
-def uni_anti_symport(base):
+def uni_anti_symport_formulae(base):
     """Provide a model with 3 simple transport reactions."""
     met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
     met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
@@ -46,7 +46,28 @@ def uni_anti_symport(base):
 
 
 @register_with(MODEL_REGISTRY)
-def abc_pump(base):
+def uni_anti_symport_annotations(base):
+    """Provide a model with 3 simple transport reactions."""
+    met_a = cobra.Metabolite("co2_c", compartment="c")
+    met_b = cobra.Metabolite("co2_e", compartment="e")
+    met_c = cobra.Metabolite("na_c", compartment="c")
+    met_d = cobra.Metabolite("na_e", compartment="e")
+    met_a.annotation["formula"] = "CO2"
+    met_b.annotation["formula"] = "CO2"
+    met_c.annotation["formula"] = "Na"
+    met_d.annotation["formula"] = "Na"
+    uni = cobra.Reaction("UNI")
+    uni.add_metabolites({met_a: 1, met_b: -1})
+    anti = cobra.Reaction("ANTI")
+    anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
+    sym = cobra.Reaction("SYM")
+    sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    base.add_reactions([uni, anti, sym])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def abc_pump_formulae(base):
     """Provide a model with an ABC transport reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
     adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
@@ -55,6 +76,30 @@ def abc_pump(base):
     h2o = cobra.Metabolite("h2o_c", formula='H2O', compartment="c")
     aso_c = cobra.Metabolite("aso3_c", formula='AsO3', compartment="c")
     aso_e = cobra.Metabolite("aso3_e", formula='AsO3', compartment="e")
+    pump = cobra.Reaction("PUMP")
+    pump.add_metabolites({aso_c: -1, atp: -1, h2o: -1,
+                          adp: 1, h: 1, pi: 1, aso_e: 1})
+    base.add_reactions([pump])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def abc_pump_annotations(base):
+    """Provide a model with an ABC transport reaction."""
+    atp = cobra.Metabolite("atp_c", compartment="c")
+    adp = cobra.Metabolite("adp_c", compartment="c")
+    h = cobra.Metabolite("h_c", compartment="c")
+    pi = cobra.Metabolite("pi_c", compartment="c")
+    h2o = cobra.Metabolite("h2o_c", compartment="c")
+    aso_c = cobra.Metabolite("aso3_c", compartment="c")
+    aso_e = cobra.Metabolite("aso3_e", compartment="e")
+    atp.annotation["formula"] = "C10H12N5O13P3"
+    adp.annotation["formula"] = "C10H12N5O10P2"
+    h.annotation["formula"] = "H"
+    pi.annotation["formula"] = "HO4P"
+    h2o.annotation["formula"] = "H2O"
+    aso_c.annotation["formula"] = "AsO3"
+    aso_e.annotation["formula"] = "AsO3"
     pump = cobra.Reaction("PUMP")
     pump.add_metabolites({aso_c: -1, atp: -1, h2o: -1,
                           adp: 1, h: 1, pi: 1, aso_e: 1})
@@ -278,8 +323,8 @@ def biomass_metabolite(base):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("uni_anti_symport", 3),
-    ("abc_pump", 1),
+    ("uni_anti_symport_formulae", 3),
+    ("abc_pump_formulae", 1),
     ("proton_pump", 1),
     ("energy_transfer", 0),
     ("phosphotransferase_system", 1)
