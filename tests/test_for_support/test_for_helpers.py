@@ -109,77 +109,38 @@ def abc_pump_annotations(base):
 
     atp.annotation["bigg.metabolite"] = "atp"
     atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
-    atp.annotation["chebi"] = ["CHEBI:10789", "CHEBI:10841", "CHEBI:13236",
-                               "CHEBI:15422", "CHEBI:22249", "CHEBI:2359",
-                               "CHEBI:237958", "CHEBI:30616", "CHEBI:40938",
-                               "CHEBI:57299"]
-    atp.annotation["kegg.compound"] = "C00002"
-    atp.annotation["kegg.drug"] = "D08646"
     atp.annotation["metanetx.chemical"] = "MNXM13"
     atp.annotation["seed.compound"] = "cpd00011"
 
     adp.annotation["bigg.metabolite"] = "adp"
     adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
-    adp.annotation["chebi"] = ["CHEBI:13222", "CHEBI:16761", "CHEBI:22244",
-                               "CHEBI:2342", "CHEBI:40553", "CHEBI:456216",
-                               "CHEBI:87518"]
-    adp.annotation["kegg.compound"] = ["C00008", "G11113"]
     adp.annotation["metanetx.chemical"] = "MNXM7"
     adp.annotation["seed.compound"] = "cpd00008"
 
     h.annotation["bigg.metabolite"] = "h"
     h.annotation["biocyc"] = "META:PROTON"
-    h.annotation["chebi"] = ["CHEBI:10744", "CHEBI:13357", "CHEBI:15378",
-                             "CHEBI:24636", "CHEBI:29233", "CHEBI:29234",
-                             "CHEBI:5584"]
-    h.annotation["kegg.compound"] = "C00080"
     h.annotation["metanetx.chemical"] = "MNXM1"
     h.annotation["seed.compound"] = "cpd00067"
 
     pi.annotation["bigg.metabolite"] = "pi"
     pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010",
                                "META:PHOSPHATE-GROUP", "META:Pi"]
-    pi.annotation["chebi"] = ["CHEBI:14791", "CHEBI:18367", "CHEBI:26078",
-                              "CHEBI:29137", "CHEBI:29139", "CHEBI:35780",
-                              "CHEBI:39739", "CHEBI:39745", "CHEBI:43470",
-                              "CHEBI:43474", "CHEBI:45024", "CHEBI:7793"]
-    pi.annotation["kegg.compound"] = ["C00009", "C13558"]
-    pi.annotation["kegg.drug"] = "D05467"
     pi.annotation["metanetx.chemical"] = "MNXM9"
     pi.annotation["seed.compound"] = ["cpd00009", "cpd27787"]
 
     h2o.annotation["bigg.metabolite"] = "h2o"
     h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP", 
                                 "META:OH", "META:OXONIUM", "META:WATER"]
-    h2o.annotation["chebi"] = ["CHEBI:10743", "CHEBI:13352", "CHEBI:13365",
-                               "CHEBI:13419", "CHEBI:15377", "CHEBI:16234",
-                               "CHEBI:27313", "CHEBI:29356", "CHEBI:29373",
-                               "CHEBI:29374", "CHEBI:29375", "CHEBI:29412",
-                               "CHEBI:30490", "CHEBI:33806", "CHEBI:33811",
-                               "CHEBI:33813", "CHEBI:41979", "CHEBI:41981",
-                               "CHEBI:42043", "CHEBI:42857", "CHEBI:43228",
-                               "CHEBI:44292", "CHEBI:44641", "CHEBI:44701",
-                               "CHEBI:44819", "CHEBI:5585", "CHEBI:5594"]
-    h2o.annotation["kegg.compound"] = [ "C00001", "C01328", "C18714"]
-    h2o.annotation["kegg.drug"] = ["D00001", "D03703", "D06322"]
     h2o.annotation["metanetx.chemical"] = "MNXM2"
     h2o.annotation["seed.compound"] = ["cpd00001", "cpd15275", "cpd27222"]
 
     aso_c.annotation["bigg.metabolite"] = "aso3"
     aso_c.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
-    aso_c.annotation["chebi"] = ["CHEBI:13857", "CHEBI:22635", "CHEBI:2846",
-                                 "CHEBI:29242", "CHEBI:29243", "CHEBI:29866",
-                                 "CHEBI:49899", "CHEBI:49900"]
-    aso_c.annotation["kegg.compound"] = "C06697"
     aso_c.annotation["metanetx.chemical"] = "MNXM658"
     aso_c.annotation["seed.compound"] = ["cpd04098", "cpd26385"]
 
     aso_e.annotation["bigg.metabolite"] = "aso3"
     aso_e.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
-    aso_e.annotation["chebi"] = ["CHEBI:13857", "CHEBI:22635", "CHEBI:2846",
-                                 "CHEBI:29242", "CHEBI:29243", "CHEBI:29866",
-                                 "CHEBI:49899", "CHEBI:49900"]
-    aso_e.annotation["kegg.compound"] = "C06697"
     aso_e.annotation["metanetx.chemical"] = "MNXM658"
     aso_e.annotation["seed.compound"] = ["cpd04098", "cpd26385"]
 
@@ -218,68 +179,33 @@ def proton_pump_annotations(base):
 
     atp.annotation["bigg.metabolite"] = "atp"
     atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
-    atp.annotation["chebi"] = ["CHEBI:10789", "CHEBI:10841", "CHEBI:13236",
-                               "CHEBI:15422", "CHEBI:22249", "CHEBI:2359",
-                               "CHEBI:237958", "CHEBI:30616", "CHEBI:40938",
-                               "CHEBI:57299"]
-    atp.annotation["kegg.compound"] = "C00002"
-    atp.annotation["kegg.drug"] = "D08646"
     atp.annotation["metanetx.chemical"] = "MNXM13"
     atp.annotation["seed.compound"] = "cpd00011"
 
     adp.annotation["bigg.metabolite"] = "adp"
     adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
-    adp.annotation["chebi"] = ["CHEBI:13222", "CHEBI:16761", "CHEBI:22244",
-                               "CHEBI:2342", "CHEBI:40553", "CHEBI:456216",
-                               "CHEBI:87518"]
-    adp.annotation["kegg.compound"] = ["C00008", "G11113"]
     adp.annotation["metanetx.chemical"] = "MNXM7"
     adp.annotation["seed.compound"] = "cpd00008"
 
     h_c.annotation["bigg.metabolite"] = "h"
     h_c.annotation["biocyc"] = "META:PROTON"
-    h_c.annotation["chebi"] = ["CHEBI:10744", "CHEBI:13357", "CHEBI:15378",
-                             "CHEBI:24636", "CHEBI:29233", "CHEBI:29234",
-                             "CHEBI:5584"]
-    h_c.annotation["kegg.compound"] = "C00080"
     h_c.annotation["metanetx.chemical"] = "MNXM1"
     h_c.annotation["seed.compound"] = "cpd00067"
 
     pi.annotation["bigg.metabolite"] = "pi"
     pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010",
                                "META:PHOSPHATE-GROUP", "META:Pi"]
-    pi.annotation["chebi"] = ["CHEBI:14791", "CHEBI:18367", "CHEBI:26078",
-                              "CHEBI:29137", "CHEBI:29139", "CHEBI:35780",
-                              "CHEBI:39739", "CHEBI:39745", "CHEBI:43470",
-                              "CHEBI:43474", "CHEBI:45024", "CHEBI:7793"]
-    pi.annotation["kegg.compound"] = ["C00009", "C13558"]
-    pi.annotation["kegg.drug"] = "D05467"
     pi.annotation["metanetx.chemical"] = "MNXM9"
     pi.annotation["seed.compound"] = ["cpd00009", "cpd27787"]
 
     h2o.annotation["bigg.metabolite"] = "h2o"
     h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP", 
                                 "META:OH", "META:OXONIUM", "META:WATER"]
-    h2o.annotation["chebi"] = ["CHEBI:10743", "CHEBI:13352", "CHEBI:13365",
-                               "CHEBI:13419", "CHEBI:15377", "CHEBI:16234",
-                               "CHEBI:27313", "CHEBI:29356", "CHEBI:29373",
-                               "CHEBI:29374", "CHEBI:29375", "CHEBI:29412",
-                               "CHEBI:30490", "CHEBI:33806", "CHEBI:33811",
-                               "CHEBI:33813", "CHEBI:41979", "CHEBI:41981",
-                               "CHEBI:42043", "CHEBI:42857", "CHEBI:43228",
-                               "CHEBI:44292", "CHEBI:44641", "CHEBI:44701",
-                               "CHEBI:44819", "CHEBI:5585", "CHEBI:5594"]
-    h2o.annotation["kegg.compound"] = [ "C00001", "C01328", "C18714"]
-    h2o.annotation["kegg.drug"] = ["D00001", "D03703", "D06322"]
     h2o.annotation["metanetx.chemical"] = "MNXM2"
     h2o.annotation["seed.compound"] = ["cpd00001", "cpd15275", "cpd27222"]
 
     h_p.annotation["bigg.metabolite"] = "h"
     h_p.annotation["biocyc"] = "META:PROTON"
-    h_p.annotation["chebi"] = ["CHEBI:10744", "CHEBI:13357", "CHEBI:15378",
-                             "CHEBI:24636", "CHEBI:29233", "CHEBI:29234",
-                             "CHEBI:5584"]
-    h_p.annotation["kegg.compound"] = "C00080"
     h_p.annotation["metanetx.chemical"] = "MNXM1"
     h_p.annotation["seed.compound"] = "cpd00067"
 
@@ -315,38 +241,21 @@ def phosphotransferase_system_annotations(base):
 
     pep.annotation["bigg.metabolite"] = "pep"
     pep.annotation["biocyc"] = "META:PHOSPHO-ENOL-PYRUVATE"
-    pep.annotation["chebi"] = ["CHEBI:14812", "CHEBI:18021", "CHEBI:26054",
-                               "CHEBI:26055", "CHEBI:44894", "CHEBI:44897",
-                               "CHEBI:58702", "CHEBI:8147"]
-    pep.annotation["kegg.compound"] = "C00074"
     pep.annotation["metanetx.chemical"] = "MNXM73"
     pep.annotation["seed.compound"] = "cpd00061"
 
     pyr.annotation["bigg.metabolite"] = "pyr"
     pyr.annotation["biocyc"] = "META:PYRUVATE"
-    pyr.annotation["chebi"] = ["CHEBI:14987", "CHEBI:15361", "CHEBI:26462",
-                               "CHEBI:26466", "CHEBI:32816", "CHEBI:45253",
-                               "CHEBI:86354", "CHEBI:8685"]
-    pyr.annotation["kegg.compound"] = "C00022"
     pyr.annotation["metanetx.chemical"] = "MNXM23"
     pyr.annotation["seed.compound"] = "cpd00020"
 
     malt.annotation["bigg.metabolite"] = "malt"
     malt.annotation["biocyc"] = ["META:ALPHA-MALTOSE", "META:MALTOSE"]
-    malt.annotation["chebi"] = ["CHEBI:10300", "CHEBI:12340", "CHEBI:14568",
-                                "CHEBI:17306", "CHEBI:18167", "CHEBI:22463",
-                                "CHEBI:25144", "CHEBI:43893", "CHEBI:6668"]
-    malt.annotation["kegg.compound"] = ["C00208", "C00897", "G00275"]
-    malt.annotation["kegg.drug"] = "D00044"
     malt.annotation["metanetx.chemical"] = "MNXM165"
     malt.annotation["seed.compound"] = ["cpd00179", "cpd00665"]
 
     malt6p.annotation["bigg.metabolite"] = "malt6p"
     malt6p.annotation["biocyc"] = ["META:CPD-1244", "META:CPD-15982"]
-    malt6p.annotation["chebi"] = ["CHEBI:111006", "CHEBI:14569", "CHEBI:15703",
-                                  "CHEBI:25142", "CHEBI:57478", "CHEBI:6669",
-                                  "CHEBI:6670", "CHEBI:91177"]
-    malt6p.annotation["kegg.compound"] = ["C02995", "G10519"]
     malt6p.annotation["metanetx.chemical"] = "MNXM2394"
     malt6p.annotation["seed.compound"] = "cpd01919"
 
@@ -376,10 +285,10 @@ def energy_transfer_annotations(base):
     cytared = cobra.Metabolite("cytared_c", compartment="c")
     cytbox = cobra.Metabolite("cytbox_m", compartment="m")
     cytbred = cobra.Metabolite("cytbred_m", compartment="m")
-    cytaox.annotation["formula"] = "X"
-    cytared.annotation["formula"] = "XH2"
-    cytbox.annotation["formula"] = "X"
-    cytbred.annotation["formula"] = "XH2"
+    cytaox.annotation["kegg.compound"] = "NAD"
+    cytared.annotation["kegg.compound"] = "NADH"
+    cytbox.annotation["kegg.compound"] = "UBIQUINONE-ox"
+    cytbred.annotation["kegg.compound"] = "UBIQUINONE-red"
     et = cobra.Reaction("ET")
     et.add_metabolites({cytaox: -1, cytbred: -1, cytared: 1, cytbox: 1})
     base.add_reactions([et])
@@ -566,7 +475,7 @@ def biomass_metabolite(base):
     ("proton_pump_annotations", 1),
     ("energy_transfer_formulae", 0),
     ("energy_transfer_annotations", 0),
-    ("phosphotransferase_system_formulae", 0),
+    ("phosphotransferase_system_formulae",),
     ("phosphotransferase_system_annotations", 0)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
