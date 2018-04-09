@@ -164,6 +164,42 @@ def test_reaction_annotation_overview(read_only_model, db):
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
+@pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
+@annotate(title="Missing Gene Product Annotations Per Database",
+          type="percent", message=dict(), data=dict(), metric=dict())
+def test_gene_product_annotation_overview(read_only_model, db):
+    """
+    Expect all gene products to have annotations from common databases.
+
+    Specific database cross-references are paramount to mapping information.
+    To provide references to as many databases as possible helps to make the
+    metabolic model more accessible to other researchers. This does not only
+    facilitate the use of a model in a broad array of computational pipelines,
+    it also promotes the metabolic model itself to become an organism-specific
+    knowledge base.
+
+    For this test to pass, each gene product annotation should contain
+    cross-references to a number of databases (listed in `annotation.py`).
+    For each database this test checks for the presence of its corresponding
+    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
+    those defined on https://identifiers.org/.
+
+    Since each database is quite different and some potentially incomplete, it
+    may not be feasible to achieve 100% coverage for each of them. Generally
+    it should be possible, however, to obtain cross-references to at least
+    one of the databases for all gene products consistently.
+    """
+    ann = test_reaction_annotation_overview.annotation
+    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
+        read_only_model.genes, db))
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
+    ann["message"][db] = wrapper.fill(
+        """The following {} gene products ({:.2%}) lack annotation for {}:
+        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
+                     truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
+
+
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
 @annotate(title="Wrong Metabolite Annotations Per Database",
           type="percent", message=dict(), data=dict(), metric=dict())
