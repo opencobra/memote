@@ -168,9 +168,8 @@ def find_transport_reactions(model):
         if (None not in rxn_metabolites) or (len(rxn_metabolites) != 0):
             find_transport_reactions_with_formulae(
                 model, rxn, transport_reactions)
-        else:
-            find_transport_reactions_with_annotations(
-                model, rxn, transport_reactions)
+        find_transport_reactions_with_annotations(
+            model, rxn, transport_reactions)
 
     return set(transport_reactions)
 
