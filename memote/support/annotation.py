@@ -58,7 +58,7 @@ LOGGER = logging.getLogger(__name__)
 # 'HPRD'        ['gen']         'http://www.hprd.org/'
 # 'ASAP'        ['gen']         'http://asap.ahabs.wisc.edu/asap/home.php'
 
-GENE_ANNOTATIONS = OrderedDict([
+GENE_PRODUCT_ANNOTATIONS = OrderedDict([
     ('refseq', re.compile(
         r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
         r"NW|XM|XP|XR|YP|ZP)_\d+|"
