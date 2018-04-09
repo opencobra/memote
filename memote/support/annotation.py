@@ -33,10 +33,9 @@ LOGGER = logging.getLogger(__name__)
 # common databases that are currently included are:
 #   DB             gen,rxn,met              url
 #
-# 'MetaNetX'            ['rxn','met']       'http://www.metanetx.org'
-# 'Kegg'                ['gen','rxn','met'] 'http://www.kegg.jp/'
-# 'SEED'                ['met']             'http://modelseed.org/'
-# 'EnzymeNomenclature'  ['rxn']             'http://www.enzyme-database.org/'
+# 'MetaNetX'    ['rxn','met']       'http://www.metanetx.org'
+# 'Kegg'        ['gen','rxn','met'] 'http://www.kegg.jp/'
+# 'SEED'        ['met']             'http://modelseed.org/'
 #
 # 'InChIKey'    ['met']     'http://cactus.nci.nih.gov/chemical/structure'
 # 'ChEBI'       ['met']     'http://bioportal.bioontology.org/ontologies/CHEBI'
@@ -50,13 +49,35 @@ LOGGER = logging.getLogger(__name__)
 # 'PubChem'     ['met']         'https://pubchem.ncbi.nlm.nih.gov/'
 # 'RefSeq'      ['gen']         'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
 # 'Uniprot'     ['gen']         'http://www.uniprot.org/'
-# 'EC-Code'     ['rxn']         'https://www.ebi.ac.uk/enzymeportal'
+# 'EC-Code'     ['rxn']         'http://www.enzyme-database.org/'
 # 'EcoGene'     ['gen']         'http://ecogene.org/'
 # 'NCBI GI'     ['gen']         'http://www.ncbi.nlm.nih.gov/protein/'
 # 'NCBI Gene'   ['gen']         'http://ncbigene.bio2rdf.org/fct'
+# 'NCBI Protein'['gen']         'http://www.ncbi.nlm.nih.gov/protein'
 # 'CCDS'        ['gen']         'http://www.ncbi.nlm.nih.gov/CCDS/'
 # 'HPRD'        ['gen']         'http://www.hprd.org/'
 # 'ASAP'        ['gen']         'http://asap.ahabs.wisc.edu/asap/home.php'
+
+GENE_ANNOTATIONS = OrderedDict([
+    ('refseq', re.compile(
+        r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
+        r"NW|XM|XP|XR|YP|ZP)_\d+|"
+        r"(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
+    ('uniprot', re.compile(
+        r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9]"
+        r"[A-Z, 0-9][0-9]){1,2})|([O,P,Q]"
+        r"[0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9]"
+        r"[0-9])(\.\d+)?$")),
+    ('ecogene', re.compile(r"^EG\d+$")),
+    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$")),
+    ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
+    ('ncbigene', re.compile(r"^\d+$")),
+    ('ncbiprotein', re.compile(r"^(\w+\d+(\.\d+)?)|(NP_\d+)$")),
+    ('ccds', re.compile(r"^CCDS\d+\.\d+$")),
+    ('hprd', re.compile(r"^\d+$")),
+    ('asap', re.compile(r"^[A-Za-z0-9-]+$"))
+])
+
 
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
@@ -91,19 +112,6 @@ METABOLITE_ANNOTATIONS = OrderedDict([
     ('bigg.metabolite', re.compile(r"^[a-z_A-Z0-9]+$")),
     ('biocyc', re.compile(
         r"^[A-Z-0-9]+(?<!CHEBI)(\:)?[A-Za-z0-9+_.%-]+$"))
-])
-
-
-GENE_ANNOTATIONS = OrderedDict([
-    ('refseq', re.compile(r"^((AC|AP|NC|NG|NM|NP|NR|NT|NW|XM|XP|XR|YP|ZP)_\d+|(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
-    ('uniprot', re.compile(r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$")),
-    ('ecogene', re.compile(r"^EG\d+$")),
-    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$")),
-    ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
-    ('ncbigene', re.compile(r"^\d+$")),
-    ('ccds', re.compile(r"^CCDS\d+\.\d+$")),
-    ('hprd', re.compile(r"^\d+$")),
-    ('asap', re.compile(r"^[A-Za-z0-9-]+$"))
 ])
 
 
