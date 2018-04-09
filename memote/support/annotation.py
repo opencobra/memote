@@ -31,25 +31,29 @@ LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
 # common databases that are currently included are:
-# DB    gen,rxn,met url
-# 'MetaNetX'  ['rxn','met'] 'http://www.metanetx.org'
-# 'Kegg'  ['gen','rxn','met'] 'http://www.kegg.jp/'
-# 'SEED'  ['met']  'http://modelseed.org/'
-# 'InChIKey'  ['met'] 'http://cactus.nci.nih.gov/chemical/structure'
-# 'ChEBI' ['met'] 'http://bioportal.bioontology.org/ontologies/CHEBI'
-# 'EnzymeNomenclature'    ['rxn'] 'http://www.enzyme-database.org/'
-# 'BRENDA'    ['rxn']    'http://www.brenda-enzymes.org/'
-# 'RHEA'  ['rxn']  'http://www.rhea-db.org/'
-# 'HMDB'  ['met'] 'http://www.hmdb.ca/'
-# 'BioCyc'  ['rxn','met'] 'http://biocyc.org'
-# 'Reactome'    ['met'] 'http://www.reactome.org/'
-# 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
-# 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
-# 'RefSeq' ['gen'] 'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
-# 'Uniprot' ['gen'] 'http://www.uniprot.org/'
-# 'EC-Code' ['gen'] 'https://www.ebi.ac.uk/enzymeportal'
-# 'EcoGene' ['gen'] 'http://ecogene.org/'
-
+# DB            gen,rxn,met         url
+#
+# 'MetaNetX'            ['rxn','met']       'http://www.metanetx.org'
+# 'Kegg'                ['gen','rxn','met'] 'http://www.kegg.jp/'
+# 'SEED'                ['met']             'http://modelseed.org/'
+# 'EnzymeNomenclature'  ['rxn']             'http://www.enzyme-database.org/'
+#
+# 'InChIKey'    ['met']     'http://cactus.nci.nih.gov/chemical/structure'
+# 'ChEBI'       ['met']     'http://bioportal.bioontology.org/ontologies/CHEBI'
+# 'BRENDA'      ['rxn']     'http://www.brenda-enzymes.org/'
+# 'RHEA'        ['rxn']     'http://www.rhea-db.org/'
+# 'HMDB'        ['met']     'http://www.hmdb.ca/'
+#
+# 'BioCyc'      ['rxn','met']   'http://biocyc.org'
+# 'Reactome'    ['met']         'http://www.reactome.org/'
+# 'BiGG'        ['rxn','met']   'http://bigg.ucsd.edu/universal/'
+# 'PubChem'     ['met']         'https://pubchem.ncbi.nlm.nih.gov/'
+# 'RefSeq'      ['gen']         'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
+# 'Uniprot'     ['gen']         'http://www.uniprot.org/'
+# 'EC-Code'     ['gen']         'https://www.ebi.ac.uk/enzymeportal'
+# 'EcoGene'     ['gen']         'http://ecogene.org/'
+# 'NCBI GI'     ['gen']         'http://www.ncbi.nlm.nih.gov/protein/'
+# 'NCBI Gene'   ['gen']         'http://ncbigene.bio2rdf.org/fct'
 
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
