@@ -297,7 +297,7 @@ def energy_transfer_annotations(base):
 
 @register_with(MODEL_REGISTRY)
 def labeled_reaction(base):
-    """Provide a model with a labeled tranport reaction."""
+    """Provide a model with a labeled transport reaction."""
     a = cobra.Metabolite("a")
     b = cobra.Metabolite("b")
     rxn = cobra.Reaction("rxn")
@@ -309,7 +309,7 @@ def labeled_reaction(base):
 
 @register_with(MODEL_REGISTRY)
 def unlabeled_reaction(base):
-    """Provide a model with a labeled tranport reaction."""
+    """Provide a model with a labeled transport reaction."""
     a = cobra.Metabolite("a")
     b = cobra.Metabolite("b")
     rxn = cobra.Reaction("rxn")
