@@ -70,7 +70,7 @@ def test_reaction_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without Annotation", type="count")
+@annotate(title="Gene Products without Annotation", type="count")
 def test_gene_product_annotation_presence(read_only_model):
     """
     Expect all gene products to have a non-empty annotation attribute
@@ -85,7 +85,7 @@ def test_gene_product_annotation_presence(read_only_model):
     ann = test_reaction_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
         read_only_model, "genes"))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
     ann["message"] = wrapper.fill(
         """A total of {} gene products ({:.2%}) lack any form of annotation:
         {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
