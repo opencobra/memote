@@ -73,7 +73,7 @@ def test_reaction_annotation_presence(read_only_model):
 @annotate(title="Gene Products without Annotation", type="count")
 def test_gene_product_annotation_presence(read_only_model):
     """
-    Expect all gene products to have a non-empty annotation attribute
+    Expect all gene products to have a non-empty annotation attribute.
 
     This test checks if any annotations at all are present in the SBML
     annotations field (extended by FBC package) for each gene product,
@@ -277,6 +277,48 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
         """The provided reaction annotations for the {} database do not match
         the regular expression patterns defined on identifiers.org. A total of
         {} reaction annotations ({:.2%}) needs to be fixed: {}""".format(
+            db, len(ann["data"][db]), ann["metric"][db],
+            truncate(ann["data"][db])))
+    assert len(ann["data"][db]) == 0, ann["message"][db]
+
+
+@pytest.mark.parametrize("db", annotation.GENE_PRODUCT_ANNOTATIONS)
+@annotate(title="Wrong Gene Product Annotations Per Database",
+          type="percent", message=dict(), data=dict(), metric=dict())
+def test_gene_product_annotation_wrong_ids(read_only_model, db):
+    """
+    Expect all annotations of gene products to be in the correct format.
+
+    To identify databases and the identifiers belonging to them, computational
+    tools rely on the presence of specific patterns. Only when these patterns
+    can be identified consistently is an ID truly machine-readable. This test
+    checks if the database cross-references in reaction annotations conform
+    to patterns defined according to the MIRIAM guidelines, i.e. matching
+    those that are defined at https://identifiers.org/.
+
+    The required formats, i.e., regex patterns are further outlined in
+    `annotation.py`. This test does not carry out a web query for the composed
+    URI, it merely controls that the regex patterns match the identifiers.
+    """
+    ann = test_reaction_annotation_wrong_ids.annotation
+    ann["data"][db] = total = get_ids(
+        set(read_only_model.genes).difference(
+            annotation.generate_component_annotation_overview(
+                read_only_model.genes, db)))
+    ann["metric"][db] = 1.0
+    ann["message"][db] = wrapper.fill(
+        """There are no gene products annotations for the {} database.
+        """.format(db))
+    assert len(total) > 0, ann["message"][db]
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_miriam_match(
+            read_only_model.reactions, "genes", db))
+    ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
+    ann["message"][db] = wrapper.fill(
+        """The provided gene product annotations for the {} database do not
+        match the regular expression patterns defined on identifiers.org. A
+        total of {} gene product annotations ({:.2%}) needs to be
+        fixed: {}""".format(
             db, len(ann["data"][db]), ann["metric"][db],
             truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
