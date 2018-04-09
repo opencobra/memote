@@ -296,6 +296,29 @@ def energy_transfer_annotations(base):
 
 
 @register_with(MODEL_REGISTRY)
+def labeled_reaction(base):
+    """Provide a model with a labeled tranport reaction."""
+    a = cobra.Metabolite("a")
+    b = cobra.Metabolite("b")
+    rxn = cobra.Reaction("rxn")
+    rxn.annotation["SBO"] = "SBO:0000655"
+    rxn.add_metabolites({a: -1, b: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def unlabeled_reaction(base):
+    """Provide a model with a labeled tranport reaction."""
+    a = cobra.Metabolite("a")
+    b = cobra.Metabolite("b")
+    rxn = cobra.Reaction("rxn")
+    rxn.add_metabolites({a: -1, b: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def converting_reactions(base):
     """Provide a model with a couple of converting reaction."""
     a = cobra.Metabolite("atp_c", compartment="c")
@@ -476,7 +499,9 @@ def biomass_metabolite(base):
     ("energy_transfer_formulae", 0),
     ("energy_transfer_annotations", 0),
     ("phosphotransferase_system_formulae", 1),
-    ("phosphotransferase_system_annotations", 0)
+    ("phosphotransferase_system_annotations", 0),
+    ("labeled_reaction", 1),
+    ("unlabeled_reaction", 0)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
     """Expect amount of transporters to be identified correctly."""
