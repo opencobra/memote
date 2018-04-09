@@ -45,6 +45,13 @@ LOGGER = logging.getLogger(__name__)
 # 'Reactome'    ['met'] 'http://www.reactome.org/'
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
 # 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
+# 'RefSeq' ['gen'] 'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
+# 'Uniprot' ['?'] 'http://www.uniprot.org/'
+# 'EC-Code' ['?'] 'https://www.ebi.ac.uk/enzymeportal'
+# 'BRENDA (maybe)'
+# 'EcoGene' ['gen'] 'http://ecogene.org/'
+# 'Kegg (maybe)'
+
 
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
@@ -79,6 +86,24 @@ METABOLITE_ANNOTATIONS = OrderedDict([
     ('bigg.metabolite', re.compile(r"^[a-z_A-Z0-9]+$")),
     ('biocyc', re.compile(
         r"^[A-Z-0-9]+(?<!CHEBI)(\:)?[A-Za-z0-9+_.%-]+$"))
+])
+
+
+GENE_ANNOTATIONS = OrderedDict([
+    ('refseq', re.compile(r"^((AC|AP|NC|NG|NM|NP|NR|NT|NW|XM|XP|XR|YP|ZP)_\d+|(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
+    # Does this belong?
+    ('uniprot', re.compile(r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$")),
+    # Does this belong?
+    ('ec-code', re.compile(r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$"))
+    # Does this belong?
+    ('brenda', re.compile(
+        r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+        r"\d+\.\d+\.\d+\.-|"
+        r"\d+\.\d+\.\d+\.(n)?\d+$")),
+    # Does this belong?
+    ('ecogene', re.compile(r"^EG\d+$")),
+    # Is this right?
+    ('kegg.gene', re.compile(r"^([CHDEGTMKR]\d+)|(\w+:[\w\d\.-]*)|([a-z]{3,5})|(\w{2,4}\d{5})$"))
 ])
 
 
