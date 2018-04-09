@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
 # common databases that are currently included are:
-# DB            gen,rxn,met         url
+#   DB             gen,rxn,met              url
 #
 # 'MetaNetX'            ['rxn','met']       'http://www.metanetx.org'
 # 'Kegg'                ['gen','rxn','met'] 'http://www.kegg.jp/'
@@ -50,10 +50,13 @@ LOGGER = logging.getLogger(__name__)
 # 'PubChem'     ['met']         'https://pubchem.ncbi.nlm.nih.gov/'
 # 'RefSeq'      ['gen']         'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
 # 'Uniprot'     ['gen']         'http://www.uniprot.org/'
-# 'EC-Code'     ['gen']         'https://www.ebi.ac.uk/enzymeportal'
+# 'EC-Code'     ['rxn']         'https://www.ebi.ac.uk/enzymeportal'
 # 'EcoGene'     ['gen']         'http://ecogene.org/'
 # 'NCBI GI'     ['gen']         'http://www.ncbi.nlm.nih.gov/protein/'
 # 'NCBI Gene'   ['gen']         'http://ncbigene.bio2rdf.org/fct'
+# 'CCDS'        ['gen']         'http://www.ncbi.nlm.nih.gov/CCDS/'
+# 'HPRD'        ['gen']         'http://www.hprd.org/'
+# 'ASAP'        ['gen']         'http://asap.ahabs.wisc.edu/asap/home.php'
 
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
@@ -94,9 +97,13 @@ METABOLITE_ANNOTATIONS = OrderedDict([
 GENE_ANNOTATIONS = OrderedDict([
     ('refseq', re.compile(r"^((AC|AP|NC|NG|NM|NP|NR|NT|NW|XM|XP|XR|YP|ZP)_\d+|(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
     ('uniprot', re.compile(r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$")),
-    ('ec-code', re.compile(r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$"))
     ('ecogene', re.compile(r"^EG\d+$")),
-    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$"))
+    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$")),
+    ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
+    ('ncbigene', re.compile(r"^\d+$")),
+    ('ccds', re.compile(r"^CCDS\d+\.\d+$")),
+    ('hprd', re.compile(r"^\d+$")),
+    ('asap', re.compile(r"^[A-Za-z0-9-]+$"))
 ])
 
 
