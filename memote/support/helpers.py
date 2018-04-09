@@ -215,8 +215,7 @@ def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
     # biomass reactions, are defined as transport reactions.
     # This includes reactions where the transported metabolite reacts with
     # a carrier molecule.
-    elif sum(non_zero_array) and rxn not in model.exchanges and \
-            rxn not in find_biomass_reaction(model):
+    elif sum(non_zero_array):
         transport_reactions.append(rxn)
 
 
