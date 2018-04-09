@@ -82,7 +82,7 @@ def test_gene_product_annotation_presence(read_only_model):
     pass the model is expected to have genes and each of them should have some
     form of annotation.
     """
-    ann = test_reaction_annotation_presence.annotation
+    ann = test_gene_product_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
         read_only_model, "genes"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
@@ -189,7 +189,7 @@ def test_gene_product_annotation_overview(read_only_model, db):
     it should be possible, however, to obtain cross-references to at least
     one of the databases for all gene products consistently.
     """
-    ann = test_reaction_annotation_overview.annotation
+    ann = test_gene_product_annotation_overview.annotation
     ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
         read_only_model.genes, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
@@ -300,7 +300,7 @@ def test_gene_product_annotation_wrong_ids(read_only_model, db):
     `annotation.py`. This test does not carry out a web query for the composed
     URI, it merely controls that the regex patterns match the identifiers.
     """
-    ann = test_reaction_annotation_wrong_ids.annotation
+    ann = test_gene_product_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
         set(read_only_model.genes).difference(
             annotation.generate_component_annotation_overview(
@@ -312,7 +312,7 @@ def test_gene_product_annotation_wrong_ids(read_only_model, db):
     assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
         annotation.generate_component_annotation_miriam_match(
-            read_only_model.reactions, "genes", db))
+            read_only_model.genes, "genes", db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
     ann["message"][db] = wrapper.fill(
         """The provided gene product annotations for the {} database do not
