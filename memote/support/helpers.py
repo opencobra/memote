@@ -165,11 +165,11 @@ def find_transport_reactions(model):
     for rxn in transport_rxn_candidates:
         # Check if metabolites have formula field
         rxn_metabolites = set([met.formula for met in rxn.metabolites])
-        if None in rxn_metabolites or len(rxn_metabolites) == 0:
-            find_transport_reactions_with_annotations(
+        if (None not in rxn_metabolites) or (len(rxn_metabolites) != 0):
+            find_transport_reactions_with_formulae(
                 model, rxn, transport_reactions)
         else:
-            find_transport_reactions_with_formulae(
+            find_transport_reactions_with_annotations(
                 model, rxn, transport_reactions)
 
     return set(transport_reactions)
