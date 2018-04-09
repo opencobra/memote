@@ -60,7 +60,6 @@ cards:
     - test_transport_reaction_gpr_presence
     - test_metabolites_charge_presence
     - test_metabolites_formula_presence
-    - test_transport_reaction_presence
     - test_metabolites_presence
     - test_reactions_presence
     - test_genes_presence
