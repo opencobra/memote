@@ -102,11 +102,26 @@ def test_transport_reaction_presence(read_only_model):
     to another.
 
     A transport reaction is defined as follows:
-    1. It contains metabolites from at least two compartments and
-    2. at least one metabolite undergoes no chemical conversion, i.e.,
-    the formula stays the same on both sides of the equation.
+    1. It contains metabolites from at least 2 compartments and
+    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
+    the formula and/or annotation stays the same on both sides of the equation.
 
-    This test will not be able to identify transport via the PTS System.
+    A notable exception is transport via PTS, which also contains the following
+    restriction:
+    3. The transported metabolite(s) are transported into a compartment through
+    the exchange of a phosphate.
+
+    An example of tranport via PTS would be
+    pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
+
+    Reactions similar to transport via PTS (referred to as "modified transport
+    reactions") follow a similar pattern:
+    A[x] + B-R[y] -> A-R[y] + B[y]
+
+    Such modified transport reactions can be detected, but only when a formula
+    field exists for all metabolites in a particular reaction. If this is not
+    the case, transport reactions are identified through annotations, which
+    cannot detect modified tranport reactions.
     """
     ann = test_transport_reaction_presence.annotation
     ann["data"] = get_ids(helpers.find_transport_reactions(read_only_model))
