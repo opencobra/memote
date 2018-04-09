@@ -31,9 +31,9 @@ LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
 # common databases that are currently included are:
-# DB    rxn,met,gen url
+# DB    gen,rxn,met url
 # 'MetaNetX'  ['rxn','met'] 'http://www.metanetx.org'
-# 'Kegg'  ['rxn','met'] 'http://www.kegg.jp/'
+# 'Kegg'  ['gen','rxn','met'] 'http://www.kegg.jp/'
 # 'SEED'  ['met']  'http://modelseed.org/'
 # 'InChIKey'  ['met'] 'http://cactus.nci.nih.gov/chemical/structure'
 # 'ChEBI' ['met'] 'http://bioportal.bioontology.org/ontologies/CHEBI'
@@ -46,11 +46,9 @@ LOGGER = logging.getLogger(__name__)
 # 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
 # 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
 # 'RefSeq' ['gen'] 'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
-# 'Uniprot' ['?'] 'http://www.uniprot.org/'
-# 'EC-Code' ['?'] 'https://www.ebi.ac.uk/enzymeportal'
-# 'BRENDA (maybe)'
+# 'Uniprot' ['gen'] 'http://www.uniprot.org/'
+# 'EC-Code' ['gen'] 'https://www.ebi.ac.uk/enzymeportal'
 # 'EcoGene' ['gen'] 'http://ecogene.org/'
-# 'Kegg (maybe)'
 
 
 REACTION_ANNOTATIONS = OrderedDict([
@@ -91,19 +89,10 @@ METABOLITE_ANNOTATIONS = OrderedDict([
 
 GENE_ANNOTATIONS = OrderedDict([
     ('refseq', re.compile(r"^((AC|AP|NC|NG|NM|NP|NR|NT|NW|XM|XP|XR|YP|ZP)_\d+|(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
-    # Does this belong?
     ('uniprot', re.compile(r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9][A-Z, 0-9][0-9]){1,2})|([O,P,Q][0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9][0-9])(\.\d+)?$")),
-    # Does this belong?
     ('ec-code', re.compile(r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|\d+\.\d+\.\d+\.-|\d+\.\d+\.\d+\.(n)?\d+$"))
-    # Does this belong?
-    ('brenda', re.compile(
-        r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-        r"\d+\.\d+\.\d+\.-|"
-        r"\d+\.\d+\.\d+\.(n)?\d+$")),
-    # Does this belong?
     ('ecogene', re.compile(r"^EG\d+$")),
-    # Is this right?
-    ('kegg.gene', re.compile(r"^([CHDEGTMKR]\d+)|(\w+:[\w\d\.-]*)|([a-z]{3,5})|(\w{2,4}\d{5})$"))
+    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$"))
 ])
 
 
