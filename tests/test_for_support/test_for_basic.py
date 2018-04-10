@@ -453,7 +453,7 @@ def test_find_constrained_pure_metabolic_reactions(model, num):
 ], indirect=["model"])
 def test_find_constrained_transport_reactions(model, num):
     """Expect num of contrained transport rxns to be identified correctly."""
-    transporters = set(helpers.find_transport_reactions(model))
+    transporters = helpers.find_transport_reactions(model)
     constrained_transporters = set(
         [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
     assert len(constrained_transporters) == num
