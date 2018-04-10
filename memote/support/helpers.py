@@ -156,7 +156,10 @@ def find_transport_reactions(model):
     sbo_matches = set([rxn for rxn in transport_rxn_candidates if
                        rxn.annotation is not None and
                        'SBO' in rxn.annotation and
-                       (rxn.annotation['SBO'] == 'SBO:0000655' or
+                       (rxn.annotation['SBO'] == 'SBO:0000185' or
+                        rxn.annotation['SBO'] == 'SBO:0000588' or
+                        rxn.annotation['SBO'] == 'SBO:0000587' or
+                        rxn.annotation['SBO'] == 'SBO:0000655' or
                         rxn.annotation['SBO'] == 'SBO:0000654' or
                         rxn.annotation['SBO'] == 'SBO:0000660' or
                         rxn.annotation['SBO'] == 'SBO:0000659' or
