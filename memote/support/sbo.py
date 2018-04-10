@@ -45,7 +45,7 @@ def find_components_without_sbo_terms(model, components):
             elem.annotation is None or 'SBO' not in elem.annotation]
 
 
-def check_component_for_specific_sbo_terms(items, term):
+def check_component_for_specific_sbo_term(items, term):
     """
     Identify model components that lack a specific SBO term(s).
 
