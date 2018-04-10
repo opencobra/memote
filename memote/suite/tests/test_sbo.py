@@ -132,12 +132,15 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
 
 @annotate(title="Transport Reactions without SBO:0000185", type="count")
 def test_transport_reaction_specific_sbo_presence(read_only_model):
-    """Expect all transport reactions to be annotated with SBO:0000185.
+    """Expect all transport reactions to be annotated properly.
 
-    SBO:0000185 represents the term 'transport reaction'. Every transport
-    reaction that is not a pure metabolic or boundary reaction should be
-    annotated with this. The results shown are relative to the total of all
-    transport reactions.
+    'SBO:0000185', 'SBO:0000588', 'SBO:0000587', 'SBO:0000655', 'SBO:0000654',
+    'SBO:0000660', 'SBO:0000659', 'SBO:0000657', and 'SBO:0000658' represent
+    the terms 'transport reaction' and 'translocation reaction', in addition
+    to their children (more specific transport reaction labels). Every 
+    transport reaction that is not a pure metabolic or boundary reaction should
+    be annotated with one of these terms. The results shown are relative to the
+    total of all transport reactions.
     """
     ann = test_transport_reaction_specific_sbo_presence.annotation
     transports = helpers.find_transport_reactions(read_only_model)
