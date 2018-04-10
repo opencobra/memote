@@ -137,22 +137,24 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     'SBO:0000185', 'SBO:0000588', 'SBO:0000587', 'SBO:0000655', 'SBO:0000654',
     'SBO:0000660', 'SBO:0000659', 'SBO:0000657', and 'SBO:0000658' represent
     the terms 'transport reaction' and 'translocation reaction', in addition
-    to their children (more specific transport reaction labels). Every 
+    to their children (more specific transport reaction labels). Every
     transport reaction that is not a pure metabolic or boundary reaction should
     be annotated with one of these terms. The results shown are relative to the
     total of all transport reactions.
     """
+    sbo_transport_terms = helpers.TRANSPORT_RXN_SBO_TERMS
     ann = test_transport_reaction_specific_sbo_presence.annotation
     transports = helpers.find_transport_reactions(read_only_model)
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        transports, "SBO:0000185"))
+        transports, sbo_transport_terms))
     try:
         ann["metric"] = len(ann["data"]) / len(transports)
         ann["message"] = wrapper.fill(
             """A total of {} metabolic reactions ({:.2%} of all transport
-            reactions) lack annotation with the SBO term "SBO:0000185" for
+            reactions) lack annotation with one of the SBO terms: {} for
             'biochemical reaction': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], sbo_transport_terms,
+                truncate(ann["data"])))
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no transport reactions."
