@@ -54,8 +54,9 @@ def check_component_for_specific_sbo_term(items, term):
     items : list
         A list of model components i.e. reactions to be checked for a specific
         SBO term.
-    term : str
-        A string denoting a valid SBO term matching the regex '^SBO:\d{7}$'.
+    term : str or list of str
+        A string denoting a valid SBO term matching the regex '^SBO:\d{7}$'
+        or a list containing such string elements.
 
     Returns
     -------
@@ -66,4 +67,4 @@ def check_component_for_specific_sbo_term(items, term):
     return [elem for elem in items if
             elem.annotation is None or
             'SBO' not in elem.annotation or
-            elem.annotation['SBO'] != term]
+            elem.annotation['SBO'] not in term]
