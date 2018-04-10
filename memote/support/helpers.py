@@ -39,6 +39,11 @@ import memote.support.data
 
 LOGGER = logging.getLogger(__name__)
 
+TRANSPORT_RXN_SBO_TERMS = ['SBO:0000185', 'SBO:0000588', 'SBO:0000587',
+                           'SBO:0000655', 'SBO:0000654', 'SBO:0000660',
+                           'SBO:0000659', 'SBO:0000657', 'SBO:0000658']
+
+
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
 with open_text(memote.support.data, "met_id_shortlist.json",
@@ -156,15 +161,7 @@ def find_transport_reactions(model):
     sbo_matches = set([rxn for rxn in transport_rxn_candidates if
                        rxn.annotation is not None and
                        'SBO' in rxn.annotation and
-                       (rxn.annotation['SBO'] == 'SBO:0000185' or
-                        rxn.annotation['SBO'] == 'SBO:0000588' or
-                        rxn.annotation['SBO'] == 'SBO:0000587' or
-                        rxn.annotation['SBO'] == 'SBO:0000655' or
-                        rxn.annotation['SBO'] == 'SBO:0000654' or
-                        rxn.annotation['SBO'] == 'SBO:0000660' or
-                        rxn.annotation['SBO'] == 'SBO:0000659' or
-                        rxn.annotation['SBO'] == 'SBO:0000657' or
-                        rxn.annotation['SBO'] == 'SBO:0000658')])
+                       rxn.annotation['SBO'] in TRANSPORT_RXN_SBO_TERMS])
     if len(sbo_matches) > 0:
         transport_reactions += list(sbo_matches)
     # Find unlabeled transport reactions via formula or annotation checks
