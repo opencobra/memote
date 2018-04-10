@@ -476,7 +476,7 @@ def find_interchange_biomass_reactions(model, biomass=None):
     """
     # exchanges in this case also refer to sink and demand reactions
     exchanges = set(model.exchanges)
-    transporters = set(find_transport_reactions(model))
+    transporters = find_transport_reactions(model)
     if biomass is None:
         biomass = set(find_biomass_reaction(model))
     return exchanges | transporters | biomass
