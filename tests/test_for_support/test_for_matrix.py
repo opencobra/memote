@@ -62,8 +62,60 @@ def four_components_closed(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def three_components_open(base):
+    """Returns a simple model with 3 metabolites in an open system."""
+    met_a = cobra.Metabolite("A")
+    met_b = cobra.Metabolite("B")
+    met_c = cobra.Metabolite("C")
+    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2.add_metabolites({met_b: -1, met_c: 1})
+    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1.add_metabolites({met_a: 1})
+    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2.add_metabolites({met_c: -1})
+    base.add_reactions([rxn_1, rxn_2, rxn_b1, rxn_b2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def four_components_open(base):
+    """Returns a simple model with 3 metabolites in an open system."""
+    met_a = cobra.Metabolite("A")
+    met_b = cobra.Metabolite("B")
+    met_c = cobra.Metabolite("C")
+    met_d = cobra.Metabolite("D")
+    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2.add_metabolites({met_b: -1, met_c: 1})
+    rxn_3 = cobra.Reaction("R3", lower_bound=0, upper_bound=1000)
+    rxn_3.add_metabolites({met_c: -1, met_d: 1})
+    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1.add_metabolites({met_a: 1})
+    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2.add_metabolites({met_d: -1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_b1, rxn_b2])
+    return base
+
+
+@pytest.mark.parametrize("model, num", [
+    ("three_components_closed", (1, 1)),
+    ("four_components_closed", (1, 1)),
+    ("three_components_open", (1, 1)),
+    ("four_components_open", (1, 1)),
+], indirect=["model"])
+def test_absolute_extreme_coefficient_ratio(model, num):
+    assert matrix.absolute_extreme_coefficient_ratio(model) == num
+
+
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 1),
+    ("four_components_closed", 1),
+    ("three_components_open", 0),
+    ("four_components_open", 0),
 ], indirect=["model"])
 def test_number_independent_conservation_relations(model, num):
     assert matrix.number_independent_conservation_relations(model) == num
@@ -71,6 +123,9 @@ def test_number_independent_conservation_relations(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 0),
+    ("four_components_closed", 0),
+    ("three_components_open", 1),
+    ("four_components_open", 1),
 ], indirect=["model"])
 def test_number_steady_state_flux_solutions(model, num):
     assert matrix.number_steady_state_flux_solutions(model) == num
@@ -78,6 +133,9 @@ def test_number_steady_state_flux_solutions(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 2),
+    ("four_components_closed", 3),
+    ("three_components_open", 3),
+    ("four_components_open", 4),
 ], indirect=["model"])
 def test_matrix_rank(model, num):
     assert matrix.matrix_rank(model) == num
