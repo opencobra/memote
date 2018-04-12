@@ -99,11 +99,51 @@ def four_components_open(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def x2_cycle_closed(base):
+    x1 = cobra.Metabolite("x1")
+    x2 = cobra.Metabolite("x2")
+    x3 = cobra.Metabolite("x3")
+    x4 = cobra.Metabolite("x4")
+    x5 = cobra.Metabolite("x5")
+    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    rxn_1.add_metabolites({x1: -1, x2: -1, x3: 1})
+    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2.add_metabolites({x3: -1, x4: 1})
+    rxn_3 = cobra.Reaction("R3", lower_bound=-1000, upper_bound=1000)
+    rxn_3.add_metabolites({x4: -1, x5: 1, x2: 1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def x2_cycle_open(base):
+    x1 = cobra.Metabolite("x1")
+    x2 = cobra.Metabolite("x2")
+    x3 = cobra.Metabolite("x3")
+    x4 = cobra.Metabolite("x4")
+    x5 = cobra.Metabolite("x5")
+    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    rxn_1.add_metabolites({x1: -1, x2: -1, x3: 1})
+    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2.add_metabolites({x3: -1, x4: 1})
+    rxn_3 = cobra.Reaction("R3", lower_bound=-1000, upper_bound=1000)
+    rxn_3.add_metabolites({x4: -1, x5: 1, x2: 1})
+    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1.add_metabolites({x1: 1})
+    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2.add_metabolites({x5: -1})
+    base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_b1, rxn_b2])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", (1, 1)),
     ("four_components_closed", (1, 1)),
     ("three_components_open", (1, 1)),
     ("four_components_open", (1, 1)),
+    ("x2_cycle_closed", (1, 1)),
+    ("x2_cycle_open", (1, 1)),
 ], indirect=["model"])
 def test_absolute_extreme_coefficient_ratio(model, num):
     assert matrix.absolute_extreme_coefficient_ratio(model) == num
@@ -114,6 +154,8 @@ def test_absolute_extreme_coefficient_ratio(model, num):
     ("four_components_closed", 1),
     ("three_components_open", 0),
     ("four_components_open", 0),
+    ("x2_cycle_closed", 2),
+    ("x2_cycle_open", 1),
 ], indirect=["model"])
 def test_number_independent_conservation_relations(model, num):
     assert matrix.number_independent_conservation_relations(model) == num
@@ -124,6 +166,8 @@ def test_number_independent_conservation_relations(model, num):
     ("four_components_closed", 0),
     ("three_components_open", 1),
     ("four_components_open", 1),
+    ("x2_cycle_closed", 0),
+    ("x2_cycle_open", 1),
 ], indirect=["model"])
 def test_number_steady_state_flux_solutions(model, num):
     assert matrix.number_steady_state_flux_solutions(model) == num
@@ -134,6 +178,8 @@ def test_number_steady_state_flux_solutions(model, num):
     ("four_components_closed", 3),
     ("three_components_open", 3),
     ("four_components_open", 4),
+    ("x2_cycle_closed", 3),
+    ("x2_cycle_open", 4),
 ], indirect=["model"])
 def test_matrix_rank(model, num):
     assert matrix.matrix_rank(model) == num
@@ -144,6 +190,8 @@ def test_matrix_rank(model, num):
     ("four_components_closed", 0),
     ("three_components_open", 1),
     ("four_components_open", 1),
+    ("x2_cycle_closed", 0),
+    ("x2_cycle_open", 1),
 ], indirect=["model"])
 def test_degrees_of_freedom(model, num):
-    assert matrix.degrees_of_freedom(model) == num    
+    assert matrix.degrees_of_freedom(model) == num
