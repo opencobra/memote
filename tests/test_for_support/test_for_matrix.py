@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Ensure the expected functioning of ``memote.support.consistency``."""
+"""Ensure the expected functioning of ``memote.support.matrix``."""
 
 from __future__ import absolute_import
 
@@ -23,10 +23,8 @@ import cobra
 import pytest
 from cobra.exceptions import Infeasible
 
-import memote.support.consistency as consistency
 import memote.support.matrix as matrix
 from memote.utils import register_with
-import memote.support.consistency_helpers as con_helpers
 
 MODEL_REGISTRY = dict()
 
@@ -139,3 +137,13 @@ def test_number_steady_state_flux_solutions(model, num):
 ], indirect=["model"])
 def test_matrix_rank(model, num):
     assert matrix.matrix_rank(model) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("three_components_closed", 0),
+    ("four_components_closed", 0),
+    ("three_components_open", 1),
+    ("four_components_open", 1),
+], indirect=["model"])
+def test_degrees_of_freedom(model, num):
+    assert matrix.degrees_of_freedom(model) == num    
