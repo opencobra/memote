@@ -43,23 +43,6 @@ def three_components_closed(base):
 
 
 @register_with(MODEL_REGISTRY)
-def four_components_closed(base):
-    """Returns a simple model with 4 metabolites in a closed system."""
-    met_a = Metabolite("A")
-    met_b = Metabolite("B")
-    met_c = Metabolite("C")
-    met_d = Metabolite("D")
-    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
-    rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
-    rxn_2.add_metabolites({met_b: -1, met_c: 1})
-    rxn_3 = Reaction("R3", lower_bound=0, upper_bound=1000)
-    rxn_3.add_metabolites({met_c: -1, met_d: 1})
-    base.add_reactions([rxn_1, rxn_2, rxn_3])
-    return base
-
-
-@register_with(MODEL_REGISTRY)
 def three_components_open(base):
     """Returns a simple model with 3 metabolites in an open system."""
     met_a = Metabolite("A")
@@ -74,27 +57,6 @@ def three_components_open(base):
     rxn_b2 = Reaction("B2", lower_bound=0, upper_bound=1000)
     rxn_b2.add_metabolites({met_c: -1})
     base.add_reactions([rxn_1, rxn_2, rxn_b1, rxn_b2])
-    return base
-
-
-@register_with(MODEL_REGISTRY)
-def four_components_open(base):
-    """Returns a simple model with 3 metabolites in an open system."""
-    met_a = Metabolite("A")
-    met_b = Metabolite("B")
-    met_c = Metabolite("C")
-    met_d = Metabolite("D")
-    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
-    rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
-    rxn_2.add_metabolites({met_b: -1, met_c: 1})
-    rxn_3 = Reaction("R3", lower_bound=0, upper_bound=1000)
-    rxn_3.add_metabolites({met_c: -1, met_d: 1})
-    rxn_b1 = Reaction("B1", lower_bound=0, upper_bound=1000)
-    rxn_b1.add_metabolites({met_a: 1})
-    rxn_b2 = Reaction("B2", lower_bound=0, upper_bound=1000)
-    rxn_b2.add_metabolites({met_d: -1})
-    base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_b1, rxn_b2])
     return base
 
 
@@ -138,9 +100,7 @@ def x2_cycle_open(base):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", (1, 1)),
-    ("four_components_closed", (1, 1)),
     ("three_components_open", (1, 1)),
-    ("four_components_open", (1, 1)),
     ("x2_cycle_closed", (1, 1)),
     ("x2_cycle_open", (1, 1)),
 ], indirect=["model"])
@@ -150,9 +110,7 @@ def test_absolute_extreme_coefficient_ratio(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 1),
-    ("four_components_closed", 1),
     ("three_components_open", 0),
-    ("four_components_open", 0),
     ("x2_cycle_closed", 2),
     ("x2_cycle_open", 1),
 ], indirect=["model"])
@@ -162,9 +120,7 @@ def test_number_independent_conservation_relations(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 0),
-    ("four_components_closed", 0),
     ("three_components_open", 1),
-    ("four_components_open", 1),
     ("x2_cycle_closed", 0),
     ("x2_cycle_open", 1),
 ], indirect=["model"])
@@ -174,9 +130,7 @@ def test_number_steady_state_flux_solutions(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 2),
-    ("four_components_closed", 3),
     ("three_components_open", 3),
-    ("four_components_open", 4),
     ("x2_cycle_closed", 3),
     ("x2_cycle_open", 4),
 ], indirect=["model"])
@@ -186,9 +140,7 @@ def test_matrix_rank(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("three_components_closed", 0),
-    ("four_components_closed", 0),
     ("three_components_open", 1),
-    ("four_components_open", 1),
     ("x2_cycle_closed", 0),
     ("x2_cycle_open", 1),
 ], indirect=["model"])
