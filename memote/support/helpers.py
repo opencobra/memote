@@ -146,7 +146,7 @@ def find_transport_reactions(model):
 
     Reactions similar to transport via PTS (referred to as "modified transport
     reactions") follow a similar pattern:
-    A[x] + B-R[y] -> A-R[y] + B[y]
+    A(x) + B-R(y) -> A-R(y) + B(y)
 
     Such modified transport reactions can be detected, but only when a formula
     field exists for all metabolites in a particular reaction. If this is not
@@ -167,8 +167,8 @@ def find_transport_reactions(model):
     # Find unlabeled transport reactions via formula or annotation checks
     for rxn in transport_rxn_candidates:
         # Check if metabolites have formula field
-        rxn_metabolites = set([met.formula for met in rxn.metabolites])
-        if (None not in rxn_metabolites) and (len(rxn_metabolites) != 0):
+        rxn_mets = set([met.formula for met in rxn.metabolites])
+        if (None not in rxn_mets) and (len(rxn_mets) != 0):
             if is_transport_reaction_formulae(rxn):
                 transport_reactions.append(rxn)
         if is_transport_reaction_annotations(rxn):
