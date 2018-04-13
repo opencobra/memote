@@ -19,6 +19,7 @@ Next Release
 * ``find_transport_reactions`` detects reactions using forumlae and annotations
 * Add tests for detecting gene annotations (and verifying they are in 
   MIRIAM style)
+* Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
 
 0.6.2 (2018-03-12)
 ------------------
