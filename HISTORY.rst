@@ -16,6 +16,7 @@ Next Release
 * Fix some typos
 * Add history report view and connect it to `memote report history` call.
 * ``find_direct_metabolites`` detects and removes false positives.
+* ``find_transport_reactions`` detects reactions using forumlae and annotations
 * Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
 
 0.6.2 (2018-03-12)
