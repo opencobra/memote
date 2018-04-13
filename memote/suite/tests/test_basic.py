@@ -312,7 +312,7 @@ def test_find_transport_reactions(read_only_model):
 
     Reactions similar to transport via PTS (referred to as "modified transport
     reactions") follow a similar pattern:
-    A[x] + B-R[y] -> A-R[y] + B[y]
+    A(x) + B-R(y) -> A-R(y) + B(y)
 
     Such modified transport reactions can be detected, but only when a formula
     field exists for all metabolites in a particular reaction. If this is not
@@ -357,7 +357,7 @@ def test_find_constrained_transport_reactions(read_only_model):
 
     Reactions similar to transport via PTS (referred to as "modified transport
     reactions") follow a similar pattern:
-    A[x] + B-R[y] -> A-R[y] + B[y]
+    A(x) + B-R(y) -> A-R(y) + B(y)
 
     Such modified transport reactions can be detected, but only when a formula
     field exists for all metabolites in a particular reaction. If this is not
