@@ -54,20 +54,9 @@ def uni_anti_symport_annotations(base):
     met_d = cobra.Metabolite("na_e", compartment="e")
 
     met_a.annotation["bigg.metabolite"] = "co2"
-    met_a.annotation["metanetx.chemical"] = "MNXM13"
-    met_a.annotation["seed.compound"] = "cpd00011"
-
     met_b.annotation["bigg.metabolite"] = "co2"
-    met_b.annotation["metanetx.chemical"] = "MNXM13"
-    met_b.annotation["seed.compound"] = "cpd00011"
-
     met_c.annotation["bigg.metabolite"] = "na1"
-    met_c.annotation["metanetx.chemical"] = "MNXM27"
-    met_c.annotation["seed.compound"] = "cpd00971"
-
     met_d.annotation["bigg.metabolite"] = "na1"
-    met_d.annotation["metanetx.chemical"] = "MNXM27"
-    met_d.annotation["seed.compound"] = "cpd00971"
 
     uni = cobra.Reaction("UNI")
     uni.add_metabolites({met_a: 1, met_b: -1})
@@ -107,42 +96,13 @@ def abc_pump_annotations(base):
     aso_c = cobra.Metabolite("aso3_c", compartment="c")
     aso_e = cobra.Metabolite("aso3_e", compartment="e")
 
-    atp.annotation["bigg.metabolite"] = "atp"
     atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
-    atp.annotation["metanetx.chemical"] = "MNXM13"
-    atp.annotation["seed.compound"] = "cpd00011"
-
-    adp.annotation["bigg.metabolite"] = "adp"
     adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
-    adp.annotation["metanetx.chemical"] = "MNXM7"
-    adp.annotation["seed.compound"] = "cpd00008"
-
-    h.annotation["bigg.metabolite"] = "h"
     h.annotation["biocyc"] = "META:PROTON"
-    h.annotation["metanetx.chemical"] = "MNXM1"
-    h.annotation["seed.compound"] = "cpd00067"
-
-    pi.annotation["bigg.metabolite"] = "pi"
-    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010",
-                               "META:PHOSPHATE-GROUP", "META:Pi"]
-    pi.annotation["metanetx.chemical"] = "MNXM9"
-    pi.annotation["seed.compound"] = ["cpd00009", "cpd27787"]
-
-    h2o.annotation["bigg.metabolite"] = "h2o"
-    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP", 
-                                "META:OH", "META:OXONIUM", "META:WATER"]
-    h2o.annotation["metanetx.chemical"] = "MNXM2"
-    h2o.annotation["seed.compound"] = ["cpd00001", "cpd15275", "cpd27222"]
-
-    aso_c.annotation["bigg.metabolite"] = "aso3"
+    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010"]
+    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP"]
     aso_c.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
-    aso_c.annotation["metanetx.chemical"] = "MNXM658"
-    aso_c.annotation["seed.compound"] = ["cpd04098", "cpd26385"]
-
-    aso_e.annotation["bigg.metabolite"] = "aso3"
     aso_e.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
-    aso_e.annotation["metanetx.chemical"] = "MNXM658"
-    aso_e.annotation["seed.compound"] = ["cpd04098", "cpd26385"]
 
     pump = cobra.Reaction("PUMP")
     pump.add_metabolites({aso_c: -1, atp: -1, h2o: -1,
@@ -177,37 +137,12 @@ def proton_pump_annotations(base):
     h2o = cobra.Metabolite("h2o_c", formula='H2O', compartment="c")
     h_p = cobra.Metabolite("h_p", formula='H', compartment="p")
 
-    atp.annotation["bigg.metabolite"] = "atp"
     atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
-    atp.annotation["metanetx.chemical"] = "MNXM13"
-    atp.annotation["seed.compound"] = "cpd00011"
-
-    adp.annotation["bigg.metabolite"] = "adp"
     adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
-    adp.annotation["metanetx.chemical"] = "MNXM7"
-    adp.annotation["seed.compound"] = "cpd00008"
-
-    h_c.annotation["bigg.metabolite"] = "h"
     h_c.annotation["biocyc"] = "META:PROTON"
-    h_c.annotation["metanetx.chemical"] = "MNXM1"
-    h_c.annotation["seed.compound"] = "cpd00067"
-
-    pi.annotation["bigg.metabolite"] = "pi"
-    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010",
-                               "META:PHOSPHATE-GROUP", "META:Pi"]
-    pi.annotation["metanetx.chemical"] = "MNXM9"
-    pi.annotation["seed.compound"] = ["cpd00009", "cpd27787"]
-
-    h2o.annotation["bigg.metabolite"] = "h2o"
-    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP", 
-                                "META:OH", "META:OXONIUM", "META:WATER"]
-    h2o.annotation["metanetx.chemical"] = "MNXM2"
-    h2o.annotation["seed.compound"] = ["cpd00001", "cpd15275", "cpd27222"]
-
-    h_p.annotation["bigg.metabolite"] = "h"
+    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010"]
+    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP"]
     h_p.annotation["biocyc"] = "META:PROTON"
-    h_p.annotation["metanetx.chemical"] = "MNXM1"
-    h_p.annotation["seed.compound"] = "cpd00067"
 
     pump = cobra.Reaction("PUMP")
     pump.add_metabolites({h_c: -4, adp: -1, pi: -1,
@@ -239,25 +174,10 @@ def phosphotransferase_system_annotations(base):
     malt = cobra.Metabolite(",malt_e", compartment="e")
     malt6p = cobra.Metabolite("malt6p_c", compartment="c")
 
-    pep.annotation["bigg.metabolite"] = "pep"
     pep.annotation["biocyc"] = "META:PHOSPHO-ENOL-PYRUVATE"
-    pep.annotation["metanetx.chemical"] = "MNXM73"
-    pep.annotation["seed.compound"] = "cpd00061"
-
-    pyr.annotation["bigg.metabolite"] = "pyr"
     pyr.annotation["biocyc"] = "META:PYRUVATE"
-    pyr.annotation["metanetx.chemical"] = "MNXM23"
-    pyr.annotation["seed.compound"] = "cpd00020"
-
-    malt.annotation["bigg.metabolite"] = "malt"
     malt.annotation["biocyc"] = ["META:ALPHA-MALTOSE", "META:MALTOSE"]
-    malt.annotation["metanetx.chemical"] = "MNXM165"
-    malt.annotation["seed.compound"] = ["cpd00179", "cpd00665"]
-
-    malt6p.annotation["bigg.metabolite"] = "malt6p"
     malt6p.annotation["biocyc"] = ["META:CPD-1244", "META:CPD-15982"]
-    malt6p.annotation["metanetx.chemical"] = "MNXM2394"
-    malt6p.annotation["seed.compound"] = "cpd01919"
 
     pst = cobra.Reaction("PST")
     pst.add_metabolites({pep: -1, malt: -1, pyr: 1, malt6p: 1})
