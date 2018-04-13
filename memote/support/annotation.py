@@ -31,20 +31,53 @@ LOGGER = logging.getLogger(__name__)
 
 # MIRIAM (http://www.ebi.ac.uk/miriam/) styled identifiers for
 # common databases that are currently included are:
-# DB    rxn,met,gen url
-# 'MetaNetX'  ['rxn','met'] 'http://www.metanetx.org'
-# 'Kegg'  ['rxn','met'] 'http://www.kegg.jp/'
-# 'SEED'  ['met']  'http://modelseed.org/'
-# 'InChIKey'  ['met'] 'http://cactus.nci.nih.gov/chemical/structure'
-# 'ChEBI' ['met'] 'http://bioportal.bioontology.org/ontologies/CHEBI'
-# 'EnzymeNomenclature'    ['rxn'] 'http://www.enzyme-database.org/'
-# 'BRENDA'    ['rxn']    'http://www.brenda-enzymes.org/'
-# 'RHEA'  ['rxn']  'http://www.rhea-db.org/'
-# 'HMDB'  ['met'] 'http://www.hmdb.ca/'
-# 'BioCyc'  ['rxn','met'] 'http://biocyc.org'
-# 'Reactome'    ['met'] 'http://www.reactome.org/'
-# 'BiGG'    ['rxn','met']   'http://bigg.ucsd.edu/universal/'
-# 'PubChem' ['met'] 'https://pubchem.ncbi.nlm.nih.gov/'
+#   DB             gen,rxn,met              url
+#
+# 'MetaNetX'    ['rxn','met']       'http://www.metanetx.org'
+# 'Kegg'        ['gen','rxn','met'] 'http://www.kegg.jp/'
+# 'SEED'        ['met']             'http://modelseed.org/'
+#
+# 'InChIKey'    ['met']     'http://cactus.nci.nih.gov/chemical/structure'
+# 'ChEBI'       ['met']     'http://bioportal.bioontology.org/ontologies/CHEBI'
+# 'BRENDA'      ['rxn']     'http://www.brenda-enzymes.org/'
+# 'RHEA'        ['rxn']     'http://www.rhea-db.org/'
+# 'HMDB'        ['met']     'http://www.hmdb.ca/'
+#
+# 'BioCyc'      ['rxn','met']   'http://biocyc.org'
+# 'Reactome'    ['met']         'http://www.reactome.org/'
+# 'BiGG'        ['rxn','met']   'http://bigg.ucsd.edu/universal/'
+# 'PubChem'     ['met']         'https://pubchem.ncbi.nlm.nih.gov/'
+# 'RefSeq'      ['gen']         'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
+# 'Uniprot'     ['gen']         'http://www.uniprot.org/'
+# 'EC-Code'     ['rxn']         'http://www.enzyme-database.org/'
+# 'EcoGene'     ['gen']         'http://ecogene.org/'
+# 'NCBI GI'     ['gen']         'http://www.ncbi.nlm.nih.gov/protein/'
+# 'NCBI Gene'   ['gen']         'http://ncbigene.bio2rdf.org/fct'
+# 'NCBI Protein'['gen']         'http://www.ncbi.nlm.nih.gov/protein'
+# 'CCDS'        ['gen']         'http://www.ncbi.nlm.nih.gov/CCDS/'
+# 'HPRD'        ['gen']         'http://www.hprd.org/'
+# 'ASAP'        ['gen']         'http://asap.ahabs.wisc.edu/asap/home.php'
+
+GENE_PRODUCT_ANNOTATIONS = OrderedDict([
+    ('refseq', re.compile(
+        r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
+        r"NW|XM|XP|XR|YP|ZP)_\d+|"
+        r"(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
+    ('uniprot', re.compile(
+        r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9]"
+        r"[A-Z, 0-9][0-9]){1,2})|([O,P,Q]"
+        r"[0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9]"
+        r"[0-9])(\.\d+)?$")),
+    ('ecogene', re.compile(r"^EG\d+$")),
+    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$")),
+    ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
+    ('ncbigene', re.compile(r"^\d+$")),
+    ('ncbiprotein', re.compile(r"^(\w+\d+(\.\d+)?)|(NP_\d+)$")),
+    ('ccds', re.compile(r"^CCDS\d+\.\d+$")),
+    ('hprd', re.compile(r"^\d+$")),
+    ('asap', re.compile(r"^[A-Za-z0-9-]+$"))
+])
+
 
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
