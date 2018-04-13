@@ -16,6 +16,7 @@ Next Release
 * Fix some typos
 * Add history report view and connect it to `memote report history` call.
 * ``find_direct_metabolites`` detects and removes false positives.
+* ``find_transport_reactions`` detects reactions using forumlae and annotations
 
 0.6.2 (2018-03-12)
 ------------------

@@ -29,7 +29,7 @@ MODEL_REGISTRY = dict()
 
 
 @register_with(MODEL_REGISTRY)
-def uni_anti_symport(base):
+def uni_anti_symport_formulae(base):
     """Provide a model with 3 simple transport reactions."""
     met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
     met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
@@ -46,7 +46,30 @@ def uni_anti_symport(base):
 
 
 @register_with(MODEL_REGISTRY)
-def abc_pump(base):
+def uni_anti_symport_annotations(base):
+    """Provide a model with 3 simple transport reactions."""
+    met_a = cobra.Metabolite("co2_c", compartment="c")
+    met_b = cobra.Metabolite("co2_e", compartment="e")
+    met_c = cobra.Metabolite("na_c", compartment="c")
+    met_d = cobra.Metabolite("na_e", compartment="e")
+
+    met_a.annotation["bigg.metabolite"] = "co2"
+    met_b.annotation["bigg.metabolite"] = "co2"
+    met_c.annotation["bigg.metabolite"] = "na1"
+    met_d.annotation["bigg.metabolite"] = "na1"
+
+    uni = cobra.Reaction("UNI")
+    uni.add_metabolites({met_a: 1, met_b: -1})
+    anti = cobra.Reaction("ANTI")
+    anti.add_metabolites({met_a: 1, met_d: 1, met_b: -1, met_c: -1})
+    sym = cobra.Reaction("SYM")
+    sym.add_metabolites({met_a: 1, met_c: 1, met_b: -1, met_d: -1})
+    base.add_reactions([uni, anti, sym])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def abc_pump_formulae(base):
     """Provide a model with an ABC transport reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
     adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
@@ -63,7 +86,33 @@ def abc_pump(base):
 
 
 @register_with(MODEL_REGISTRY)
-def proton_pump(base):
+def abc_pump_annotations(base):
+    """Provide a model with an ABC transport reaction."""
+    atp = cobra.Metabolite("atp_c", compartment="c")
+    adp = cobra.Metabolite("adp_c", compartment="c")
+    h = cobra.Metabolite("h_c", compartment="c")
+    pi = cobra.Metabolite("pi_c", compartment="c")
+    h2o = cobra.Metabolite("h2o_c", compartment="c")
+    aso_c = cobra.Metabolite("aso3_c", compartment="c")
+    aso_e = cobra.Metabolite("aso3_e", compartment="e")
+
+    atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
+    adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
+    h.annotation["biocyc"] = "META:PROTON"
+    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010"]
+    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP"]
+    aso_c.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
+    aso_e.annotation["biocyc"] = ["META:CPD0-2040", "META:CPD-763"]
+
+    pump = cobra.Reaction("PUMP")
+    pump.add_metabolites({aso_c: -1, atp: -1, h2o: -1,
+                          adp: 1, h: 1, pi: 1, aso_e: 1})
+    base.add_reactions([pump])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def proton_pump_formulae(base):
     """Provide a model with an ABC proton pump reaction."""
     atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
     adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
@@ -79,7 +128,31 @@ def proton_pump(base):
 
 
 @register_with(MODEL_REGISTRY)
-def phosphotransferase_system(base):
+def proton_pump_annotations(base):
+    """Provide a model with an ABC proton pump reaction."""
+    atp = cobra.Metabolite("atp_c", formula='C10H12N5O13P3', compartment="c")
+    adp = cobra.Metabolite("adp_c", formula='C10H12N5O10P2', compartment="c")
+    h_c = cobra.Metabolite("h_c", formula='H', compartment="c")
+    pi = cobra.Metabolite("pi_c", formula='HO4P', compartment="c")
+    h2o = cobra.Metabolite("h2o_c", formula='H2O', compartment="c")
+    h_p = cobra.Metabolite("h_p", formula='H', compartment="p")
+
+    atp.annotation["biocyc"] = ["META:ATP", "META:CPD0-1634"]
+    adp.annotation["biocyc"] = ["META:ADP", "META:CPD0-1651"]
+    h_c.annotation["biocyc"] = "META:PROTON"
+    pi.annotation["biocyc"] = ["META:CPD-16459", "META:CPD-9010"]
+    h2o.annotation["biocyc"] = ["META:CPD-15815", "META:HYDROXYL-GROUP"]
+    h_p.annotation["biocyc"] = "META:PROTON"
+
+    pump = cobra.Reaction("PUMP")
+    pump.add_metabolites({h_c: -4, adp: -1, pi: -1,
+                          atp: 1, h2o: 1, h_p: 3})
+    base.add_reactions([pump])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def phosphotransferase_system_formulae(base):
     """Provide a model with a PTS transport reaction."""
     pep = cobra.Metabolite("pep_c", formula='C3H2O6P', compartment="c")
     pyr = cobra.Metabolite("pyr_c", formula='C3H3O3', compartment="c")
@@ -94,7 +167,26 @@ def phosphotransferase_system(base):
 
 
 @register_with(MODEL_REGISTRY)
-def energy_transfer(base):
+def phosphotransferase_system_annotations(base):
+    """Provide a model with a PTS transport reaction."""
+    pep = cobra.Metabolite("pep_c", compartment="c")
+    pyr = cobra.Metabolite("pyr_c", compartment="c")
+    malt = cobra.Metabolite(",malt_e", compartment="e")
+    malt6p = cobra.Metabolite("malt6p_c", compartment="c")
+
+    pep.annotation["biocyc"] = "META:PHOSPHO-ENOL-PYRUVATE"
+    pyr.annotation["biocyc"] = "META:PYRUVATE"
+    malt.annotation["biocyc"] = ["META:ALPHA-MALTOSE", "META:MALTOSE"]
+    malt6p.annotation["biocyc"] = ["META:CPD-1244", "META:CPD-15982"]
+
+    pst = cobra.Reaction("PST")
+    pst.add_metabolites({pep: -1, malt: -1, pyr: 1, malt6p: 1})
+    base.add_reactions([pst])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def energy_transfer_formulae(base):
     """Provide a model with a membrane-spanning electron transfer reaction."""
     cytaox = cobra.Metabolite("cytaox_c", formula='X', compartment="c")
     cytared = cobra.Metabolite("cytared_c", formula='XH2', compartment="c")
@@ -103,6 +195,46 @@ def energy_transfer(base):
     et = cobra.Reaction("ET")
     et.add_metabolites({cytaox: -1, cytbred: -1, cytared: 1, cytbox: 1})
     base.add_reactions([et])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def energy_transfer_annotations(base):
+    """Provide a model with a membrane-spanning electron transfer reaction."""
+    cytaox = cobra.Metabolite("cytaox_c", compartment="c")
+    cytared = cobra.Metabolite("cytared_c", compartment="c")
+    cytbox = cobra.Metabolite("cytbox_m", compartment="m")
+    cytbred = cobra.Metabolite("cytbred_m", compartment="m")
+    cytaox.annotation["kegg.compound"] = "NAD"
+    cytared.annotation["kegg.compound"] = "NADH"
+    cytbox.annotation["kegg.compound"] = "UBIQUINONE-ox"
+    cytbred.annotation["kegg.compound"] = "UBIQUINONE-red"
+    et = cobra.Reaction("ET")
+    et.add_metabolites({cytaox: -1, cytbred: -1, cytared: 1, cytbox: 1})
+    base.add_reactions([et])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def labeled_reaction(base):
+    """Provide a model with a labeled transport reaction."""
+    a = cobra.Metabolite("a")
+    b = cobra.Metabolite("b")
+    rxn = cobra.Reaction("rxn")
+    rxn.annotation["SBO"] = "SBO:0000655"
+    rxn.add_metabolites({a: -1, b: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def unlabeled_reaction(base):
+    """Provide a model with a labeled transport reaction."""
+    a = cobra.Metabolite("a")
+    b = cobra.Metabolite("b")
+    rxn = cobra.Reaction("rxn")
+    rxn.add_metabolites({a: -1, b: 1})
+    base.add_reactions([rxn])
     return base
 
 
@@ -278,11 +410,18 @@ def biomass_metabolite(base):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("uni_anti_symport", 3),
-    ("abc_pump", 1),
-    ("proton_pump", 1),
-    ("energy_transfer", 0),
-    ("phosphotransferase_system", 1)
+    ("uni_anti_symport_formulae", 3),
+    ("uni_anti_symport_annotations", 3),
+    ("abc_pump_formulae", 1),
+    ("abc_pump_annotations", 1),
+    ("proton_pump_formulae", 1),
+    ("proton_pump_annotations", 1),
+    ("energy_transfer_formulae", 0),
+    ("energy_transfer_annotations", 0),
+    ("phosphotransferase_system_formulae", 1),
+    ("phosphotransferase_system_annotations", 0),
+    ("labeled_reaction", 1),
+    ("unlabeled_reaction", 0)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
     """Expect amount of transporters to be identified correctly."""
