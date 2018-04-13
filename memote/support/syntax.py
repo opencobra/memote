@@ -62,7 +62,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
         the `suffix` appended.
 
     """
-    transport_rxns = set(helpers.find_transport_reactions(model))
+    transport_rxns = helpers.find_transport_reactions(model)
     exchange_demand_rxns = set(model.exchanges)
 
     comp_pattern = re.compile(
