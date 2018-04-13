@@ -179,7 +179,7 @@ def find_transport_reactions(model):
 
 def is_transport_reaction_formulae(rxn):
     """
-    True if rxn is a transport reaction (from formulae), False otherwise.
+    Return boolean given if rxn is a transport reaction (from formulae).
 
     Parameters
     ----------
@@ -221,7 +221,7 @@ def is_transport_reaction_formulae(rxn):
 
 def is_transport_reaction_annotations(rxn):
     """
-    True if rxn is a transport reaction (from annotations), False otherwise.
+    Return boolean given if rxn is a transport reaction (from annotations).
 
     Parameters
     ----------
