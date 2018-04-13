@@ -168,16 +168,16 @@ def find_transport_reactions(model):
     for rxn in transport_rxn_candidates:
         # Check if metabolites have formula field
         rxn_metabolites = set([met.formula for met in rxn.metabolites])
-        if (None not in rxn_metabolites) or (len(rxn_metabolites) != 0):
-            find_transport_reactions_with_formulae(
-                model, rxn, transport_reactions)
-        find_transport_reactions_with_annotations(
-            model, rxn, transport_reactions)
+        if (None not in rxn_metabolites) and (len(rxn_metabolites) != 0):
+            if is_transport_reaction_formulae(rxn):
+                transport_reactions.append(rxn)
+        if is_transport_reaction_annotations(rxn):
+            transport_reactions.append(rxn)
 
     return set(transport_reactions)
 
 
-def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
+def is_transport_reaction_formulae(rxn):
     """
     Append to a list of all transport reactions if rxn is a transport reaction.
 
@@ -216,10 +216,10 @@ def find_transport_reactions_with_formulae(model, rxn, transport_reactions):
     # This includes reactions where the transported metabolite reacts with
     # a carrier molecule.
     elif sum(non_zero_array):
-        transport_reactions.append(rxn)
+        return True
 
 
-def find_transport_reactions_with_annotations(model, rxn, transport_reactions):
+def is_transport_reaction_annotations(rxn):
     """
     Append to a list of all transport reactions if rxn is a transport reaction.
 
@@ -249,7 +249,7 @@ def find_transport_reactions_with_annotations(model, rxn, transport_reactions):
     # charges effecting a change in protonation) are weeded out.
     transported_mets = reactants & products
     if len(transported_mets) > 0:
-        transport_reactions.append(rxn)
+        return True
 
 
 def find_converting_reactions(model, pair):
