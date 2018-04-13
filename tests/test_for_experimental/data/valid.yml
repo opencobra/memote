@@ -1,0 +1,27 @@
+version: "0.1"
+medium:
+  path: "."
+  definitions:
+    m9_glucose:
+      filename:
+    m9_mannose:
+essentiality:
+  path:
+  experiments:
+    my_gene_deletion_experiment:
+      filename:
+      medium: "m9_glucose"
+      objective: "BIOMASS"
+      constraints:
+      - "ratio_constraint.json"
+      label: "Gene essentiality in M9 minimal medium + glucose."
+growth:
+  path: "growth/"
+  experiments:
+    my_growth_experiment:
+      filename: "growth.csv"
+      medium: "m9_glucose"
+      objective: "BIOMASS"
+      constraints:
+      - "ratio_constraint.json"
+      label: "Growth in M9 minimal medium + glucose."

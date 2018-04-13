@@ -28,6 +28,8 @@ import click
 import git
 from cobra.io import read_sbml_model
 
+from memote.experimental import ExperimentConfiguration
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -53,6 +55,15 @@ def validate_collect(context, param, value):
         return value
     else:
         return True
+
+
+def validate_experimental(context, param, value):
+    """Load and validate an experimental data configuration."""
+    if value is None:
+        return
+    config = ExperimentConfiguration(value)
+    config.validate()
+    return config
 
 
 def validate_pytest_args(context, param, value):

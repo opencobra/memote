@@ -45,7 +45,7 @@ class ResultCollectionPlugin(object):
     # Seems brittle, can we do better?
     _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
-    def __init__(self, model,
+    def __init__(self, model, experimental_config=None,
                  exclusive=None, skip=None, **kwargs):
         """
         Collect and store values during testing.
@@ -54,6 +54,8 @@ class ResultCollectionPlugin(object):
         ----------
         model : cobra.Model
             The metabolic model under investigation.
+        experimental_config : memote.ExperimentConfiguration, optional
+            A description of experiments.
         exclusive : iterable, optional
             Names of test cases or modules to run and exclude all others. Takes
             precedence over ``skip``.
@@ -63,27 +65,34 @@ class ResultCollectionPlugin(object):
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
+        self._exp_config = experimental_config
         self.results = MemoteResult()
         self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
         self._skip = frozenset() if skip is None else frozenset(skip)
 
     def pytest_namespace(self):
         """Insert model information into the pytest namespace."""
-        biomass_ids = [rxn.id for rxn in find_biomass_reaction(self._model)]
-        compartment_ids = sorted(self._model.compartments)
+        namespace = dict()
+        namespace["memote"] = memote = dict()
+        memote["biomass_ids"] = [
+            rxn.id for rxn in find_biomass_reaction(self._model)]
+        memote["compartment_ids"] = sorted(self._model.compartments)
         try:
-            compartment_ids.remove("c")
+            memote["compartment_ids"].remove("c")
         except ValueError:
             LOGGER.error(
                 "The model does not contain a compartment ID labeled 'c' for "
                 "the cytosol which is an essential compartment. Many syntax "
                 "tests depend on this being labeled accordingly.")
-        return {
-            "memote": {
-                "biomass_ids": biomass_ids,
-                "compartment_ids": compartment_ids
-            }
-        }
+        # Add experimental information if there are any.
+        if self._exp_config is None:
+            memote["experimental"] = dict()
+            memote["experimental"]["essentiality"] = list()
+        else:
+            # Load experimental data.
+            self._exp_config.load_data(self._model)
+            memote["experimental"] = self._exp_config
+        return namespace
 
     @pytest.hookimpl(tryfirst=True)
     def pytest_runtest_call(self, item):

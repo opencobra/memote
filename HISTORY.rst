@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+* Expose testing of experimental essentiality and growth data in memote.
+* Create a configuration system for media that is extensible to further
+  experimental data types.
 * Add test for identifying purely metabolic reactions with fixed constraints in
   models
 * Add test for identifying transport reactions with fixed constraints in models
@@ -17,7 +20,7 @@ Next Release
 * Add history report view and connect it to `memote report history` call.
 * ``find_direct_metabolites`` detects and removes false positives.
 * ``find_transport_reactions`` detects reactions using forumlae and annotations
-* Add tests for detecting gene annotations (and verifying they are in 
+* Add tests for detecting gene annotations (and verifying they are in
   MIRIAM style)
 * Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
 

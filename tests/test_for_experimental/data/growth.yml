@@ -1,0 +1,13 @@
+version: "0.1"
+medium:
+  path: "media/"
+  definitions:
+    glucose:
+    m9_fructose:
+      filename: "fructose.tsv"
+    pyruvate:
+growth:
+  path: "growth"
+  experiments:
+    core:
+      filename: "growth.csv"

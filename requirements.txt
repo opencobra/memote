@@ -20,3 +20,4 @@ sqlalchemy
 importlib_resources
 numpydoc
 pylru
+goodtables==1.0.0

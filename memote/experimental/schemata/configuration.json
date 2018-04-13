@@ -1,0 +1,70 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Memote Experimental Tests Configuration Schema",
+    "description": "Validate an experimental data configuration file that defines additional memote tests.",
+
+    "definitions": {
+        "stringSet": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+        "fileName": {
+            "type": ["string", "null"],
+            "pattern": "^.+\\.(csv|tsv|xls|xlsx|ods)$"
+        },
+        "experiment": {
+            "type": ["object", "null"],
+            "properties": {
+                "filename": { "$ref": "#/definitions/fileName" },
+                "medium": { "type": ["string", "null"] },
+                "objective": { "type": ["string", "null"] },
+                "constraints": { "$ref": "#/definitions/stringSet" },
+                "label": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+        },
+        "medium": {
+            "type": ["object", "null"],
+            "properties": {
+                "filename": { "$ref": "#/definitions/fileName" },
+                "label": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+        },
+        "experiments": {
+            "type": "object",
+            "properties" : {
+                "path": { "type": ["string", "null"] },
+                "experiments": {
+                    "type": "object",
+                    "additionalProperties": { "$ref": "#/definitions/experiment" }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+
+    "type": "object",
+    "properties": {
+        "version": {
+            "type": "string",
+            "enum": ["0.1"]
+        },
+        "medium": {
+            "type": "object",
+            "properties" : {
+                "path": { "type": ["string", "null"] },
+                "definitions": {
+                    "type": "object",
+                    "additionalProperties": { "$ref": "#/definitions/medium" }
+                }
+            },
+            "additionalProperties": false
+        },
+        "essentiality": { "$ref": "#/definitions/experiments" },
+        "growth": { "$ref": "#/definitions/experiments" }
+    },
+    "required": ["version"],
+    "additionalProperties": false
+}
