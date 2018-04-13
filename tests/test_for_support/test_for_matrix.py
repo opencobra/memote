@@ -19,9 +19,8 @@
 
 from __future__ import absolute_import
 
-import cobra
 import pytest
-from cobra.exceptions import Infeasible
+from cobra import Metabolite, Reaction
 
 import memote.support.matrix as matrix
 from memote.utils import register_with
@@ -32,12 +31,12 @@ MODEL_REGISTRY = dict()
 @register_with(MODEL_REGISTRY)
 def three_components_closed(base):
     """Returns a simple model with 3 metabolites in a closed system."""
-    met_a = cobra.Metabolite("A")
-    met_b = cobra.Metabolite("B")
-    met_c = cobra.Metabolite("C")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    met_a = Metabolite("A")
+    met_b = Metabolite("B")
+    met_c = Metabolite("C")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({met_b: -1, met_c: 1})
     base.add_reactions([rxn_1, rxn_2])
     return base
@@ -46,15 +45,15 @@ def three_components_closed(base):
 @register_with(MODEL_REGISTRY)
 def four_components_closed(base):
     """Returns a simple model with 4 metabolites in a closed system."""
-    met_a = cobra.Metabolite("A")
-    met_b = cobra.Metabolite("B")
-    met_c = cobra.Metabolite("C")
-    met_d = cobra.Metabolite("D")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    met_a = Metabolite("A")
+    met_b = Metabolite("B")
+    met_c = Metabolite("C")
+    met_d = Metabolite("D")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({met_b: -1, met_c: 1})
-    rxn_3 = cobra.Reaction("R3", lower_bound=0, upper_bound=1000)
+    rxn_3 = Reaction("R3", lower_bound=0, upper_bound=1000)
     rxn_3.add_metabolites({met_c: -1, met_d: 1})
     base.add_reactions([rxn_1, rxn_2, rxn_3])
     return base
@@ -63,16 +62,16 @@ def four_components_closed(base):
 @register_with(MODEL_REGISTRY)
 def three_components_open(base):
     """Returns a simple model with 3 metabolites in an open system."""
-    met_a = cobra.Metabolite("A")
-    met_b = cobra.Metabolite("B")
-    met_c = cobra.Metabolite("C")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    met_a = Metabolite("A")
+    met_b = Metabolite("B")
+    met_c = Metabolite("C")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({met_b: -1, met_c: 1})
-    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1 = Reaction("B1", lower_bound=0, upper_bound=1000)
     rxn_b1.add_metabolites({met_a: 1})
-    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2 = Reaction("B2", lower_bound=0, upper_bound=1000)
     rxn_b2.add_metabolites({met_c: -1})
     base.add_reactions([rxn_1, rxn_2, rxn_b1, rxn_b2])
     return base
@@ -81,19 +80,19 @@ def three_components_open(base):
 @register_with(MODEL_REGISTRY)
 def four_components_open(base):
     """Returns a simple model with 3 metabolites in an open system."""
-    met_a = cobra.Metabolite("A")
-    met_b = cobra.Metabolite("B")
-    met_c = cobra.Metabolite("C")
-    met_d = cobra.Metabolite("D")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    met_a = Metabolite("A")
+    met_b = Metabolite("B")
+    met_c = Metabolite("C")
+    met_d = Metabolite("D")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({met_b: -1, met_c: 1})
-    rxn_3 = cobra.Reaction("R3", lower_bound=0, upper_bound=1000)
+    rxn_3 = Reaction("R3", lower_bound=0, upper_bound=1000)
     rxn_3.add_metabolites({met_c: -1, met_d: 1})
-    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1 = Reaction("B1", lower_bound=0, upper_bound=1000)
     rxn_b1.add_metabolites({met_a: 1})
-    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2 = Reaction("B2", lower_bound=0, upper_bound=1000)
     rxn_b2.add_metabolites({met_d: -1})
     base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_b1, rxn_b2])
     return base
@@ -101,16 +100,16 @@ def four_components_open(base):
 
 @register_with(MODEL_REGISTRY)
 def x2_cycle_closed(base):
-    x1 = cobra.Metabolite("x1")
-    x2 = cobra.Metabolite("x2")
-    x3 = cobra.Metabolite("x3")
-    x4 = cobra.Metabolite("x4")
-    x5 = cobra.Metabolite("x5")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    x1 = Metabolite("x1")
+    x2 = Metabolite("x2")
+    x3 = Metabolite("x3")
+    x4 = Metabolite("x4")
+    x5 = Metabolite("x5")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({x1: -1, x2: -1, x3: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({x3: -1, x4: 1})
-    rxn_3 = cobra.Reaction("R3", lower_bound=-1000, upper_bound=1000)
+    rxn_3 = Reaction("R3", lower_bound=-1000, upper_bound=1000)
     rxn_3.add_metabolites({x4: -1, x5: 1, x2: 1})
     base.add_reactions([rxn_1, rxn_2, rxn_3])
     return base
@@ -118,20 +117,20 @@ def x2_cycle_closed(base):
 
 @register_with(MODEL_REGISTRY)
 def x2_cycle_open(base):
-    x1 = cobra.Metabolite("x1")
-    x2 = cobra.Metabolite("x2")
-    x3 = cobra.Metabolite("x3")
-    x4 = cobra.Metabolite("x4")
-    x5 = cobra.Metabolite("x5")
-    rxn_1 = cobra.Reaction("R1", lower_bound=-1000, upper_bound=1000)
+    x1 = Metabolite("x1")
+    x2 = Metabolite("x2")
+    x3 = Metabolite("x3")
+    x4 = Metabolite("x4")
+    x5 = Metabolite("x5")
+    rxn_1 = Reaction("R1", lower_bound=-1000, upper_bound=1000)
     rxn_1.add_metabolites({x1: -1, x2: -1, x3: 1})
-    rxn_2 = cobra.Reaction("R2", lower_bound=-1000, upper_bound=1000)
+    rxn_2 = Reaction("R2", lower_bound=-1000, upper_bound=1000)
     rxn_2.add_metabolites({x3: -1, x4: 1})
-    rxn_3 = cobra.Reaction("R3", lower_bound=-1000, upper_bound=1000)
+    rxn_3 = Reaction("R3", lower_bound=-1000, upper_bound=1000)
     rxn_3.add_metabolites({x4: -1, x5: 1, x2: 1})
-    rxn_b1 = cobra.Reaction("B1", lower_bound=0, upper_bound=1000)
+    rxn_b1 = Reaction("B1", lower_bound=0, upper_bound=1000)
     rxn_b1.add_metabolites({x1: 1})
-    rxn_b2 = cobra.Reaction("B2", lower_bound=0, upper_bound=1000)
+    rxn_b2 = Reaction("B2", lower_bound=0, upper_bound=1000)
     rxn_b2.add_metabolites({x5: -1})
     base.add_reactions([rxn_1, rxn_2, rxn_3, rxn_b1, rxn_b2])
     return base
