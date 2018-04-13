@@ -70,10 +70,10 @@ def test_reaction_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Genes/Gene-Products without Annotation", type="count")
+@annotate(title="Genes without Annotation", type="count")
 def test_gene_product_annotation_presence(read_only_model):
     """
-    Expect all genes/gene products to have a non-empty annotation attribute.
+    Expect all genes to have a non-empty annotation attribute.
 
     This test checks if any annotations at all are present in the SBML
     annotations field (extended by FBC package) for each gene product,
@@ -87,7 +87,7 @@ def test_gene_product_annotation_presence(read_only_model):
         read_only_model, "genes"))
     ann["metric"] = len(ann["data"]) / len(read_only_model.genes)
     ann["message"] = wrapper.fill(
-        """A total of {} genes/gene-products ({:.2%}) lack any form of
+        """A total of {} genes ({:.2%}) lack any form of
         annotation: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -166,11 +166,11 @@ def test_reaction_annotation_overview(read_only_model, db):
 
 
 @pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
-@annotate(title="Missing Gene/Gene-Product Annotations Per Database",
+@annotate(title="Missing Gene Annotations Per Database",
           type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_overview(read_only_model, db):
     """
-    Expect all genes/gene-products to have annotations from common databases.
+    Expect all genes to have annotations from common databases.
 
     Specific database cross-references are paramount to mapping information.
     To provide references to as many databases as possible helps to make the
@@ -195,7 +195,7 @@ def test_gene_product_annotation_overview(read_only_model, db):
         read_only_model.genes, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
     ann["message"][db] = wrapper.fill(
-        """The following {} gene/gene-products ({:.2%}) lack annotation for {}:
+        """The following {} genes ({:.2%}) lack annotation for {}:
         {}""".format(len(ann["data"][db]), ann["metric"][db], db,
                      truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
@@ -284,7 +284,7 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
 
 
 @pytest.mark.parametrize("db", annotation.GENE_PRODUCT_ANNOTATIONS)
-@annotate(title="Wrong Gene/Gene-Product Annotations Per Database",
+@annotate(title="Wrong Gene Annotations Per Database",
           type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_wrong_ids(read_only_model, db):
     """
@@ -308,7 +308,7 @@ def test_gene_product_annotation_wrong_ids(read_only_model, db):
                 read_only_model.genes, db)))
     ann["metric"][db] = 1.0
     ann["message"][db] = wrapper.fill(
-        """There are no gene or gene-product annotations for the {} database.
+        """There are no gene annotations for the {} database.
         """.format(db))
     assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
