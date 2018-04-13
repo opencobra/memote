@@ -18,3 +18,5 @@ pygithub
 travispy
 travis-encrypt
 importlib_resources
+squalchemy
+pylru
