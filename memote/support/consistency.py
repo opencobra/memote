@@ -569,7 +569,7 @@ def find_metabolite_production_feasibility(model):
         # Add a demand and maximize flux
         demand = Reaction("demand_for_{}".format(met.id), upper_bound=1000)
         demand.add_metabolites({met: -1})
-        model.add_reactions(demand)
+        model.add_reactions([demand])
         # Check feasability
         model.objective = demand.id
         solution = model.optimize()
