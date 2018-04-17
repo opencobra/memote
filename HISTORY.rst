@@ -23,6 +23,8 @@ Next Release
 * Add tests for detecting gene annotations (and verifying they are in
   MIRIAM style)
 * Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
+* Add test to detect infeasible metabolites (i.e. metabolites are cannot
+  be produced by the model even with exchanges open).
 
 0.6.2 (2018-03-12)
 ------------------
