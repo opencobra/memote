@@ -303,6 +303,29 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
+@annotate(title="fixme", type="count")
+def test_find_metabolite_production_feasibility(read_only_model):
+    """
+    Expect all metabolites to be produced with open exchanges.
+
+    Just as metabolites should not be produced from nothing, conversely, all
+    metabolites in the model should be produced when all exchanges are open. To
+    pass this test no metabolite may exist that is not produced when all
+    exchanges are open
+    """
+    ann = test_find_metabolite_production_feasibility.annotation
+    mets = set(read_only_model.metabolites)
+    feasible_mets = \
+        consistency.find_metabolite_production_feasability(read_only_model)
+    ann["data"] = get_ids(mets - feasible_mets)
+    ann["metric"] = len(ann["data"] / len(mets))
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites cannot be produced even with
+        fully open system boundary reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
 @annotate(
     title="Fraction of Unbounded Reactions in the Default Condition",
     type="percent")
