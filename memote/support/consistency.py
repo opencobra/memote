@@ -548,12 +548,14 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
-def find_carbon_metabolite_production_feasability(model):
+def find_metabolite_production_feasability(model):
     """
-    Return number of carbon-containing metabolites produced in complete medium.
+    Return number of metabolites produced in complete medium.
 
     This is the reverse check for testing metabolite production with closed
-    bounds and used to assist in gap-filling.
+    bounds. As no metabolites should exist that are produced or consumed
+    from nothing, conversely, all metabolites in the model should be produced
+    when all exchanges are open.
 
     Parameters
     ----------
@@ -563,17 +565,14 @@ def find_carbon_metabolite_production_feasability(model):
     """
     feasable_mets = []
     helpers.open_boundaries(model)
-    # TODO: replace mets with carbon-containing mets (maybe with function?)
-    mets = model.metabolites
-    for met in mets:
+    for met in model.metabolites:
         # Add a demand and maximize flux
-        demand = cobra.Reaction("demand_for_{}".format(met.id),
-                                upper_bound=1000)
+        demand = Reaction("demand_for_{}".format(met.id), upper_bound=1000)
         demand.add_metabolites({met: -1})
         model.add_reactions(demand)
+        # Check feasability
         model.objective = demand.id
         solution = model.optimize()
-        # Check feasability
         if solution.status != "Infeasible":
             feasable_mets.append(met)
     return set(feasable_mets)
