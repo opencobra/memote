@@ -311,7 +311,7 @@ def test_find_metabolite_production_feasibility(read_only_model):
     Just as metabolites should not be produced from nothing, conversely, all
     metabolites in the model should be produced when all exchanges are open. To
     pass this test no metabolite may exist that is not produced when all
-    exchanges are open
+    exchanges are open.
     """
     ann = test_find_metabolite_production_feasibility.annotation
     mets = set(read_only_model.metabolites)
