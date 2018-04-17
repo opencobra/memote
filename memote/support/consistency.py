@@ -567,7 +567,8 @@ def find_carbon_metabolite_production_feasability(model):
     mets = model.metabolites
     for met in mets:
         # Add a demand and maximize flux
-        demand = cobra.Reaction("demand_for_{}".format(met.id))
+        demand = cobra.Reaction("demand_for_{}".format(met.id),
+                                upper_bound=1000)
         demand.add_metabolites({met: -1})
         model.add_reactions(demand)
         model.objective = demand.id
