@@ -559,10 +559,16 @@ def check_carbon_metabolite_production_feasability(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    met : cobra.Metabolite
+        The metabolite under investigation.
 
     """
-    #FIXME
-    return model
+    helpers.open_boundaries(model)
+    # TODO: replace mets with carbon-containing mets (maybe with function?)
+    mets = model.metabolites
+    for met in mets:
+        # TODO: add a demand and maximize flux, then check feasability
+        continue
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
