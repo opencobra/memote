@@ -548,7 +548,7 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
-def find_metabolite_production_feasability(model):
+def find_metabolite_production_feasibility(model):
     """
     Return number of metabolites produced in complete medium.
 
@@ -563,7 +563,7 @@ def find_metabolite_production_feasability(model):
         The metabolic model under investigation.
 
     """
-    feasable_mets = []
+    feasible_mets = []
     helpers.open_boundaries(model)
     for met in model.metabolites:
         # Add a demand and maximize flux
@@ -574,8 +574,8 @@ def find_metabolite_production_feasability(model):
         model.objective = demand.id
         solution = model.optimize()
         if solution.status != "Infeasible":
-            feasable_mets.append(met)
-    return set(feasable_mets)
+            feasible_mets.append(met)
+    return set(feasible_mets)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
