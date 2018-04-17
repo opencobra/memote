@@ -548,6 +548,23 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
+def check_carbon_metabolite_production_feasability(model):
+    """
+    Check number of carbon-containing metabolites producted in complete medium.
+
+    This is the reverse check for testing metabolite production with closed
+    bounds and used to assist in gap-filling.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    #FIXME
+    return model
+
+
 def find_reactions_with_unbounded_flux_default_condition(model):
     """
     Return list of reactions whose flux is unbounded in the default condition.
