@@ -563,19 +563,22 @@ def find_metabolite_production_feasibility(model):
         The metabolic model under investigation.
 
     """
-    feasible_mets = []
+    infeasible_mets = []
     helpers.open_boundaries(model)
     for met in model.metabolites:
         # Add a demand and maximize flux
-        demand = Reaction("demand_for_{}".format(met.id), upper_bound=1000)
-        demand.add_metabolites({met: -1})
-        model.add_reactions([demand])
+        model.add_boundary(met, type="demand")
+        rxn_id = "DM_{}".format(met.id)
         # Check feasability
-        model.objective = demand.id
-        solution = model.optimize()
-        if solution.status != "Infeasible":
-            feasible_mets.append(met)
-    return set(feasible_mets)
+        model.objective = rxn_id
+        try:
+            model.slim_optimize(error_value=None)
+        except OptimizationError:
+            pass
+        else:
+            if solution.status == "Infeasible":
+                infeasible_mets.append(met)
+    return set(infeasible_mets)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
