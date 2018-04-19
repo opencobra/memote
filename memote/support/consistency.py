@@ -24,7 +24,7 @@ from operator import attrgetter
 
 import numpy as np
 from cobra import Reaction
-from cobra.exceptions import Infeasible
+from cobra.exceptions import Infeasible, OptimizationError
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.consistency_helpers as con_helpers
