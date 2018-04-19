@@ -304,7 +304,7 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
 
 
 @annotate(title="fixme", type="count")
-def test_find_metabolite_production_feasibility(read_only_model):
+def test_find_metabolite_production_infeasibility(read_only_model):
     """
     Expect all metabolites to be produced with open exchanges.
 
@@ -315,7 +315,7 @@ def test_find_metabolite_production_feasibility(read_only_model):
     """
     ann = test_find_metabolite_production_feasibility.annotation
     infeasible_mets = \
-        consistency.find_metabolite_production_feasability(read_only_model)
+        consistency.find_metabolite_production_infeasability(read_only_model)
     ann["data"] = get_ids(infeasible_mets)
     ann["metric"] = len(ann["data"] / len(set(read_only_model.metabolites)))
     ann["message"] = wrapper.fill(

@@ -548,9 +548,9 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
-def find_metabolite_production_feasibility(model):
+def find_metabolite_production_infeasibility(model):
     """
-    Return number of metabolites produced in complete medium.
+    Return number of metabolites not produced in complete medium.
 
     This is the reverse check for testing metabolite production with closed
     bounds. As no metabolites should exist that are produced or consumed
