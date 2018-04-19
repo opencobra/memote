@@ -313,7 +313,7 @@ def test_find_metabolite_production_infeasibility(read_only_model):
     pass this test no metabolite may exist that is not produced when all
     exchanges are open.
     """
-    ann = test_find_metabolite_production_feasibility.annotation
+    ann = test_find_metabolite_production_infeasibility.annotation
     infeasible_mets = \
         consistency.find_metabolite_production_infeasability(read_only_model)
     ann["data"] = get_ids(infeasible_mets)
