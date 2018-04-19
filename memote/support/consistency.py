@@ -572,7 +572,7 @@ def find_metabolite_production_feasibility(model):
         # Check feasability
         model.objective = rxn_id
         try:
-            model.slim_optimize(error_value=None)
+            solution = model.slim_optimize(error_value=None)
         except OptimizationError:
             pass
         else:
