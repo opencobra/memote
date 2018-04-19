@@ -574,7 +574,7 @@ def find_metabolite_production_infeasibility(model):
         try:
             solution = model.slim_optimize(error_value=None)
         except OptimizationError:
-            if solution.status == "Infeasible":
+            if solution.status == "infeasible":
                 infeasible_mets.append(met)
     return set(infeasible_mets)
 
