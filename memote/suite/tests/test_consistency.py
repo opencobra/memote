@@ -314,11 +314,10 @@ def test_find_metabolite_production_feasibility(read_only_model):
     exchanges are open.
     """
     ann = test_find_metabolite_production_feasibility.annotation
-    mets = set(read_only_model.metabolites)
-    feasible_mets = \
+    infeasible_mets = \
         consistency.find_metabolite_production_feasability(read_only_model)
-    ann["data"] = get_ids(mets - feasible_mets)
-    ann["metric"] = len(ann["data"] / len(mets))
+    ann["data"] = get_ids(infeasible_mets)
+    ann["metric"] = len(ann["data"] / len(set(read_only_model.metabolites)))
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be produced even with
         fully open system boundary reactions: {}""".format(

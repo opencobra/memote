@@ -730,9 +730,8 @@ def test_find_metabolites_consumed_with_closed_bounds(model, num):
 ], indirect=["model"])
 def test_find_metabolite_production_feasibility(model, num):
     """Expect the appropriate amount of feasible metabolites to be found."""
-    mets = set(model.metabolites)
-    feasible = consistency.find_metabolite_production_feasibility(model)
-    assert len(mets - feasible) == num
+    infeasible = consistency.find_metabolite_production_feasibility(model)
+    assert len(infeasible) == num
 
 
 @pytest.mark.parametrize("model, fraction", [
