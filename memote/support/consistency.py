@@ -566,11 +566,8 @@ def find_metabolites_not_produced_with_open_bounds(model):
     helpers.open_boundaries(model)
     for met in model.metabolites:
         with model:
-            exch = model.add_boundary(met,
-                                      type="irrex",
-                                      reaction_id="irrex_{}".format(met.id),
-                                      lb=0,
-                                      ub=1)
+            exch = model.add_boundary(
+                met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
             solution = helpers.run_fba(model, exch.id, direction="max")
             if solution is np.nan or solution == 0:
                 mets_not_produced.append(met)
@@ -595,11 +592,8 @@ def find_metabolites_not_consumed_with_open_bounds(model):
     helpers.open_boundaries(model)
     for met in model.metabolites:
         with model:
-            exch = model.add_boundary(met,
-                                      type="irrex",
-                                      reaction_id="irrex_{}".format(met.id),
-                                      lb=-1,
-                                      ub=0)
+            exch = model.add_boundary(
+                met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
             solution = helpers.run_fba(model, exch.id, direction="max")
             if solution is np.nan or solution == 0:
                 mets_not_consumed.append(met)
