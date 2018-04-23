@@ -568,7 +568,7 @@ def find_metabolites_not_produced_with_open_bounds(model):
         with model:
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
-            solution = helpers.run_fba(model, exch.id, direction="max")
+            solution = helpers.run_fba(model, exch.id)
             if solution is np.nan or solution == 0:
                 mets_not_produced.append(met)
     return mets_not_produced
@@ -594,41 +594,10 @@ def find_metabolites_not_consumed_with_open_bounds(model):
         with model:
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
-            solution = helpers.run_fba(model, exch.id, direction="max")
+            solution = helpers.run_fba(model, exch.id, direction="min")
             if solution is np.nan or solution == 0:
                 mets_not_consumed.append(met)
     return mets_not_consumed
-
-
-# def find_metabolite_production_infeasibility(model):
-#     """
-#     Return number of metabolites not produced in complete medium.
-
-#     This is the reverse check for testing metabolite production with closed
-#     bounds. As no metabolites should exist that are produced or consumed
-#     from nothing, conversely, all metabolites in the model should be produced
-#     when all exchanges are open.
-
-#     Parameters
-#     ----------
-#     model : cobra.Model
-#         The metabolic model under investigation.
-
-#     """
-#     infeasible_mets = []
-#     helpers.open_boundaries(model)
-#     for met in model.metabolites:
-#         # Add a demand and maximize flux
-#         model.add_boundary(met, type="demand")
-#         rxn_id = "DM_{}".format(met.id)
-#         # Check feasability
-#         model.objective = rxn_id
-#         try:
-#             solution = model.slim_optimize(error_value=None)
-#         except OptimizationError:
-#             if solution.status == "infeasible":
-#                 infeasible_mets.append(met)
-#     return set(infeasible_mets)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
