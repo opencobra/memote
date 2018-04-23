@@ -24,7 +24,7 @@ from operator import attrgetter
 
 import numpy as np
 from cobra import Reaction
-from cobra.exceptions import Infeasible, OptimizationError
+from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
 
 import memote.support.consistency_helpers as con_helpers
@@ -548,14 +548,13 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
-def find_metabolite_production_infeasibility(model):
+def find_metabolites_not_produced_with_open_bounds(model):
     """
-    Return number of metabolites not produced in complete medium.
+    Return metabolites that cannot be produced with open boundary reactions.
 
-    This is the reverse check for testing metabolite production with closed
-    bounds. As no metabolites should exist that are produced or consumed
-    from nothing, conversely, all metabolites in the model should be produced
-    when all exchanges are open.
+    Inverse case from 'find_metabolites_produced_with_closed_bounds', just
+    like metabolites should not be produced from nothing, metabolites should
+    all be produced with open exhanges.
 
     Parameters
     ----------
@@ -563,20 +562,79 @@ def find_metabolite_production_infeasibility(model):
         The metabolic model under investigation.
 
     """
-    infeasible_mets = []
+    mets_not_produced = list()
     helpers.open_boundaries(model)
     for met in model.metabolites:
-        # Add a demand and maximize flux
-        model.add_boundary(met, type="demand")
-        rxn_id = "DM_{}".format(met.id)
-        # Check feasability
-        model.objective = rxn_id
-        try:
-            solution = model.slim_optimize(error_value=None)
-        except OptimizationError:
-            if solution.status == "infeasible":
-                infeasible_mets.append(met)
-    return set(infeasible_mets)
+        with model:
+            exch = model.add_boundary(met,
+                                      type="irrex",
+                                      reaction_id="irrex_{}".format(met.id),
+                                      lb=0,
+                                      ub=1)
+            solution = helpers.run_fba(model, exch.id, direction="max")
+            if solution is np.nan or solution == 0:
+                mets_not_produced.append(met)
+    return mets_not_produced
+
+
+def find_metabolites_not_consumed_with_open_bounds(model):
+    """
+    Return metabolites that cannot be consumed with open boundary reactions.
+
+    Reverse case from 'find_metabolites_not_produced_with_open_bounds', just
+    like metabolites should all be produced with open exchanges, they should
+    also all be consumed with open exchanges.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_not_consumed = list()
+    helpers.open_boundaries(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(met,
+                                      type="irrex",
+                                      reaction_id="irrex_{}".format(met.id),
+                                      lb=-1,
+                                      ub=0)
+            solution = helpers.run_fba(model, exch.id, direction="max")
+            if solution is np.nan or solution == 0:
+                mets_not_consumed.append(met)
+    return mets_not_consumed
+
+
+# def find_metabolite_production_infeasibility(model):
+#     """
+#     Return number of metabolites not produced in complete medium.
+
+#     This is the reverse check for testing metabolite production with closed
+#     bounds. As no metabolites should exist that are produced or consumed
+#     from nothing, conversely, all metabolites in the model should be produced
+#     when all exchanges are open.
+
+#     Parameters
+#     ----------
+#     model : cobra.Model
+#         The metabolic model under investigation.
+
+#     """
+#     infeasible_mets = []
+#     helpers.open_boundaries(model)
+#     for met in model.metabolites:
+#         # Add a demand and maximize flux
+#         model.add_boundary(met, type="demand")
+#         rxn_id = "DM_{}".format(met.id)
+#         # Check feasability
+#         model.objective = rxn_id
+#         try:
+#             solution = model.slim_optimize(error_value=None)
+#         except OptimizationError:
+#             if solution.status == "infeasible":
+#                 infeasible_mets.append(met)
+#     return set(infeasible_mets)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
