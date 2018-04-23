@@ -275,9 +275,8 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Number of Metabolites Consumed Without Product Removal ",
-    type="count")
+@annotate(title="Number of Metabolites Consumed Without Product Removal",
+          type="count")
 def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     """
     Expect no metabolites to be consumed without product removal.
@@ -303,26 +302,80 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="fixme", type="count")
-def test_find_metabolite_production_infeasibility(read_only_model):
+@annotate(title="Number of Metabolites Not Produced In Complete Medium",
+          type="count")
+def test_find_metabolites_not_produced_with_open_bounds(read_only_model):
     """
-    Expect all metabolites to be produced with open exchanges.
+    Expect no metabolites to be unproducible in complete medium.
 
-    Just as metabolites should not be produced from nothing, conversely, all
-    metabolites in the model should be produced when all exchanges are open. To
-    pass this test no metabolite may exist that is not produced when all
-    exchanges are open.
+    It should not be possible for the model to not produce metabolites in
+    complete medium. This test enables all the boundary reactions and checks
+    if each metabolite is incapable of being produced individually using flux
+    balance analysis. To pass this test no metabolite outside of
+    specific boundary reactions should be unproducible in complete medium.
     """
-    ann = test_find_metabolite_production_infeasibility.annotation
-    infeasible_mets = \
-        consistency.find_metabolite_production_infeasability(read_only_model)
-    ann["data"] = get_ids(infeasible_mets)
-    ann["metric"] = len(ann["data"] / len(set(read_only_model.metabolites)))
+    ann = test_find_metabolites_not_produced_with_open_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_not_produced_with_open_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites cannot be produced even with
-        fully open system boundary reactions: {}""".format(
+        """A total of {} ({:.2%}) metabolites cannot be produced in complete
+        medium: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Not Consumed In Complete Medium",
+          type="count")
+def test_find_metabolites_not_consumed_with_open_bounds(read_only_model):
+    """
+    Expect no metabolites to be inconsumable in complete medium.
+
+    Just like metabolites should not be unproducible in complete medium,
+    they also should not be incapable of being consumed in complete medium.
+    This test enables all the boundary reactions and checks if each metabolite
+    is incapble of being consumed individually using flux balance analysis. To
+    pass this test no metabolite outside of specific boundary reactions should
+    be inconsumable in complete medium.
+    """
+    ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_not_consumed_with_open_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites cannot be consumed in complete
+        medium: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+# FIXME: replace with two new functions made
+# @annotate(title="fixme", type="count")
+# def test_find_metabolite_production_infeasibility(read_only_model):
+#     """
+#     Expect all metabolites to be produced with open exchanges.
+
+#     Just as metabolites should not be produced from nothing, conversely, all
+#     metabolites in the model should be produced when all exchanges are open.
+#     To pass this test no metabolite may exist that is not produced when all
+#     exchanges are open.
+#     """
+#     ann = test_find_metabolite_production_infeasibility.annotation
+#     infeasible_mets = \
+#         consistency.find_metabolite_production_infeasability(read_only_model)
+#     ann["data"] = get_ids(infeasible_mets)
+#     ann["metric"] = len(ann["data"] / len(set(read_only_model.metabolites)))
+#     ann["message"] = wrapper.fill(
+#         """A total of {} ({:.2%}) metabolites cannot be produced even with
+#         fully open system boundary reactions: {}""".format(
+#             len(ann["data"]), ann["metric"], truncate(ann["data"])))
+#     assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(
