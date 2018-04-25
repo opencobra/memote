@@ -6,7 +6,6 @@ python:
   - "3.5"
   - "2.7"
   - "3.6"
-  - "3.7-dev"
 sudo: false
 git:
   depth: 2
