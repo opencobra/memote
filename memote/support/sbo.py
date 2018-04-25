@@ -46,7 +46,7 @@ def find_components_without_sbo_terms(model, components):
 
 
 def check_component_for_specific_sbo_term(items, term):
-    """
+    r"""
     Identify model components that lack a specific SBO term(s).
 
     Parameters
