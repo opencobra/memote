@@ -32,7 +32,7 @@ script:
 stages:
   - test
   - name: deploy
-    if: repo = $GITHUB_REPO AND tag IS present
+    if: (repo = env(GITHUB_REPO)) AND (tag IS present)
 
 jobs:
   include:
