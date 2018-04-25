@@ -10,9 +10,8 @@ from __future__ import absolute_import, print_function
 
 from builtins import dict
 
+import pkg_resources
 import platform
-
-import pip
 
 __all__ = ("show_versions", "PKG_ORDER")
 
@@ -63,7 +62,7 @@ def get_pkg_info():
     """Return Python package information as a dict."""
     dependencies = frozenset(PKG_ORDER)
     blob = dict()
-    for dist in pip.get_installed_distributions():
+    for dist in pkg_resources.working_set:
         if dist.project_name in dependencies:
             blob[dist.project_name] = dist.version
     return blob

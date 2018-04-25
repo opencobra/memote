@@ -217,7 +217,7 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
                 envvar="MEMOTE_MODEL")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 def history(model, solver, location, pytest_args, commits, skip,
-            exclusive, experimental):
+            exclusive, experimental):  # noqa: D301
     """
     Re-compute test results for the git branch history.
 

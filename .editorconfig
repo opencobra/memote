@@ -1,21 +1,23 @@
-# http://editorconfig.org
-
+# Editor Configuration (http://editorconfig.org)
 root = true
 
 [*]
-indent_style = space
-indent_size = 4
-trim_trailing_whitespace = true
-insert_final_newline = true
 charset = utf-8
+indent_style = space
+indent_size = 2
 end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
 
-[*.bat]
-indent_style = tab
-end_of_line = crlf
+[*.{py, pyi}]
+indent_size = 4
 
-[LICENSE]
-insert_final_newline = false
+[*.{ini, cfg}]
+indent_size = 4
+
+[*.{md,rst}]
+trim_trailing_whitespace = false
 
 [Makefile]
 indent_style = tab
+indent_size = 4

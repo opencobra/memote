@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+* Remove the pip dependency in ``show_versions``.
+* Update the CI to use stages and ``tox-travis``.
+* Modify some editor and other configuration.
 * Expose testing of experimental essentiality and growth data in memote.
 * Create a configuration system for media that is extensible to further
   experimental data types.
