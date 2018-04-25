@@ -2,7 +2,7 @@ language: python
 node_js: "node"
 sudo: false
 git:
-  depth: 1
+  depth: 2
 cache:
 - pip: true
 - directories:
