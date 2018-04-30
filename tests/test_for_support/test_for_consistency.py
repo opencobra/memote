@@ -526,6 +526,20 @@ def gap_model(base):
 
 
 @register_with(MODEL_REGISTRY)
+def gap_model_2(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
+    base.add_reactions([cobra.Reaction(i) 
+                        for i in ["EX_A", "A2B", "C2D", "EX_D"]])
+    base.reactions.EX_A.add_metabolites({"A": 1})
+    base.reactions.EX_D.add_metabolites({"D": -1})
+    base.reactions.A2B.add_metabolites({"A": -1, "B": 1})
+    base.reactions.C2D.add_metabolites({"C": -1, "D": 1})
+    base.reactions.A2B.bounds = 0, 1000
+    base.reactions.C2D.bounds = 0, 1000
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def gapfilled_model(base):
     a_c = cobra.Metabolite("a_c")
     a_e = cobra.Metabolite("a_e")
@@ -723,6 +737,28 @@ def test_find_metabolites_consumed_with_closed_bounds(model, num):
     """Expect the appropriate amount of consumed metabolites to be found."""
     consumed = consistency.find_metabolites_consumed_with_closed_bounds(model)
     assert len(consumed) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gap_model", 4),
+    ("gap_model_2", 1),
+    ("gapfilled_model", 0),
+], indirect=['model'])
+def test_find_metabolites_not_produced_with_open_bounds(model, num):
+    """Expect the appropriate amount of nonproduced metabolites to be found."""
+    badmets = consistency.find_metabolites_not_produced_with_open_bounds(model)
+    assert len(badmets) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("gap_model", 4),
+    ("gap_model_2", 1),
+    ("gapfilled_model", 0),
+], indirect=['model'])
+def test_find_metabolites_not_consumed_with_open_bounds(model, num):
+    """Expect the appropriate amount of nonconsumed metabolites to be found."""
+    badmets = consistency.find_metabolites_not_consumed_with_open_bounds(model)
+    assert len(badmets) == num
 
 
 @pytest.mark.parametrize("model, fraction", [

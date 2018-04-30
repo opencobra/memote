@@ -275,9 +275,8 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Number of Metabolites Consumed Without Product Removal ",
-    type="count")
+@annotate(title="Number of Metabolites Consumed Without Product Removal",
+          type="count")
 def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     """
     Expect no metabolites to be consumed without product removal.
@@ -299,6 +298,59 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites can be consumed without
         using the system's boundary reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Not Produced In Complete Medium",
+          type="count")
+def test_find_metabolites_not_produced_with_open_bounds(read_only_model):
+    """
+    Expect no metabolites to be unproducible in complete medium.
+
+    It should not be possible for the model to not produce metabolites in
+    complete medium. This test enables all the boundary reactions and checks
+    if each metabolite is incapable of being produced individually using flux
+    balance analysis. To pass this test no metabolite outside of
+    specific boundary reactions should be unproducible in complete medium.
+    """
+    ann = test_find_metabolites_not_produced_with_open_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_not_produced_with_open_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites cannot be produced in complete
+        medium: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Not Consumed In Complete Medium",
+          type="count")
+def test_find_metabolites_not_consumed_with_open_bounds(read_only_model):
+    """
+    Expect no metabolites to be inconsumable in complete medium.
+
+    Just like metabolites should not be unproducible in complete medium,
+    they also should not be incapable of being consumed in complete medium.
+    This test enables all the boundary reactions and checks if each metabolite
+    is incapble of being consumed individually using flux balance analysis. To
+    pass this test no metabolite outside of specific boundary reactions should
+    be inconsumable in complete medium.
+    """
+    ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
+    ann["data"] = get_ids(
+        consistency.find_metabolites_not_consumed_with_open_bounds(
+            read_only_model
+        )
+    )
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """A total of {} ({:.2%}) metabolites cannot be consumed in complete
+        medium: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 

@@ -26,6 +26,8 @@ Next Release
 * Add tests for detecting gene annotations (and verifying they are in
   MIRIAM style)
 * Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
+* Add tests ``find_metabolites_not_produced_with_open_bounds`` and
+  ``find_metabolites_not_consumed_with_open_bounds``
 
 0.6.2 (2018-03-12)
 ------------------

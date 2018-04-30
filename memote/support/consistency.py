@@ -548,6 +548,58 @@ def find_metabolites_consumed_with_closed_bounds(model):
     return mets_consumed
 
 
+def find_metabolites_not_produced_with_open_bounds(model):
+    """
+    Return metabolites that cannot be produced with open boundary reactions.
+
+    Inverse case from 'find_metabolites_produced_with_closed_bounds', just
+    like metabolites should not be produced from nothing, metabolites should
+    all be produced with open exhanges.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_not_produced = list()
+    helpers.open_boundaries(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
+            solution = helpers.run_fba(model, exch.id)
+            if solution is np.nan or solution == 0:
+                mets_not_produced.append(met)
+    return mets_not_produced
+
+
+def find_metabolites_not_consumed_with_open_bounds(model):
+    """
+    Return metabolites that cannot be consumed with open boundary reactions.
+
+    Reverse case from 'find_metabolites_not_produced_with_open_bounds', just
+    like metabolites should all be produced with open exchanges, they should
+    also all be consumed with open exchanges.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    mets_not_consumed = list()
+    helpers.open_boundaries(model)
+    for met in model.metabolites:
+        with model:
+            exch = model.add_boundary(
+                met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
+            solution = helpers.run_fba(model, exch.id, direction="min")
+            if solution is np.nan or solution == 0:
+                mets_not_consumed.append(met)
+    return mets_not_consumed
+
+
 def find_reactions_with_unbounded_flux_default_condition(model):
     """
     Return list of reactions whose flux is unbounded in the default condition.
