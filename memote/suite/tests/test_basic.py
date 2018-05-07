@@ -375,34 +375,6 @@ def test_find_constrained_transport_reactions(read_only_model):
                                                truncate(ann["data"])))
 
 
-@annotate(title="Fraction of Transport Reactions without GPR", type="percent")
-def test_transport_reaction_gpr_presence(read_only_model):
-    """
-    Expect a small fraction of transport reactions not to have a GPR rule.
-
-    As it is hard to identify the exact transport processes within a cell,
-    transport reactions are often added purely for modeling purposes.
-    Highlighting where assumptions have been made vs where
-    there is proof may help direct the efforts to improve transport and
-    transport energetics of the tested metabolic model.
-    However, transport reactions without GPR may also be valid:
-    Diffusion, or known reactions with yet undiscovered genes likely lack GPR.
-    """
-    # TODO: Update threshold with improved insight from meta study.
-    ann = test_transport_reaction_gpr_presence.annotation
-    ann["data"] = get_ids(
-        basic.check_transport_reaction_gpr_presence(read_only_model)
-    )
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_transport_reactions(read_only_model)
-    )
-    ann["message"] = wrapper.fill(
-        """There are a total of {} transport reactions ({:.2%} of all
-        transport reactions) without GPR:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert ann["metric"] < 0.2, ann["message"]
-
-
 @annotate(title="Number of Reversible Oxygen-Containing Reactions",
           type="count")
 def test_find_reversible_oxygen_reactions(read_only_model):
@@ -468,3 +440,31 @@ def test_find_duplicate_metabolites_in_compartments(read_only_model):
         have duplicates in the same compartment: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Fraction of Transport Reactions without GPR", type="percent")
+def test_transport_reaction_gpr_presence(read_only_model):
+    """
+    Expect a small fraction of transport reactions not to have a GPR rule.
+
+    As it is hard to identify the exact transport processes within a cell,
+    transport reactions are often added purely for modeling purposes.
+    Highlighting where assumptions have been made vs where
+    there is proof may help direct the efforts to improve transport and
+    transport energetics of the tested metabolic model.
+    However, transport reactions without GPR may also be valid:
+    Diffusion, or known reactions with yet undiscovered genes likely lack GPR.
+    """
+    # TODO: Update threshold with improved insight from meta study.
+    ann = test_transport_reaction_gpr_presence.annotation
+    ann["data"] = get_ids(
+        basic.check_transport_reaction_gpr_presence(read_only_model)
+    )
+    ann["metric"] = len(ann["data"]) / len(
+        helpers.find_transport_reactions(read_only_model)
+    )
+    ann["message"] = wrapper.fill(
+        """There are a total of {} transport reactions ({:.2%} of all
+        transport reactions) without GPR:
+        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert ann["metric"] < 0.2, ann["message"]
