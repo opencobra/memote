@@ -240,6 +240,28 @@ def find_unique_metabolites(model):
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
 
 
+def find_duplicate_metabolites_in_compartments(model):
+    """
+    Return list of metabolites with duplicates in the same compartment.
+
+    All comparments in models should have a unique set of metabolites. This
+    functions checks for and returns a list of tuples contaning the duplicate
+    metabolites. An example of this would be finding compounds with IDs ATP1
+    and ATP2 in the cytosolic compartment, with both having identical InChI
+    annotations.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation
+
+    """
+    for comparment in model.comparments:
+        ann_mets = [(met, met.annotation) for met in model.metabolites
+                    if met.comparment == comparment]
+        for ann_met in ann_mets:
+            
+
 def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
     return [rxn for rxn in helpers.find_transport_reactions(model)
