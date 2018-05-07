@@ -372,6 +372,7 @@ def find_demand_reactions(model):
             extracellular not in rxn.get_compartments()]
 
 
+@lrudecorator(size=2)
 def find_sink_reactions(model):
     u"""
     Return a list of sink reactions.
