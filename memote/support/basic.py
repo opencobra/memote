@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import logging
+from itertools import combinations
 
 import memote.support.helpers as helpers
 
@@ -256,10 +257,14 @@ def find_duplicate_metabolites_in_compartments(model):
         The metabolic model under investigation
 
     """
+    duplicates = []
     for comparment in model.comparments:
         ann_mets = [(met, met.annotation) for met in model.metabolites
                     if met.comparment == comparment]
-        for ann_met in ann_mets:
+        for a, b in combinations(ann_mets, 2):
+            if a[1] == b[1] and a[1] != {} and b[1] != {}:
+                duplicates.append((a[0], b[0]))
+    return duplicates
             
 
 def check_transport_reaction_gpr_presence(model):
