@@ -328,13 +328,6 @@ def find_biomass_reaction(model):
     return list(buzzword_matches | biomass_met_matches)
 
 
-def df2dict(df):
-    """Turn a `pandas.DataFrame` into a `dict` of lists."""
-    blob = dict((key, df[key].tolist()) for key in df.columns)
-    blob["index"] = df.index.tolist()
-    return blob
-
-
 def find_demand_reactions(model):
     u"""
     Return a list of demand reactions.
