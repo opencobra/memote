@@ -446,3 +446,25 @@ def test_find_unique_metabolites(read_only_model):
         total of {} ({:.2%}) unique metabolites in the model: {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
     assert len(ann["data"]) < len(read_only_model.metabolites), ann["message"]
+
+
+@annotate(title="Number of Unique Metabolites", type="count")
+def test_find_duplicate_metabolites_in_compartments(read_only_model):
+    """
+    Expect there to be zero duplicate metabolites in the same compartments.
+
+    Metabolites may be transported into different compartments, and so models
+    may have metabolites such H2O or ATP in multiple compartments. However,
+    within a compartment, there should be no such duplicate metabolites. This
+    test therefore expects that every metabolite in any particular compartment
+    has unique inchikey values.
+    """
+    ann = test_find_duplicate_metabolites_in_compartments.annotation
+    ann["data"] = basic.find_duplicate_metabolites_in_compartments(
+        read_only_model)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} ({:.2%}) metabolites in the model which
+        have duplicates in the same compartment: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
