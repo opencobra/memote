@@ -260,12 +260,13 @@ def find_duplicate_metabolites_in_compartments(model):
     duplicates = []
     for comparment in model.comparments:
         ann_mets = [(met, met.annotation) for met in model.metabolites
-                    if met.comparment == comparment]
+                    if met.comparment == comparment and
+                    "InChI" in met.annotation]
         for a, b in combinations(ann_mets, 2):
-            if a[1] == b[1] and a[1] != {} and b[1] != {}:
+            if a[1]["InChI"] == b[1]["InChI"]:
                 duplicates.append((a[0], b[0]))
     return duplicates
-            
+
 
 def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
