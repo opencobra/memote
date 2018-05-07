@@ -221,6 +221,7 @@ def get_interface(model):
     )
 
 
+@lrudecorator(size=2)
 def get_internals(model):
     """
     Return non-exchange reactions and their metabolites.
