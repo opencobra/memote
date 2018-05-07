@@ -261,9 +261,9 @@ def find_duplicate_metabolites_in_compartments(model):
     for comparment in model.comparments:
         ann_mets = [(met, met.annotation) for met in model.metabolites
                     if met.comparment == comparment and
-                    "InChI" in met.annotation]
+                    "inchikey" in met.annotation]
         for a, b in combinations(ann_mets, 2):
-            if a[1]["InChI"] == b[1]["InChI"]:
+            if a[1]["inchikey"] == b[1]["InChI"]:
                 duplicates.append((a[0], b[0]))
     return duplicates
 
