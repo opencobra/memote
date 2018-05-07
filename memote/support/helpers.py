@@ -329,6 +329,7 @@ def find_biomass_reaction(model):
     return list(buzzword_matches | biomass_met_matches)
 
 
+@lrudecorator(size=2)
 def find_demand_reactions(model):
     u"""
     Return a list of demand reactions.
