@@ -120,6 +120,7 @@ def find_transported_elements(rxn):
     return delta_dict
 
 
+@lrudecorator(size=2)
 def find_transport_reactions(model):
     """
     Return a list of all transport reactions.
