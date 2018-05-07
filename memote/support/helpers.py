@@ -414,6 +414,7 @@ def find_sink_reactions(model):
             extracellular not in rxn.get_compartments()]
 
 
+@lrudecorator(size=2)
 def find_exchange_rxns(model):
     u"""
     Return a list of exchange reactions.
