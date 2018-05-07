@@ -27,6 +27,7 @@ import sympy
 from numpy.linalg import svd
 from six import iteritems, itervalues
 from builtins import zip, dict
+from pylru import lrudecorator
 
 from memote.support.helpers import find_biomass_reaction
 
@@ -201,6 +202,7 @@ def nullspace_basis(stoichiometry_matrix, atol=1e-13, rtol=0):
     return ns
 
 
+@lrudecorator(size=2)
 def get_interface(model):
     """
     Return the interface specific classes.
