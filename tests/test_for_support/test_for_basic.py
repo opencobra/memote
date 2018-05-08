@@ -153,7 +153,7 @@ def nonzero_constrained_rxn(base):
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
     rxn_2 = cobra.Reaction("RXN2")
     rxn_2.add_metabolites({met_1: -1, met_2: 1})
-    rxn_1.bounds = 0, 5
+    rxn_1.bounds = 0, 1000
     rxn_2.bounds = -5, 0
     base.add_reactions([rxn_1, rxn_2])
     return base
@@ -396,7 +396,7 @@ def test_metabolic_coverage(model, coverage):
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("unconstrained_rxn", 0),
-    ("nonzero_constrained_rxn", 2),
+    ("nonzero_constrained_rxn", 1),
 ], indirect=["model"])
 def test_find_nonzero_constrained_reactions(model, num):
     """Expect amount of non-zero rxns to be identified correctly."""
