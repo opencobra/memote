@@ -225,10 +225,11 @@ def find_pure_metabolic_reactions(model):
 
 def is_constrained_reaction(rxn):
     """Return whether a reaction has fixed constraints."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     if rxn.reversibility:
-        return rxn.lower_bound > -1000 or rxn.upper_bound < 1000
+        return rxn.lower_bound > lower_bound or rxn.upper_bound < upper_bound
     else:
-        return rxn.lower_bound > 0 or rxn.upper_bound < 1000
+        return rxn.lower_bound > 0 or rxn.upper_bound < upper_bound
 
 
 def find_oxygen_reactions(model):
