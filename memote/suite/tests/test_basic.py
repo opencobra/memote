@@ -64,7 +64,7 @@ def test_reactions_presence(read_only_model):
     Expect that at least one reaction is defined in the model.
 
     To be useful a metabolic model should consist at least of a few reactions.
-    This test simply checks if there are more than one.
+    This test simply checks if there are more than zero reactions.
     """
     ann = test_reactions_presence.annotation
     assert hasattr(read_only_model, "reactions")
@@ -81,7 +81,7 @@ def test_metabolites_presence(read_only_model):
 
     To be useful a metabolic model should consist at least of a few
     metabolites that are converted by reactions.
-    This test simply checks if there are more than one metabolites defined.
+    This test simply checks if there are more than zero metabolites.
     """
     ann = test_metabolites_presence.annotation
     assert hasattr(read_only_model, "metabolites")
