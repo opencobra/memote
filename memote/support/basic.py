@@ -223,7 +223,7 @@ def find_pure_metabolic_reactions(model):
         model)
 
 
-def is_constrained_reaction(rxn):
+def is_constrained_reaction(model, rxn):
     """Return whether a reaction has fixed constraints."""
     lower_bound, upper_bound = helpers.find_bounds(model)
     if rxn.reversibility:
