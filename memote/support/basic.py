@@ -48,9 +48,10 @@ def check_gene_protein_reaction_rule_presence(model):
 
 def find_nonzero_constrained_reactions(model):
     """Return list of reactions with non-zero, non-maximal bounds."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     return [rxn for rxn in model.reactions if
-            0 > rxn.lower_bound > -1000 or
-            0 < rxn.upper_bound < 1000]
+            0 > rxn.lower_bound > lower_bound or
+            0 < rxn.upper_bound < upper_bound]
 
 
 def find_zero_constrained_reactions(model):
@@ -67,9 +68,10 @@ def find_irreversible_reactions(model):
 
 def find_unconstrained_reactions(model):
     """Return list of reactions that are not constrained at all."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     return [rxn for rxn in model.reactions if
-            rxn.lower_bound <= -1000 and
-            rxn.upper_bound >= 1000]
+            rxn.lower_bound <= lower_bound and
+            rxn.upper_bound >= upper_bound]
 
 
 def find_ngam(model):
