@@ -43,7 +43,7 @@ def test_model_id_presence(read_only_model):
 @annotate(title="Total Number of Genes", type="count")
 def test_genes_presence(read_only_model):
     """
-    Expect that more than one gene is defined in the model.
+    Expect that at least one gene is defined in the model.
 
     A metabolic model can still be a useful tool without any
     genes, however there are certain methods which rely on the presence of
@@ -61,7 +61,7 @@ def test_genes_presence(read_only_model):
 @annotate(title="Total Number of Reactions", type="count")
 def test_reactions_presence(read_only_model):
     """
-    Expect that more than one reaction is defined in the model.
+    Expect that at least one reaction is defined in the model.
 
     To be useful a metabolic model should consist at least of a few reactions.
     This test simply checks if there are more than one.
@@ -77,7 +77,7 @@ def test_reactions_presence(read_only_model):
 @annotate(title="Total Number of Metabolites", type="count")
 def test_metabolites_presence(read_only_model):
     """
-    Expect that more than one metabolite is defined in the model.
+    Expect that at least one metabolite is defined in the model.
 
     To be useful a metabolic model should consist at least of a few
     metabolites that are converted by reactions.
