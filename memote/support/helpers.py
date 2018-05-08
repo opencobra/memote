@@ -501,6 +501,7 @@ def find_functional_units(gpr_str):
         yield unit.split('*')
 
 
+@lrudecorator(size=2)
 def run_fba(model, rxn_id, direction="max", single_value=True):
     """
     Return the solution of an FBA to a set objective function.
