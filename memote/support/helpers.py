@@ -759,3 +759,18 @@ def find_objective_function(model):
 
     """
     return [rxn for rxn in model.reactions if rxn.objective_coefficient != 0]
+
+def find_bounds(model):
+    """
+    Return the maximal and minimal bounds of the reactions of the model.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
+    bounds = [bound for rxn in model.reactions for bound in rxn.bounds]
+    lower_bound = np.array(bounds[0::2]).min()
+    upper_bound = np.array(bounds[1::2]).max()
+    return lower_bound, upper_bound
