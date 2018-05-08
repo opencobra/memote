@@ -448,7 +448,8 @@ def test_find_unique_metabolites(read_only_model):
     assert len(ann["data"]) < len(read_only_model.metabolites), ann["message"]
 
 
-@annotate(title="Number of Unique Metabolites", type="count")
+@annotate(title="Number of Duplicate Metabolites in Identical Compartments",
+          type="count")
 def test_find_duplicate_metabolites_in_compartments(read_only_model):
     """
     Expect there to be zero duplicate metabolites in the same compartments.
