@@ -30,9 +30,9 @@ def test_model_id_presence(read_only_model):
     """
     Expect that the model has an identifier.
 
-    The MIRIAM guidelines require a model to be identified via an ID. While it is not
-    required, the ID will be displayed on the memote reports, which helps to
-    distinguish the output clearly.
+    The MIRIAM guidelines require a model to be identified via an ID. 
+    While it is not required, the ID will be displayed on the memote 
+    reports, which helps to distinguish the output clearly.
     """
     ann = test_model_id_presence.annotation
     assert hasattr(read_only_model, "id")
