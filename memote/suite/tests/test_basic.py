@@ -454,18 +454,17 @@ def test_find_duplicate_metabolites_in_compartments(read_only_model):
     """
     Expect there to be zero duplicate metabolites in the same compartments.
 
-    Metabolites may be transported into different compartments, and so models
-    may have metabolites such H2O or ATP in multiple compartments. However,
-    within a compartment, there should be no such duplicate metabolites. This
+    The main reason for having this test is to clean up merged models or models
+    from automated reconstruction pipelines as these are prone to having
+    identical metabolites from different namespaces (hence different IDs). This
     test therefore expects that every metabolite in any particular compartment
     has unique inchikey values.
     """
     ann = test_find_duplicate_metabolites_in_compartments.annotation
     ann["data"] = basic.find_duplicate_metabolites_in_compartments(
         read_only_model)
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """There are a total of {} ({:.2%}) metabolites in the model which
+        """There are a total of {} metabolites in the model which
         have duplicates in the same compartment: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
