@@ -487,7 +487,7 @@ def test_find_constrained_pure_metabolic_reactions(model, num):
     """Expect num of contrained metabolic rxns to be identified correctly."""
     pmr = basic.find_pure_metabolic_reactions(model)
     contrained_pmr = set(
-        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)])
+        [rxn for rxn in pmr if basic.is_constrained_reaction(model, rxn)])
     assert len(contrained_pmr) == num
 
 
@@ -500,7 +500,8 @@ def test_find_constrained_transport_reactions(model, num):
     """Expect num of contrained transport rxns to be identified correctly."""
     transporters = helpers.find_transport_reactions(model)
     constrained_transporters = set(
-        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
+        [rxn for rxn in transporters if basic.is_constrained_reaction(
+            model, rxn)])
     assert len(constrained_transporters) == num
 
 
