@@ -459,7 +459,7 @@ def find_exchange_rxns(model):
 
 def find_interchange_biomass_reactions(model, biomass=None):
     """
-    Return the set of all tranport, boundary, and biomass reactions in a model.
+    Return the set of all transport, boundary, and biomass reactions in a model.
 
     These reactions are incorporated in models simply for to allow
     metabolites into the correct compartments for vital system reactions to
