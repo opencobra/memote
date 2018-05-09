@@ -49,7 +49,7 @@ The minimal content of a custom test module should look like this:
 
     @annotate(
         title="Some human-readable descriptive title for the report",
-        type="Single keyword describing how the data ought to be displayed."
+        format_type="Single keyword describing how the data ought to be displayed."
     )
     def test_your_custom_case(read_only_model):
     """

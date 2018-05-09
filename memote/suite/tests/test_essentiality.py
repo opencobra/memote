@@ -34,8 +34,8 @@ ESSENTIALITY_DATA = list(pytest.memote.experimental.essentiality)
 
 
 @pytest.mark.parametrize("experiment", ESSENTIALITY_DATA)
-@annotate(title="Gene Essentiality Prediction", type="number", data=dict(),
-          message=dict(), metric=dict())
+@annotate(title="Gene Essentiality Prediction", format_type="number",
+          data=dict(), message=dict(), metric=dict())
 def test_gene_essentiality_from_data_qualitative(model, experiment,
                                                  threshold=0.8):
     """
