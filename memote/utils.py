@@ -61,7 +61,7 @@ def register_with(registry):
 
 # TODO: Change naming of the 'type' argument once the angular app is completed.
 # It is misleading.
-def annotate(title, type, message=None, data=None, metric=1.0):
+def annotate(title, format_type, message=None, data=None, metric=1.0):
     """
     Annotate a test case.
 
@@ -69,7 +69,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     ----------
     title : str
         A human-readable descriptive title of the test case.
-    type : str
+    format_type : str
         A string that determines how the result data is formatted in the
         report. It is expected not to be None.
         - 'number' : 'data' is a single number which can be an integer or
@@ -105,7 +105,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
     predefined keys as a dictionary.
 
     """
-    if type not in TYPES:
+    if format_type not in TYPES:
         raise ValueError(
             "Invalid type. Expected one of: {}.".format(", ".join(TYPES)))
 
@@ -115,7 +115,7 @@ def annotate(title, type, message=None, data=None, metric=1.0):
             summary=extended_summary(func),
             message=message,
             data=data,
-            type=type,
+            format_type=format_type,
             metric=metric)
         return func
     return decorator
