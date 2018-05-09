@@ -68,18 +68,18 @@ def test_register_with(func, func_name):
 
 
 @pytest.mark.parametrize("notes, func, summary", [
-    (dict(title="One", data=4, type="raw"), one,
+    (dict(title="One", data=4, format_type="raw"), one,
      """One line."""),
-    (dict(title="Two", data="some text", type="raw"), two,
+    (dict(title="Two", data="some text", format_type="raw"), two,
      """Two lines.
     Why?
     """),
-    (dict(title="Three", data=[2, 4, 51, 63], type="count"), three,
+    (dict(title="Three", data=[2, 4, 51, 63], format_type="count"), three,
      """
     Three lines.
     Why?
     """),
-    (dict(title="Four", data=None, type="raw"), four,
+    (dict(title="Four", data=None, format_type="raw"), four,
      """
     Fourth summary.
 
@@ -90,8 +90,8 @@ def test_register_with(func, func_name):
     None
 
     """),
-    pytest.mark.raises((dict(title="Some Title", type="wrong_type"), one, ""),
-                       exception=ValueError)
+    pytest.mark.raises((dict(title="Some Title",format_type="wrong_type"), 
+                        one, ""), exception=ValueError)
 ])
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
@@ -99,5 +99,5 @@ def test_annotate(notes, func, summary):
     assert res.annotation["summary"] == utils.extended_summary(func)
     assert res.annotation["data"] is notes["data"]
     assert res.annotation["message"] is None
-    assert res.annotation["type"] == notes["type"]
+    assert res.annotation["format_type"] == notes["format_type"]
     assert res.annotation["metric"] == 1.0
