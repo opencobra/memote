@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import logging
+from itertools import combinations
 from pylru import lrudecorator
 
 import memote.support.helpers as helpers
@@ -240,6 +241,33 @@ def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     # TODO: BiGG specific (met_c).
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
+
+
+def find_duplicate_metabolites_in_compartments(model):
+    """
+    Return list of metabolites with duplicates in the same compartment.
+
+    All comparments in models should have a unique set of metabolites. This
+    functions checks for and returns a list of tuples contaning the duplicate
+    metabolites. An example of this would be finding compounds with IDs ATP1
+    and ATP2 in the cytosolic compartment, with both having identical InChI
+    annotations.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation
+
+    """
+    duplicates = []
+    for compartment in model.compartments:
+        ann_mets = [(met, met.annotation) for met in model.metabolites
+                    if met.compartment == compartment and
+                    "inchikey" in met.annotation]
+        for a, b in combinations(ann_mets, 2):
+            if a[1]["inchikey"] == b[1]["inchikey"]:
+                duplicates.append((a[0], b[0]))
+    return duplicates
 
 
 def check_transport_reaction_gpr_presence(model):
