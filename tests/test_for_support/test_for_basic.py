@@ -147,15 +147,40 @@ def zero_constrained_rxn(base):
 @register_with(MODEL_REGISTRY)
 def nonzero_constrained_rxn(base):
     """Provide a model with one nonzero-constrained reaction"""
-    rxn_1 = cobra.Reaction("RXN1")
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
+    met_3 = cobra.Metabolite("met3")
+    met_4 = cobra.Metabolite("met4")
+    rxn_1 = cobra.Reaction("RXN1")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
     rxn_2 = cobra.Reaction("RXN2")
-    rxn_2.add_metabolites({met_1: -1, met_2: 1})
-    rxn_1.bounds = 0, 1000
-    rxn_2.bounds = -5, 0
-    base.add_reactions([rxn_1, rxn_2])
+    rxn_2.add_metabolites({met_2: -1, met_3: -1})
+    rxn_3 = cobra.Reaction("RXN3")
+    rxn_3.add_metabolites({met_3: -1, met_4: 1})
+    rxn_1.bounds = -1000, 1000
+    rxn_2.bounds = -1000, 1000
+    rxn_3.bounds = 0, 10
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def no_nonzero_constrained_rxn(base):
+    """Provide a model with no nonzero-constrained reactions"""
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    met_3 = cobra.Metabolite("met3")
+    met_4 = cobra.Metabolite("met4")
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2 = cobra.Reaction("RXN2")
+    rxn_2.add_metabolites({met_2: -1, met_3: -1})
+    rxn_3 = cobra.Reaction("RXN3")
+    rxn_3.add_metabolites({met_3: -1, met_4: 1})
+    rxn_1.bounds = -1000, 1000
+    rxn_2.bounds = -1000, 1000
+    rxn_3.bounds = 0, 1000
+    base.add_reactions([rxn_1, rxn_2, rxn_3])
     return base
 
 
@@ -397,6 +422,7 @@ def test_metabolic_coverage(model, coverage):
     ("empty", 0),
     ("unconstrained_rxn", 0),
     ("nonzero_constrained_rxn", 1),
+    ("no_nonzero_constrained_rxn", 0),
 ], indirect=["model"])
 def test_find_nonzero_constrained_reactions(model, num):
     """Expect amount of non-zero rxns to be identified correctly."""
