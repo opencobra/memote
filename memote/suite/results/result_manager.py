@@ -25,11 +25,10 @@ import platform
 from builtins import open
 from datetime import datetime
 
-import pip
+from depinfo import get_pkg_info
 from future.utils import raise_with_traceback
 
 from memote.utils import log_json_incompatible_types
-from memote.version_info import PKG_ORDER
 from memote.suite.results.result import MemoteResult
 
 __all__ = ("ResultManager",)
@@ -51,11 +50,7 @@ class ResultManager(object):
         meta["platform"] = platform.system()
         meta["release"] = platform.release()
         meta["python"] = platform.python_version()
-        dependencies = frozenset(PKG_ORDER)
-        meta["packages"] = dict(
-            (dist.project_name, dist.version) for dist in
-            pip.get_installed_distributions()
-            if dist.project_name in dependencies)
+        meta["packages"] = get_pkg_info("memote")
 
     def store(self, result, filename, env_info=True, pretty=True):
         """

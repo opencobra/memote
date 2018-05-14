@@ -23,10 +23,11 @@ import logging
 from builtins import dict, str
 from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
+from depinfo import print_dependencies
 
 __all__ = ("register_with", "annotate", "get_ids",
            "get_ids_and_bounds", "truncate", "wrapper",
-           "log_json_incompatible_types")
+           "log_json_incompatible_types", "show_versions")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -196,3 +197,8 @@ def extended_summary(func):
     """
     doc = NumpyDocString(func.__doc__)
     return "\n".join(doc["Extended Summary"])
+
+
+def show_versions():
+    """Print formatted dependency information to stdout."""
+    print_dependencies("memote")
