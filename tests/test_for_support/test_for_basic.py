@@ -153,7 +153,7 @@ def nonzero_constrained_rxn(base):
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
     rxn_2 = cobra.Reaction("RXN2")
     rxn_2.add_metabolites({met_1: -1, met_2: 1})
-    rxn_1.bounds = 0, 5
+    rxn_1.bounds = 0, 1000
     rxn_2.bounds = -5, 0
     base.add_reactions([rxn_1, rxn_2])
     return base
@@ -299,6 +299,51 @@ def non_reversible_oxygen_flow(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def dup_mets_in_c(base):
+    """Provide a model with duplicate metabolites in the same compartment"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    dup_a = cobra.Metabolite("x_c", compartment="c")
+    not_a = cobra.Metabolite("b_c", compartment="c")
+
+    met_a.annotation["inchikey"] = "1231"
+    met_a.annotation["kegg"] = "123"
+    dup_a.annotation["inchikey"] = "1231"
+    dup_a.annotation["kegg"] = "123"
+    not_a.annotation["inchikey"] = "3211"
+    not_a.annotation["kegg"] = "321"
+
+    met_b = cobra.Metabolite("a_p", compartment="p")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_b = cobra.Reaction("AB")
+    rxn_a_b.add_metabolites({dup_a: 1, met_a: 1, met_b: -1})
+    rxn_b_c = cobra.Reaction("BC")
+    rxn_b_c.add_metabolites({not_a: 1, met_b: 1, met_c: -1})
+    base.add_reactions([rxn_b_c, rxn_a_b])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_mets_in_c_wrong_annotation(base):
+    """Provide a model like `dup_mets_in_c` but with improper annotations"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    dup_a = cobra.Metabolite("x_c", compartment="c")
+    not_a = cobra.Metabolite("b_c", compartment="c")
+
+    met_a.annotation["kegg"] = "123"
+    dup_a.annotation["kegg"] = "123"
+    not_a.annotation["kegg"] = "321"
+
+    met_b = cobra.Metabolite("a_p", compartment="p")
+    met_c = cobra.Metabolite("a_e", compartment="e")
+    rxn_a_b = cobra.Reaction("AB")
+    rxn_a_b.add_metabolites({dup_a: 1, met_a: 1, met_b: -1})
+    rxn_b_c = cobra.Reaction("BC")
+    rxn_b_c.add_metabolites({not_a: 1, met_b: 1, met_c: -1})
+    base.add_reactions([rxn_b_c, rxn_a_b])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -351,7 +396,7 @@ def test_metabolic_coverage(model, coverage):
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("unconstrained_rxn", 0),
-    ("nonzero_constrained_rxn", 2),
+    ("nonzero_constrained_rxn", 1),
 ], indirect=["model"])
 def test_find_nonzero_constrained_reactions(model, num):
     """Expect amount of non-zero rxns to be identified correctly."""
@@ -442,7 +487,7 @@ def test_find_constrained_pure_metabolic_reactions(model, num):
     """Expect num of contrained metabolic rxns to be identified correctly."""
     pmr = basic.find_pure_metabolic_reactions(model)
     contrained_pmr = set(
-        [rxn for rxn in pmr if basic.is_constrained_reaction(rxn)])
+        [rxn for rxn in pmr if basic.is_constrained_reaction(model, rxn)])
     assert len(contrained_pmr) == num
 
 
@@ -455,7 +500,8 @@ def test_find_constrained_transport_reactions(model, num):
     """Expect num of contrained transport rxns to be identified correctly."""
     transporters = helpers.find_transport_reactions(model)
     constrained_transporters = set(
-        [rxn for rxn in transporters if basic.is_constrained_reaction(rxn)])
+        [rxn for rxn in transporters if basic.is_constrained_reaction(
+            model, rxn)])
     assert len(constrained_transporters) == num
 
 
@@ -477,6 +523,16 @@ def test_find_reversible_oxygen_reactions(model, num):
 def test_find_unique_metabolites(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_unique_metabolites(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("dup_mets_in_c", 1),
+    ("dup_mets_in_c_wrong_annotation", 0),
+    ("gpr_missing", 0)
+], indirect=["model"])
+def test_find_duplicate_metabolites_in_compartments(model, num):
+    """Expect amount of duplicate metabolites to be identified correctly."""
+    assert len(basic.find_duplicate_metabolites_in_compartments(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
