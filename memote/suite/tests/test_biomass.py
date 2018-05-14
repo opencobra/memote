@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 BIOMASS_IDS = pytest.memote.biomass_ids
 
 
-@annotate(title="Amount of Biomass Reactions", type="count")
+@annotate(title="Amount of Biomass Reactions", format_type="count")
 def test_biomass_presence():
     """
     Expect the model to contain at least one biomass reaction.
@@ -66,7 +66,7 @@ def test_biomass_presence():
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Consistency", type="number", data=dict(),
+@annotate(title="Biomass Consistency", format_type="number", data=dict(),
           message=dict(), metric=dict())
 def test_biomass_consistency(read_only_model, reaction_id):
     """
@@ -93,7 +93,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production At Default State", type="number",
+@annotate(title="Biomass Production At Default State", format_type="number",
           data=dict(), message=dict(), metric=dict())
 def test_biomass_default_production(model, reaction_id):
     """
@@ -115,7 +115,7 @@ def test_biomass_default_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production In Complete Medium", type="number",
+@annotate(title="Biomass Production In Complete Medium", format_type="number",
           data=dict(), message=dict(), metric=dict())
 def test_biomass_open_production(model, reaction_id):
     """
@@ -138,8 +138,8 @@ def test_biomass_open_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Blocked Biomass Precursors At Default State", type="count",
-          data=dict(), metric=dict(), message=dict())
+@annotate(title="Blocked Biomass Precursors At Default State",
+          format_type="count", data=dict(), metric=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
     """
     Expect production of all biomass precursors in default medium.
@@ -171,8 +171,8 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Blocked Biomass Precursors In Complete Medium", type="count",
-          data=dict(), metric=dict(), message=dict())
+@annotate(title="Blocked Biomass Precursors In Complete Medium",
+          format_type="count", data=dict(), metric=dict(), message=dict())
 def test_biomass_precursors_open_production(model, reaction_id):
     """
     Expect precursor production in complete medium.
@@ -206,7 +206,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Growth-associated Maintenance in Biomass Reaction",
-          type="raw", data=dict(), message=dict(), metric=dict())
+          format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_gam_in_biomass(model, reaction_id):
     """
     Expect the biomass reactions to contain atp and adp.
@@ -227,8 +227,8 @@ def test_gam_in_biomass(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Unrealistic Growth Rate In Default Condition", type="raw",
-          data=dict(), message=dict(), metric=dict())
+@annotate(title="Unrealistic Growth Rate In Default Condition",
+          format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_fast_growth_default(model, reaction_id):
     """
     Expect the predicted growth rate for each BOF to be below 10.3972.
@@ -250,7 +250,7 @@ def test_fast_growth_default(model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Ratio of Direct Metabolites in Biomass Reaction",
-          type="percent", data=dict(), message=dict(), metric=dict())
+          format_type="percent", data=dict(), message=dict(), metric=dict())
 def test_direct_metabolites_in_biomass(model, reaction_id):
     """
     Expect the biomass reactions to contain atp and adp.
@@ -302,7 +302,7 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Number of Missing Essential Biomass Precursors",
-          type="count", data=dict(), message=dict(), metric=dict())
+          format_type="count", data=dict(), message=dict(), metric=dict())
 def test_essential_precursors_not_in_biomass(model, reaction_id):
     """
     Expect the biomass reaction to contain all essential precursors.

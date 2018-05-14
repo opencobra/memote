@@ -28,7 +28,7 @@ import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-@annotate(title="Metabolites without Annotation", type="count")
+@annotate(title="Metabolites without Annotation", format_type="count")
 def test_metabolite_annotation_presence(read_only_model):
     """
     Expect all metabolites to have a non-empty annotation attribute.
@@ -49,7 +49,7 @@ def test_metabolite_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without Annotation", type="count")
+@annotate(title="Reactions without Annotation", format_type="count")
 def test_reaction_annotation_presence(read_only_model):
     """
     Expect all reactions to have a non-empty annotation attribute.
@@ -70,7 +70,7 @@ def test_reaction_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Genes without Annotation", type="count")
+@annotate(title="Genes without Annotation", format_type="count")
 def test_gene_product_annotation_presence(read_only_model):
     """
     Expect all genes to have a non-empty annotation attribute.
@@ -95,7 +95,7 @@ def test_gene_product_annotation_presence(read_only_model):
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
 @annotate(title="Missing Metabolite Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_metabolite_annotation_overview(read_only_model, db):
     """
     Expect all metabolites to have annotations from common databases.
@@ -119,8 +119,9 @@ def test_metabolite_annotation_overview(read_only_model, db):
     one of the databases for all metabolites consistently.
     """
     ann = test_metabolite_annotation_overview.annotation
-    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
-        read_only_model.metabolites, db))
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_overview(
+            read_only_model.metabolites, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.metabolites)
     ann["message"][db] = wrapper.fill(
         """The following {} metabolites ({:.2%}) lack annotation for {}:
@@ -131,7 +132,7 @@ def test_metabolite_annotation_overview(read_only_model, db):
 
 @pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
 @annotate(title="Missing Reaction Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_reaction_annotation_overview(read_only_model, db):
     """
     Expect all reactions to have annotations from common databases.
@@ -155,8 +156,9 @@ def test_reaction_annotation_overview(read_only_model, db):
     one of the databases for all reactions consistently.
     """
     ann = test_reaction_annotation_overview.annotation
-    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
-        read_only_model.reactions, db))
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_overview(
+            read_only_model.reactions, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
     ann["message"][db] = wrapper.fill(
         """The following {} reactions ({:.2%}) lack annotation for {}:
@@ -167,7 +169,7 @@ def test_reaction_annotation_overview(read_only_model, db):
 
 @pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
 @annotate(title="Missing Gene Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_overview(read_only_model, db):
     """
     Expect all genes to have annotations from common databases.
@@ -191,8 +193,9 @@ def test_gene_product_annotation_overview(read_only_model, db):
     one of the databases for all gene products consistently.
     """
     ann = test_gene_product_annotation_overview.annotation
-    ann["data"][db] = get_ids(annotation.generate_component_annotation_overview(
-        read_only_model.genes, db))
+    ann["data"][db] = get_ids(
+        annotation.generate_component_annotation_overview(
+            read_only_model.genes, db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
     ann["message"][db] = wrapper.fill(
         """The following {} genes ({:.2%}) lack annotation for {}:
@@ -203,7 +206,7 @@ def test_gene_product_annotation_overview(read_only_model, db):
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
 @annotate(title="Wrong Metabolite Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_metabolite_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of metabolites to be in the correct format.
@@ -244,7 +247,7 @@ def test_metabolite_annotation_wrong_ids(read_only_model, db):
 
 @pytest.mark.parametrize("db", annotation.REACTION_ANNOTATIONS)
 @annotate(title="Wrong Reaction Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_reaction_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of reactions to be in the correct format.
@@ -285,7 +288,7 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
 
 @pytest.mark.parametrize("db", annotation.GENE_PRODUCT_ANNOTATIONS)
 @annotate(title="Wrong Gene Annotations Per Database",
-          type="percent", message=dict(), data=dict(), metric=dict())
+          format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_wrong_ids(read_only_model, db):
     """
     Expect all annotations of genes/gene-products to be in the correct format.
@@ -325,7 +328,7 @@ def test_gene_product_annotation_wrong_ids(read_only_model, db):
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
-@annotate(title="Uniform Metabolite Identifier Namespace", type="count")
+@annotate(title="Uniform Metabolite Identifier Namespace", format_type="count")
 def test_metabolite_id_namespace_consistency(read_only_model):
     """
     Expect metabolite identifiers to be from the same namespace.
@@ -362,7 +365,7 @@ def test_metabolite_id_namespace_consistency(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Uniform Metabolite Identifier Namespace", type="count")
+@annotate(title="Uniform Metabolite Identifier Namespace", format_type="count")
 def test_reaction_id_namespace_consistency(read_only_model):
     """
     Expect reaction identifiers to be from the same namespace.

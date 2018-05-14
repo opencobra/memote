@@ -26,7 +26,7 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 import memote.support.consistency_helpers as con_helpers
 
 
-@annotate(title="Stoichiometric Consistency", type="count")
+@annotate(title="Stoichiometric Consistency", format_type="count")
 def test_stoichiometric_consistency(read_only_model):
     """
     Expect that the stoichiometry is consistent.
@@ -59,7 +59,7 @@ def test_stoichiometric_consistency(read_only_model):
 
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])
-@annotate(title="Erroneous Energy-generating Cycles", type="count",
+@annotate(title="Erroneous Energy-generating Cycles", format_type="count",
           data=dict(), message=dict())
 def test_detect_energy_generating_cycles(read_only_model, met):
     u"""
@@ -94,7 +94,7 @@ def test_detect_energy_generating_cycles(read_only_model, met):
     assert len(ann["data"][met]) == 0, ann["message"][met]
 
 
-@annotate(title="Number of Charge-Imbalanced Reactions", type="count")
+@annotate(title="Number of Charge-Imbalanced Reactions", format_type="count")
 def test_reaction_charge_balance(read_only_model):
     """
     Expect all reactions to be charge balanced.
@@ -122,7 +122,7 @@ def test_reaction_charge_balance(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Mass-Unbalanced Reactions", type="count")
+@annotate(title="Number of Mass-Unbalanced Reactions", format_type="count")
 def test_reaction_mass_balance(read_only_model):
     """
     Expect all reactions to be mass balanced.
@@ -151,7 +151,7 @@ def test_reaction_mass_balance(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Universally Blocked Reactions", type="count")
+@annotate(title="Number of Universally Blocked Reactions", format_type="count")
 def test_blocked_reactions(read_only_model):
     """
     Expect all reactions to be able to carry flux in complete medium.
@@ -173,7 +173,7 @@ def test_blocked_reactions(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Stoichiometrically Balanced Cycles", type="count")
+@annotate(title="Stoichiometrically Balanced Cycles", format_type="count")
 def test_find_stoichiometrically_balanced_cycles(read_only_model):
     """
     Expect no stoichiometrically balanced loops to be present.
@@ -193,7 +193,7 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Orphan Metabolites", type="count")
+@annotate(title="Number of Orphan Metabolites", format_type="count")
 def test_find_orphans(read_only_model):
     """
     Expect no orphans to be present.
@@ -211,7 +211,7 @@ def test_find_orphans(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Dead-end Metabolites", type="count")
+@annotate(title="Number of Dead-end Metabolites", format_type="count")
 def test_find_deadends(read_only_model):
     """
     Expect no dead-ends to be present.
@@ -229,7 +229,7 @@ def test_find_deadends(read_only_model):
     assert ann["data"] == 0, ann["message"]
 
 
-@annotate(title="Number of Disconnected Metabolites", type="count")
+@annotate(title="Number of Disconnected Metabolites", format_type="count")
 def test_find_disconnected(read_only_model):
     """
     Expect no disconnected metabolites to be present.
@@ -249,7 +249,7 @@ def test_find_disconnected(read_only_model):
 
 
 @annotate(title="Number of Metabolites Produced Without Substrate Consumption",
-          type="count")
+          format_type="count")
 def test_find_metabolites_produced_with_closed_bounds(read_only_model):
     """
     Expect no metabolites to be produced without substrate consumption.
@@ -276,7 +276,7 @@ def test_find_metabolites_produced_with_closed_bounds(read_only_model):
 
 
 @annotate(title="Number of Metabolites Consumed Without Product Removal",
-          type="count")
+          format_type="count")
 def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
     """
     Expect no metabolites to be consumed without product removal.
@@ -303,7 +303,7 @@ def test_find_metabolites_consumed_with_closed_bounds(read_only_model):
 
 
 @annotate(title="Number of Metabolites Not Produced In Complete Medium",
-          type="count")
+          format_type="count")
 def test_find_metabolites_not_produced_with_open_bounds(read_only_model):
     """
     Expect no metabolites to be unproducible in complete medium.
@@ -329,7 +329,7 @@ def test_find_metabolites_not_produced_with_open_bounds(read_only_model):
 
 
 @annotate(title="Number of Metabolites Not Consumed In Complete Medium",
-          type="count")
+          format_type="count")
 def test_find_metabolites_not_consumed_with_open_bounds(read_only_model):
     """
     Expect no metabolites to be inconsumable in complete medium.
@@ -357,7 +357,7 @@ def test_find_metabolites_not_consumed_with_open_bounds(read_only_model):
 
 @annotate(
     title="Fraction of Unbounded Reactions in the Default Condition",
-    type="percent")
+    format_type="percent")
 def test_find_reactions_unbounded_flux_default_condition(read_only_model):
     """
     Expect the fraction of unbounded reactions to be low.

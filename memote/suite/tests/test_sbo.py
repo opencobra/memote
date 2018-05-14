@@ -28,7 +28,7 @@ import memote.support.sbo as sbo
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-@annotate(title="Metabolites without SBO-Term Annotation", type="count")
+@annotate(title="Metabolites without SBO-Term Annotation", format_type="count")
 def test_metabolite_sbo_presence(read_only_model):
     """Expect all metabolites to have a some form of SBO-Term annotation.
 
@@ -43,8 +43,8 @@ def test_metabolite_sbo_presence(read_only_model):
     try:
         ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
         ann["message"] = wrapper.fill(
-            """A total of {} metabolites ({:.2%}) lack annotation with any type of
-            SBO term: {}""".format(
+            """A total of {} metabolites ({:.2%}) lack annotation with any type
+            of SBO term: {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
     except ZeroDivisionError:
         ann["metric"] = 1.0
@@ -53,7 +53,7 @@ def test_metabolite_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
-@annotate(title="Reactions without SBO-Term Annotation", type="count")
+@annotate(title="Reactions without SBO-Term Annotation", format_type="count")
 def test_reaction_sbo_presence(read_only_model):
     """Expect all reactions to have a some form of SBO-Term annotation.
 
@@ -68,8 +68,8 @@ def test_reaction_sbo_presence(read_only_model):
     try:
         ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
         ann["message"] = wrapper.fill(
-            """A total of {} reactions ({:.2%}) lack annotation with any type of
-            SBO term: {}""".format(
+            """A total of {} reactions ({:.2%}) lack annotation with any type
+            of SBO term: {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
     except ZeroDivisionError:
         ann["metric"] = 1.0
@@ -78,7 +78,7 @@ def test_reaction_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(read_only_model.reactions), ann["message"]
 
 
-@annotate(title="Genes without SBO-Term Annotation", type="count")
+@annotate(title="Genes without SBO-Term Annotation", format_type="count")
 def test_gene_sbo_presence(read_only_model):
     """Expect all genes to have a some form of SBO-Term annotation.
 
@@ -103,7 +103,7 @@ def test_gene_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
-@annotate(title="Metabolic Reactions without SBO:0000176", type="count")
+@annotate(title="Metabolic Reactions without SBO:0000176", format_type="count")
 def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     """Expect all metabolic reactions to be annotated with SBO:0000176.
 
@@ -119,9 +119,9 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     try:
         ann["metric"] = len(ann["data"]) / len(pure)
         ann["message"] = wrapper.fill(
-            """A total of {} metabolic reactions ({:.2%} of all purely metabolic
-            reactions) lack annotation with the SBO term "SBO:0000176" for
-            'biochemical reaction': {}""".format(
+            """A total of {} metabolic reactions ({:.2%} of all purely
+            metabolic reactions) lack annotation with the SBO term
+            "SBO:0000176" for 'biochemical reaction': {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
     except ZeroDivisionError:
         ann["metric"] = 1.0
@@ -130,7 +130,7 @@ def test_metabolic_reaction_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(pure), ann["message"]
 
 
-@annotate(title="Transport Reactions without SBO:0000185", type="count")
+@annotate(title="Transport Reactions without SBO:0000185", format_type="count")
 def test_transport_reaction_specific_sbo_presence(read_only_model):
     """Expect all transport reactions to be annotated properly.
 
@@ -162,7 +162,7 @@ def test_transport_reaction_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(transports), ann["message"]
 
 
-@annotate(title="Metabolites without SBO:0000247", type="count")
+@annotate(title="Metabolites without SBO:0000247", format_type="count")
 def test_metabolite_specific_sbo_presence(read_only_model):
     """Expect all metabolites to be annotated with SBO:0000247.
 
@@ -175,8 +175,8 @@ def test_metabolite_specific_sbo_presence(read_only_model):
     try:
         ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
         ann["message"] = wrapper.fill(
-            """A total of {} transport reactions ({:.2%} of all metabolites) lack
-            annotation with the SBO term "SBO:0000247" for
+            """A total of {} transport reactions ({:.2%} of all metabolites)
+            lack annotation with the SBO term "SBO:0000247" for
             'simple chemical': {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
     except ZeroDivisionError:
@@ -186,7 +186,7 @@ def test_metabolite_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(read_only_model.metabolites), ann["message"]
 
 
-@annotate(title="Genes without SBO:0000243", type="count")
+@annotate(title="Genes without SBO:0000243", format_type="count")
 def test_gene_specific_sbo_presence(read_only_model):
     """Expect all genes to be annotated with SBO:0000243.
 
@@ -210,7 +210,7 @@ def test_gene_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(read_only_model.genes), ann["message"]
 
 
-@annotate(title="Exchange reactions without SBO:0000627", type="count")
+@annotate(title="Exchange reactions without SBO:0000627", format_type="count")
 def test_exchange_specific_sbo_presence(read_only_model):
     """Expect all exchange reactions to be annotated with SBO:0000627.
 
@@ -235,8 +235,8 @@ def test_exchange_specific_sbo_presence(read_only_model):
     try:
         ann["metric"] = len(ann["data"]) / len(exchanges)
         ann["message"] = wrapper.fill(
-            """A total of {} exchange reactions ({:.2%} of all exchange reactions)
-            lack annotation with the SBO term "SBO:0000627" for
+            """A total of {} exchange reactions ({:.2%} of all exchange
+            reactions) lack annotation with the SBO term "SBO:0000627" for
             'exchange reaction': {}""".format(
                 len(ann["data"]), ann["metric"], truncate(ann["data"])))
     except ZeroDivisionError:
@@ -246,7 +246,7 @@ def test_exchange_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(exchanges), ann["message"]
 
 
-@annotate(title="Demand reactions without SBO:0000628", type="count")
+@annotate(title="Demand reactions without SBO:0000628", format_type="count")
 def test_demand_specific_sbo_presence(read_only_model):
     """Expect all demand reactions to be annotated with SBO:0000627.
 
@@ -281,7 +281,7 @@ def test_demand_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(demands), ann["message"]
 
 
-@annotate(title="Sink reactions without SBO:0000632", type="count")
+@annotate(title="Sink reactions without SBO:0000632", format_type="count")
 def test_sink_specific_sbo_presence(read_only_model):
     """Expect all sink reactions to be annotated with SBO:0000632.
 
@@ -320,7 +320,7 @@ def test_sink_specific_sbo_presence(read_only_model):
     assert len(ann["data"]) == len(sinks), ann["message"]
 
 
-@annotate(title="Biomass reactions without SBO:0000629", type="count")
+@annotate(title="Biomass reactions without SBO:0000629", format_type="count")
 def test_biomass_specific_sbo_presence(read_only_model):
     """Expect all biomass reactions to be annotated with SBO:0000629.
 

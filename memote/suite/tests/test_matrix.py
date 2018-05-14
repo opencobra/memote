@@ -24,7 +24,7 @@ from memote.utils import annotate, wrapper
 
 
 @annotate(title="Ratio between largest and smallest non-zero coefficients",
-          type="percent")
+          format_type="percent")
 def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     """
     Show ratio of the absolute largest and smallest non-zero coefficients.
@@ -51,7 +51,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
 
 
 @annotate(title="Number of independent conservation relations in model",
-          type="number")
+          format_type="number")
 def test_number_independent_conservation_relations(model):
     """
     Show number of independent conservation relations in the model.
@@ -69,7 +69,8 @@ def test_number_independent_conservation_relations(model):
             ann["data"]))
 
 
-@annotate(title="Number of steady-state flux solution vectors", type="number")
+@annotate(title="Number of steady-state flux solution vectors",
+          format_type="number")
 def test_number_steady_state_flux_solutions(model):
     """
     Show number of independent steady-state flux solution vectors for model.
@@ -87,7 +88,7 @@ def test_number_steady_state_flux_solutions(model):
         """.format(ann["data"]))
 
 
-@annotate(title="Rank of S-Matrix", type="number")
+@annotate(title="Rank of S-Matrix", format_type="number")
 def test_matrix_rank(model):
     """
     Show rank of the S-Matrix.
@@ -103,7 +104,7 @@ def test_matrix_rank(model):
         """The rank of the S-Matrix is {}.""".format(ann["data"]))
 
 
-@annotate(title="Degrees of freedom of S-Matrix", type="number")
+@annotate(title="Degrees of freedom of S-Matrix", format_type="number")
 def test_degrees_of_freedom(model):
     """
     Show degrees of freedom of the S-Matrix.
@@ -117,4 +118,5 @@ def test_degrees_of_freedom(model):
     ann = test_degrees_of_freedom.annotation
     ann["data"] = matrix.degrees_of_freedom(model)
     ann["message"] = wrapper.fill(
-        """The degrees of freedom of the S-Matrix is {}.""".format(ann["data"]))
+        """The degrees of freedom of the S-Matrix is {}.""".format(
+            ann["data"]))
