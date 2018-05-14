@@ -28,7 +28,6 @@ from __future__ import absolute_import, division
 import logging
 
 import pytest
-import numpy as np
 from cobra.exceptions import OptimizationError
 
 import memote.support.biomass as biomass
@@ -87,8 +86,10 @@ def test_biomass_consistency(read_only_model, reaction_id):
         """The component molar mass of the biomass reaction {} sums up to {}
         which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
         """.format(reaction_id, ann["data"][reaction_id]))
-    assert np.isclose(
-        ann["data"][reaction_id], 1.0, atol=1e-03), ann["message"][reaction_id]
+    # To account for numerical innacuracies, a range from 1-1e0-3 to 1+1e-06
+    # is implemented in the assertion check
+    assert (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06), \
+        ann["message"][reaction_id]
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
