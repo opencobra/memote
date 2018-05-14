@@ -20,6 +20,8 @@
 from __future__ import absolute_import
 
 import logging
+from itertools import combinations
+from pylru import lrudecorator
 
 import memote.support.helpers as helpers
 
@@ -46,9 +48,10 @@ def check_gene_protein_reaction_rule_presence(model):
 
 def find_nonzero_constrained_reactions(model):
     """Return list of reactions with non-zero, non-maximal bounds."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     return [rxn for rxn in model.reactions if
-            0 > rxn.lower_bound > -1000 or
-            0 < rxn.upper_bound < 1000]
+            0 > rxn.lower_bound > lower_bound or
+            0 < rxn.upper_bound < upper_bound]
 
 
 def find_zero_constrained_reactions(model):
@@ -65,9 +68,10 @@ def find_irreversible_reactions(model):
 
 def find_unconstrained_reactions(model):
     """Return list of reactions that are not constrained at all."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     return [rxn for rxn in model.reactions if
-            rxn.lower_bound <= -1000 and
-            rxn.upper_bound >= 1000]
+            rxn.lower_bound <= lower_bound and
+            rxn.upper_bound >= upper_bound]
 
 
 def find_ngam(model):
@@ -204,6 +208,7 @@ def find_protein_complexes(model):
     return protein_complexes
 
 
+@lrudecorator(size=2)
 def find_pure_metabolic_reactions(model):
     """
     Return reactions that are neither transporters, exchanges, nor pseudo.
@@ -218,12 +223,13 @@ def find_pure_metabolic_reactions(model):
         model)
 
 
-def is_constrained_reaction(rxn):
+def is_constrained_reaction(model, rxn):
     """Return whether a reaction has fixed constraints."""
+    lower_bound, upper_bound = helpers.find_bounds(model)
     if rxn.reversibility:
-        return rxn.lower_bound > -1000 or rxn.upper_bound < 1000
+        return rxn.lower_bound > lower_bound or rxn.upper_bound < upper_bound
     else:
-        return rxn.lower_bound > 0 or rxn.upper_bound < 1000
+        return rxn.lower_bound > 0 or rxn.upper_bound < upper_bound
 
 
 def find_oxygen_reactions(model):
@@ -238,6 +244,33 @@ def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
     # TODO: BiGG specific (met_c).
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
+
+
+def find_duplicate_metabolites_in_compartments(model):
+    """
+    Return list of metabolites with duplicates in the same compartment.
+
+    All comparments in models should have a unique set of metabolites. This
+    functions checks for and returns a list of tuples contaning the duplicate
+    metabolites. An example of this would be finding compounds with IDs ATP1
+    and ATP2 in the cytosolic compartment, with both having identical InChI
+    annotations.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation
+
+    """
+    duplicates = []
+    for compartment in model.compartments:
+        ann_mets = [(met, met.annotation) for met in model.metabolites
+                    if met.compartment == compartment and
+                    "inchikey" in met.annotation]
+        for a, b in combinations(ann_mets, 2):
+            if a[1]["inchikey"] == b[1]["inchikey"]:
+                duplicates.append((a[0], b[0]))
+    return duplicates
 
 
 def check_transport_reaction_gpr_presence(model):
