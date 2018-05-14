@@ -32,6 +32,8 @@ Next Release
   metabolites in identical compartments
 * Cache heavily used support functions in ``helpers.py`` and 
   ``consistency_helpers.py``
+* Upper and lower bounds are now dynamic and based on the most extreme bound
+  values given in a model (if none exist -1000 and 1000 are chosen as defaults)
 
 0.6.2 (2018-03-12)
 ------------------
