@@ -47,7 +47,6 @@ cards:
     title: "Basic Information"
     cases:
     - test_find_unique_metabolites
-    - test_find_duplicate_metabolites_in_compartments
     - test_find_transport_reactions
     - test_find_constrained_transport_reactions
     - test_find_pure_metabolic_reactions
