@@ -92,7 +92,7 @@ export class ReportDataService {
                 result: data['tests'][test]['result'][param],
                 summary: data['tests'][test]['summary'],
                 title: data['tests'][test]['title'],
-                type: data['tests'][test]['type']}
+                type: data['tests'][test]['format_type']}
               )
             );
         }
@@ -127,7 +127,7 @@ export class ReportDataService {
                 {history: data['tests'][test]['history'][param],
                 summary: data['tests'][test]['summary'],
                 title: data['tests'][test]['title'],
-                type: data['tests'][test]['type']}
+                type: data['tests'][test]['format_type']}
               )
             );
         }
