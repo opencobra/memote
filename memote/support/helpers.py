@@ -781,13 +781,13 @@ def find_bounds(model):
     try:
         lower_bound = np.array(bounds[0::2]).min()
         upper_bound = np.array(bounds[1::2]).max()
-        lower_bound = -np.amax([np.abs(lower_bound), np.abs(upper_bound)])
-        upper_bound = np.amax([np.abs(lower_bound), np.abs(upper_bound)])
     except ValueError:
         lower_bound = -1000
         upper_bound = 1000
 
-    if lower_bound != 0 and upper_bound != 0:
-        return lower_bound, upper_bound
+    if lower_bound == 0 and upper_bound != 0:
+        return 0, upper_bound
+    elif lower_bound != 0 and upper_bound == 0:
+        return lower_bound, 0
     else:
         return -1000, 1000
