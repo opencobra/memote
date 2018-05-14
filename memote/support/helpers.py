@@ -785,11 +785,7 @@ def find_bounds(model):
         lower_bound = -1000
         upper_bound = 1000
 
-    if lower_bound != 0 and upper_bound != 0:
+    if lower_bound != 0 or upper_bound != 0:
         return lower_bound, upper_bound
-    elif lower_bound == 0 and upper_bound != 0:
-        return 0, upper_bound
-    elif lower_bound != 0 and upper_bound == 0:
-        return lower_bound, 0
     else:
         return -1000, 1000
