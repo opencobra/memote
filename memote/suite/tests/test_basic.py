@@ -454,7 +454,7 @@ def test_find_unique_metabolites(read_only_model):
 
 
 @annotate(title="Number of Duplicate Metabolites in Identical Compartments",
-          type="count")
+          format_type="count")
 def test_find_duplicate_metabolites_in_compartments(read_only_model):
     """
     Expect there to be zero duplicate metabolites in the same compartments.
