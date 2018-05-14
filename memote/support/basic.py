@@ -277,3 +277,24 @@ def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
     return [rxn for rxn in helpers.find_transport_reactions(model)
             if not rxn.gene_reaction_rule]
+
+
+def find_duplicate_reactions_in_compartments(model):
+    """
+    Return list of reactions with duplicates.
+
+    All models should contain a unique set of reactions. This function checks
+    for and returns a list of tuples containing the duplicate reactions. An
+    example of this would be finding reactions PGI1 and PGI2, both of which
+    convert G6P(c) to F6P(c) in the same compartments.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation
+
+    """
+    duplicates = []
+    RXN_DB = ["metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
+              "bigg.reaction"]
+    ann_rxns = [(rxn, rxn.annotation) for rxn in model.reactions] # finish line
