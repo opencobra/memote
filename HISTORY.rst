@@ -28,6 +28,8 @@ Next Release
 * Add unit tests for ``matrix.py`` in file ``test_for_matrix.py``.
 * Add tests ``find_metabolites_not_produced_with_open_bounds`` and
   ``find_metabolites_not_consumed_with_open_bounds``
+* Add test ``find_duplicate_metabolites_in_compartments`` to detect duplicate
+  metabolites in identical compartments
 
 0.6.2 (2018-03-12)
 ------------------
