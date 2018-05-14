@@ -30,6 +30,8 @@ Next Release
   ``find_metabolites_not_consumed_with_open_bounds``
 * Add test ``find_duplicate_metabolites_in_compartments`` to detect duplicate
   metabolites in identical compartments
+* Cache heavily used support functions in ``helpers.py`` and 
+  ``consistency_helpers.py``
 
 0.6.2 (2018-03-12)
 ------------------

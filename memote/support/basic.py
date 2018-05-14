@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 from itertools import combinations
+from pylru import lrudecorator
 
 import memote.support.helpers as helpers
 
@@ -205,6 +206,7 @@ def find_protein_complexes(model):
     return protein_complexes
 
 
+@lrudecorator(size=2)
 def find_pure_metabolic_reactions(model):
     """
     Return reactions that are neither transporters, exchanges, nor pseudo.
