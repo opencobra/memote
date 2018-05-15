@@ -51,8 +51,7 @@ def find_nonzero_constrained_reactions(model):
     lower_bound, upper_bound = helpers.find_bounds(model)
     return [rxn for rxn in model.reactions if
             0 > rxn.lower_bound > lower_bound or
-            0 < rxn.upper_bound < upper_bound or
-            (rxn.lower_bound == 0 and rxn.upper_bound < upper_bound)]
+            0 < rxn.upper_bound < upper_bound]
 
 
 def find_zero_constrained_reactions(model):
