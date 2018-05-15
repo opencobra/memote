@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 
+0.7.0 (2018-05-15)
+------------------
+
 * Remove the pip dependency in ``show_versions``.
 * Update the CI to use stages and ``tox-travis``.
 * Modify some editor and other configuration.
@@ -30,7 +33,7 @@ Next Release
   ``find_metabolites_not_consumed_with_open_bounds``
 * Add test ``find_duplicate_metabolites_in_compartments`` to detect duplicate
   metabolites in identical compartments
-* Cache heavily used support functions in ``helpers.py`` and 
+* Cache heavily used support functions in ``helpers.py`` and
   ``consistency_helpers.py``
 * Add dynamic upper and lower bounds. They are based on the most extreme bound
   values given in a model (if none exist -1000 and 1000 are chosen as defaults)
@@ -80,10 +83,12 @@ Next Release
   re-generate the shortlist
 * Add helper function ``find_met_in_model`` which looks up a query metabolite
   ID using the MNX namespace in the shortlist and:
+
     - If no compartment is provided, returns a list of all possible candidates
       metabolites.
     - If a compartment is provided, tries to return a list containing only
       ONE corresponding metabolite.
+
 * Add helper function ``find_compartment_id_in_model`` to identify
   compartments using an internal shortlist of possible compartment names.
 * Provide tests for each function
@@ -124,7 +129,7 @@ Next Release
   to the biomass reaction.
   The function is ``essential_precursors_not_in_biomass``
 * Record the score of individual test cases and sections in the result output.
-* Correct the import of module 'annotation' with 'sbo' in ``test_sbo`.py`
+* Correct the import of module 'annotation' with 'sbo' in ``test_sbo.py``
 * Refactor sink_react_list to sink_reactions for improved readability
 * Allow ``test_sink_specific_sbo_presence`` to be skipped when no sink reactions
   are present with a metric of 1.0
