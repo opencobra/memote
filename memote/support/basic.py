@@ -273,7 +273,7 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-def find_duplicate_reactions_in_compartments(model):
+def find_duplicate_reactions(model):
     """
     Return list of reactions with duplicates.
 
