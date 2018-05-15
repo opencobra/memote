@@ -295,8 +295,11 @@ def find_duplicate_reactions_in_compartments(model):
                 for db in RXN_DB if db in rxn.annotation]
     for a, b in combinations(ann_rxns, 2):
         for db in RXN_DB:
-            if a[1][db] == b[1][db]:
-                duplicates.append(a[0], b[0])
+            try:
+                if a[1][db] == b[1][db]:
+                    duplicates.append(a[0], b[0])
+            except KeyError:
+                continue
     return duplicates
 
 
