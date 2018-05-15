@@ -778,8 +778,8 @@ def find_bounds(model):
 
     """
     try:
-        lower_bound = np.amin(rxn.lower_bound for rxn in model.reactions)
-        upper_bound = np.amax(rxn.upper_bound for rxn in model.reactions)
+        lower_bound = np.amin([rxn.lower_bound for rxn in model.reactions])
+        upper_bound = np.amax([rxn.upper_bound for rxn in model.reactions])
     except ValueError:
         lower_bound = -1000
         upper_bound = 1000
