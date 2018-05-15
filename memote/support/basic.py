@@ -273,12 +273,6 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-def check_transport_reaction_gpr_presence(model):
-    """Return the list of transport reactions that have no associated gpr."""
-    return [rxn for rxn in helpers.find_transport_reactions(model)
-            if not rxn.gene_reaction_rule]
-
-
 def find_duplicate_reactions_in_compartments(model):
     """
     Return list of reactions with duplicates.
@@ -297,4 +291,16 @@ def find_duplicate_reactions_in_compartments(model):
     duplicates = []
     RXN_DB = ["metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
               "bigg.reaction"]
-    ann_rxns = [(rxn, rxn.annotation) for rxn in model.reactions] # finish line
+    ann_rxns = [(rxn, rxn.annotation) for rxn in model.reactions
+                for db in RXN_DB if db in rxn.annotation]
+    for a, b in combinations(ann_rxns, 2):
+        for db in RXN_DB:
+            if a[1][db] == b[1][db]:
+                duplicates.append(a[0], b[0])
+    return duplicates
+
+
+def check_transport_reaction_gpr_presence(model):
+    """Return the list of transport reactions that have no associated gpr."""
+    return [rxn for rxn in helpers.find_transport_reactions(model)
+            if not rxn.gene_reaction_rule]
