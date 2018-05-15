@@ -777,10 +777,9 @@ def find_bounds(model):
         The metabolic model under investigation.
 
     """
-    bounds = [bound for rxn in model.reactions for bound in rxn.bounds]
     try:
-        lower_bound = np.array(bounds[0::2]).min()
-        upper_bound = np.array(bounds[1::2]).max()
+        lower_bound = np.amin(rxn.lower_bound for rxn in model.reactions)
+        upper_bound = np.amax(rxn.upper_bound for rxn in model.reactions)
     except ValueError:
         lower_bound = -1000
         upper_bound = 1000
