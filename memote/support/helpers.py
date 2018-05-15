@@ -761,6 +761,7 @@ def find_objective_function(model):
     return [rxn for rxn in model.reactions if rxn.objective_coefficient != 0]
 
 
+@lrudecorator(size=2)
 def find_bounds(model):
     """
     Return the maximal and minimal bounds of the reactions of the model.
