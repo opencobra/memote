@@ -24,7 +24,7 @@ genome-scale metabolic models.
 
 from __future__ import absolute_import
 
-from memote.version_info import show_versions
+from memote.utils import show_versions
 from memote.suite.api import *
 from memote.suite.results import *
 

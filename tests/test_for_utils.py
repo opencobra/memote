@@ -90,7 +90,7 @@ def test_register_with(func, func_name):
     None
 
     """),
-    pytest.mark.raises((dict(title="Some Title",format_type="wrong_type"), 
+    pytest.mark.raises((dict(title="Some Title",format_type="wrong_type"),
                         one, ""), exception=ValueError)
 ])
 def test_annotate(notes, func, summary):
@@ -101,3 +101,18 @@ def test_annotate(notes, func, summary):
     assert res.annotation["message"] is None
     assert res.annotation["format_type"] == notes["format_type"]
     assert res.annotation["metric"] == 1.0
+
+
+def test_show_versions(capsys):
+    utils.show_versions()
+    captured = capsys.readouterr()
+    lines = captured.out.split("\n")
+    assert lines[1].startswith("System Information")
+    assert lines[2].startswith("==================")
+    assert lines[3].startswith("OS")
+    assert lines[4].startswith("OS-release")
+    assert lines[5].startswith("Python")
+
+    assert lines[7].startswith("Package Versions")
+    assert lines[8].startswith("================")
+    assert any(l.startswith("memote") for l in lines[9:])
