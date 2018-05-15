@@ -369,6 +369,19 @@ def dup_mets_in_c_wrong_annotation(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def dup_rxns(base):
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    rxn_1 = cobra.Reaction("rxn1")
+    dup_1 = cobra.Reaction("dup1")
+    rxn_1.annotation["kegg.reaction"] = "HEX"
+    dup_1.annotation["kegg.reaction"] = "HEX"
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    dup_1.add_metabolites({met_a: -1, met_b: 1})
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -559,6 +572,16 @@ def test_find_unique_metabolites(model, num):
 def test_find_duplicate_metabolites_in_compartments(model, num):
     """Expect amount of duplicate metabolites to be identified correctly."""
     assert len(basic.find_duplicate_metabolites_in_compartments(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("dup_rxns", 2),
+    ("gpr_missing", 0)
+], indirect=["model"])
+def test_find_duplicate_reactions(model, num):
+    """Expect amount of duplicate metabolites to be identified correctly."""
+    assert len(basic.find_duplicate_reactions(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
