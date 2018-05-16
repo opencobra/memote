@@ -577,7 +577,7 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("dup_rxns", 2),
+    ("dup_rxns", 1),
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions(model, num):
