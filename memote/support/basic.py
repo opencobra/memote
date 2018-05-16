@@ -273,7 +273,6 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-# TODO: Find out why this function doesn't work/pass unit tests
 def find_duplicate_reactions(model):
     """
     Return list of reactions with duplicates.
