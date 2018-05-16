@@ -289,12 +289,12 @@ def find_duplicate_reactions(model):
 
     """
     duplicates = []
-    RXN_DB = ["metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
-              "bigg.reaction"]
+    rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
+                          "rhea", "biocyc", "bigg.reaction"]
     ann_rxns = [(rxn, rxn.annotation) for rxn in model.reactions
-                for db in RXN_DB if db in rxn.annotation]
+                for db in rxn_db_identifiers if db in rxn.annotation]
     for a, b in combinations(ann_rxns, 2):
-        for db in RXN_DB:
+        for db in rxn_db_identifiers:
             try:
                 if a[1][db] == b[1][db]:
                     duplicates.append((a[0], b[0]))
