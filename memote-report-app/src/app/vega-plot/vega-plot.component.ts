@@ -14,7 +14,7 @@ import { TestHistory } from './../test-history.model';
 export class VegaPlotComponent implements OnInit {
   @Input() testId: string;
   testObject: TestHistory;
-  type: string;
+  format_type: string;
   nativeElement: any;
 
   constructor(private data: ReportDataService, private elementRef: ElementRef) {
@@ -23,18 +23,18 @@ export class VegaPlotComponent implements OnInit {
 
   public initialize() {
     this.testObject = this.data.byID(this.testId);
-    this.type = this.testObject.type;
+    this.format_type = this.testObject.format_type;
 
     // Initialize the vega plot
-    if (['count', 'raw', 'number'].includes(this.type)) {
-      this.type = 'data';
+    if (['count', 'raw', 'number'].includes(this.format_type)) {
+      this.format_type = 'data';
     } else {
-      this.type = 'metric';
+      this.format_type = 'metric';
     }
     specMetric.data[0]['values'] = this.testObject.history;
     const view = new View(parse(specMetric))
       .renderer('svg')
-      .signal('type', this.type)
+      .signal('type', this.format_type)
       .initialize(this.nativeElement)
       .hover()
       .run();
