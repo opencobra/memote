@@ -298,7 +298,7 @@ def find_duplicate_reactions(model):
         for db in RXN_DB:
             try:
                 if a[1][db] == b[1][db]:
-                    duplicates.append(a[0], b[0])
+                    duplicates.append((a[0], b[0]))
             except KeyError:
                 continue
     return duplicates
