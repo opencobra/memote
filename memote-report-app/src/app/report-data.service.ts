@@ -37,6 +37,10 @@ export class ReportDataService {
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
+        // this.http.get('/data/testData.json')
+        // .subscribe(data => {this.convertResults(data); });
+        // this.reportType = 'snapshot';
+        // break;
         this.http.get('/data/testHistory.json')
         .subscribe(data => {this.convertHistoryResults(data); });
         this.reportType = 'history';
@@ -92,7 +96,7 @@ export class ReportDataService {
                 result: data['tests'][test]['result'][param],
                 summary: data['tests'][test]['summary'],
                 title: data['tests'][test]['title'],
-                type: data['tests'][test]['format_type']}
+                format_type: data['tests'][test]['format_type']}
               )
             );
         }
@@ -127,7 +131,7 @@ export class ReportDataService {
                 {history: data['tests'][test]['history'][param],
                 summary: data['tests'][test]['summary'],
                 title: data['tests'][test]['title'],
-                type: data['tests'][test]['format_type']}
+                format_type: data['tests'][test]['format_type']}
               )
             );
         }

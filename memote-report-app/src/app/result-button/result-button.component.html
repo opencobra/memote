@@ -12,22 +12,22 @@
   </div>
   <ng-template #notScored>
     <!-- If they are from unscored tests the user has some control over how -->
-    <!-- they are displayed using the 'type' attribute of each test. -->
+    <!-- they are displayed using the 'format_type' attribute of each test. -->
     <button
     mat-raised-button
     color="primary"
     style="color:white">
       <!-- Hence for each test, determine now how the result ought to be formatted -->
-      <div *ngIf="data.byID(testId)?.type === 'count'">
+      <div *ngIf="data.byID(testId)?.format_type === 'count'">
         {{ data.byID(testId)?.data.length | number : '1.'}}
       </div>
-      <div *ngIf="data.byID(testId)?.type === 'number'">
+      <div *ngIf="data.byID(testId)?.format_type === 'number'">
         {{ data.byID(testId)?.data | number : '1.2-2'}}
       </div>
-      <div *ngIf="data.byID(testId)?.type === 'percent'">
+      <div *ngIf="data.byID(testId)?.format_type === 'percent'">
         {{ data.byID(testId)?.metric | number : '1.2-2'}}
       </div>
-      <div *ngIf="data.byID(testId)?.type === 'raw'">
+      <div *ngIf="data.byID(testId)?.format_type === 'raw'">
         {{ data.byID(testId)?.data }}
       </div>
     </button>

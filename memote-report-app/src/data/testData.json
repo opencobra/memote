@@ -280,7 +280,7 @@
             },
             "summary": "\n    Expect biomass components to sum up to 1 g[CDW].\n\n    The molecular weight of the biomass reaction in metabolic models is\n    defined to be equal to 1 g/mmol. Conforming to this is essential in order\n    to be able to reliably calculate growth yields, to cross-compare models,\n    and to obtain valid predictions when simulating microbial consortia. A\n    deviation by 1e-03 is accepted.\n    ",
             "title": "Biomass Consistency",
-            "type": "number"
+            "format_type": "number"
         },
         "test_biomass_default_production": {
             "data": {
@@ -298,7 +298,7 @@
             },
             "summary": "\n    Expect biomass production in default medium.\n\n    Using flux balance analysis this test optimizes the model for growth in\n    the medium that is set by default. Any non-zero growth rate is accepted to\n    pass this test.\n    ",
             "title": "Biomass Production At Default State",
-            "type": "number"
+            "format_type": "number"
         },
         "test_biomass_precursors_default_production": {
             "data": {
@@ -322,7 +322,7 @@
             },
             "summary": "\n    Expect production of all biomass precursors in default medium.\n\n    Using flux balance analysis this test optimizes for the production of each\n    metabolite that is a substrate of the biomass reaction with the exception\n    of atp and h2o. Optimizations are carried out using the default\n    conditions. This is useful when reconstructing the precursor biosynthesis\n    pathways of a metabolic model. To pass this test, the model should be able\n    to synthesis all the precursors.\n    ",
             "title": "Blocked Biomass Precursors At Default State",
-            "type": "count"
+            "format_type": "count"
         },
         "test_biomass_precursors_open_production": {
             "data": {
@@ -343,7 +343,7 @@
             },
             "summary": "\n    Expect precursor production in complete medium.\n\n    Using flux balance analysis this test optimizes for the production of each\n    metabolite that is a substrate of the biomass reaction with the exception\n    of atp and h2o. Optimizations are carried out using a complete\n    medium i.e. unconstrained boundary reactions. This is useful when\n    reconstructing the precursor biosynthesis pathways of a metabolic model.\n    To pass this test, the model should be able to synthesis all the\n    precursors.\n    ",
             "title": "Blocked Biomass Precursors In Complete Medium",
-            "type": "count"
+            "format_type": "count"
         },
         "test_biomass_presence": {
             "data": [
@@ -355,7 +355,7 @@
             "result": "passed",
             "summary": "\n    Expect the model to contain at least one biomass reaction.\n\n    The biomass composition aka biomass formulation aka biomass reaction\n    is a common pseudo-reaction accounting for biomass synthesis in\n    constraints-based modelling. It describes the stoichiometry of\n    intracellular compounds that are required for cell growth. While this\n    reaction may not be relevant to modeling the metabolism of higher\n    organisms, it is essential for single-cell modeling.\n\n    This test checks if at least one biomass reaction is present. Currently,\n    the biomass reaction is identified by looking for the word 'biomass' in\n    the reaction ID. The heuristics of identification will be improved in the\n    future.\n    ",
             "title": "Amount of Biomass Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_blocked_reactions": {
              "data": [],
@@ -365,7 +365,7 @@
              "result": "passed",
              "summary": "\n    Expect all reactions to be able to carry flux in complete medium.\n\n    Universally blocked reactions are reactions that during Flux Variability\n    Analysis cannot carry any flux while all model boundaries are open.\n    Generally blocked reactions are caused by network gaps, which can be\n    attributed to scope or knowledge gaps.\n    ",
              "title": "Number of Universally Blocked Reactions",
-             "type": "count"
+             "format_type": "count"
         },
         "test_compartments_presence": {
             "data": [
@@ -378,7 +378,7 @@
             "result": "failed",
             "summary": "\n    Expect that more than two compartments are defined in the model.\n\n    While simplified metabolic models may be perfectly viable, generally\n    across the tree of life organisms contain at least one distinct\n    compartment: the cytosol or cytoplasm. In the case of prokaryotes there is\n    usually a periplasm, and eurkaryotes are more complex. In addition to the\n    internal compartment, a metabolic model also reflects the extracellular\n    environment i.e. the medium/ metabolic context in which the modelled cells\n    grow. Hence, in total, at least two compartments can be expected from a\n    metabolic model.\n    ",
             "title": "Total Number of Compartments",
-            "type": "count"
+            "format_type": "count"
         },
         "test_detect_energy_generating_cycles": {
             "data": {
@@ -438,7 +438,7 @@
             },
             "summary": "\n    Expect that no energy metabolite can be produced out of nothing.\n\n    When a model is not sufficiently constrained to account for the\n    thermodynamics of reactions, flux cycles may form which provide reduced\n    metabolites to the model without requiring nutrient uptake. These cycles\n    are referred to as erroneous energy-generating cycles. Their effect on the\n    predicted growth rate in FBA may account for an increase of up to 25%,\n    which makes studies involving the growth rates predicted from such models\n    unreliable.\n\n    This test uses an implementation of the algorithm presented by:\n    Fritzemeier, C. J., Hartleb, D., Szappanos, B., Papp, B., & Lercher,\n    M. J. (2017). Erroneous energy-generating cycles in published genome scale\n    metabolic networks: Identification and removal. PLoS Computational\n    Biology, 13(4), 1\u201314. http://doi.org/10.1371/journal.pcbi.1005494\n    ",
             "title": "Erroneous Energy-generating Cycles",
-            "type": "count"
+            "format_type": "count"
         },
         "test_direct_metabolites_in_biomass": {
             "data": {
@@ -456,7 +456,7 @@
             },
             "summary": "\n    Expect the biomass reactions to contain atp and adp.\n\n    Some biomass precursors are taken from the media and directly consumed by\n    the biomass reaction. It might not be a problem for ions or\n    metabolites for which the organism in question is auxotrophic. However,\n    too many of these metabolites may be artifacts of automated gap-filling\n    procedures. Many gap-filling algorithms attempt to minimise the number of\n    added reactions. This can lead to many biomass precursors being\n    \"direct metabolites\".\n\n    This test reports the ratio of direct metabolites to the total amount of\n    precursors to a given biomass reaction. It specifically looks for\n    metabolites that are only in either exchange, transport or biomass\n    reactions. Bear in mind that this may lead to false positives in heavily\n    compartimentalized models.\n\n    To pass this test, the ratio of direct metabolites should be less than 50%\n    of all biomass precursors. This is an arbitrary threshold but it takes\n    into account that while certain ions do not serve a relevant metabolic\n    function, it may still be important to include them in the biomass\n    reaction to account for the impact of their uptake energy costs.\n\n    This threshold is subject to change in the future.\n    ",
             "title": "Ratio of Direct Metabolites in Biomass Reaction",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_fast_growth_default": {
             "data": {
@@ -474,7 +474,7 @@
             },
             "summary": "\n    Expect the predicted growth rate for each BOF to be below 10.3972.\n\n    The growth rate of a metabolic model should not be faster than that of the\n    fastest growing organism. This is based on lowest doubling time reported\n    here:\n    http://www.pnnl.gov/science/highlights/highlight.asp?id=879\n    ",
             "title": "Unrealistic Growth Rate In Default Condition",
-            "type": "raw"
+            "format_type": "raw"
         },
         "test_find_deadends": {
             "data": [],
@@ -484,7 +484,7 @@
             "result": "failed",
             "summary": "\n    Expect no dead-ends to be present.\n\n    Dead-ends are metabolites that can only be produced but not consumed by\n    reactions in the model. They may indicate the presence of network gaps.\n    ",
             "title": "Number of Dead-end Metabolites",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_disconnected": {
             "data": [],
@@ -494,7 +494,7 @@
             "result": "passed",
             "summary": "\n    Expect no disconnected metabolites to be present.\n\n    Disconnected metabolites are not part of any reaction in the model. They\n    are most likely left-over from the reconstruction process, but may also\n    point to network gaps.\n    ",
             "title": "Number of Disconnected Metabolites",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_metabolites_consumed_with_closed_bounds": {
             "data": [],
@@ -504,7 +504,7 @@
             "result": "passed",
             "summary": "\n    Expect no metabolites to be consumed without product removal.\n\n    Just like metabolites should not be produced from nothing, mass should\n    not simply be removed from the model. This test disables all the\n    boundary reactions and checks if each metabolite can be consumed\n    individually using flux balance analysis. To pass this test no\n    metabolite outside of specific boundary reactions should be consumed\n    without product leaving the system.\n    ",
             "title": "Number of Metabolites Consumed Without Product Removal ",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_metabolites_produced_with_closed_bounds": {
             "data": [],
@@ -514,7 +514,7 @@
             "result": "passed",
             "summary": "\n    Expect no metabolites to be produced without substrate consumption.\n\n    It should not be possible for the model to produce metabolites without\n    consuming substrate from the medium. This test disables all the boundary\n    reactions and checks if each metabolite can be produced individually\n    using flux balance analysis. To pass this test no metabolite outside of\n    specific boundary reactions should be produced without the consumption of\n    substrate.\n    ",
             "title": "Number of Metabolites Produced Without Substrate Consumption",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_orphans": {
             "data": [
@@ -529,7 +529,7 @@
             "result": "failed",
             "summary": "\n    Expect no orphans to be present.\n\n    Orphans are metabolites that are only consumed but not produced by\n    reactions in the model. They may indicate the presence of network gaps.\n    ",
             "title": "Number of Orphan Metabolites",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_pure_metabolic_reactions": {
             "data": [
@@ -589,7 +589,7 @@
             "result": "passed",
             "summary": "\n    Expect at least one pure metabolic reaction to be defined in the model.\n\n    If a reaction is neither a transport reaction, a biomass reaction nor a\n    boundary reaction, it is counted as a purely metabolic reaction. This test\n    requires the presence of metabolite formula to be able to identify\n    transport reactions. This test is passed when the model contains at least\n    one purely metabolic reaction i.e. a conversion of one metabolite into\n    another.\n    ",
             "title": "Number of Purely Metabolic Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_reactions_unbounded_flux_default_condition": {
             "data": [
@@ -601,7 +601,7 @@
             "result": "passed",
             "summary": "\n    Expect the fraction of unbounded reactions to be low.\n\n    A large fraction of model reactions able to carry unlimited flux under\n    default conditions indicates problems with reaction directionality,\n    missing cofactors, incorrectly defined transport reactions and more.\n    ",
             "title": "Fraction of Unbounded Reactions in the Default Condition",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_find_stoichiometrically_balanced_cycles": {
             "data": null,
@@ -611,7 +611,7 @@
             "result": "skipped",
             "summary": "\n    Expect no stoichiometrically balanced loops to be present.\n\n    Stoichiometrically Balanced Cycles are artifacts of insufficiently\n    constrained networks resulting in reactions that can carry flux when\n    all the boundaries have been closed.\n    ",
             "title": "Stoichiometrically Balanced Cycles",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_transport_reactions": {
             "data": [
@@ -647,7 +647,7 @@
             "result": "passed",
             "summary": "Expect >= 1 transport reactions are present in the read_only_model.",
             "title": "Number of Transport Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_find_unique_metabolites": {
             "data": [
@@ -712,7 +712,7 @@
             "result": "passed",
             "summary": "\n    Expect there to be less metabolites when removing compartment tag.\n\n    Metabolites may be transported into different compartments, which means\n    that in a compartimentalized model the number of metabolites may be\n    much higher than in a model with no compartments. This test counts only\n    one occurrence of each metabolite and returns this as the number of unique\n    metabolites. The test expects that the model is compartimentalized, and\n    thus, that the number of unique metabolites is generally lower than the\n    total number of metabolites.\n    ",
             "title": "Number of Unique Metabolites",
-            "type": "count"
+            "format_type": "count"
         },
         "test_gam_in_biomass": {
             "data": {
@@ -730,7 +730,7 @@
             },
             "summary": "\n    Expect the biomass reactions to contain atp and adp.\n\n    The growth-associated maintenance (GAM) term accounts for the energy in\n    the form of ATP that is required to synthesize macromolecules such as\n    Proteins, DNA and RNA, and other processes during growth. This test checks\n    if a biomass reaction contains this term.\n    ",
             "title": "Growth-associated Maintenance in Biomass Reaction",
-            "type": "raw"
+            "format_type": "raw"
         },
         "test_gene_protein_reaction_rule_presence": {
             "data": [
@@ -747,7 +747,7 @@
             "result": "failed",
             "summary": "\n    Expect all non-exchange reactions to have a GPR rule.\n\n    Gene-Protein-Reaction rules express which gene has what function.\n    The presence of this annotation is important to justify the existence\n    of reactions in the model, and is required to conduct in silico gene\n    deletion studies. However, reactions without GPR may also be valid:\n    Spontaneous reactions, or known reactions with yet undiscovered genes\n    likely lack GPR.\n    ",
             "title": "Reactions without GPR",
-            "type": "count"
+            "format_type": "count"
         },
         "test_genes_presence": {
             "data": [
@@ -895,7 +895,7 @@
             "result": "passed",
             "summary": "\n    Expect that more than one gene is defined in the model.\n\n    A metabolic model can still be a useful tool without any\n    genes, however there are certain methods which rely on the presence of\n    genes and, more importantly, the corresponding gene-protein-reaction\n    rules. This test requires that there is at least one gene defined.\n    ",
             "title": "Total Number of Genes",
-            "type": "count"
+            "format_type": "count"
         },
         "test_metabolic_coverage": {
             "data": null,
@@ -905,7 +905,7 @@
             "result": "failed",
             "summary": "\n    Expect a model to have a metabolic coverage >= 1.\n\n    The degree of metabolic coverage indicates the modeling detail of a\n    given reconstruction calculated by dividing the total amount of\n    reactions by the amount of genes. Models with a 'high level of modeling\n    detail have ratios >1, and models with a low level of detail have\n    ratios <1. This difference arises as models with basic or intermediate\n    levels of detail are assumed to include many reactions in which several\n    gene products and their enzymatic transformations are \u2018lumped\u2019.\n    ",
             "title": "Metabolic Coverage",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_metabolite_annotation_overview": {
             "data": {
@@ -1207,7 +1207,7 @@
             },
             "summary": "\n    Expect all metabolites to have annotations from common databases.\n\n    Specific database cross-references are paramount to mapping information.\n    To provide references to as many databases as possible helps to make the\n    metabolic model more accessible to other researchers. This does not only\n    facilitate the use of a model in a broad array of computational pipelines,\n    it also promotes the metabolic model itself to become an organism-specific\n    knowledge base.\n\n    For this test to pass, each metabolite annotation should contain\n    cross-references to a number of databases (listed in `annotation.py`).\n    For each database this test checks for the presence of its corresponding\n    namespace ID to comply with the MIRIAM guidelines i.e. they have to match\n    those defined on https://identifiers.org/.\n\n    Since each database is quite different and some potentially incomplete, it\n    may not be feasible to achieve 100% coverage for each of them. Generally\n    it should be possible, however, to obtain cross-references to at least\n    one of the databases for all metabolites consistently.\n    ",
             "title": "Missing Metabolite Annotations Per Database",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_metabolite_annotation_presence": {
             "data": [],
@@ -1217,7 +1217,7 @@
             "result": "passed",
             "summary": "\n    Expect all metabolites to have a non-empty annotation attribute.\n\n    This test checks if any annotations at all are present in the SBML\n    annotations field for each metabolite, irrespective of the type of\n    annotation i.e. specific database  cross-references, ontology terms,\n    additional information. For this test to pass the model is expected to\n    have metabolites and each of them should have some form of annotation.\n    ",
             "title": "Metabolites without Annotation",
-            "type": "count"
+            "format_type": "count"
         },
         "test_metabolite_annotation_wrong_ids": {
             "data": {
@@ -1308,7 +1308,7 @@
             },
             "summary": "\n    Expect all annotations of metabolites to be in the correct format.\n\n    To identify databases and the identifiers belonging to them, computational\n    tools rely on the presence of specific patterns. Only when these patterns\n    can be identified consistently is an ID truly machine-readable. This test\n    checks if the database cross-references in metabolite annotations conform\n    to patterns defined according to the MIRIAM guidelines, i.e. matching\n    those that are defined at https://identifiers.org/.\n\n    The required formats, i.e., regex patterns are further outlined in\n    `annotation.py`. This test does not carry out a web query for the composed\n    URI, it merely controls that the regex patterns match the identifiers.\n    ",
             "title": "Wrong Metabolite Annotations Per Database",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_metabolite_id_namespace_consistency": {
             "data": [
@@ -1391,7 +1391,7 @@
             "result": "failed",
             "summary": "\n    Expect metabolite identifiers to be from the same namespace.\n\n    In well-annotated models it is no problem if the pool of main identifiers\n    for metabolites consists of identifiers from several databases. However,\n    in models that lack appropriate annotations, it may hamper the ability of\n    other researchers to use it. Running the model through a computational\n    pipeline may be difficult without first consolidating the namespace.\n\n    Hence, this test checks if the main metabolite identifiers can be\n    attributed to one single namespace based on the regex patterns defined at\n    https://identifiers.org/\n    ",
             "title": "Uniform Metabolite Identifier Namespace",
-            "type": "count"
+            "format_type": "count"
         },
         "test_metabolites_charge_presence": {
             "data": [
@@ -1474,7 +1474,7 @@
             "result": "failed",
             "summary": "\n    Expect all metabolites to have charge information.\n\n    To be able to ensure that reactions are charge-balanced, all model\n    metabolites ought to be provided with a charge.\n    ",
             "title": "Metabolites without Charge",
-            "type": "count"
+            "format_type": "count"
         },
         "test_metabolites_formula_presence": {
             "data": [],
@@ -1484,7 +1484,7 @@
             "result": "passed",
             "summary": "\n    Expect all metabolites to have a formula.\n\n    To be able to ensure that reactions are mass-balanced, all model\n    metabolites ought to be provided with a chemical formula.\n    ",
             "title": "Metabolites without Formula",
-            "type": "count"
+            "format_type": "count"
         },
         "test_metabolites_presence": {
             "data": [
@@ -1567,7 +1567,7 @@
             "result": "passed",
             "summary": "\n    Expect that more than one metabolite is defined in the model.\n\n    To be useful a metabolic model should consist at least of a few\n    metabolites that are converted by reactions.\n    This test simply checks if there are more than one metabolites defined.\n    ",
             "title": "Total Number of Metabolites",
-            "type": "count"
+            "format_type": "count"
         },
         "test_model_id_presence": {
             "data": "e_coli_core",
@@ -1577,7 +1577,7 @@
             "result": "passed",
             "summary": "\n    Expect that the model has an identifier.\n\n    The MIRIAM guidelines require a model to be named. While it is not\n    required, the ID will be displayed on the memote reports, which helps to\n    distinguish the output clearly.\n    ",
             "title": "Model Identifier",
-            "type": "raw"
+            "format_type": "raw"
         },
         "test_ngam_presence": {
             "data": [
@@ -1589,7 +1589,7 @@
             "result": "passed",
             "summary": "\n    Expect a single non growth-associated maintenance reaction.\n\n    The Non-Growth Associated Maintenance reaction (NGAM) is an\n    ATP-hydrolysis reaction added to metabolic models to represent energy\n    expenses that the cell invests in continuous processes independent of\n    the growth rate.\n    ",
             "title": "Non-Growth Associated Maintenance Reaction",
-            "type": "count"
+            "format_type": "count"
         },
         "test_protein_complex_presence": {
             "data": [
@@ -1719,7 +1719,7 @@
             "result": "passed",
             "summary": "\n    Expect that more than one enzyme complex is present in the model.\n\n    Based on the gene-protein-reaction (GPR) rules, it is possible to infer\n    whether a reaction is catalyzed by a single gene product, isozymes or by a\n    heteromeric protein complex. This test checks that at least one\n    such protein complex is defined in the GPR of the model. For S. cerevisiae\n    it could be shown that \"essential proteins tend to [cluster] together in\n    essential complexes\" (https://doi.org/10.1074%2Fmcp.M800490-MCP200).\n\n    This might also be a relevant metric for other organisms.\n    ",
             "title": "Number of Enzyme Complexes",
-            "type": "count"
+            "format_type": "count"
         },
         "test_reaction_annotation_overview": {
             "data": {
@@ -2345,7 +2345,7 @@
             },
             "summary": "\n    Expect all reactions to have annotations from common databases.\n\n    Specific database cross-references are paramount to mapping information.\n    To provide references to as many databases as possible helps to make the\n    metabolic model more accessible to other researchers. This does not only\n    facilitate the use of a model in a broad array of computational pipelines,\n    it also promotes the metabolic model itself to become an organism-specific\n    knowledge base.\n\n    For this test to pass, each reaction annotation should contain\n    cross-references to a number of databases (listed in `annotation.py`).\n    For each database this test checks for the presence of its corresponding\n    namespace ID to comply with the MIRIAM guidelines i.e. they have to match\n    those defined on https://identifiers.org/.\n\n    Since each database is quite different and some potentially incomplete, it\n    may not be feasible to achieve 100% coverage for each of them. Generally\n    it should be possible, however, to obtain cross-references to at least\n    one of the databases for all reactions consistently.\n    ",
             "title": "Missing Reaction Annotations Per Database",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_reaction_annotation_presence": {
             "data": [],
@@ -2355,7 +2355,7 @@
             "result": "passed",
             "summary": "\n    Expect all reactions to have a non-empty annotation attribute.\n\n    This test checks if any annotations at all are present in the SBML\n    annotations field for each reaction, irrespective of the type of\n    annotation i.e. specific database  cross-references, ontology terms,\n    additional information. For this test to pass the model is expected to\n    have reactions and each of them should have some form of annotation.\n    ",
             "title": "Reactions without Annotation",
-            "type": "count"
+            "format_type": "count"
         },
         "test_reaction_annotation_wrong_ids": {
             "data": {
@@ -2405,7 +2405,7 @@
             },
             "summary": "\n    Expect all annotations of reactions to be in the correct format.\n\n    To identify databases and the identifiers belonging to them, computational\n    tools rely on the presence of specific patterns. Only when these patterns\n    can be identified consistently is an ID truly machine-readable. This test\n    checks if the database cross-references in reaction annotations conform\n    to patterns defined according to the MIRIAM guidelines, i.e. matching\n    those that are defined at https://identifiers.org/.\n\n    The required formats, i.e., regex patterns are further outlined in\n    `annotation.py`. This test does not carry out a web query for the composed\n    URI, it merely controls that the regex patterns match the identifiers.\n    ",
             "title": "Wrong Reaction Annotations Per Database",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_reaction_charge_balance": {
             "data": [
@@ -2490,7 +2490,7 @@
             "result": "failed",
             "summary": "\n    Expect all reactions to be charge balanced.\n\n    In steady state, for each metabolite the sum of influx equals the sum\n    of outflux. Hence the net charges of both sides of any model reaction have\n    to be equal.\n    ",
             "title": "Number of Charge-Imbalanced Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_reaction_id_namespace_consistency": {
             "data": [
@@ -2596,7 +2596,7 @@
             "result": "failed",
             "summary": "\n    Expect reaction identifiers to be from the same namespace.\n\n    In well-annotated models it is no problem if the pool of main identifiers\n    for reactions consists of identifiers from several databases. However,\n    in models that lack appropriate annotations, it may hamper the ability of\n    other researchers to use it. Running the model through a computational\n    pipeline may be difficult without first consolidating the namespace.\n\n    Hence, this test checks if the main reaction identifiers can be\n    attributed to one single namespace based on the regex patterns defined at\n    https://identifiers.org/\n    ",
             "title": "Uniform Metabolite Identifier Namespace",
-            "type": "count"
+            "format_type": "count"
         },
         "test_reaction_mass_balance": {
             "data": [],
@@ -2606,7 +2606,7 @@
             "result": "passed",
             "summary": "\n    Expect all reactions to be mass balanced.\n\n    In steady state, for each metabolite the sum of influx equals the sum\n    of outflux. Hence the net masses of both sides of any model reaction have\n    to be equal.\n    ",
             "title": "Number of Mass-Unbalanced Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_reactions_presence": {
             "data": [
@@ -2712,7 +2712,7 @@
             "result": "passed",
             "summary": "\n    Expect that more than one reaction is defined in the model.\n\n    To be useful a metabolic model should consist at least of a few reactions.\n    This test simply checks if there are more than one.\n    ",
             "title": "Total Number of Reactions",
-            "type": "count"
+            "format_type": "count"
         },
         "test_stoichiometric_consistency": {
             "data": [],
@@ -2722,7 +2722,7 @@
             "result": "passed",
             "summary": "\n    Expect that the stoichiometry is consistent.\n\n    Stoichiometric inconsistency violates universal constraints:\n    1. Molecular masses are always positive, and\n    2. On each side of a reaction the mass is conserved.\n    A single incorrectly defined reaction can lead to stoichiometric\n    inconsistency in the model, and consequently to unconserved metabolites.\n    Similar to insufficient constraints, this may give rise to cycles which\n    either produce mass from nothing or consume mass from the model.\n\n    This test uses an implementation of the algorithm presented by\n    Gevorgyan, A., M. G Poolman, and D. A Fell.\n    \"Detection of Stoichiometric Inconsistencies in Biomolecular Models.\"\n    Bioinformatics 24, no. 19 (2008): 2245.\n    doi: 10.1093/bioinformatics/btn425\n    ",
             "title": "Stoichiometric Consistency",
-            "type": "count"
+            "format_type": "count"
         },
         "test_transport_reaction_gpr_presence": {
             "data": [
@@ -2737,7 +2737,7 @@
             "result": "failed",
             "summary": "\n    Expect a small fraction of transport reactions not to have a GPR rule.\n\n    As it is hard to identify the exact transport processes within a cell,\n    transport reactions are often added purely for modeling purposes.\n    Highlighting where assumptions have been made vs where\n    there is proof may help direct the efforts to improve transport and\n    transport energetics of the tested metabolic model.\n    However, transport reactions without GPR may also be valid:\n    Diffusion, or known reactions with yet undiscovered genes likely lack GPR.\n    ",
             "title": "Fraction of Transport Reactions without GPR",
-            "type": "percent"
+            "format_type": "percent"
         },
         "test_transport_reaction_presence": {
             "data": [
@@ -2773,7 +2773,7 @@
             "result": "passed",
             "summary": "\n    Expect more than one transport reaction to be defined in the model.\n\n    Cellular metabolism in any organism usually involves the transport of\n    metabolites across a lipid bi-layer. Hence, this test checks that there is\n    at least one reaction, which transports metabolites from one compartment\n    to another.\n\n    A transport reaction is defined as follows:\n    1. It contains metabolites from at least two compartments and\n    2. at least one metabolite undergoes no chemical conversion, i.e.,\n    the formula stays the same on both sides of the equation.\n\n    This test will not be able to identify transport via the PTS System.\n    ",
             "title": "Total Number of Transport Reactions",
-            "type": "count"
+            "format_type": "count"
         }
     },
     "weights": {
