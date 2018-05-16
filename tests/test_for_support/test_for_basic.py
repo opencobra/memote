@@ -379,6 +379,7 @@ def dup_rxns(base):
     dup_1.annotation["kegg.reaction"] = "HEX"
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
     dup_1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn_1, dup_1])
     return base
 
 
