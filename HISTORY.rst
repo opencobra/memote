@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 
+* Add test ``find_duplicate_reactions`` to detect duplicate reactions in model
 * Add dynamic upper and lower bounds. They are based on the most extreme bound
   values given in a model (if none exist -1000 and 1000 are chosen as defaults)
 * Fix logic in ``find_bounds`` function in ``helpers.py``
