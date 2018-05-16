@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.7.1 (2018-05-16)
+------------------
+* Fix a problem with the report caused by previous refactoring.
+
 0.7.0 (2018-05-15)
 ------------------
 
