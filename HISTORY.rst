@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.7.3 (2018-05-23)
+------------------
+* Make the report type variable a string in the ``index.html``.
+
 0.7.2 (2018-05-22)
 ------------------
 * Distribute the missing tests.
