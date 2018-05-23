@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+* Add test ``find_duplicate_reactions`` to detect duplicate reactions in model
+* Add dynamic upper and lower bounds. They are based on the most extreme bound
+  values given in a model (if none exist -1000 and 1000 are chosen as defaults)
+* Fix logic in ``find_bounds`` function in ``helpers.py``
+
 0.7.3 (2018-05-23)
 ------------------
 * Make the report type variable a string in the ``index.html``.
@@ -47,9 +52,6 @@ Next Release
   metabolites in identical compartments
 * Cache heavily used support functions in ``helpers.py`` and
   ``consistency_helpers.py``
-* Add dynamic upper and lower bounds. They are based on the most extreme bound
-  values given in a model (if none exist -1000 and 1000 are chosen as defaults)
-* Fix logic in ``find_bounds`` function in ``helpers.py``
 
 0.6.2 (2018-03-12)
 ------------------

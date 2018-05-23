@@ -273,6 +273,43 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
+def find_duplicate_reactions(model):
+    """
+    Return list of reactions with duplicates.
+
+    All models should contain a unique set of reactions. This function checks
+    for and returns a list of tuples containing the duplicate reactions. An
+    example of this would be finding reactions PGI1 and PGI2, both of which
+    convert G6P(c) to F6P(c) in the same compartments.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation
+
+    """
+    duplicates = []
+    rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
+                          "rhea", "biocyc", "bigg.reaction"]
+
+    # TODO: Fix bug where duplicates double count tuples, fix bug where having
+    # the same key qualifies 2 annoations values as being equal.
+    ann_rxns = []
+    for rxn in model.reactions:
+        ann = []
+        for key in rxn_db_identifiers:
+            if key in rxn.annotation:
+                if type(rxn.annotation[key]) is list:
+                    ann.extend([(key, elem) for elem in rxn.annotation[key]])
+                else:
+                    ann.append((key, rxn.annotation[key]))
+        ann_rxns.append((rxn, frozenset(ann)))
+    for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
+        if len(ann_a & ann_b) > 0:
+            duplicates.append((rxn_a, rxn_b))
+    return duplicates
+
+
 def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
     return [rxn for rxn in helpers.find_transport_reactions(model)

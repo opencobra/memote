@@ -473,3 +473,22 @@ def test_find_duplicate_metabolites_in_compartments(read_only_model):
         have duplicates in the same compartment: {}""".format(
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Duplicate Reactions", format_type="count")
+def test_find_duplicate_reactions(read_only_model):
+    """
+    Expect there to be zero duplicate reactions.
+
+    The main reason for having this test is to clean up merged models or models
+    from automated reconstruction pipelines as these are prone to having
+    identical reactions from different namespaces (hence different IDs). This
+    test therefore expects that every reaction has unique identifier values
+    (i.e. unique BRENDA, BiGG, KEGG, etc. values).
+    """
+    ann = test_find_duplicate_reactions.annotation
+    ann["data"] = basic.test_find_duplicate_reactions(read_only_model)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} reactions in the model which
+        have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
