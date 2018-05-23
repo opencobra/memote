@@ -297,9 +297,9 @@ def find_duplicate_reactions(model):
         for key in rxn_db_identifiers:
             if key in rxn.annotation:
                 if type(rxn.annotation[key]) is list:
-                    ann_rxns.append([(
+                    ann_rxns.append((
                         rxn, frozenset((
-                            key, elem) for elem in rxn.annotation[key]))])
+                            key, elem) for elem in rxn.annotation[key])))
                 else:
                     ann_rxns.append((rxn,
                                      frozenset((key, rxn.annotation[key]))))
