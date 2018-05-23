@@ -291,10 +291,18 @@ def find_duplicate_reactions(model):
     duplicates = []
     rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
                           "rhea", "biocyc", "bigg.reaction"]
-    ann_rxns = [(rxn, frozenset((key, rxn.annotation[key])
-                                for key in rxn_db_identifiers
-                                if key in rxn.annotation))
-                for rxn in model.reactions]
+
+    ann_rxns = []
+    for rxn in model.reactions:
+        for key in rxn_db_identifiers:
+            if key in rxn.annotation:
+                if type(rxn.annotation[key]) is list:
+                    tuple_list = [(rxn, frozenset((key, elem)))
+                                  for elem in rxn.annotation[key]]
+                    ann_rxns += tuple_list
+                else:
+                    ann_rxns.append((rxn,
+                                     frozenset((key, rxn.annotation[key]))))
 
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
