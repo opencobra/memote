@@ -25,5 +25,5 @@ from setuptools import setup
 
 # All other keys are defined in `setup.cfg` under [metadata] and [options].
 setup(
-    version="0.7.2",
+    version="0.7.3",
 )
