@@ -761,6 +761,7 @@ def find_objective_function(model):
     return [rxn for rxn in model.reactions if rxn.objective_coefficient != 0]
 
 
+@lrudecorator(size=2)
 def find_bounds(model):
     """
     Return the maximal and minimal bounds of the reactions of the model.
@@ -777,17 +778,14 @@ def find_bounds(model):
         The metabolic model under investigation.
 
     """
-    bounds = [bound for rxn in model.reactions for bound in rxn.bounds]
     try:
-        lower_bound = np.array(bounds[0::2]).min()
-        upper_bound = np.array(bounds[1::2]).max()
-        lower_bound = -np.amax([np.abs(lower_bound), np.abs(upper_bound)])
-        upper_bound = np.amax([np.abs(lower_bound), np.abs(upper_bound)])
+        lower_bound = min(rxn.lower_bound for rxn in model.reactions)
+        upper_bound = max(rxn.upper_bound for rxn in model.reactions)
     except ValueError:
         lower_bound = -1000
         upper_bound = 1000
 
-    if lower_bound != 0 and upper_bound != 0:
+    if lower_bound != 0 or upper_bound != 0:
         return lower_bound, upper_bound
     else:
         return -1000, 1000

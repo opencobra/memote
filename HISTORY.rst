@@ -49,6 +49,7 @@ Next Release
   ``consistency_helpers.py``
 * Add dynamic upper and lower bounds. They are based on the most extreme bound
   values given in a model (if none exist -1000 and 1000 are chosen as defaults)
+* Fix logic in ``find_bounds`` function in ``helpers.py``
 
 0.6.2 (2018-03-12)
 ------------------
