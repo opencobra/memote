@@ -56,7 +56,7 @@ with open_text(memote.support.data, "met_id_shortlist.yml",
     # METANETX_SHORTLIST = pd.read_json(file_handle)
     # TODO: find out why the YAML file does not seem to exist
     # (even though it does!)
-    METANETX_SHORTLIST = pd.Dataframe(load(file_handle, Loader=Loader))
+    METANETX_SHORTLIST = load(file_handle, Loader=Loader)
 
 
 # Provide a compartment shortlist to identify specfic compartments whenever
