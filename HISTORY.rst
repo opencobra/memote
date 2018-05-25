@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.7.5 (2018-05-25)
+------------------
+* Expose more of the internal API to the top level.
+* Also, remember to carry a towel!
+
 0.7.4 (2018-05-23)
 ------------------
 * Add test ``find_duplicate_reactions`` to detect duplicate reactions in model
