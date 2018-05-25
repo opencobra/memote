@@ -29,11 +29,11 @@
 
 import pandas as pd
 
-from yaml import load, dump
+from yaml import dump
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CDumper as Dumper
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Dumper
 
 # Read the database dumps in the correct format: remove comment lines, and
 # provide appropriate column names.
