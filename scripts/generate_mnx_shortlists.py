@@ -29,6 +29,12 @@
 
 import pandas as pd
 
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
 # Read the database dumps in the correct format: remove comment lines, and
 # provide appropriate column names.
 
@@ -117,4 +123,5 @@ xref = xref.unstack('XREF_ID')
 xref = xref.T
 
 # Saving the shortlist to memote/support/data
-xref.to_json('../memote/support/data/met_id_shortlist.json')
+#xref.to_json('../memote/support/data/met_id_shortlist.json')
+
