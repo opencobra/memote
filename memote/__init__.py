@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from memote.utils import show_versions
 from memote.suite.api import *
 from memote.suite.results import *
+from memote.suite.reporting import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"

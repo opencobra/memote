@@ -28,6 +28,7 @@ class DiffReport(Report):
     def __init__(self, **kwargs):
         """Initialize the data."""
         super(DiffReport, self).__init__(**kwargs)
+        self._report_type = "diff"
 
     def render_html(self):
         """Render an HTML report for a model."""
