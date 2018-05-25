@@ -123,5 +123,5 @@ xref = xref.unstack('XREF_ID')
 xref = xref.T
 
 # Saving the shortlist to memote/support/data
-#xref.to_json('../memote/support/data/met_id_shortlist.json')
-
+with open('../memote/support/data/met_id_shortlist.yml', 'w+') as file:
+    dump(xref, file, Loader=Loader)
