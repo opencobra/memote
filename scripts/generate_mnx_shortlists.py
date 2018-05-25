@@ -124,4 +124,4 @@ xref = xref.T
 
 # Saving the shortlist to memote/support/data
 with open('../memote/support/data/met_id_shortlist.yml', 'w+') as file:
-    dump(xref, file, Loader=Loader)
+    dump(xref, file, Dumper=Dumper)
