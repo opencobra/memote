@@ -51,7 +51,8 @@ class HistoryReport(Report):
             The default horizontal axis type for all plots.
 
         """
-        super(HistoryReport, self).__init__(**kwargs)
+        super(HistoryReport, self).__init__(
+            result=None, configuration=configuration, **kwargs)
         self._report_type = "history"
         self._history = history
         self.config = configuration
@@ -82,8 +83,9 @@ class HistoryReport(Report):
                     if "summary" not in tests[test]:
                         tests[test]["summary"] = result.cases[test]["summary"]
                     if "type" not in tests[test]:
-                        tests[test]["type"] = result.cases[test]["type"]
-                    type = tests[test]["type"]
+                        tests[test]["format_type"] = result.cases[test][
+                            "format_type"]
+                    type = tests[test]["format_type"]
                     metric = result.cases[test].get("metric")
                     data = result.cases[test].get("data")
                     res = result.cases[test].get("result")
