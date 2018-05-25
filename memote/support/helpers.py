@@ -33,6 +33,12 @@ from importlib_resources import open_text
 from cobra.exceptions import Infeasible
 from pylru import lrudecorator
 
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+
 import memote.utils as utils
 import memote.support.data
 
@@ -45,9 +51,13 @@ TRANSPORT_RXN_SBO_TERMS = ['SBO:0000185', 'SBO:0000588', 'SBO:0000587',
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-with open_text(memote.support.data, "met_id_shortlist.json",
+with open_text(memote.support.data, "met_id_shortlist.yml",
                encoding="utf-8") as file_handle:
-    METANETX_SHORTLIST = pd.read_json(file_handle)
+    # METANETX_SHORTLIST = pd.read_json(file_handle)
+    # TODO: find out why the YAML file does not seem to exist
+    # (even though it does!)
+    METANETX_SHORTLIST = pd.Dataframe(load(file_handle, Loader=Loader))
+
 
 # Provide a compartment shortlist to identify specfic compartments whenever
 # necessary.
