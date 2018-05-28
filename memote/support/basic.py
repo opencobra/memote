@@ -292,8 +292,6 @@ def find_duplicate_reactions(model):
     rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
                           "rhea", "biocyc", "bigg.reaction"]
 
-    # TODO: Fix bug where duplicates double count tuples, fix bug where having
-    # the same key qualifies 2 annoations values as being equal.
     ann_rxns = []
     for rxn in model.reactions:
         ann = []
