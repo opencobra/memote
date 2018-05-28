@@ -694,3 +694,12 @@ def test_find_duplicate_reactions(model, num):
 def test_check_transport_reaction_gpr_presence(model, num):
     """Expect amount of transport reactions without gpr to be identified."""
     assert len(basic.check_transport_reaction_gpr_presence(model)) == num
+
+
+# TODO: Add proper unit test cases for find_medium_metabolites
+@pytest.mark.parametrize("model, num", [
+    ("transport_gpr", 1)
+], indirect=["model"])
+def test_find_medium_metabolites(model, num):
+    """Expect amount of medium metabolites be identified."""
+    assert len(basic.find_medium_metabolites(model)) == num
