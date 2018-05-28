@@ -54,8 +54,6 @@ TRANSPORT_RXN_SBO_TERMS = ['SBO:0000185', 'SBO:0000588', 'SBO:0000587',
 with open_text(memote.support.data, "met_id_shortlist.yml",
                encoding="utf-8") as file_handle:
     # METANETX_SHORTLIST = pd.read_json(file_handle)
-    # TODO: find out why the YAML file does not seem to exist
-    # (even though it does!)
     METANETX_SHORTLIST = load(file_handle, Loader=Loader)
 
 
