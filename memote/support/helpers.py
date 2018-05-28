@@ -26,7 +26,6 @@ from operator import itemgetter
 
 
 import numpy as np
-# import pandas as pd
 from six import iteritems, itervalues
 from sympy import expand
 from importlib_resources import open_text
