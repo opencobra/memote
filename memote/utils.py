@@ -19,15 +19,18 @@
 
 from __future__ import absolute_import
 
+import json
 import logging
 from builtins import dict, str
+
+from future.utils import raise_with_traceback
 from numpydoc.docscrape import NumpyDocString
 from textwrap import TextWrapper
 from depinfo import print_dependencies
 
 __all__ = ("register_with", "annotate", "get_ids",
            "get_ids_and_bounds", "truncate", "wrapper",
-           "log_json_incompatible_types", "show_versions")
+           "log_json_incompatible_types", "show_versions", "jsonify")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -202,3 +205,32 @@ def extended_summary(func):
 def show_versions():
     """Print formatted dependency information to stdout."""
     print_dependencies("memote")
+
+
+def jsonify(obj, pretty=False):
+    """
+    Turn a nested object into a (compressed) JSON string.
+
+    Parameters
+    ----------
+    obj : dict
+        Any kind of dictionary structure.
+    pretty : bool, optional
+        Whether to format the resulting JSON in a more legible way (
+        default False).
+
+    """
+    # TODO: Use compression of JSON in future.
+    #     results=b64encode(compress(
+    #         json.dumps(self.data).encode("UTF-16"), level=9)))
+    if pretty:
+        params = dict(sort_keys=True, indent=2,
+                      separators=(",", ": "), ensure_ascii=False)
+    else:
+        params = dict(sort_keys=False, indent=None,
+                      separators=(",", ":"), ensure_ascii=False)
+    try:
+        return json.dumps(obj, **params)
+    except TypeError as error:
+        log_json_incompatible_types(obj)
+        raise_with_traceback(error)

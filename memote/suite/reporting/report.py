@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import
 
-import json
 import logging
 from string import Template
 
@@ -28,7 +27,7 @@ from pandas import DataFrame
 from six import iteritems, itervalues
 
 import memote.suite.templates as templates
-from memote.utils import log_json_incompatible_types
+from memote.utils import jsonify
 
 LOGGER = logging.getLogger(__name__)
 
@@ -65,22 +64,18 @@ class Report(object):
         self._template = Template(
             read_text(templates, "index.html", encoding="utf-8"))
 
-    @staticmethod
-    def jsonify(obj):
-        """Turn a nested object into a compressed JSON string."""
-        # TODO: Use compression of JSON in future.
-        # return template.safe_substitute(
-        #     results=b64encode(compress(
-        #         json.dumps(self.data).encode("UTF-16"), level=9)))
-        try:
-            return json.dumps(obj, sort_keys=False, indent=None,
-                              separators=(",", ":"))
-        except TypeError:
-            log_json_incompatible_types(obj)
+    def render_json(self, pretty=False):
+        """
+        Render the report results as JSON.
 
-    def render_json(self):
-        """Render the report results as JSON."""
-        raise NotImplementedError("Abstract method.")
+        Parameters
+        ----------
+        pretty : bool, optional
+            Whether to format the resulting JSON in a more legible way (
+            default False).
+
+        """
+        return jsonify(self.result, pretty=pretty)
 
     def render_html(self):
         """Render an HTML report."""

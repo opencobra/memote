@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 import sys
+from builtins import open
 
 import click
 import git
@@ -100,7 +101,9 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     _, results = api.test_model(model, results=True, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
-    api.snapshot_report(results, config, filename)
+    with open(filename, "w", encoding="utf-8") as file_handle:
+        LOGGER.info("Writing snapshot report to '%s'.", filename)
+        file_handle.write(api.snapshot_report(results, config))
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
@@ -147,16 +150,18 @@ def history(location, filename, index, custom_config):
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
-    api.history_report(repo, manager, filename, index=index, config=config)
+    with open(filename, "w", encoding="utf-8") as file_handle:
+        file_handle.write(api.history_report(
+            repo, manager, filename, index=index, config=config))
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("model1", type=click.Path(exists=True, dir_okay=False))
-@click.argument("model2", type=click.Path(exists=True, dir_okay=False))
+@click.argument("modela", type=click.Path(exists=True, dir_okay=False))
+@click.argument("modelb", type=click.Path(exists=True, dir_okay=False))
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
-def diff(model1, model2, filename):
+def diff(modela, modelb, filename):
     """Compare two metabolic models against each other."""
     raise NotImplementedError(u"Coming soon™.")

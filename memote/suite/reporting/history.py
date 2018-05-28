@@ -39,7 +39,7 @@ class HistoryReport(Report):
 
     _valid_indexes = frozenset(["time", "hash"])
 
-    def __init__(self, history, configuration, index="hash", **kwargs):
+    def __init__(self, history, configuration, **kwargs):
         """
         Initialize the git history report.
 
@@ -56,6 +56,10 @@ class HistoryReport(Report):
         self._report_type = "history"
         self._history = history
         self.config = configuration
+        self._history.build_branch_structure()
+        self._history.load_history()
+        self.result = self.collect_history()
+        self.result.update(self.config)
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
@@ -108,11 +112,3 @@ class HistoryReport(Report):
                             "data": format_data(data),
                             "result": res})
         return base
-
-    def render_json(self):
-        """Render a rich report for the repository."""
-        self._history.build_branch_structure()
-        self._history.load_history()
-        structure = self.collect_history()
-        structure.update(self.config)
-        return self.jsonify(structure)

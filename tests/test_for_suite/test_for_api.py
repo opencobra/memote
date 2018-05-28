@@ -71,9 +71,9 @@ def test_test_model_result(model):
 ], indirect=["model"])
 def test_snapshot_report_file(model, tmpdir):
     filename = str(tmpdir.join("index.html"))
-    _, results = api.test_model(model, results=True)
-    api.snapshot_report(results, filename=filename)
-    assert exists(filename)
+    _, results = api.test_model(model, results=True, pytest_args=["--tb", "no"])
+    report = api.snapshot_report(results, html=True)
+    assert report.startswith("<!doctype html>")
     # TODO: Perform some content checks here.
 
 
