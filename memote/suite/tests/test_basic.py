@@ -492,3 +492,22 @@ def test_find_duplicate_reactions(read_only_model):
         """There are a total of {} reactions in the model which
         have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Number of Metabolites Produced/Consumed in Medium",
+          format_type="count")
+def test_find_medium_metabolites(read_only_model):
+    """
+    Expect there to be at least one metabolite produced/consumed in medium.
+
+    This test will help identify the metabolites involved in model production
+    and/or consumption, which in turn will help identify minimal growth media
+    for the model in question. At least one metabolite must be present in this
+    minimal growth medium.
+    """
+    ann = test_find_medium_metabolites.annotation
+    ann["data"] = basic.test_find_medium_metabolites(read_only_model)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} metabolites which are produced/consumed
+        in the model: {}""".format(len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) >= 1, ann["message"]
