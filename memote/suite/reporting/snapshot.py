@@ -43,10 +43,6 @@ class SnapshotReport(Report):
         """Initialize the snapshot report."""
         super(SnapshotReport, self).__init__(**kwargs)
         self._report_type = "snapshot"
-
-    def render_json(self):
-        """Render the snapshot results as JSON."""
         self.determine_miscellaneous_tests()
         self.compute_score()
         self.result.update(self.config)
-        return self.jsonify(self.result)

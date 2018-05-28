@@ -26,9 +26,8 @@ from builtins import open
 from datetime import datetime
 
 from depinfo import get_pkg_info
-from future.utils import raise_with_traceback
 
-from memote.utils import log_json_incompatible_types
+from memote.utils import jsonify
 from memote.suite.results.result import MemoteResult
 
 __all__ = ("ResultManager",)
@@ -70,19 +69,9 @@ class ResultManager(object):
         """
         if env_info:
             self.add_environment(result.meta)
-        if pretty:
-            kwargs = dict(sort_keys=True, indent=2,
-                          separators=(",", ": "), ensure_ascii=False)
-        else:
-            kwargs = dict(sort_keys=False, indent=None,
-                          separators=(",", ":"), ensure_ascii=False)
         LOGGER.info("Storing result in '%s'.", filename)
         with open(filename, "w", encoding="utf-8") as file_handle:
-            try:
-                return file_handle.write(json.dumps(result, **kwargs))
-            except TypeError as error:
-                log_json_incompatible_types(result)
-                raise_with_traceback(error)
+            file_handle.write(jsonify(result, pretty=pretty))
 
     def load(self, filename):
         """Load a result from the given JSON file."""

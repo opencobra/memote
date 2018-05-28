@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 
 import logging
-from builtins import open
 
 import pytest
 
@@ -77,29 +76,30 @@ def test_model(model, results=False, pytest_args=None,
         return code
 
 
-def snapshot_report(result, config=None, filename=None):
+def snapshot_report(result, config=None, html=True):
     """
-    Test a model and save a basic report.
+    Generate a snapshot report from a result set and configuration.
 
     Parameters
     ----------
     result : memote.MemoteResult
         Nested dictionary structure as returned from the test suite.
     config : dict, optional
-        The final test report configuration.
-    filename : str or pathlib.Path
-        A filename for the HTML report.
+        The final test report configuration (default None).
+    html : bool, optional
+        Whether to render the report as full HTML or JSON (default True).
 
     """
     if config is None:
         config = ReportConfiguration.load()
     report = SnapshotReport(result=result, configuration=config)
-    LOGGER.info("Writing snapshot report to '%s'.", filename)
-    with open(filename, "w", encoding="utf-8") as file_h:
-        file_h.write(report.render_html())
+    if html:
+        return report.render_html()
+    else:
+        return report.render_json()
 
 
-def history_report(repository, manager, filename, index="hash", config=None):
+def history_report(repository, manager, index="hash", config=None, html=True):
     """
     Test a model and save a history report.
 
@@ -109,12 +109,12 @@ def history_report(repository, manager, filename, index="hash", config=None):
         An instance of the working directory git repository.
     manager : memote.RepoResultManager
         The manager grants access to previous results.
-    filename : str or pathlib.Path
-        A filename for the HTML report.
     index : {"hash", "time"}, optional
         The default horizontal axis type for all plots.
     config : dict, optional
         The final test report configuration.
+    html : bool, optional
+        Whether to render the report as full HTML or JSON (default True).
 
     """
     if config is None:
@@ -122,9 +122,10 @@ def history_report(repository, manager, filename, index="hash", config=None):
     report = HistoryReport(
         history=HistoryManager(repository=repository, manager=manager),
         configuration=config, index=index)
-    LOGGER.info("Writing history report '%s'.", filename)
-    with open(filename, "w", encoding="utf-8") as file_h:
-        file_h.write(report.render_html())
+    if html:
+        return report.render_html()
+    else:
+        return report.render_json()
 
 
 def diff_report():
