@@ -3,12 +3,13 @@ _data: !!python/object/new:pandas.core.internals.BlockManager
   state: !!python/tuple
   - &id004
     - !!python/object/apply:pandas.core.indexes.base._new_Index
-      - &id001 !!python/name:pandas.core.indexes.base.Index 
+      - &id001 !!python/name:pandas.core.indexes.base.Index ''
       - data: !!python/object/apply:numpy.core.multiarray._reconstruct
           args:
-          - &id002 !!python/name:numpy.ndarray 
+          - &id002 !!python/name:numpy.ndarray ''
           - !!python/tuple [0]
-          - b
+          - !!binary |
+            Yg==
           state: !!python/tuple
           - 1
           - !!python/tuple [64]
@@ -31,7 +32,8 @@ _data: !!python/object/new:pandas.core.internals.BlockManager
           args:
           - *id002
           - !!python/tuple [0]
-          - b
+          - !!binary |
+            Yg==
           state: !!python/tuple
           - 1
           - !!python/tuple [13]
@@ -44,7 +46,8 @@ _data: !!python/object/new:pandas.core.internals.BlockManager
       args:
       - *id002
       - !!python/tuple [0]
-      - b
+      - !!binary |
+        Yg==
       state: !!python/tuple
       - 1
       - !!python/tuple [64, 13]
@@ -957,7 +960,8 @@ _data: !!python/object/new:pandas.core.internals.BlockManager
           args:
           - *id002
           - !!python/tuple [0]
-          - b
+          - !!binary |
+            Yg==
           state: !!python/tuple
           - 1
           - !!python/tuple [64]
@@ -975,7 +979,7 @@ _data: !!python/object/new:pandas.core.internals.BlockManager
   - 0.14.1:
       axes: *id004
       blocks:
-      - mgr_locs: !!python/object/apply:__builtin__.slice [0, 64, 1]
+      - mgr_locs: !!python/object/apply:builtins.slice [0, 64, 1]
         values: *id005
 _metadata: []
 _typ: dataframe
