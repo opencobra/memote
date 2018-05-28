@@ -28,6 +28,9 @@ install:
 - pip install -U pip setuptools wheel tox tox-travis
 script:
 - travis_wait tox
+after_success:
+- pip install -U codecov
+- codecov
 
 stages:
   - test
@@ -37,7 +40,11 @@ stages:
 jobs:
   include:
     - stage: deploy
+      install:
+        - make reports
+        - pip install -U pip setuptools wheel
       script: skip
+      after_success: skip
       deploy:
         - provider: pypi
           skip_cleanup: true
