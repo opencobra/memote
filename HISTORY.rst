@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Refactor internal API and JSON object creation.
 
 0.7.5 (2018-05-25)
 ------------------
