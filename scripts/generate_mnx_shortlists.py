@@ -28,6 +28,7 @@
 """Scripts to generate a reduced shortlist from MetaNetX database dumps."""
 
 import pandas as pd
+import io
 
 from yaml import dump
 try:
@@ -123,5 +124,6 @@ xref = xref.unstack('XREF_ID')
 xref = xref.T
 
 # Saving the shortlist to memote/support/data
-with open('../memote/support/data/met_id_shortlist.yml', 'w+') as file:
-    dump(xref, file, Dumper=Dumper)
+with io.open('../memote/support/data/met_id_shortlist.yml', 'w+',
+             encoding="utf8") as file:
+    dump(xref, file, Dumper=Dumper, allow_unicode=True)
