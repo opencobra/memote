@@ -314,3 +314,10 @@ def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
     return [rxn for rxn in helpers.find_transport_reactions(model)
             if not rxn.gene_reaction_rule]
+
+
+def find_medium_metabolites(model):
+    """Return the list of metabolites ingested/excreted by the model."""
+    rxns = cobra.DictList({rxn: rxn.id for rxn in model.reactions})
+    return set([met.id for rxn in model.medium
+                for met in rxns.get_by_id(rxn).metabolites])
