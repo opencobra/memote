@@ -503,7 +503,7 @@ def rxns_with_two_substrates(base):
     base.add_boundary(
         met_c, type="custom", reaction_id="EX_c", lb=-1000, ub=1000)
     base.add_boundary(
-        met_d, type="custom", reaction_id="EX_c", lb=-1000, ub=1000)
+        met_d, type="custom", reaction_id="EX_d", lb=-1000, ub=1000)
     return base
 
 
