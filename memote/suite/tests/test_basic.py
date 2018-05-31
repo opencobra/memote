@@ -498,14 +498,13 @@ def test_find_duplicate_reactions(read_only_model):
           format_type="count")
 def test_find_medium_metabolites(read_only_model):
     """
-    Expect there to be zero or more metabolite produced/consumed in medium.
+    Expect zero or more metabolites in currently set medium.
 
-    This test will help identify the metabolites involved in model production
-    and/or consumption, which in turn will help identify minimal growth media
-    for the model in question.
+    This test checks all boundary reactions in the model that permit flux
+    towards creating a metabolite, and reports on those metabolites.
     """
     ann = test_find_medium_metabolites.annotation
     ann["data"] = basic.test_find_medium_metabolites(read_only_model)
     ann["message"] = wrapper.fill(
-        """There are a total of {} metabolites which are produced/consumed
+        """There are a total of {} metabolites in the currently set medium
         in the model: {}""".format(len(ann["data"]), truncate(ann["data"])))
