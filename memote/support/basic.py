@@ -22,7 +22,6 @@ from __future__ import absolute_import
 import logging
 from itertools import combinations
 from pylru import lrudecorator
-from cobra import DictList
 
 import memote.support.helpers as helpers
 
@@ -319,6 +318,5 @@ def check_transport_reaction_gpr_presence(model):
 
 def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
-    rxns = DictList({rxn: rxn.id for rxn in model.reactions})
-    return set([met.id for rxn in model.medium
-                for met in rxns.get_by_id(rxn).metabolites])
+    return [met.id for rxn in model.medium
+            for met in model.reactions.get_by_id(rxn).metabolites]
