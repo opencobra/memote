@@ -109,9 +109,12 @@ class Report(object):
 
     def compute_score(self):
         """Calculate the overall test score using the configuration."""
+        LOGGER.info("Begin scoring")
         scores = DataFrame({"score": 1.0, "max": 1.0},
                            index=list(self.result.cases))
+        # Calculate the scores for each test individually.
         for test, result in iteritems(self.result.cases):
+            LOGGER.info("Calculate score for test: '%s'.", test)
             # Test metric may be a dictionary for a parametrized test.
             metric = result["metric"]
             if hasattr(metric, "items"):
@@ -131,14 +134,19 @@ class Report(object):
             scores.loc[test, :] *= self.config["weights"].get(test, 1.0)
         score = 0.0
         maximum = 0.0
+        # Calculate the scores for each section considering the individual test
+        # case scores.
         for card in itervalues(self.config['cards']['scored']['sections']):
+            LOGGER.info("Calculate score for section: '%s'.", card)
             cases = card.get("cases", None)
             if cases is None:
                 continue
             weight = card.get("weight", 1.0)
-            card_score = scores.loc[cases, "score"].sum()
+            card_score \
+                = self.result.setdefault("score",dict())[card] \
+                = scores.loc[cases, "score"].sum()
             card_total = scores.loc[cases, "max"].sum()
             card["score"] = card_score / card_total
             score += card_score * weight
             maximum += card_total * weight
-        self.result["score"] = score / maximum
+        self.result.setdefault("score",dict())["total_score"] = score / maximum
