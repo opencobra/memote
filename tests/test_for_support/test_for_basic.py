@@ -499,8 +499,8 @@ def rxns_with_two_substrates(base):
     met_d = cobra.Metabolite("d_e", compartment="e")
     rxn_1 = cobra.Reaction("rxn1")
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
-    base.add_boundary(met_c, reaction_id="EX_c_e", lb=-1000, ub=1000)
-    base.add_boundary(met_d, reaction_id="EX_d_e", lb=-1000, ub=1000)
+    base.add_boundary(met_c)
+    base.add_boundary(met_d)
     return base
 
 
