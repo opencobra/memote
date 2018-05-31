@@ -7,7 +7,7 @@
         fxLayout.xs='column'>
         <div fxFlex> Total Score
           <div>
-            <div style="font-size:15vh">99</div>
+            <div style="font-size:15vh">{{ data.score.total_score | percent:'.'  }}</div>
           </div>
         </div>
         <div fxFlex> Score per Category

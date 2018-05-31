@@ -2789,5 +2789,11 @@
         "test_reaction_id_namespace_consistency": null,
         "test_reaction_mass_balance": null,
         "test_stoichiometric_consistency": 3.0
-    }
+    },
+  "score": {
+    "annotation": 2.0,
+    "consistency": 6.787234042553191,
+    "sbo": 0.0,
+    "total_score": 0.3923105636431504
+  }
 }
