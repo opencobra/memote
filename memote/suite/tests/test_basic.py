@@ -494,8 +494,7 @@ def test_find_duplicate_reactions(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Metabolites Produced/Consumed in Medium",
-          format_type="count")
+@annotate(title="Medium Components", format_type="count")
 def test_find_medium_metabolites(read_only_model):
     """
     Expect zero or more metabolites in currently set medium.
