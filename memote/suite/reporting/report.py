@@ -112,6 +112,7 @@ class Report(object):
         LOGGER.info("Begin scoring")
         scores = DataFrame({"score": 1.0, "max": 1.0},
                            index=list(self.result.cases))
+        self.result.setdefault("score", dict())
         # Calculate the scores for each test individually.
         for test, result in iteritems(self.result.cases):
             LOGGER.info("Calculate score for test: '%s'.", test)
@@ -136,17 +137,18 @@ class Report(object):
         maximum = 0.0
         # Calculate the scores for each section considering the individual test
         # case scores.
-        for card in itervalues(self.config['cards']['scored']['sections']):
-            LOGGER.info("Calculate score for section: '%s'.", card)
+        for section_id, card in iteritems(
+            self.config['cards']['scored']['sections']):
+            LOGGER.info("Calculate score for section: '%s'.", section_id)
             cases = card.get("cases", None)
             if cases is None:
                 continue
             weight = card.get("weight", 1.0)
             card_score \
-                = self.result.setdefault("score",dict())[card] \
+                = self.result["score"][section_id] \
                 = scores.loc[cases, "score"].sum()
             card_total = scores.loc[cases, "max"].sum()
             card["score"] = card_score / card_total
             score += card_score * weight
             maximum += card_total * weight
-        self.result.setdefault("score",dict())["total_score"] = score / maximum
+        self.result["score"]["total_score"] = score / maximum
