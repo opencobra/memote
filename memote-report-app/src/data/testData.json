@@ -2791,9 +2791,11 @@
         "test_stoichiometric_consistency": 3.0
     },
   "score": {
-    "annotation": 2.0,
-    "consistency": 6.787234042553191,
-    "sbo": 0.0,
+      "sections":[
+          {"section":"annotation", "score": 2.0},
+          {"section":"consistency",  "score":6.787234042553191},
+          {"section":"sbo", "score":0.0}
+        ],
     "total_score": 0.3923105636431504
   }
 }
