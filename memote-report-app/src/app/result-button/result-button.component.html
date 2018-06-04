@@ -6,8 +6,9 @@
     <button
     mat-raised-button
     style="color:white"
-    [ngStyle]="{'background-color':getColor(data.byID(testId)?.metric | number : '1.2-2')}">
-      {{ data.byID(testId)?.metric | number : '1.2-2' }}
+    [ngStyle]="{'background-color':getColor(1 - data.byID(testId)?.metric | number : '1.2-2')}">
+      {{ 1 - data.byID(testId)?.metric | percent : '1.0' }}
+      <!-- {{ 1 - data.byID(testId)?.metric | percent : '1.2-2' }} -->
     </button>
   </div>
   <ng-template #notScored>

@@ -18,7 +18,7 @@ export class ResultButtonComponent implements OnInit {
 
 // I tested this scheme against Deuteranopia, Protanopia and Tritanopia
   getColor(value) {
-    const hue = ((1 - value) * 132).toString(10);
+    const hue = (value * 132).toString(10);
     return ['hsl(', hue, ',80%,35%)'].join('');
 }
 
