@@ -120,7 +120,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "it can also alter the default behavior. Please refer to "
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
-def history(location, filename, index, custom_config):
+def history(location, filename, custom_config):
     """
     Generate a report over a model's git commit history.
 
@@ -148,7 +148,7 @@ def history(location, filename, index, custom_config):
         config.merge(ReportConfiguration.load(custom))
     with open(filename, "w", encoding="utf-8") as file_handle:
         file_handle.write(api.history_report(
-            repo, manager, filename, config=config))
+            repo, manager, config=config))
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)
