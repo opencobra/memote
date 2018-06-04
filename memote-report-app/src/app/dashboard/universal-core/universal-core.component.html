@@ -5,16 +5,24 @@
         fxLayoutAlign='space-between start'
         fxLayoutAlign.xs='space-between center'
         fxLayout.xs='column'>
+        <div *ngIf="data.reportType != 'history'; else vegaHistoryScore">
         <div fxFlex> Total Score
-          <div>
-            <div style="font-size:15vh">{{ data.score.total_score | percent:'.'  }}</div>
-          </div>
+            <div>
+              <div style="font-size:15vh">{{ data.score.total_score | percent:'.'  }}</div>
+            </div>
         </div>
         <div fxFlex> Score per Category
-        <div id="catScore">
-          <app-vega-bar-chart></app-vega-bar-chart>
+            <div id="catScore">
+              <app-vega-bar-chart></app-vega-bar-chart>
+            </div>
         </div>
         </div>
+          <ng-template #vegaHistoryScore>
+              <div>
+                Total Score
+                <app-vega-plot [testObject]="data.score.total_score"></app-vega-plot>
+              </div>
+          </ng-template>
       </div>
       <hr>
       <div>

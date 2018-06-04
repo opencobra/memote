@@ -113,6 +113,83 @@
         "title": "Stoichiometry Matrix"
       }
     },
+    "score":{
+      "total_score": {
+          "history": [
+            {
+              "commit": "095aeaa8d998fdec3ce34e99bf1bd56bd443087e",
+              "metric": 0.1,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "2bdf753982b7e4e0fd61421828aa0c4a26722988",
+              "metric": 0.4,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "54032275776f2810b78af11b960cc65bb6c2b002",
+              "metric": 0.45,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
+              "metric": 0.4634,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "4da7d0de7823f1b179dd70e2e295eff6f7960fa0",
+              "metric": 0.7,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "0089055223ebabc54385a9d5fbe5eb03837e902d",
+              "metric": 0.7,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "c453461bccc9de73f0a94f1e53ae3b24eabe59c3",
+              "metric": 0.8,
+              "branch": "origin/master"
+            },
+            {
+              "commit": "095aeaa8d998fdec3ce34e99bf1bd56bd443087e",
+              "metric": 0.9,
+              "branch": "master"
+            },
+            {
+              "commit": "2bdf753982b7e4e0fd61421828aa0c4a26722988",
+              "metric": 1.0,
+              "branch": "master"
+            },
+            {
+              "commit": "54032275776f2810b78af11b960cc65bb6c2b002",
+              "metric": 1.0,
+              "branch": "master"
+            },
+            {
+              "commit": "e7e2f680853599a2e8ed8d540da5801e06865482",
+              "metric": 1.0,
+              "branch": "master"
+            },
+            {
+              "commit": "4da7d0de7823f1b179dd70e2e295eff6f7960fa0",
+              "metric": 0.8,
+              "branch": "master"
+            },
+            {
+              "commit": "0089055223ebabc54385a9d5fbe5eb03837e902d",
+              "metric": 0.4,
+              "branch": "master"
+            },
+            {
+              "commit": "c453461bccc9de73f0a94f1e53ae3b24eabe59c3",
+              "metric": 0.4,
+              "branch": "master"
+            }
+          ],
+          "format_type": "score"
+        }
+      },
     "tests": {
       "test_gam_in_biomass": {
         "history": {

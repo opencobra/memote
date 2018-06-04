@@ -12,8 +12,7 @@ import { TestHistory } from './../test-history.model';
   encapsulation: ViewEncapsulation.None
 })
 export class VegaPlotComponent implements OnInit {
-  @Input() testId: string;
-  testObject: TestHistory;
+  @Input() testObject: any;
   format_type: string;
   nativeElement: any;
 
@@ -22,7 +21,6 @@ export class VegaPlotComponent implements OnInit {
   }
 
   public initialize() {
-    this.testObject = this.data.byID(this.testId);
     this.format_type = this.testObject.format_type;
 
     // Initialize the vega plot
