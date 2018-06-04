@@ -112,10 +112,6 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
-@click.option("--index", type=click.Choice(["hash", "time"]), default="hash",
-              show_default=True,
-              help="Use either commit hashes or time as the independent "
-                   "variable for plots.")
 @click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
               multiple=True,
               help="A path to a report configuration file that will be merged "
@@ -152,7 +148,7 @@ def history(location, filename, index, custom_config):
         config.merge(ReportConfiguration.load(custom))
     with open(filename, "w", encoding="utf-8") as file_handle:
         file_handle.write(api.history_report(
-            repo, manager, filename, index=index, config=config))
+            repo, manager, filename, config=config))
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)

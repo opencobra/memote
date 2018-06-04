@@ -37,8 +37,6 @@ class HistoryReport(Report):
 
     """
 
-    _valid_indexes = frozenset(["time", "hash"])
-
     def __init__(self, history, configuration, **kwargs):
         """
         Initialize the git history report.
@@ -47,8 +45,9 @@ class HistoryReport(Report):
         ----------
         history : memote.HistoryManager
             An instance that manages access to test results.
-        index : {"hash", "time"}, optional
-            The default horizontal axis type for all plots.
+        configuration : memote.MemoteConfiguration
+            A memote configuration structure.
+
 
         """
         super(HistoryReport, self).__init__(
