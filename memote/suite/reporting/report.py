@@ -113,6 +113,7 @@ class Report(object):
         scores = DataFrame({"score": 1.0, "max": 1.0},
                            index=list(self.result.cases))
         self.result.setdefault("score", dict())
+        self.result["score"]["sections"] = list()
         # Calculate the scores for each test individually.
         for test, result in iteritems(self.result.cases):
             LOGGER.info("Calculate score for test: '%s'.", test)
@@ -143,12 +144,14 @@ class Report(object):
             cases = card.get("cases", None)
             if cases is None:
                 continue
-            weight = card.get("weight", 1.0)
-            card_score \
-                = self.result["score"][section_id] \
-                = scores.loc[cases, "score"].sum()
+            card_score = scores.loc[cases, "score"].sum()
             card_total = scores.loc[cases, "max"].sum()
-            card["score"] = card_score / card_total
+            # Format results nicely to work immediately with Vega Bar Chart.
+            section_score = { "section" : section_id,
+                              "score" : card_score / card_total}
+            self.result["score"]["sections"].append(section_score)
+            # Calculate the final score for the entire model.
+            weight = card.get("weight", 1.0)
             score += card_score * weight
             maximum += card_total * weight
         self.result["score"]["total_score"] = score / maximum
