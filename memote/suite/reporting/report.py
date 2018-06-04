@@ -109,14 +109,14 @@ class Report(object):
 
     def compute_score(self):
         """Calculate the overall test score using the configuration."""
-        LOGGER.info("Begin scoring")
+        # LOGGER.info("Begin scoring")
         scores = DataFrame({"score": 1.0, "max": 1.0},
                            index=list(self.result.cases))
         self.result.setdefault("score", dict())
         self.result["score"]["sections"] = list()
         # Calculate the scores for each test individually.
         for test, result in iteritems(self.result.cases):
-            LOGGER.info("Calculate score for test: '%s'.", test)
+            # LOGGER.info("Calculate score for test: '%s'.", test)
             # Test metric may be a dictionary for a parametrized test.
             metric = result["metric"]
             if hasattr(metric, "items"):
@@ -140,7 +140,7 @@ class Report(object):
         # case scores.
         for section_id, card in iteritems(
             self.config['cards']['scored']['sections']):
-            LOGGER.info("Calculate score for section: '%s'.", section_id)
+            # LOGGER.info("Calculate score for section: '%s'.", section_id)
             cases = card.get("cases", None)
             if cases is None:
                 continue
