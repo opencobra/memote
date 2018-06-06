@@ -480,6 +480,48 @@ def dup_rxns_multiple_list_anns_no_match(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def rxns_no_exchange(base):
+    """Provide a model with no exchange reactions"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    rxn_1 = cobra.Reaction("rxn1")
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def rxns_with_two_substrates(base):
+    """Provide a model with two substrates that can be taken up"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    met_c = cobra.Metabolite("c_e", compartment="e")
+    met_d = cobra.Metabolite("d_e", compartment="e")
+    rxn_1 = cobra.Reaction("rxn1")
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn_1])
+    base.add_boundary(
+        met_c, type="custom", reaction_id="EX_c", lb=-1000, ub=1000)
+    base.add_boundary(
+        met_d, type="custom", reaction_id="EX_d", lb=-1000, ub=1000)
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def rxns_with_two_false_substrates(base):
+    """Provide a model with two false substrates that cannot be taken up"""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    met_c = cobra.Metabolite("c_e", compartment="c")
+    met_d = cobra.Metabolite("d_e", compartment="c")
+    rxn_1 = cobra.Reaction("rxn1")
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn_1])
+    base.add_boundary(met_c, type="custom", reaction_id="EX_c", lb=1, ub=1000)
+    base.add_boundary(met_d, type="custom", reaction_id="EX_d", lb=1, ub=1000)
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -694,3 +736,13 @@ def test_find_duplicate_reactions(model, num):
 def test_check_transport_reaction_gpr_presence(model, num):
     """Expect amount of transport reactions without gpr to be identified."""
     assert len(basic.check_transport_reaction_gpr_presence(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("rxns_with_two_substrates", 2),
+    ("rxns_with_two_false_substrates", 0),
+    ("rxns_no_exchange", 0),
+], indirect=["model"])
+def test_find_medium_metabolites(model, num):
+    """Expect amount of medium metabolites be identified."""
+    assert len(basic.find_medium_metabolites(model)) == num

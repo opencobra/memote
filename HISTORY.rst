@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Add test ``find_medium_metabolites`` to detect and display all substrates
+  capable of being taken up by model
 
 0.7.6 (2018-05-28)
 ------------------

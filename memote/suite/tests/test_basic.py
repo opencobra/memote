@@ -492,3 +492,18 @@ def test_find_duplicate_reactions(read_only_model):
         """There are a total of {} reactions in the model which
         have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Medium Components", format_type="count")
+def test_find_medium_metabolites(read_only_model):
+    """
+    Expect zero or more metabolites in currently set medium.
+
+    This test checks all boundary reactions in the model that permit flux
+    towards creating a metabolite, and reports on those metabolites.
+    """
+    ann = test_find_medium_metabolites.annotation
+    ann["data"] = basic.test_find_medium_metabolites(read_only_model)
+    ann["message"] = wrapper.fill(
+        """There are a total of {} metabolites in the currently set medium
+        in the model: {}""".format(len(ann["data"]), truncate(ann["data"])))

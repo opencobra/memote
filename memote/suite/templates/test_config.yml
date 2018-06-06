@@ -66,6 +66,7 @@ cards:
     - test_reactions_presence
     - test_genes_presence
     - test_model_id_presence
+    - test_find_medium_metabolites
   test_biomass:
     title: "Biomass"
     cases:
