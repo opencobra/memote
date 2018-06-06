@@ -139,7 +139,8 @@ class Report(object):
         # Calculate the scores for each section considering the individual test
         # case scores.
         for section_id, card in iteritems(
-            self.config['cards']['scored']['sections']):
+            self.config['cards']['scored']['sections']
+        ):
             # LOGGER.info("Calculate score for section: '%s'.", section_id)
             cases = card.get("cases", None)
             if cases is None:
@@ -147,8 +148,8 @@ class Report(object):
             card_score = scores.loc[cases, "score"].sum()
             card_total = scores.loc[cases, "max"].sum()
             # Format results nicely to work immediately with Vega Bar Chart.
-            section_score = { "section" : section_id,
-                              "score" : card_score / card_total}
+            section_score = {"section": section_id,
+                             "score": card_score / card_total}
             self.result["score"]["sections"].append(section_score)
             # Calculate the final score for the entire model.
             weight = card.get("weight", 1.0)
