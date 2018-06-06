@@ -99,7 +99,7 @@ def snapshot_report(result, config=None, html=True):
         return report.render_json()
 
 
-def history_report(repository, manager, index="hash", config=None, html=True):
+def history_report(repository, manager, config=None, html=True):
     """
     Test a model and save a history report.
 
@@ -109,8 +109,6 @@ def history_report(repository, manager, index="hash", config=None, html=True):
         An instance of the working directory git repository.
     manager : memote.RepoResultManager
         The manager grants access to previous results.
-    index : {"hash", "time"}, optional
-        The default horizontal axis type for all plots.
     config : dict, optional
         The final test report configuration.
     html : bool, optional
@@ -121,7 +119,7 @@ def history_report(repository, manager, index="hash", config=None, html=True):
         config = ReportConfiguration.load()
     report = HistoryReport(
         history=HistoryManager(repository=repository, manager=manager),
-        configuration=config, index=index)
+        configuration=config)
     if html:
         return report.render_html()
     else:
