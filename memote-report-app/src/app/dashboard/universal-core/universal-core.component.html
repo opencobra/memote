@@ -2,28 +2,24 @@
     <mat-card-content>
       <div
         fxLayout='row'
+        fxLayout.lt-lg='column'
         fxLayoutAlign='space-between start'
-        fxLayoutAlign.xs='space-between center'
-        fxLayout.xs='column'>
-        <div *ngIf="data.reportType != 'history'; else vegaHistoryScore">
+        *ngIf="data.reportType != 'history'; else vegaHistoryScore">
         <div fxFlex> Total Score
-            <div>
-              <div style="font-size:15vh">{{ data.score.total_score | percent:'.'  }}</div>
-            </div>
+          <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
         </div>
-        <div fxFlex> Score per Category
-            <div id="catScore">
-              <app-vega-bar-chart></app-vega-bar-chart>
-            </div>
+        <div fxFlex class="svg-container"> Score per Category
+          <br>
+              <app-vega-bar-chart ></app-vega-bar-chart>
         </div>
-        </div>
-          <ng-template #vegaHistoryScore>
-              <div>
-                Total Score
-                <app-vega-plot [testObject]="data.score.total_score"></app-vega-plot>
-              </div>
-          </ng-template>
       </div>
+      <ng-template #vegaHistoryScore>
+          <div>
+            Total Score
+            <br>
+            <app-vega-plot [testObject]="data.score.total_score"></app-vega-plot>
+          </div>
+      </ng-template>
       <hr>
       <div>
       <div fxFlex>

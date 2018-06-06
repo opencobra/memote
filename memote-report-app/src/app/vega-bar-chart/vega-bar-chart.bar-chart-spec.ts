@@ -2,8 +2,8 @@ export const specBarChart = {
   "$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 300,
   "height": 200,
-  "padding": 5,
-
+  "autosize": 'fit',
+  "padding": 'strict',
   "data": [
     {
       "name": "table",
