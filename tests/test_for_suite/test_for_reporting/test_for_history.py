@@ -27,12 +27,41 @@ from git import Repo
 import pytest
 
 import memote.suite.reporting.history as history
-from memote.utils import register_with
 
+def mock_model(base):
+    met_a = cobra.Metabolite("A")
+    met_b = cobra.Metabolite("B")
+    rxn1 = cobra.Reaction("R1")
+    rxn1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn1])
+    return base
+
+@pytest.mark.parametrize("model", [
+    ("mock_repo"),
+], indirect=["model"])
 @pytest.fixture(scope="session")
-def mock_repo(tmpdir_factory):
+def mock_repo(tmpdir_factory, model):
     """Build a mock git repository with two branches and one commit each."""
     repo_path = tmpdir_factory.mktemp("git_repo")
-    git_repo = Repo.init(repo_path, bare=True)
+    git_repo = Repo.init(repo_path)
+    cobra.io.write_sbml_model(model,repo_path.join('model.xml'))
+    git_repo.index.add([repo_path.join('model.xml')])
+    git_repo.index.commit("initial commit")
+    met_c = cobra.Metabolite("C")
+    rxn2 = cobra.Reaction("R2")
+    rxn2.add_metabolites({met_b: -1, met_c: 1})
+    model.add_reactions([rxn2])
+    git_repo.git.checkout('HEAD', b="develop")
+    cobra.io.write_sbml_model(model,repo_path.join('model.xml'))
+    git_repo.index.add([repo_path.join('model.xml')])
+    git_repo.index.commit("second commit")
     return git_repo
 
+
+@pytest.mark.parametrize("repo, num", [
+    ("mock_repo", 0),
+], indirect=["repo"])
+def test_this_one_thing(repo, num):
+    """Expect this one thing to be true."""
+    print repo
+    assert 0 == num
