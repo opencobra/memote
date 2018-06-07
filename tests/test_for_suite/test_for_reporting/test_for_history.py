@@ -26,42 +26,60 @@ import cobra
 from git import Repo
 import pytest
 
-import memote.suite.reporting.history as history
 
-def mock_model(base):
-    met_a = cobra.Metabolite("A")
-    met_b = cobra.Metabolite("B")
+from memote.suite.api import test_model, history_report
+from memote.suite.results import HistoryManager
+from memote.suite.results import RepoResultManager
+from memote.suite.reporting import (
+    HistoryReport, ReportConfiguration)
+
+
+@pytest.fixture(scope="session")
+def mock_history_report(tmpdir_factory):
+    """Build a mock git repository with two branches and one commit each."""
+    # Initialize temporary directory
+    repo_path = tmpdir_factory.mktemp("git_repo")
+    # Create git repository on temporary directory.
+    git_repo = Repo.init(repo_path)
+    # Create mockup mini model.
+    base = cobra.Model('mock model')
+    met_a = cobra.Metabolite("A", name="A")
+    met_b = cobra.Metabolite("B", name="B")
     rxn1 = cobra.Reaction("R1")
     rxn1.add_metabolites({met_a: -1, met_b: 1})
     base.add_reactions([rxn1])
-    return base
-
-@pytest.mark.parametrize("model", [
-    ("mock_repo"),
-], indirect=["model"])
-@pytest.fixture(scope="session")
-def mock_repo(tmpdir_factory, model):
-    """Build a mock git repository with two branches and one commit each."""
-    repo_path = tmpdir_factory.mktemp("git_repo")
-    git_repo = Repo.init(repo_path)
-    cobra.io.write_sbml_model(model,repo_path.join('model.xml'))
-    git_repo.index.add([repo_path.join('model.xml')])
+    # Write mini model as SBML file to the temporary directory.
+    model_path = str(repo_path.join('model.xml'))
+    cobra.io.write_sbml_model(base, model_path)
+    # Add and commit the file to the master branch of the mock repo.
+    git_repo.index.add([model_path])
     git_repo.index.commit("initial commit")
-    met_c = cobra.Metabolite("C")
+    # Make a small change to the mockup model.
+    met_c = cobra.Metabolite("C", name="C")
     rxn2 = cobra.Reaction("R2")
     rxn2.add_metabolites({met_b: -1, met_c: 1})
-    model.add_reactions([rxn2])
+    base.add_reactions([rxn2])
+    # Checkout and commit the changes to develop.
     git_repo.git.checkout('HEAD', b="develop")
-    cobra.io.write_sbml_model(model,repo_path.join('model.xml'))
-    git_repo.index.add([repo_path.join('model.xml')])
+    cobra.io.write_sbml_model(base, model_path)
+    git_repo.index.add([str(model_path)])
     git_repo.index.commit("second commit")
-    return git_repo
+    # Calculate the memote results for the commit history of the mockup repo.
+    location = str(repo_path.join('Results'))
+    manager = RepoResultManager(repository=git_repo, location=location)
+    history = HistoryManager(repository=git_repo, manager=manager)
+    history.build_branch_structure()
+    for commit in history.iter_commits():
+        git_repo.git.checkout(commit)
+        model = cobra.io.read_sbml_model(model_path)
+        _, result = test_model(model, results=True)
+        manager.store(result, commit=commit)
+    history.reset()
+    # Return history report.
+    json_report = history_report(git_repo, manager, html=False)
+    return json_report
 
 
-@pytest.mark.parametrize("repo, num", [
-    ("mock_repo", 0),
-], indirect=["repo"])
-def test_this_one_thing(repo, num):
+def test_structure(mock_history_report):
     """Expect this one thing to be true."""
-    print repo
-    assert 0 == num
+    assert mock_history_report.keys() == ['cards', 'tests', 'score']
