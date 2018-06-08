@@ -19,67 +19,191 @@
 
 from __future__ import absolute_import
 
-from os.path import exists
-from builtins import str
+from six import iteritems
 
-import cobra
-from git import Repo
 import pytest
-
-
-from memote.suite.api import test_model, history_report
-from memote.suite.results import HistoryManager
-from memote.suite.results import RepoResultManager
-from memote.suite.reporting import (
-    HistoryReport, ReportConfiguration)
+from memote.suite.reporting import HistoryReport
+from memote.suite.results.result import MemoteResult
 
 
 @pytest.fixture(scope="session")
-def mock_history_report(tmpdir_factory):
-    """Build a mock git repository with two branches and one commit each."""
-    # Initialize temporary directory
-    repo_path = tmpdir_factory.mktemp("git_repo")
-    # Create git repository on temporary directory.
-    git_repo = Repo.init(repo_path)
-    # Create mockup mini model.
-    base = cobra.Model('mock model')
-    met_a = cobra.Metabolite("A", name="A")
-    met_b = cobra.Metabolite("B", name="B")
-    rxn1 = cobra.Reaction("R1")
-    rxn1.add_metabolites({met_a: -1, met_b: 1})
-    base.add_reactions([rxn1])
-    # Write mini model as SBML file to the temporary directory.
-    model_path = str(repo_path.join('model.xml'))
-    cobra.io.write_sbml_model(base, model_path)
-    # Add and commit the file to the master branch of the mock repo.
-    git_repo.index.add([model_path])
-    git_repo.index.commit("initial commit")
-    # Make a small change to the mockup model.
-    met_c = cobra.Metabolite("C", name="C")
-    rxn2 = cobra.Reaction("R2")
-    rxn2.add_metabolites({met_b: -1, met_c: 1})
-    base.add_reactions([rxn2])
-    # Checkout and commit the changes to develop.
-    git_repo.git.checkout('HEAD', b="develop")
-    cobra.io.write_sbml_model(base, model_path)
-    git_repo.index.add([str(model_path)])
-    git_repo.index.commit("second commit")
-    # Calculate the memote results for the commit history of the mockup repo.
-    location = str(repo_path.join('Results'))
-    manager = RepoResultManager(repository=git_repo, location=location)
-    history = HistoryManager(repository=git_repo, manager=manager)
-    history.build_branch_structure()
-    for commit in history.iter_commits():
-        git_repo.git.checkout(commit)
-        model = cobra.io.read_sbml_model(model_path)
-        _, result = test_model(model, results=True)
-        manager.store(result, commit=commit)
-    history.reset()
-    # Return history report.
-    json_report = history_report(git_repo, manager, html=False)
-    return json_report
+def mock_history_manager():
+    """Build a mock history manager that already contains results."""
+    result1 = MemoteResult({
+        "meta": {
+            "branch": "master",
+            "commit_author": "John Doe",
+            "commit_hash": "3f4665356a24d76a9461043f62a2b12dab56c75f",
+            "packages": {
+                "SomePackate": "0.1.0"},
+            "platform": "Darwin",
+            "python": "2.7.10",
+            "release": "14.5.0",
+            "timestamp": "2017-05-03 18:26:11+02:00"
+        },
+        "tests": {
+            "test_parametrized": {
+                "data": {
+                    "parameter1": ["item2", "item3"],
+                    "parameter1": ["item4", "item3"]
+                },
+                "duration": {
+                    "parameter1": 0.12,
+                    "parameter1": 0.32
+                },
+                "format_type": 'percent',
+                "message": {
+                    "parameter1": "Some Message 1",
+                    "parameter1": "Some Message 2"
+                },
+                "metric": {
+                    "parameter1": 0.5,
+                    "parameter1": 0.9
+                },
+                "result": {
+                    "parameter1": "failed",
+                    "parameter1": "failed"
+                },
+                "summary": "Some description of the test",
+                "title": "Parametrized Test"
+            },
+            "test_number": {
+                "data": (5, 8),
+                "duration": 0.002,
+                "format_type": "percent",
+                "message": "Some Message 3",
+                "result": "passed",
+                "summary": "Some description again",
+                "metric": 0.2,
+                "title": "Non-Parametrized Test"
+            }
+        }
+    })
+    result2 = MemoteResult({
+        "meta": {
+            "branch": "develop",
+            "commit_author": "John Doe",
+            "commit_hash": "6e30d6236f5d47ebb4be39253eaa6a5dcb487687",
+            "packages": {
+                "SomePackate": "0.1.0"},
+            "platform": "Darwin",
+            "python": "2.7.10",
+            "release": "14.5.0",
+            "timestamp": "2017-05-03 18:50:11+02:00"
+        },
+        "tests": {
+            "test_parametrized": {
+                "data": {
+                    "parameter1": ["item1", "item2"],
+                    "parameter1": ["item2", "item3"]
+                },
+                "duration": {
+                    "parameter1": 0.2,
+                    "parameter1": 0.1
+                },
+                "format_type": 'percent',
+                "message": {
+                    "parameter1": "Some Message 1",
+                    "parameter1": "Some Message 2"
+                },
+                "metric": {
+                    "parameter1": 1.0,
+                    "parameter1": 1.0
+                },
+                "result": {
+                    "parameter1": "failed",
+                    "parameter1": "failed"
+                },
+                "summary": "Some description of the test",
+                "title": "Parametrized Test"
+            },
+            "test_number": {
+                "data": (2, 3),
+                "duration": 0.002,
+                "format_type": "percent",
+                "message": "Some Message 3",
+                "result": "passed",
+                "summary": "Some description again",
+                "metric": 0.6,
+                "title": "Non-Parametrized Test"
+            }
+        }
+    })
+    branch_structure = {
+        "commits":{
+            "3f4665356a24d76a9461043f62a2b12dab56c75f": {
+                "timestamp": "2017-05-03 18:26:11+02:00",
+                "author": "John Doe",
+                "email": "John_Doe@test.com"
+            },
+            "6e30d6236f5d47ebb4be39253eaa6a5dcb487687": {
+                "timestamp": "2017-05-03 18:50:11+02:00",
+                "author": "John Doe",
+                "email": "John_Doe@test.com"
+            }
+        },
+        "branches": {
+            "master":["3f4665356a24d76a9461043f62a2b12dab56c75f"],
+            "develop": ["6e30d6236f5d47ebb4be39253eaa6a5dcb487687",
+                        "3f4665356a24d76a9461043f62a2b12dab56c75f"]
+        }
+    }
+    results = {
+        "3f4665356a24d76a9461043f62a2b12dab56c75f": result1,
+        "6e30d6236f5d47ebb4be39253eaa6a5dcb487687": result2,
+    }
+
+    # Create mock history manager.
+    class History(object):
+
+        def __init__(self, **kwargs):
+            super(History, self).__init__(**kwargs)
+            self._results = results
+            self._history = branch_structure
+
+        def get_result(self, commit):
+            return results[commit]
+
+        def iter_branches(self):
+            return iteritems(self._history["branches"])
+
+        def build_branch_structure(self):
+            pass
+
+        def load_history(self):
+            pass
+
+    return History()
 
 
-def test_structure(mock_history_report):
+def test_structure(mock_history_manager):
     """Expect this one thing to be true."""
-    assert mock_history_report.keys() == ['cards', 'tests', 'score']
+    history = mock_history_manager
+    configuration = {
+        'cards': {
+            'scored': {
+                'sections': {
+                    'scored_sub_section': {
+                        'cases': [
+                            'test_parametrized'
+                        ],
+                        'title': 'Scored Sub Section',
+                        'weight': 1.0
+                    }
+                },
+            'title': 'Core Tests'},
+            'test_basic': {
+                'cases': [
+                    'test_number'
+                ],
+                'title': 'Basic Information'
+            }
+        },
+        'weights': {
+            'test_number': 1.0,
+            'test_parametrized': 1.0,
+        }
+    }
+    results = HistoryReport(history, configuration).result
+
+    assert set(results.keys()) == set(['cards', 'tests', 'score', 'weights'])
