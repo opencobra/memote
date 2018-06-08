@@ -45,32 +45,32 @@ def mock_history_manager():
             "test_parametrized": {
                 "data": {
                     "parameter1": ["item2", "item3"],
-                    "parameter1": ["item4", "item3"]
+                    "parameter2": ["item4", "item3"]
                 },
                 "duration": {
                     "parameter1": 0.12,
-                    "parameter1": 0.32
+                    "parameter2": 0.32
                 },
                 "format_type": 'percent',
                 "message": {
                     "parameter1": "Some Message 1",
-                    "parameter1": "Some Message 2"
+                    "parameter2": "Some Message 2"
                 },
                 "metric": {
                     "parameter1": 0.5,
-                    "parameter1": 0.9
+                    "parameter2": 0.9
                 },
                 "result": {
                     "parameter1": "failed",
-                    "parameter1": "failed"
+                    "parameter2": "failed"
                 },
                 "summary": "Some description of the test",
                 "title": "Parametrized Test"
             },
             "test_number": {
-                "data": (5, 8),
+                "data": ['x', 'y', 'z'],
                 "duration": 0.002,
-                "format_type": "percent",
+                "format_type": "count",
                 "message": "Some Message 3",
                 "result": "passed",
                 "summary": "Some description again",
@@ -95,32 +95,32 @@ def mock_history_manager():
             "test_parametrized": {
                 "data": {
                     "parameter1": ["item1", "item2"],
-                    "parameter1": ["item2", "item3"]
+                    "parameter2": ["item2", "item3"]
                 },
                 "duration": {
                     "parameter1": 0.2,
-                    "parameter1": 0.1
+                    "parameter2": 0.1
                 },
                 "format_type": 'percent',
                 "message": {
                     "parameter1": "Some Message 1",
-                    "parameter1": "Some Message 2"
+                    "parameter2": "Some Message 2"
                 },
                 "metric": {
                     "parameter1": 1.0,
-                    "parameter1": 1.0
+                    "parameter2": 1.0
                 },
                 "result": {
                     "parameter1": "failed",
-                    "parameter1": "failed"
+                    "parameter2": "failed"
                 },
                 "summary": "Some description of the test",
                 "title": "Parametrized Test"
             },
             "test_number": {
-                "data": (2, 3),
+                "data": ['x', 'y', 'z'],
                 "duration": 0.002,
-                "format_type": "percent",
+                "format_type": "count",
                 "message": "Some Message 3",
                 "result": "passed",
                 "summary": "Some description again",
@@ -130,7 +130,7 @@ def mock_history_manager():
         }
     })
     branch_structure = {
-        "commits":{
+        "commits": {
             "3f4665356a24d76a9461043f62a2b12dab56c75f": {
                 "timestamp": "2017-05-03 18:26:11+02:00",
                 "author": "John Doe",
@@ -143,7 +143,7 @@ def mock_history_manager():
             }
         },
         "branches": {
-            "master":["3f4665356a24d76a9461043f62a2b12dab56c75f"],
+            "master": ["3f4665356a24d76a9461043f62a2b12dab56c75f"],
             "develop": ["6e30d6236f5d47ebb4be39253eaa6a5dcb487687",
                         "3f4665356a24d76a9461043f62a2b12dab56c75f"]
         }
@@ -191,7 +191,8 @@ def test_structure(mock_history_manager):
                         'weight': 1.0
                     }
                 },
-            'title': 'Core Tests'},
+                'title': 'Core Tests'
+            },
             'test_basic': {
                 'cases': [
                     'test_number'
@@ -207,3 +208,6 @@ def test_structure(mock_history_manager):
     results = HistoryReport(history, configuration).result
 
     assert set(results.keys()) == set(['cards', 'tests', 'score', 'weights'])
+    assert set(results["score"].keys()) == set(['total_score'])
+    assert set(results["score"]["total_score"].keys()) == \
+        set(['history', 'format_type'])
