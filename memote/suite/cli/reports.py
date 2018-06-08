@@ -203,18 +203,18 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
-    diff_store = dict()
+    diff_results = dict()
     for model_path in models:
         try:
-            filename = model_path.split('/')[-1].split('.')[0]
+            model_filename = model_path.split('/')[-1].split('.')[0]
             model = callbacks.validate_model(model_path)
             model.solver = solver
-            _, diff_store[filename] = api.test_model(model, results=True,
+            _, diff_results[model_filename] = api.test_model(model, results=True,
                                              pytest_args=pytest_args,
                                              skip=skip, exclusive=exclusive,
                                              experimental=experimental)
         except:
             pass
     with open(filename, "w", encoding="utf-8") as file_handle:
-        LOGGER.info("Writing snapshot report to '%s'.", filename)
-        file_handle.write(api.diff_report(diff_store, config))
+        LOGGER.info("Writing diff report to '%s'.", filename)
+        file_handle.write(api.diff_report(diff_results, config))

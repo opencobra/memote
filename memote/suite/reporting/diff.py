@@ -23,11 +23,24 @@ from memote.suite.reporting.report import Report
 
 
 class DiffReport(Report):
-    """Render a report from the comparison of two models."""
+    """
+    Render a report displaying the results of two or more models.
 
-    def __init__(self, **kwargs):
+    Attributes
+    ----------
+    diff_results : python.Dictionary
+        The dictionary structure of memote.MemoteResult objects.
+    configuration : memote.MemoteConfiguration
+        A memote configuration structure.
+
+    """
+
+    def __init__(self, diff_results, configuration, **kwargs):
         """Initialize the data."""
-        super(DiffReport, self).__init__(**kwargs)
+        super(DiffReport, self).__init__(
+            result=None, configuration=configuration, **kwargs)
+        self.results = diff_results
+        self.config = configuration
         self._report_type = "diff"
 
     def render_html(self):
