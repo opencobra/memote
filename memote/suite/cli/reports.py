@@ -153,11 +153,68 @@ def history(location, filename, custom_config):
 
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("modela", type=click.Path(exists=True, dir_okay=False))
-@click.argument("modelb", type=click.Path(exists=True, dir_okay=False))
+@click.argument("models", type=click.Path(exists=True, dir_okay=False),
+                nargs=-1)
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
-def diff(modela, modelb, filename):
-    """Compare two metabolic models against each other."""
-    raise NotImplementedError(u"Coming soon™.")
+@click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
+              help="Any additional arguments you want to pass to pytest. "
+                   "Should be given as one continuous string.")
+@click.option("--exclusive", type=str, multiple=True, metavar="TEST",
+              help="The name of a test or test module to be run exclusively. "
+                   "All other tests are skipped. This option can be used "
+                   "multiple times and takes precedence over '--skip'.")
+@click.option("--skip", type=str, multiple=True, metavar="TEST",
+              help="The name of a test or test module to be skipped. This "
+                   "option can be used multiple times.")
+@click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
+              default="glpk", show_default=True,
+              help="Set the solver to be used.")
+@click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
+              default=None, callback=callbacks.validate_experimental,
+              help="Define additional tests using experimental data.")
+@click.option("--custom-tests", type=click.Path(exists=True, file_okay=False),
+              multiple=True,
+              help="A path to a directory containing custom test "
+                   "modules. Please refer to the documentation for more "
+                   "information on how to write custom tests. May be "
+                   "specified multiple times.")
+@click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
+              multiple=True,
+              help="A path to a report configuration file that will be merged "
+                   "into the default configuration. It's primary use is to "
+                   "configure the placement and scoring of custom tests but "
+                   "it can also alter the default behavior. Please refer to "
+                   "the documentation for the expected YAML format used. This "
+                   "option can be specified multiple times.")
+def diff(models, filename, pytest_args, exclusive, skip, solver,
+        experimental, custom_tests, custom_config):
+    """
+    Take a snapshot of all the supplied models and generate a diff report.
+
+    MODELS: List of paths to model files.
+    """
+    if not any(a.startswith("--tb") for a in pytest_args):
+        pytest_args = ["--tb", "no"] + pytest_args
+    # Add further directories to search for tests.
+    pytest_args.extend(custom_tests)
+    config = ReportConfiguration.load()
+    # Update the default test configuration with custom ones (if any).
+    for custom in custom_config:
+        config.merge(ReportConfiguration.load(custom))
+    diff_store = dict()
+    for model_path in models:
+        try:
+            filename = model_path.split('/')[-1].split('.')[0]
+            model = callbacks.validate_model(model_path)
+            model.solver = solver
+            _, diff_store[filename] = api.test_model(model, results=True,
+                                             pytest_args=pytest_args,
+                                             skip=skip, exclusive=exclusive,
+                                             experimental=experimental)
+        except:
+            pass
+    with open(filename, "w", encoding="utf-8") as file_handle:
+        LOGGER.info("Writing snapshot report to '%s'.", filename)
+        file_handle.write(api.diff_report(diff_store, config))
