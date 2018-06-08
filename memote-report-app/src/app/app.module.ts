@@ -15,6 +15,7 @@ import { SystemInformationComponent } from './dashboard/system-information/syste
 import { AccordionComponent } from './accordion/accordion.component';
 import { ResultButtonComponent } from './result-button/result-button.component';
 import { VegaPlotComponent } from "./vega-plot/vega-plot.component";
+import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component";
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { VegaPlotComponent } from "./vega-plot/vega-plot.component";
     SystemInformationComponent,
     AccordionComponent,
     ResultButtonComponent,
-    VegaPlotComponent
+    VegaPlotComponent,
+    VegaBarChartComponent
   ],
   imports: [
     BrowserModule,

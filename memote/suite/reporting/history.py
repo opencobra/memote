@@ -76,9 +76,24 @@ class HistoryReport(Report):
 
         base = dict()
         tests = base.setdefault("tests", dict())
+        score = base.setdefault("score", dict())
+        score_collection = score.setdefault("total_score", dict())
         for branch, commits in self._history.iter_branches():
             for commit in commits:
-                result = self._history.get_result(commit, )
+                result = self.result = self._history.get_result(commit, )
+                # Calculate the score for each result and store all the total
+                # scores for each commit in the base dictionary.
+                self.compute_score()
+                total_score = self.result["score"]["total_score"]
+                score_collection.setdefault("history", list())
+                score_collection["format_type"] = "score"
+                score_collection["history"].append({
+                    "branch": branch,
+                    "commit": commit,
+                    "metric": total_score})
+                # Now arrange the results for each test into the appropriate
+                # format. Specifically such that the Accordion and the Vega
+                # Plot components can easily read them.
                 for test in result.cases:
                     tests.setdefault(test, dict())
                     if "title" not in tests[test]:

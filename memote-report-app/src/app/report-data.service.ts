@@ -14,6 +14,7 @@ export class ReportDataService {
   scoredTests: string[] = [];
   reportType: string;
   allExpandState = false;
+  score: any;
 
   constructor(private http: HttpClient) {}
 
@@ -37,14 +38,14 @@ export class ReportDataService {
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
-        // this.http.get('/data/testData.json')
-        // .subscribe(data => {this.convertResults(data); });
-        // this.reportType = 'snapshot';
-        // break;
-        this.http.get('/data/testHistory.json')
-        .subscribe(data => {this.convertHistoryResults(data); });
-        this.reportType = 'history';
+        this.http.get('/data/testData.json')
+        .subscribe(data => {this.convertResults(data); });
+        this.reportType = 'snapshot';
         break;
+        // this.http.get('/data/testHistory.json')
+        // .subscribe(data => {this.convertHistoryResults(data); });
+        // this.reportType = 'history';
+        // break;
       }
   }
 }
@@ -109,6 +110,7 @@ export class ReportDataService {
       }
     }
     this.extractMetadata(data);
+    this.extractScoring(data);
     this.distributeCardsToSections(data);
     this.determineScoredTests();
   }
@@ -139,11 +141,17 @@ export class ReportDataService {
   }
   this.distributeCardsToSections(data);
   this.determineScoredTests();
+  this.extractScoring(data);
 }
 
   private extractMetadata(data: Object): void {
     // Extract metaddata information to be used in the metadata card
     this.metaData = data['meta'];
+  }
+
+  private extractScoring(data: Object): void {
+    // Extract score information to be used in the score display and bar chart plot
+    this.score = data['score'];
   }
 
   private distributeCardsToSections(data: Object): void {
