@@ -209,5 +209,13 @@ def test_structure(mock_history_manager):
 
     assert set(results.keys()) == set(['cards', 'tests', 'score', 'weights'])
     assert set(results["score"].keys()) == set(['total_score'])
-    assert set(results["score"]["total_score"].keys()) == \
+    assert set(
+        results["score"]["total_score"].keys()) == \
         set(['history', 'format_type'])
+    assert set(results["score"]["total_score"]["history"][0]) == \
+        set(["commit", "metric", "branch"])
+    assert set(
+        results["tests"]["test_parametrized"]["history"]["parameter1"][0]
+    ) == set(["commit", "metric", "branch", "data", "result"])
+    assert set(results["tests"]["test_number"]["history"][0]) == \
+        set(["commit", "metric", "branch", "data", "result"])
