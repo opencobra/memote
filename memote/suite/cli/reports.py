@@ -189,7 +189,7 @@ def history(location, filename, custom_config):
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
 def diff(models, filename, pytest_args, exclusive, skip, solver,
-        experimental, custom_tests, custom_config):
+         experimental, custom_tests, custom_config):
     """
     Take a snapshot of all the supplied models and generate a diff report.
 
@@ -203,18 +203,21 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
+    # Build the diff report specific data structure
     diff_results = dict()
     for model_path in models:
         try:
             model_filename = model_path.split('/')[-1].split('.')[0]
-            model = callbacks.validate_model(model_path)
+            diff_results.setdefault(model_filename, dict())
+            model = callbacks._load_model(model_path)
             model.solver = solver
-            _, diff_results[model_filename] = api.test_model(model, results=True,
-                                             pytest_args=pytest_args,
-                                             skip=skip, exclusive=exclusive,
-                                             experimental=experimental)
-        except:
-            pass
+            _, diff_results[model_filename] = api.test_model(
+                model, results=True, pytest_args=pytest_args,
+                skip=skip, exclusive=exclusive, experimental=experimental)
+        except Exception as e:
+            LOGGER.warning(
+                "The following exception occurred while loading model {}: {}"
+                "".format(model_filename, e))
     with open(filename, "w", encoding="utf-8") as file_handle:
         LOGGER.info("Writing diff report to '%s'.", filename)
         file_handle.write(api.diff_report(diff_results, config))

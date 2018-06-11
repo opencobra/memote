@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+from six import iteritems
 from memote.suite.reporting.report import Report
 
 
@@ -39,10 +40,40 @@ class DiffReport(Report):
         """Initialize the data."""
         super(DiffReport, self).__init__(
             result=None, configuration=configuration, **kwargs)
-        self.results = diff_results
         self.config = configuration
         self._report_type = "diff"
+        self.result = self.format_and_score_diff_data(diff_results)
+        self.result.update(self.config)
 
-    def render_html(self):
-        """Render an HTML report for a model."""
-        raise NotImplementedError(u"Coming soon™.")
+    def format_and_score_diff_data(self, diff_results):
+        base = dict()
+        meta = base.setdefault('meta', dict())
+        tests = base.setdefault('tests', dict())
+        score = base.setdefault('score', dict())
+        for model_filename, result in iteritems(diff_results):
+            if meta == dict():
+                meta = result["meta"]
+            for test_id, test_results in iteritems(result["tests"]):
+                tests.setdefault(test_id, dict()).setdefault("diff", list())
+                if tests[test_id]["diff"] == list():
+                    tests[test_id]["summary"] = test_results["summary"]
+                    tests[test_id]["title"] = test_results["title"]
+                    tests[test_id]["format_type"] = test_results["format_type"]
+                tests[test_id]["diff"].append({
+                    "model": model_filename,
+                    "data": test_results.setdefault("data"),
+                    "duration": test_results.setdefault("duration"),
+                    "message": test_results.setdefault("message"),
+                    "metric": test_results.setdefault("metric"),
+                    "result": test_results.setdefault("result")})
+            self.result = result
+            self.compute_score()
+            score.setdefault('total_score', dict()).setdefault('diff', list())
+            score.setdefault('sections', dict()).setdefault('diff', list())
+            score['total_score']['diff'].append({
+                "model": model_filename,
+                "total_score": self.result['score']['total_score']})
+            for section in self.result['score']['sections']:
+                section.update({"model": model_filename})
+                score['sections']['diff'].append(section)
+        return base
