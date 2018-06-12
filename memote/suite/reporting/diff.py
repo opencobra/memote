@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 from six import iteritems
 from memote.suite.reporting.report import Report
-
+from memote.utils import jsonify
 
 class DiffReport(Report):
     """
@@ -44,6 +44,7 @@ class DiffReport(Report):
         self._report_type = "diff"
         self.result = self.format_and_score_diff_data(diff_results)
         self.result.update(self.config)
+        print (jsonify(self.result, pretty=True))
 
     def format_and_score_diff_data(self, diff_results):
         base = dict()
@@ -54,18 +55,31 @@ class DiffReport(Report):
             if meta == dict():
                 meta = result["meta"]
             for test_id, test_results in iteritems(result["tests"]):
-                tests.setdefault(test_id, dict()).setdefault("diff", list())
-                if tests[test_id]["diff"] == list():
+                tests.setdefault(test_id, dict())
+                if tests[test_id] == dict():
                     tests[test_id]["summary"] = test_results["summary"]
                     tests[test_id]["title"] = test_results["title"]
                     tests[test_id]["format_type"] = test_results["format_type"]
-                tests[test_id]["diff"].append({
-                    "model": model_filename,
-                    "data": test_results.setdefault("data"),
-                    "duration": test_results.setdefault("duration"),
-                    "message": test_results.setdefault("message"),
-                    "metric": test_results.setdefault("metric"),
-                    "result": test_results.setdefault("result")})
+                if isinstance(test_results["metric"], dict):
+                    tests[test_id].setdefault("diff", dict())
+                    for param in test_results["metric"]:
+                        tests[test_id]["diff"].setdefault(param, list()). \
+                            append({
+                                "model": model_filename,
+                                "data": test_results["data"].setdefault(param),
+                                "duration": test_results["duration"].setdefault(param),
+                                "message": test_results["message"].setdefault(param),
+                                "metric": test_results["metric"].setdefault(param),
+                                "result": test_results["result"].setdefault(param)})
+                else:
+                    tests[test_id].setdefault("diff", list())
+                    tests[test_id]["diff"].append({
+                        "model": model_filename,
+                        "data": test_results.setdefault("data"),
+                        "duration": test_results.setdefault("duration"),
+                        "message": test_results.setdefault("message"),
+                        "metric": test_results.setdefault("metric"),
+                        "result": test_results.setdefault("result")})
             self.result = result
             self.compute_score()
             score.setdefault('total_score', dict()).setdefault('diff', list())

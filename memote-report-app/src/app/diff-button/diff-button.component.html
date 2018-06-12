@@ -1,0 +1,36 @@
+<div *ngIf="data.isScored(data.getParam(testId, 0)); else notScored">
+    <!-- If they are from scored tests colorize the result button -->
+    <!-- <div *ngFor="let results of data.byID(testId).diff"> -->
+      <button
+      *ngFor="let results of data.byID(testId).diff"
+      mat-raised-button
+      color="primary"
+      [ngStyle]="{'background-color':highlightColor}">
+        {{ 1 - results.metric | percent : '1.0' }}
+        <!-- {{ 1 - data.byID(testId)?.metric | percent : '1.2-2' }} -->
+      </button>
+    <!-- </div> -->
+</div>
+<ng-template #notScored>
+  <!-- If they are from unscored tests the user has some control over how -->
+  <!-- they are displayed using the 'format_type' attribute of each test. -->
+    <button
+    *ngFor="let results of data.byID(testId).diff"
+    mat-raised-button
+    color="primary"
+    [ngStyle]="{'background-color':highlightColor}">
+      <!-- Hence for each test, determine now how the result ought to be formatted -->
+      <div *ngIf="data.byID(testId)?.format_type === 'count'">
+        {{ results.data?.length | number : '1.'}}
+      </div>
+      <div *ngIf="data.byID(testId)?.format_type === 'number'">
+        {{ results.data | number : '1.2-2'}}
+      </div>
+      <div *ngIf="data.byID(testId)?.format_type === 'percent'">
+        {{ results.metric | number : '1.2-2'}}
+      </div>
+      <div *ngIf="data.byID(testId)?.format_type === 'raw'">
+        {{ results.data }}
+      </div>
+    </button>
+</ng-template>

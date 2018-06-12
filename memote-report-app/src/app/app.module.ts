@@ -14,8 +14,9 @@ import { KeysPipe } from './keys.pipe';
 import { SystemInformationComponent } from './dashboard/system-information/system-information.component';
 import { AccordionComponent } from './accordion/accordion.component';
 import { ResultButtonComponent } from './result-button/result-button.component';
-import { VegaPlotComponent } from "./vega-plot/vega-plot.component";
-import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component";
+import { DiffButtonComponent } from './diff-button/diff-button.component';
+import { VegaPlotComponent } from './vega-plot/vega-plot.component';
+import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component
     SystemInformationComponent,
     AccordionComponent,
     ResultButtonComponent,
+    DiffButtonComponent,
     VegaPlotComponent,
     VegaBarChartComponent
   ],

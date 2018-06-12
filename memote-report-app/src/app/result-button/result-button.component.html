@@ -1,4 +1,4 @@
-<!-- First distinguish wether the tests have passed/failed or skipped or errorer -->
+<!-- First distinguish wether the tests have passed/failed or skipped or errored -->
 <div *ngIf="data.byID(testId)?.result === 'passed' || data.byID(testId)?.result === 'failed'">
   <!-- Then determine if the test results are from scored or from unscored tests -->
   <div *ngIf="data.isScored(data.getParam(testId, 0)); else notScored">

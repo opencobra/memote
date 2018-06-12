@@ -6,7 +6,12 @@
         fxLayoutAlign='space-between start'
         *ngIf="data.reportType != 'history'; else vegaHistoryScore">
         <div fxFlex> Total Score
-          <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
+          <div *ngIf="data.reportType === 'snapshot'; else diffScore">
+            <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
+          </div>
+          <ng-template>
+              <div>  SOMETHING FOR NOW </div>
+          </ng-template>
         </div>
         <div fxFlex class="svg-container"> Score per Category
           <br>
