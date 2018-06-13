@@ -48,6 +48,7 @@ class DiffReport(Report):
         print(jsonify(self.result, pretty=True))
 
     def format_and_score_diff_data(self, diff_results):
+        """Reformat the api results to work with the front-end."""
         base = dict()
         meta = base.setdefault('meta', dict())
         tests = base.setdefault('tests', dict())
