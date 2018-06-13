@@ -8,6 +8,7 @@ Next Release
 * Display the score on History and Snapshot reports.
 * Invert the colour coding.
 * Display results as percentages.
+* Add ability to generate a diff report which compares two or more models. 
 
 0.7.6 (2018-05-28)
 ------------------
