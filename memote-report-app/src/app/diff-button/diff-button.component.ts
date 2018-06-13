@@ -21,11 +21,12 @@ export class DiffButtonComponent implements OnInit {
   }
 
   getDiffColor() {
-    const red: string;
     if ( this.data.isScored(this.data.getParam(this.testId, 0)) ) {
       for (const results of this.data.byID(this.testId).diff){
         this.metricList.push(results.metric);
       }
+      console.log(this.testId)
+      console.log(this.metricList)
       this.spectrum(this.ratioOrVariance(this.metricList));
     } else {
     if (this.data.byID(this.testId).format_type !== 'raw') {
@@ -57,22 +58,26 @@ export class DiffButtonComponent implements OnInit {
   }
 
   ratioOrVariance(array: any[]) {
+    const minimum = Math.min(...array);
+    const maximum = Math.max(...array);
     if (array.length === 2 && array[0] === array[1]) {
       return 0;
+    }
+    if (minimum === 0) {
+      return (1 - (minimum + 1 / maximum + 1)) * 100;
     } else {
-      const minimum = Math.min(...array);
-      const maximum = Math.max(...array);
-      return (minimum / maximum) * 100;
+      return (1 - (minimum / maximum)) * 100;
     }
   }
 
   determineStringEquality(array: any[]) {
+    let allEqual: boolean;
     if (array.length) {
-      const allTheSame: boolean = !!array.reduce(function(a, b){ return (a === b) ? a : NaN; });
+      allEqual = !!array.reduce(function(a, b){ return (a === b) ? a : NaN; });
     } else {
-      const allTheSame = false;
+      allEqual = false;
     }
-    if (allTheSame) {
+    if (allEqual) {
       return 0;
     } else {
       return 100;
