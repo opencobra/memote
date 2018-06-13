@@ -49,13 +49,13 @@ export const specGroupedBarChart = {
         'facet': {
           'data': 'diff',
           'name': 'facet',
-          'groupby': 'category'
+          'groupby': 'model'
         }
       },
 
       'encode': {
         'enter': {
-          'y': {'scale': 'yscale', 'field': 'category'}
+          'y': {'scale': 'yscale', 'field': 'model'}
         }
       },
 
