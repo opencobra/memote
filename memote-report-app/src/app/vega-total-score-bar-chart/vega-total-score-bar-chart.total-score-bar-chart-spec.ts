@@ -1,27 +1,18 @@
 export const specTotalScoreBarChart = {
   "$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 300,
-  "height": 200,
+  "height": 240,
   "autosize": 'fit',
   "padding": 'strict',
   "data": [
     {
       "name": "table",
-      "values": []
-    }
-  ],
-
-  "signals": [
-    {
-      "name": "tooltip",
-      "value": {},
-      "on": [
-        {"events": "rect:mouseover", "update": "datum"},
-        {"events": "rect:mouseout",  "update": "{}"}
+      "values": [],
+      'transform': [
+        {"type": "formula", "as": "percent", "expr": "round(datum.total_score * 100)"}
       ]
     }
   ],
-
   "scales": [
     {
       "name": "xscale",
@@ -33,7 +24,7 @@ export const specTotalScoreBarChart = {
     },
     {
       "name": "yscale",
-      "domain": {"data": "table", "field": "total_score"},
+      "domain": {"data": "table", "field": "percent"},
       "nice": true,
       "range": "height"
     }
@@ -52,36 +43,34 @@ export const specTotalScoreBarChart = {
         "enter": {
           "x": {"scale": "xscale", "field": "model"},
           "width": {"scale": "xscale", "band": 1},
-          "y": {"scale": "yscale", "field": "total_score"},
+          "y": {"scale": "yscale", "field": "percent"},
           "y2": {"scale": "yscale", "value": 0}
-        },
-        "update": {
-          "fill": {"value": "steelblue"}
-        },
-        "hover": {
-          "fill": {"value": "red"}
         }
       }
     },
-    {
-      "type": "text",
-      "encode": {
-        "enter": {
-          "align": {"value": "center"},
-          "baseline": {"value": "bottom"},
-          "fill": {"value": "#333"}
-        },
-        "update": {
-          "x": {"scale": "xscale", "signal": "tooltip.model", "band": 0.5},
-          "y": {"scale": "yscale", "signal": "tooltip.total_score", "offset": -2},
-          "text": {"signal": "tooltip.total_score"},
-          "fillOpacity": [
-            {"test": "datum === tooltip", "value": 0},
-            {"value": 1}
-          ]
-        }
+    {"type": "text",
+    "from": {
+        "data": "table"
+      },
+    "encode":{
+      "enter":{
+        "text": {"field": "percent"},
+         "x": {
+            "scale": "xscale",
+            "field": "model",
+            "band": 0.5
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "percent",
+            "offset" : 5
+          },
+        "fill": {"value": "white"},
+        "align": {"value": "center"},
+        "baseline": {"value": "top"},
+        "fontSize": {"value": 18}
       }
     }
+    }
   ]
-}
-;
+};

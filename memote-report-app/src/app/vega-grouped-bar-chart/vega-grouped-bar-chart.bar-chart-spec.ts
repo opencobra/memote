@@ -7,10 +7,29 @@ export const specGroupedBarChart = {
   'data': [
     {
       'name': 'diff',
-      'values': []
+      'values': [],
+      'transform': [
+        {"type": "formula", "as": "percent", "expr": "round(datum.score * 100)"}
+      ]
     }
   ],
-
+  "legends": [
+    {
+      'columns' : 0,
+      "orient": "bottom",
+      "fill": "color",
+      "encode": {
+        "title": {
+          "update": {
+            "fontSize": {"value": 14}
+          }
+        },
+        "labels": {
+          "interactive": false
+        }
+      }
+    }
+  ],
   'scales': [
     {
       'name': 'yscale',
@@ -22,7 +41,7 @@ export const specGroupedBarChart = {
     {
       'name': 'xscale',
       'type': 'linear',
-      'domain': {'data': 'diff', 'field': 'score'},
+      'domain': {'data': 'diff', 'field': 'percent'},
       'range': 'width',
       'round': true,
       'zero': true,
@@ -81,8 +100,8 @@ export const specGroupedBarChart = {
             'enter': {
               'y': {'scale': 'pos', 'field': 'section'},
               'height': {'scale': 'pos', 'band': 1},
-              'x': {'scale': 'xscale', 'field': 'score'},
-              'x2': {'scale': 'xscale', 'score': 0},
+              'x': {'scale': 'xscale', 'field': 'percent'},
+              'x2': {'scale': 'xscale', 'percent': 0},
               'fill': {'scale': 'color', 'field': 'section'}
             }
           }
@@ -97,7 +116,8 @@ export const specGroupedBarChart = {
               'fill': {'value': 'white'},
               'align': {'value': 'right'},
               'baseline': {'value': 'middle'},
-              'text': {'field': 'datum.value'}
+              'text': { 'field': 'datum.percent'},
+              "fontSize": {"value": 18}
             }
           }
         }
