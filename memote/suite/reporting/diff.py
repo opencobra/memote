@@ -23,6 +23,7 @@ from six import iteritems
 from memote.suite.reporting.report import Report
 from memote.utils import jsonify
 
+
 class DiffReport(Report):
     """
     Render a report displaying the results of two or more models.
@@ -44,7 +45,7 @@ class DiffReport(Report):
         self._report_type = "diff"
         self.result = self.format_and_score_diff_data(diff_results)
         self.result.update(self.config)
-        print (jsonify(self.result, pretty=True))
+        print(jsonify(self.result, pretty=True))
 
     def format_and_score_diff_data(self, diff_results):
         base = dict()
@@ -67,10 +68,14 @@ class DiffReport(Report):
                             append({
                                 "model": model_filename,
                                 "data": test_results["data"].setdefault(param),
-                                "duration": test_results["duration"].setdefault(param),
-                                "message": test_results["message"].setdefault(param),
-                                "metric": test_results["metric"].setdefault(param),
-                                "result": test_results["result"].setdefault(param)})
+                                "duration":
+                                    test_results["duration"].setdefault(param),
+                                "message":
+                                    test_results["message"].setdefault(param),
+                                "metric":
+                                    test_results["metric"].setdefault(param),
+                                "result":
+                                    test_results["result"].setdefault(param)})
                 else:
                     tests[test_id].setdefault("diff", list())
                     tests[test_id]["diff"].append({
