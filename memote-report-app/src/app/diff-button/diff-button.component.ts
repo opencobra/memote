@@ -21,7 +21,7 @@ export class DiffButtonComponent implements OnInit {
   }
 
   getDiffColor() {
-    let red: string;
+    const red: string;
     if ( this.data.isScored(this.data.getParam(this.testId, 0)) ) {
       for (const results of this.data.byID(this.testId).diff){
         this.metricList.push(results.metric);

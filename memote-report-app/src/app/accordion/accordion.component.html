@@ -82,10 +82,13 @@
               </textarea>
               </div>
               <div *ngSwitchCase="'diff'">
-                <br>
-                  <div>
-                    <p>NOT SURE WHAT TO PUT HERE YET</p>
+                  <div *ngFor='let results of data.byID(testId)?.diff; let i = index'>
+                    <p> For model "{{ results.model }}" : {{ results.message }} </p>
                   </div>
+                  <br>
+                  <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+                    {{ data.getString(data.byID(testId)?.diff) }}
+                  </textarea>
               </div>
               <div *ngSwitchCase="'history'">
                   <br>

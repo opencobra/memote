@@ -17,6 +17,8 @@ import { ResultButtonComponent } from './result-button/result-button.component';
 import { DiffButtonComponent } from './diff-button/diff-button.component';
 import { VegaPlotComponent } from './vega-plot/vega-plot.component';
 import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
+import { VegaTotalScoreBarChartComponent } from './vega-total-score-bar-chart/vega-total-score-bar-chart.component';
+import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grouped-bar-chart.component';
 
 
 @NgModule({
@@ -32,7 +34,9 @@ import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component
     ResultButtonComponent,
     DiffButtonComponent,
     VegaPlotComponent,
-    VegaBarChartComponent
+    VegaBarChartComponent,
+    VegaGroupedBarChartComponent,
+    VegaTotalScoreBarChartComponent
   ],
   imports: [
     BrowserModule,

@@ -9,14 +9,27 @@
           <div *ngIf="data.reportType === 'snapshot'; else diffScore">
             <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
           </div>
-          <ng-template>
-              <div>  SOMETHING FOR NOW </div>
+          <ng-template #diffScore>
+              <div> 
+                <app-vega-total-score-bar-chart> </app-vega-total-score-bar-chart>
+              </div>
           </ng-template>
         </div>
-        <div fxFlex class="svg-container"> Score per Category
+        <div>
+        <div 
+          fxFlex 
+          class="svg-container"
+          *ngIf="data.reportType === 'snapshot'; else diffSectionScore"> Score per Category
           <br>
               <app-vega-bar-chart ></app-vega-bar-chart>
         </div>
+        <ng-template #diffSectionScore>
+            <div fxFlex class="svg-container"> Score per Category
+            <br>
+                <app-vega-grouped-bar-chart ></app-vega-grouped-bar-chart>
+          </div>
+        </ng-template>
+      </div>
       </div>
       <ng-template #vegaHistoryScore>
           <div>
