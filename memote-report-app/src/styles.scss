@@ -81,20 +81,17 @@ textarea {
   font-weight: 500;
 }
 
-// .svg-container {
-//   display: inline-block;
-// 	position: relative;
-//   width: 100%;
-// 	padding-bottom: 100%; 
-// 	vertical-align: middle; 
-// 	overflow: hidden; 
-// }
-
-// svg {
-//   width: 100%;
-//   height: 100%;
-// 	display: inline-block;
-// 	position: absolute;
-// 	top: 0;
-// 	left: 0;
-// }
+.MatButtonEmulation {
+  font: caption;
+  display:inline-block;
+  margin: 0.05vh;
+  white-space: normal;
+  word-wrap: break-word;
+  border-radius: 2px;
+  text-align: center;
+  color: white ;
+  background: #2a7bb8; 
+  width: 70px;
+  padding: 0.5vw;
+  height: auto; 
+}
