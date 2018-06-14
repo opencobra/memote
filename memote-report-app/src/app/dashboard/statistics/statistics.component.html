@@ -1,7 +1,10 @@
 <mat-card fxFlex>
   <mat-card-title>{{ currentCard.cardName }}</mat-card-title>
     <mat-card-content>
-      <div *ngFor="let case of currentCard.associatedTests">
+      <div *ngFor="let case of currentCard.associatedTests; let first = first">
+        <div *ngIf="first && data.reportType === 'diff'">
+            BLERGH
+        </div>
          <app-accordion [case]="case"></app-accordion>
       </div>
     </mat-card-content>

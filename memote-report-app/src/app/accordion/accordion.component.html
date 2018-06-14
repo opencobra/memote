@@ -41,26 +41,26 @@
               <td class="test-title">
                 {{ data.byID(testId)?.title }}
               </td>
-              <td *ngIf="data.reportType === 'snapshot'; else diffButtonTitle">
+                <div [ngSwitch]="data.reportType">
+                <td *ngSwitchCase="'snapshot'">
                   <app-result-button [testId]="testId"></app-result-button>
                 </td>
-                <ng-template #diffButtonTitle>
-                  <td>
+                  <td *ngSwitchCase="'diff'">
                     <app-diff-button [testId]="testId"></app-diff-button>
                   </td>
-                </ng-template>
+              </div>
             </mat-panel-title>
             <ng-template #noTitle>
               <mat-panel-title fxLayoutAlign='space-between center'>
                 <td style="padding-left:1vh"> {{ data.getParam(testId, 1) }} </td>
-                <td *ngIf="data.reportType === 'snapshot'; else diffButton">
+                <div [ngSwitch]="data.reportType">
+                <td *ngSwitchCase="'snapshot'">
                   <app-result-button [testId]="testId"></app-result-button>
                 </td>
-                <ng-template #diffButton>
-                  <td>
+                <td *ngSwitchCase="'diff'">
                     <app-diff-button [testId]="testId"></app-diff-button>
                   </td>
-                </ng-template>
+                </div>
               </mat-panel-title>
             </ng-template>
           </mat-expansion-panel-header>
