@@ -111,10 +111,10 @@ export const specGroupedBarChart = {
           'from': {'data': 'bars'},
           'encode': {
             'enter': {
-              'x': {'field': 'x2', 'offset': -5},
+              'x': {'field': 'x2', 'band': 1, 'offset': 4},
               'y': {'field': 'y', 'offset': {'field': 'height', 'mult': 0.5}},
-              'fill': {'value': 'white'},
-              'align': {'value': 'right'},
+              'fill': {'value': 'black'},
+              'align': {'value': 'left'},
               'baseline': {'value': 'middle'},
               'text': { 'field': 'datum.percent'},
               "fontSize": {"value": 18}

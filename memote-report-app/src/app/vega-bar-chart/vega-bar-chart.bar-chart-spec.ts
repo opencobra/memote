@@ -7,19 +7,14 @@ export const specBarChart = {
   "data": [
     {
       "name": "table",
-      "values": []
+      "values": [],
+      'transform': [
+        {"type": "formula", "as": "percent", "expr": "round(datum.score * 100)"}
+      ]
     }
   ],
 
   "signals": [
-    {
-      "name": "tooltip",
-      "value": {},
-      "on": [
-        {"events": "rect:mouseover", "update": "datum"},
-        {"events": "rect:mouseout",  "update": "{}"}
-      ]
-    }
   ],
 
   "scales": [
@@ -33,7 +28,7 @@ export const specBarChart = {
     },
     {
       "name": "yscale",
-      "domain": {"data": "table", "field": "score"},
+      "domain": {"data": "table", "field": "percent"},
       "nice": true,
       "range": "height"
     }
@@ -52,36 +47,34 @@ export const specBarChart = {
         "enter": {
           "x": {"scale": "xscale", "field": "section"},
           "width": {"scale": "xscale", "band": 1},
-          "y": {"scale": "yscale", "field": "score"},
+          "y": {"scale": "yscale", "field": "percent"},
           "y2": {"scale": "yscale", "value": 0}
-        },
-        "update": {
-          "fill": {"value": "steelblue"}
-        },
-        "hover": {
-          "fill": {"value": "red"}
         }
       }
     },
-    {
-      "type": "text",
-      "encode": {
-        "enter": {
-          "align": {"value": "center"},
-          "baseline": {"value": "bottom"},
-          "fill": {"value": "#333"}
-        },
-        "update": {
-          "x": {"scale": "xscale", "signal": "tooltip.section", "band": 0.5},
-          "y": {"scale": "yscale", "signal": "tooltip.score", "offset": -2},
-          "text": {"signal": "tooltip.score"},
-          "fillOpacity": [
-            {"test": "datum === tooltip", "value": 0},
-            {"value": 1}
-          ]
-        }
+    {"type": "text",
+    "from": {
+        "data": "table"
+      },
+    "encode":{
+      "enter":{
+        "text": {"field": "percent"},
+         "x": {
+            "scale": "xscale",
+            "field": "section",
+            "band": 0.5
+          },
+          "y": {
+            "scale": "yscale",
+            "field": "percent",
+            "offset" : -2
+          },
+        "fill": {"value": "black"},
+        "align": {"value": "center"},
+        "baseline": {"value": "bottom"},
+        "fontSize": {"value": 18}
       }
     }
+    }
   ]
-}
-;
+};

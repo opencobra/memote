@@ -63,11 +63,11 @@ export const specTotalScoreBarChart = {
           "y": {
             "scale": "yscale",
             "field": "percent",
-            "offset" : 5
+            "offset" : -2
           },
-        "fill": {"value": "white"},
+        "fill": {"value": "black"},
         "align": {"value": "center"},
-        "baseline": {"value": "top"},
+        "baseline": {"value": "bottom"},
         "fontSize": {"value": 18}
       }
     }
