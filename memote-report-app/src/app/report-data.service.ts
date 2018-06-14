@@ -223,4 +223,5 @@ this.extractScoring(data);
   }
   return this.getString(reformatted_data);
 
+  }
 }

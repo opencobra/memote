@@ -51,7 +51,7 @@ import { HelpDialogComponent, HelpDialogTextComponent} from './help-dialog/help-
     BrowserModule,
     AppMaterialModule
   ],
-  entryComponents: [HelpDialogComponent, HelpDialogTextComponent]
+  entryComponents: [HelpDialogComponent, HelpDialogTextComponent],
   providers: [ReportDataService],
   bootstrap: [AppComponent]
 })
