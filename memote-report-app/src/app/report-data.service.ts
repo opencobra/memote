@@ -215,4 +215,12 @@ this.extractScoring(data);
     }
   }
 }
+
+  private extractData(string) {
+    const reformatted_data = {};
+    for (const diff_results of (this.byID(string).diff)) {
+      reformatted_data[diff_results.model] = diff_results.data;
+  }
+  return this.getString(reformatted_data);
+
 }

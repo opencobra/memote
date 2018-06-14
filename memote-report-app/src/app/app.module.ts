@@ -19,6 +19,7 @@ import { VegaPlotComponent } from './vega-plot/vega-plot.component';
 import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
 import { VegaTotalScoreBarChartComponent } from './vega-total-score-bar-chart/vega-total-score-bar-chart.component';
 import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grouped-bar-chart.component';
+import { HelpDialogComponent, HelpDialogTextComponent} from './help-dialog/help-dialog.component';
 
 
 @NgModule({
@@ -36,7 +37,9 @@ import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grou
     VegaPlotComponent,
     VegaBarChartComponent,
     VegaGroupedBarChartComponent,
-    VegaTotalScoreBarChartComponent
+    VegaTotalScoreBarChartComponent,
+    HelpDialogComponent,
+    HelpDialogTextComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +51,7 @@ import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grou
     BrowserModule,
     AppMaterialModule
   ],
+  entryComponents: [HelpDialogComponent, HelpDialogTextComponent]
   providers: [ReportDataService],
   bootstrap: [AppComponent]
 })

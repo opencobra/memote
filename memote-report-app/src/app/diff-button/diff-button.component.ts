@@ -25,8 +25,6 @@ export class DiffButtonComponent implements OnInit {
       for (const results of this.data.byID(this.testId).diff){
         this.metricList.push(results.metric);
       }
-      console.log(this.testId)
-      console.log(this.metricList)
       this.spectrum(this.ratioOrVariance(this.metricList));
     } else {
     if (this.data.byID(this.testId).format_type !== 'raw') {

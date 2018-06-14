@@ -87,7 +87,7 @@
                   </div>
                   <br>
                   <textarea rows="4" style="overflow-wrap: break-word; width:100%">
-                    {{ data.getString(data.byID(testId)?.diff) }}
+                      {{ data.extractData(testId) }}
                   </textarea>
               </div>
               <div *ngSwitchCase="'history'">
