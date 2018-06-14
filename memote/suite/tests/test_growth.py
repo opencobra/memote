@@ -16,11 +16,11 @@
 # limitations under the License.
 
 """
-Perform tests on an instance of `cobra.Model` using gene data.
+Perform tests on an instance of `cobra.Model` using growth data.
 
-Gene data currently only includes knockout screens. However, other types of
-experiments that make changes to individual genes such as expression
-modulation experiments, etc may be possible extensions in the future.
+Growth data comes from processed biolog experiments. Growth curves have to be
+converted into binary decisions whether or not an organism/strain was able to
+grow in a certain medium.
 """
 
 from __future__ import absolute_import
@@ -30,32 +30,32 @@ import pytest
 from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
 
-ESSENTIALITY_DATA = list(pytest.memote.experimental.essentiality)
+GROWTH_DATA = list(pytest.memote.experimental.growth)
 
 
-@pytest.mark.skipif(len(ESSENTIALITY_DATA) == 0,
-                    reason="No essentiality data found.")
-@pytest.mark.parametrize("experiment", ESSENTIALITY_DATA)
-@annotate(title="Gene Essentiality Prediction", format_type="number",
+@pytest.mark.skipif(len(GROWTH_DATA) == 0,
+                    reason="No growth data found.")
+@pytest.mark.parametrize("experiment", GROWTH_DATA)
+@annotate(title="Growth Prediction", format_type="number",
           data=dict(), message=dict(), metric=dict())
-def test_gene_essentiality_from_data_qualitative(model, experiment,
-                                                 threshold=0.8):
+def test_growth_from_data_qualitative(model, experiment, threshold=0.8):
     """
     Expect a perfect Matthew's coefficient.
 
-    The in-silico gene essentiality prediction is compared with experimental
+    The in-silico growth prediction is compared with experimental
     data and the Matthew's coefficient is used as a metric.
     """
-    ann = test_gene_essentiality_from_data_qualitative.annotation
-    exp = pytest.memote.experimental.essentiality[experiment]
+    ann = test_growth_from_data_qualitative.annotation
+    exp = pytest.memote.experimental.growth[experiment]
     expected = exp.data
     test = exp.evaluate(model)
-    test["gene"] = test.index
+    # Growth data sets need not use unique exchange reactions thus we use the
+    # numeric index here to compute the confusion matrix.
     ann["data"][experiment] = confusion_matrix(
-        set(test.loc[test["essential"], "gene"]),
-        set(expected.loc[expected["essential"], "gene"]),
-        set(test.loc[~test["essential"], "gene"]),
-        set(expected.loc[~expected["essential"], "gene"])
+        set(test.loc[test["growth"], "exchange"].index),
+        set(expected.loc[expected["growth"], "exchange"].index),
+        set(test.loc[~test["growth"], "exchange"].index),
+        set(expected.loc[~expected["growth"], "exchange"].index)
     )
     ann["metric"][experiment] = ann["data"][experiment]["MCC"]
     ann["message"][experiment] = wrapper.fill(

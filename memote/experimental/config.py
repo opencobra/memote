@@ -76,6 +76,7 @@ class ExperimentConfiguration(object):
         self.validate()
         self.load_medium(model)
         self.load_essentiality(model)
+        self.load_growth(model)
         # self.load_experiment(config.config.get("growth"), model)
         return self
 

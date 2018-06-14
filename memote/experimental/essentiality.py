@@ -37,18 +37,16 @@ class EssentialityExperiment(Experiment):
 
     SCHEMA = "essentiality.json"
 
-    def __init__(self, obj, **kwargs):
+    def __init__(self, **kwargs):
         """
         Initialize an essentiality experiment.
 
         Parameters
         ----------
-        obj : dict
         kwargs
 
         """
-        super(EssentialityExperiment, self).__init__(obj=obj, **kwargs)
-        self.medium = obj.get("medium")
+        super(EssentialityExperiment, self).__init__(**kwargs)
 
     def validate(self, model, checks=[]):
         """Use a defined schema to validate the medium table format."""
