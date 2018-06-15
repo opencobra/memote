@@ -2,10 +2,7 @@ version: "0.1"
 medium:
   path: "media/"
   definitions:
-    glucose:
-    m9_fructose:
-      filename: "fructose.tsv"
-    pyruvate:
+    m9_minimal:
 growth:
   path: "growth"
   experiments:

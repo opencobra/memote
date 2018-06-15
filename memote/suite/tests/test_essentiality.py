@@ -50,7 +50,6 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
     exp = pytest.memote.experimental.essentiality[experiment]
     expected = exp.data
     test = exp.evaluate(model)
-    test["gene"] = test.index
     ann["data"][experiment] = confusion_matrix(
         set(test.loc[test["essential"], "gene"]),
         set(expected.loc[expected["essential"], "gene"]),
