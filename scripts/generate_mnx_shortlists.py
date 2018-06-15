@@ -30,9 +30,9 @@
 from __future__ import absolute_import
 
 import logging
+import sqlite3
 from builtins import open
 from os.path import exists, dirname, join, pardir
-from shutil import copyfileobj
 
 import click
 import click_log
@@ -44,6 +44,21 @@ click_log.basic_config(LOGGER)
 
 
 def generate_shortlist(mnx_db, shortlist):
+    """
+    Create a condensed cross-references format from a long table.
+
+    Parameters
+    ----------
+    mnx_db : pandas.DataFrame
+    shortlist : pandas.DataFrame
+
+    Returns
+    -------
+    pandas.DataFrame
+        A condensed format with MetaNetX identifiers as columns and database
+        identifiers as rows. Elements are lists and often have multiple entries.
+
+    """
     # Reduce the whole database to targets of interest.
     xref = mnx_db.loc[mnx_db["MNX_ID"].isin(shortlist["MNX_ID"]), :]
     # Drop deprecated MetaNetX identifiers.
@@ -103,8 +118,8 @@ def generate(mnx_dump):
     LOGGER.info("Generate the shortlist cross-references.")
     res = generate_shortlist(db, targets)
     LOGGER.info("Save result.")
-    res.to_pickle(join(dirname(__file__), pardir, "memote", "support", "data",
-                       "met_id_shortlist.pkl"))
+    res.to_json(join(dirname(__file__), pardir, "memote", "support", "data",
+                     "met_id_shortlist.json"), force_ascii=False)
 
 
 if __name__ == "__main__":

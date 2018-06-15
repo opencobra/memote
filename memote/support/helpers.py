@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 from six import iteritems, itervalues
 from sympy import expand
-from importlib_resources import open_binary
+from importlib_resources import open_text
 from cobra.exceptions import Infeasible
 from pylru import lrudecorator
 
@@ -45,8 +45,9 @@ TRANSPORT_RXN_SBO_TERMS = ['SBO:0000185', 'SBO:0000588', 'SBO:0000587',
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-with open_binary(memote.support.data, "met_id_shortlist.pkl") as file_handle:
-    METANETX_SHORTLIST = pd.read_pickle(file_handle)
+with open_text(memote.support.data, "met_id_shortlist.json",
+               encoding="utf-8") as file_handle:
+    METANETX_SHORTLIST = pd.read_json(file_handle)
 
 
 # Provide a compartment shortlist to identify specfic compartments whenever
