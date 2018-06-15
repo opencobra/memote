@@ -27,103 +27,85 @@
 
 """Scripts to generate a reduced shortlist from MetaNetX database dumps."""
 
+from __future__ import absolute_import
+
+import logging
+from builtins import open
+from os.path import exists, dirname, join, pardir
+from shutil import copyfileobj
+
+import click
+import click_log
 import pandas as pd
-import io
+from requests import get
 
-from yaml import dump
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
-
-# Read the database dumps in the correct format: remove comment lines, and
-# provide appropriate column names.
-
-df = pd.read_csv(
-    "chem_xref.tsv",
-    delim_whitespace=True,
-    comment='#',
-    names=['XREF', 'MNX_ID', 'Evidence', 'Description'])
+LOGGER = logging.getLogger()
+click_log.basic_config(LOGGER)
 
 
-def xref_splitter(xref):
+def generate_shortlist(mnx_db, shortlist):
+    # Reduce the whole database to targets of interest.
+    xref = mnx_db.loc[mnx_db["MNX_ID"].isin(shortlist["MNX_ID"]), :]
+    # Drop deprecated MetaNetX identifiers.
+    # xref = xref.loc[~xref["XREF"].str.startswith("deprecated", na=False), :]
+    # Drop self-references.
+    xref = xref.loc[xref["XREF"] != xref["MNX_ID"], :]
+    # Split namespaces from identifiers.
+    xref[["XREF_ID", "XREF"]] = xref["XREF"].str.split(":", n=1, expand=True)
+    # Group the data in the xref dataframe so that one MNX ID maps to all
+    # corresponding cross-references from other databases. Then list all
+    # identifiers that belong to these databases:
+    # MNX_ID    XREF_ID
+    # MNXM0     chebi       [23367, 59999]
+    #           metacyc     [UNKNOWN]
+    # Make a separate column for every XREF_ID:
+    # MNX_ID    chebi           metacyc
+    # MNXM0     [23367, 59999]  [UNKNOWN]
+    xref = xref.groupby(["MNX_ID", "XREF_ID"], as_index=False, sort=False)[
+        "XREF"].apply(list).unstack('XREF_ID')
+    # Re-insert MetaNetX identifiers as lists.
+    xref["mnx"] = [[x] for x in xref.index]
+    # Transpose the dataframe such that the index are now xref databases and the
+    # column names are metanetx IDs.
+    return xref.T
+
+
+@click.command()
+@click.help_option("--help", "-h")
+@click_log.simple_verbosity_option(
+    LOGGER, default="INFO", show_default=True,
+    type=click.Choice(["CRITICAL", "ERROR", "WARN", "INFO", "DEBUG"]))
+@click.argument("mnx_dump", type=click.Path(dir_okay=False))
+def generate(mnx_dump):
     """
-    Return database name from a combined string like "bigg" in "bigg:pyr".
+    Generate a shortlist of metabolites with cross-references using MetaNetX.
 
-    Return 'mnx' as the ID when the string in xref contains 'MNX' but does not
-    contain a colon.
-
-    Parameters
-    ----------
-    xref : pandas.Dataframe
-        The metabolic model under investigation.
+    MNX_DUMP : The compounds dump from MetaNetX usually called 'chem_xref.tsv'.
+        Will be downloaded if it doesn't exist.
 
     """
-    if ':' in xref:
-        return xref.split(':')[0]
-    elif 'MNX' in xref and ':' not in xref:
-        return 'mnx'
+    LOGGER.info("Read shortlist.")
+    targets = pd.read_table(join(dirname(__file__), "shortlist.tsv"))
+    if not exists(mnx_dump):
+        # Download the MetaNetX compounds dump if it doesn't exists.
+        # Download done as per https://stackoverflow.com/a/16696317.
+        LOGGER.info("MetaNetX dump '%s' does not exist. Downloading...",
+                    mnx_dump)
+        with open(mnx_dump, "wb") as file_handle, \
+            get("https://www.metanetx.org/cgi-bin/mnxget/mnxref/chem_xref.tsv",
+                stream=True) as stream:
+            for chunk in stream.iter_content(chunk_size=1024):
+                file_handle.write(chunk)
+        LOGGER.info("Done.")
+    LOGGER.info("Read the MetaNetX dump with cross-references.")
+    db = pd.read_table(mnx_dump, comment='#',
+                       names=['XREF', 'MNX_ID', 'Evidence', 'Description'])
+    LOGGER.info("Generate the shortlist cross-references.")
+    res = generate_shortlist(db, targets)
+    LOGGER.info("Save result.")
+    res.to_pickle(join(dirname(__file__), pardir, "memote", "support", "data",
+                       "met_id_shortlist.pkl"))
 
 
-# This is the current shortlist, expand this and rerun the script when adding
-# new code that requires the identification of key metabolites.
-# Included in the list below are energy metabolites, redox cofactors,
-# essential amino acids and some vitamins.
-shortlist = ['MNXM3', 'MNXM7', 'MNXM51', 'MNXM30', 'MNXM63', 'MNXM220',
-             'MNXM121', 'MNXM17', 'MNXM423', 'MNXM495', 'MNXM2', 'MNXM9',
-             'MNXM1', 'MNXM10', 'MNXM8', 'MNXM5', 'MNXM6', 'MNXM21',
-             'MNXM26', 'MNXM15', 'MNXM89557', 'MNXM20', 'MNXM38', 'MNXM33',
-             'MNXM208',
-             'MNXM119', 'MNXM191', 'MNXM232', 'MNXM223', 'MNXM509',
-             'MNXM7517',
-             'MNXM12235', 'MNXM12233', 'MNXM12236', 'MNXM558', 'MNXM2178',
-             'MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61', 'MNXM97',
-             'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142', 'MNXM37', 'MNXM231',
-             'MNXM70', 'MNXM78', 'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29',
-             'MNXM147', 'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
-             'MNXM16',
-             'MNXM161', 'MNXM12', 'MNXM256',
-             'MNXM4']
-
-# Transpose and reshape the dataframe so that we can apply the shortlist
-# before the most intensive steps to reduce execution time.
-df = df.T
-df.columns = df.loc['MNX_ID']
-df = df.reindex(df.index.drop('MNX_ID'))
-
-# Slice the original xref dataframe to only include the shortlist metabolites.
-xref = df[shortlist]
-xref = xref.T.reset_index()
-
-# In chem_xref.tsv, the xref entries are key value pairs separated by ':'
-# Such as: bigg:10fthf
-# Split xref strings in MNX dump to obtain database names.
-xref['XREF_ID'] = xref['XREF'].apply(xref_splitter)
-
-# Obtain the corresponding database IDs from the combined strings in MNX dump.
-# This step includes handling old MNX IDs which are stored as
-# deprecated:MNXM9996 and makes them available in the mapping.
-xref['XREF'] = xref['XREF'].apply(lambda x: x.split(':')[1] if ':' in x else x)
-
-# Group the data in the xref dataframe so that one MNX ID maps to all
-# corresponding cross-references from other databases. Then list all
-# identifiers that belong to these databases:
-# MNX_ID    XREF_ID
-# MNXM0     chebi       [23367, 59999]
-#           metacyc     [UNKNOWN]
-groups = xref.groupby(['MNX_ID', 'XREF_ID'])
-xref = groups.apply(lambda x: list(x['XREF']))
-
-# Make a separate column for every XREF_ID:
-# MNX_ID    chebi           metacyc
-# MNXM0     [23367, 59999]  [UNKNOWN]
-xref = xref.unstack('XREF_ID')
-
-# Transpose the dataframe such that the index are now xref databases and the
-# column names are metanetx IDs.
-xref = xref.T
-
-# Saving the shortlist to memote/support/data
-with io.open('../memote/support/data/met_id_shortlist.yml', 'w+',
-             encoding="utf8") as file:
-    dump(xref, file, Dumper=Dumper, allow_unicode=True)
+if __name__ == "__main__":
+    generate()
