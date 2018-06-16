@@ -23,16 +23,20 @@
 # Nucleic Acids Research (2016), 44(D1):D523-D526
 # https://doi.org/10.1093/bioinformatics/btt036
 # https://www.metanetx.org/
-#
 
-"""Scripts to generate a reduced shortlist from MetaNetX database dumps."""
+"""
+Annotate a shortlist with cross-references from MetaNetX.
+
+Dependencies are assumed to be satisfied by having memote installed in the
+same project.
+
+"""
 
 from __future__ import absolute_import
 
 import logging
-import sqlite3
 from builtins import open
-from os.path import exists, dirname, join, pardir
+from os.path import dirname, exists, join, pardir
 
 import click
 import click_log
@@ -45,25 +49,31 @@ click_log.basic_config(LOGGER)
 
 def generate_shortlist(mnx_db, shortlist):
     """
-    Create a condensed cross-references format from a long table.
+    Create a condensed cross-references format from data in long form.
+
+    Both data frames must contain a column 'MNX_ID' and the dump is assumed
+    to also have a column 'XREF'.
 
     Parameters
     ----------
     mnx_db : pandas.DataFrame
+        The entire MetaNetX dump as a data frame.
     shortlist : pandas.DataFrame
+        The shortlist of targets as a data frame.
 
     Returns
     -------
     pandas.DataFrame
-        A condensed format with MetaNetX identifiers as columns and database
-        identifiers as rows. Elements are lists and often have multiple entries.
+        A condensed format with MetaNetX identifiers as the column index and
+        database identifiers as the row index. Elements are lists and often
+        have multiple entries.
 
     """
     # Reduce the whole database to targets of interest.
     xref = mnx_db.loc[mnx_db["MNX_ID"].isin(shortlist["MNX_ID"]), :]
-    # Drop deprecated MetaNetX identifiers.
+    # Drop deprecated MetaNetX identifiers. Disabled for now.
     # xref = xref.loc[~xref["XREF"].str.startswith("deprecated", na=False), :]
-    # Drop self-references.
+    # Drop self-references for now since they don't follow the format.
     xref = xref.loc[xref["XREF"] != xref["MNX_ID"], :]
     # Split namespaces from identifiers.
     xref[["XREF_ID", "XREF"]] = xref["XREF"].str.split(":", n=1, expand=True)
@@ -79,9 +89,10 @@ def generate_shortlist(mnx_db, shortlist):
     xref = xref.groupby(["MNX_ID", "XREF_ID"], as_index=False, sort=False)[
         "XREF"].apply(list).unstack('XREF_ID')
     # Re-insert MetaNetX identifiers as lists.
+    # FIXME: Shouldn't we use metanetx.chemical here instead of 'mnx'?
     xref["mnx"] = [[x] for x in xref.index]
-    # Transpose the dataframe such that the index are now xref databases and the
-    # column names are metanetx IDs.
+    # Transpose the data frame such that the index are now xref databases and
+    # the column names are MetaNetX identifiers.
     return xref.T
 
 
@@ -93,16 +104,16 @@ def generate_shortlist(mnx_db, shortlist):
 @click.argument("mnx_dump", type=click.Path(dir_okay=False))
 def generate(mnx_dump):
     """
-    Generate a shortlist of metabolites with cross-references using MetaNetX.
+    Annotate a shortlist of metabolites with cross-references using MetaNetX.
 
-    MNX_DUMP : The compounds dump from MetaNetX usually called 'chem_xref.tsv'.
+    MNX_DUMP : The chemicals dump from MetaNetX usually called 'chem_xref.tsv'.
         Will be downloaded if it doesn't exist.
 
     """
     LOGGER.info("Read shortlist.")
     targets = pd.read_table(join(dirname(__file__), "shortlist.tsv"))
     if not exists(mnx_dump):
-        # Download the MetaNetX compounds dump if it doesn't exists.
+        # Download the MetaNetX chemicals dump if it doesn't exists.
         # Download done as per https://stackoverflow.com/a/16696317.
         LOGGER.info("MetaNetX dump '%s' does not exist. Downloading...",
                     mnx_dump)
