@@ -8,7 +8,7 @@ Next Release
 * Display the score on History and Snapshot reports.
 * Invert the colour coding.
 * Display results as percentages.
-* Shortlist of metabolite identifiers now stored in YAML format
+* Annotation of metabolite shortlist simplified.
 
 0.7.6 (2018-05-28)
 ------------------
