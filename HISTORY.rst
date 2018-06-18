@@ -9,6 +9,7 @@ Next Release
 * Invert the colour coding.
 * Display results as percentages.
 * Add ability to generate a diff report which compares two or more models. 
+* Annotation of metabolite shortlist simplified.
 
 0.7.6 (2018-05-28)
 ------------------
