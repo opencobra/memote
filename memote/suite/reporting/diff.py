@@ -21,7 +21,6 @@ from __future__ import absolute_import
 
 from six import iteritems
 from memote.suite.reporting.report import Report
-from memote.utils import jsonify
 
 
 class DiffReport(Report):
