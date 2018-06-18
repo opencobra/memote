@@ -26,6 +26,7 @@ from builtins import open
 import click
 import git
 from sqlalchemy.exc import ArgumentError
+import os
 
 import memote.suite.api as api
 import memote.suite.results as managers
@@ -207,7 +208,7 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     diff_results = dict()
     for model_path in models:
         try:
-            model_filename = model_path.split('/')[-1].split('.')[0]
+            model_filename = os.path.basename(model_path)
             diff_results.setdefault(model_filename, dict())
             model = callbacks._load_model(model_path)
             model.solver = solver

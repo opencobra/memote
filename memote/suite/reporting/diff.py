@@ -45,7 +45,6 @@ class DiffReport(Report):
         self._report_type = "diff"
         self.result = self.format_and_score_diff_data(diff_results)
         self.result.update(self.config)
-        print(jsonify(self.result, pretty=True))
 
     def format_and_score_diff_data(self, diff_results):
         """Reformat the api results to work with the front-end."""
