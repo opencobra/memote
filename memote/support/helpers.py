@@ -49,6 +49,7 @@ with open_text(memote.support.data, "met_id_shortlist.json",
                encoding="utf-8") as file_handle:
     METANETX_SHORTLIST = pd.read_json(file_handle)
 
+
 # Provide a compartment shortlist to identify specfic compartments whenever
 # necessary.
 COMPARTMENT_SHORTLIST = {
