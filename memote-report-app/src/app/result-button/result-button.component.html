@@ -1,23 +1,20 @@
-<!-- First distinguish wether the tests have passed/failed or skipped or errorer -->
+<!-- First distinguish wether the tests have passed/failed or skipped or errored -->
 <div *ngIf="data.byID(testId)?.result === 'passed' || data.byID(testId)?.result === 'failed'">
   <!-- Then determine if the test results are from scored or from unscored tests -->
   <div *ngIf="data.isScored(data.getParam(testId, 0)); else notScored">
     <!-- If they are from scored tests colorize the result button -->
-    <button
-    mat-raised-button
-    style="color:white"
+    <div
+    class="MatButtonEmulation"
     [ngStyle]="{'background-color':getColor(1 - data.byID(testId)?.metric | number : '1.2-2')}">
       {{ 1 - data.byID(testId)?.metric | percent : '1.0' }}
       <!-- {{ 1 - data.byID(testId)?.metric | percent : '1.2-2' }} -->
-    </button>
+  </div>
   </div>
   <ng-template #notScored>
     <!-- If they are from unscored tests the user has some control over how -->
     <!-- they are displayed using the 'format_type' attribute of each test. -->
-    <button
-    mat-raised-button
-    color="primary"
-    style="color:white">
+    <div
+    class="MatButtonEmulation">
       <!-- Hence for each test, determine now how the result ought to be formatted -->
       <div *ngIf="data.byID(testId)?.format_type === 'count'">
         {{ data.byID(testId)?.data.length | number : '1.'}}
@@ -31,23 +28,22 @@
       <div *ngIf="data.byID(testId)?.format_type === 'raw'">
         {{ data.byID(testId)?.data }}
       </div>
-    </button>
+    </div>
   </ng-template>
 </div>
 <div *ngIf="data.byID(testId)?.result === 'skipped'">
 <!-- Skipped tests are marked with a gray button with black text -->
-    <button
-     mat-raised-button
-     disabled
-     style="color:black">
+    <div
+     class="MatButtonEmulation"
+     style="background:gray; color:black">
        Skipped
-     </button>
+     </div>
 </div>
 <div *ngIf="data.byID(testId)?.result === 'error'">
 <!-- Tests with errors are marked with a black button with red text -->
-    <button
-     mat-raised-button
+    <div
+     class="MatButtonEmulation"
      style="color:red;background-color:black">
        Errored
-     </button>
+    </div>
 </div>

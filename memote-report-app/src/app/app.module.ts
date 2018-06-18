@@ -14,8 +14,12 @@ import { KeysPipe } from './keys.pipe';
 import { SystemInformationComponent } from './dashboard/system-information/system-information.component';
 import { AccordionComponent } from './accordion/accordion.component';
 import { ResultButtonComponent } from './result-button/result-button.component';
-import { VegaPlotComponent } from "./vega-plot/vega-plot.component";
-import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component";
+import { DiffButtonComponent } from './diff-button/diff-button.component';
+import { VegaPlotComponent } from './vega-plot/vega-plot.component';
+import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
+import { VegaTotalScoreBarChartComponent } from './vega-total-score-bar-chart/vega-total-score-bar-chart.component';
+import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grouped-bar-chart.component';
+import { HelpDialogComponent, HelpDialogTextComponent} from './help-dialog/help-dialog.component';
 
 
 @NgModule({
@@ -29,8 +33,13 @@ import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component
     SystemInformationComponent,
     AccordionComponent,
     ResultButtonComponent,
+    DiffButtonComponent,
     VegaPlotComponent,
-    VegaBarChartComponent
+    VegaBarChartComponent,
+    VegaGroupedBarChartComponent,
+    VegaTotalScoreBarChartComponent,
+    HelpDialogComponent,
+    HelpDialogTextComponent
   ],
   imports: [
     BrowserModule,
@@ -42,6 +51,7 @@ import { VegaBarChartComponent } from "./vega-bar-chart/vega-bar-chart.component
     BrowserModule,
     AppMaterialModule
   ],
+  entryComponents: [HelpDialogComponent, HelpDialogTextComponent],
   providers: [ReportDataService],
   bootstrap: [AppComponent]
 })

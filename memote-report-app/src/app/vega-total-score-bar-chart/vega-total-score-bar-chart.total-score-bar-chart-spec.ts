@@ -1,7 +1,7 @@
-export const specBarChart = {
+export const specTotalScoreBarChart = {
   "$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 300,
-  "height": 200,
+  "height": 240,
   "autosize": 'fit',
   "padding": 'strict',
   "data": [
@@ -9,19 +9,15 @@ export const specBarChart = {
       "name": "table",
       "values": [],
       'transform': [
-        {"type": "formula", "as": "percent", "expr": "round(datum.score * 100)"}
+        {"type": "formula", "as": "percent", "expr": "round(datum.total_score * 100)"}
       ]
     }
   ],
-
-  "signals": [
-  ],
-
   "scales": [
     {
       "name": "xscale",
       "type": "band",
-      "domain": {"data": "table", "field": "section"},
+      "domain": {"data": "table", "field": "model"},
       "range": "width",
       "padding": 0.05,
       "round": true
@@ -45,7 +41,7 @@ export const specBarChart = {
       "from": {"data":"table"},
       "encode": {
         "enter": {
-          "x": {"scale": "xscale", "field": "section"},
+          "x": {"scale": "xscale", "field": "model"},
           "width": {"scale": "xscale", "band": 1},
           "y": {"scale": "yscale", "field": "percent"},
           "y2": {"scale": "yscale", "value": 0}
@@ -61,7 +57,7 @@ export const specBarChart = {
         "text": {"field": "percent"},
          "x": {
             "scale": "xscale",
-            "field": "section",
+            "field": "model",
             "band": 0.5
           },
           "y": {

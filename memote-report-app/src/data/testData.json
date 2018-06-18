@@ -2793,9 +2793,9 @@
   "score": {
     "sections":
         [
-            {"section":"annotation", "score": 2.0},
-            {"section":"consistency",  "score":6.787234042553191},
-            {"section":"sbo", "score":0.0}
+            {"section":"annotation", "score": 0.997},
+            {"section":"consistency",  "score":0.64},
+            {"section":"sbo", "score":0.09}
         ],
     "total_score": 0.3923105636431504
   }

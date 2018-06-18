@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ResultCard } from './resultcard.model';
 import { TestResult } from './test-result.model';
 import { TestHistory } from './test-history.model';
+import { TestDiff } from './test-diff.model';
 // import * as testData from './data/testData.json';
 
 @Injectable()
@@ -32,16 +33,20 @@ export class ReportDataService {
         break;
       }
       case 'diff': {
-        // Diff report stuff happens here
+        this.convertResults((<any>window).data);
         break;
       }
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
-        this.http.get('/data/testData.json')
-        .subscribe(data => {this.convertResults(data); });
-        this.reportType = 'snapshot';
+        this.http.get('/data/testDiff.json')
+        .subscribe(data => {this.convertDiffResults(data); });
+        this.reportType = 'diff';
         break;
+        // this.http.get('/data/testData.json')
+        // .subscribe(data => {this.convertResults(data); });
+        // this.reportType = 'snapshot';
+        // break;
         // this.http.get('/data/testHistory.json')
         // .subscribe(data => {this.convertHistoryResults(data); });
         // this.reportType = 'history';
@@ -144,6 +149,35 @@ export class ReportDataService {
   this.extractScoring(data);
 }
 
+private convertDiffResults(data: Object): void {
+  // Store each test diff result as a TestDiff object in a central list.
+  for (const test of Object.keys(data['tests'])){
+    if (data['tests'][test]['diff'] instanceof Array) {
+      this.allTests.push(
+        new TestDiff(
+          test,
+          data['tests'][test])
+    );
+    } else {
+      for (const param of Object.keys(data['tests'][test]['diff'])) {
+        const newID = test + ':' + param;
+        this.allTests.push(
+            new TestDiff(
+              newID,
+              {diff: data['tests'][test]['diff'][param],
+              summary: data['tests'][test]['summary'],
+              title: data['tests'][test]['title'],
+              format_type: data['tests'][test]['format_type']}
+            )
+          );
+      }
+  }
+}
+this.distributeCardsToSections(data);
+this.determineScoredTests();
+this.extractScoring(data);
+}
+
   private extractMetadata(data: Object): void {
     // Extract metaddata information to be used in the metadata card
     this.metaData = data['meta'];
@@ -181,4 +215,13 @@ export class ReportDataService {
     }
   }
 }
+
+  private extractData(string) {
+    const reformatted_data = {};
+    for (const diff_results of (this.byID(string).diff)) {
+      reformatted_data[diff_results.model] = diff_results.data;
+  }
+  return this.getString(reformatted_data);
+
+  }
 }

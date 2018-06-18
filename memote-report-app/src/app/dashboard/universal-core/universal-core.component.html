@@ -6,12 +6,30 @@
         fxLayoutAlign='space-between start'
         *ngIf="data.reportType != 'history'; else vegaHistoryScore">
         <div fxFlex> Total Score
-          <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
+          <div *ngIf="data.reportType === 'snapshot'; else diffScore">
+            <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
+          </div>
+          <ng-template #diffScore>
+              <div> 
+                <app-vega-total-score-bar-chart> </app-vega-total-score-bar-chart>
+              </div>
+          </ng-template>
         </div>
-        <div fxFlex class="svg-container"> Score per Category
+        <div>
+        <div 
+          fxFlex 
+          class="svg-container"
+          *ngIf="data.reportType === 'snapshot'; else diffSectionScore"> Score per Category
           <br>
               <app-vega-bar-chart ></app-vega-bar-chart>
         </div>
+        <ng-template #diffSectionScore>
+            <div fxFlex class="svg-container"> Score per Category
+            <br>
+                <app-vega-grouped-bar-chart ></app-vega-grouped-bar-chart>
+          </div>
+        </ng-template>
+      </div>
       </div>
       <ng-template #vegaHistoryScore>
           <div>
@@ -26,7 +44,28 @@
         <h2>Scored Tests</h2>
         <div *ngFor="let section of scoreData.sections | keys">
           <h3> {{ scoreData.sections[section].title }}</h3>
-          <div *ngFor="let case of scoreData.sections[section].cases">
+          <div *ngFor="let case of scoreData.sections[section].cases; let first = first">
+              <mat-expansion-panel
+              *ngIf="first && data.reportType === 'diff'"
+              disabled
+              #expPanel
+              class="mat-elevation-z0">
+                 <mat-expansion-panel-header
+                 class="mat-expansion-panel-header"
+                 collapsedHeight="auto"
+                 style="padding:0.05vh">
+                 <mat-panel-title fxLayoutAlign='space-between center'>
+                    <td class="test-title">
+                        Compared Models
+                    </td>
+                    <div style="margin-right: 10px">
+                    <td *ngFor="let results of data.byID(case).diff">
+                      <div class="MatButtonEmulation" style="background: white; color:black"> {{ results.model }} </div>
+                    </td>
+                    </div>
+                   </mat-panel-title>
+                 </mat-expansion-panel-header>
+                </mat-expansion-panel>
             <app-accordion [case]="case"></app-accordion>
           </div>
         </div>

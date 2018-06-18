@@ -27,7 +27,7 @@ from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.results import HistoryManager
 from memote.suite.reporting import (
-    SnapshotReport, HistoryReport, ReportConfiguration)
+    SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
 
 __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
@@ -126,6 +126,24 @@ def history_report(repository, manager, config=None, html=True):
         return report.render_json()
 
 
-def diff_report():
-    u"""Coming soon™."""
-    raise NotImplementedError(u"Coming soon™.")
+def diff_report(diff_results, config=None, html=True):
+    """
+    Generate a diff report from a result set and configuration.
+
+    Parameters
+    ----------
+    result : memote.MemoteResult
+        Nested dictionary structure as returned from the test suite.
+    config : dict, optional
+        The final test report configuration (default None).
+    html : bool, optional
+        Whether to render the report as full HTML or JSON (default True).
+
+    """
+    if config is None:
+        config = ReportConfiguration.load()
+    report = DiffReport(diff_results=diff_results, configuration=config)
+    if html:
+        return report.render_html()
+    else:
+        return report.render_json()

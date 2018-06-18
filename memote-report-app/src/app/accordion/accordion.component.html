@@ -41,16 +41,26 @@
               <td class="test-title">
                 {{ data.byID(testId)?.title }}
               </td>
-              <td>
-                <app-result-button [testId]="testId"></app-result-button>
-              </td>
+                <div [ngSwitch]="data.reportType">
+                <td *ngSwitchCase="'snapshot'">
+                  <app-result-button [testId]="testId"></app-result-button>
+                </td>
+                  <td *ngSwitchCase="'diff'">
+                    <app-diff-button [testId]="testId"></app-diff-button>
+                  </td>
+              </div>
             </mat-panel-title>
             <ng-template #noTitle>
               <mat-panel-title fxLayoutAlign='space-between center'>
                 <td style="padding-left:1vh"> {{ data.getParam(testId, 1) }} </td>
-                <td>
+                <div [ngSwitch]="data.reportType">
+                <td *ngSwitchCase="'snapshot'">
                   <app-result-button [testId]="testId"></app-result-button>
                 </td>
+                <td *ngSwitchCase="'diff'">
+                    <app-diff-button [testId]="testId"></app-diff-button>
+                  </td>
+                </div>
               </mat-panel-title>
             </ng-template>
           </mat-expansion-panel-header>
@@ -64,18 +74,29 @@
                 <tr> {{ data.byID(testId)?.message }} </tr>
               </div>
             </ng-template>
-            <div *ngIf="data.reportType != 'history'; else vegaPlot">
+            <div [ngSwitch]="data.reportType">
+              <div *ngSwitchCase="'snapshot'">
               <br>
               <textarea rows="4" style="overflow-wrap: break-word; width:100%">
                 {{ data.getString(data.byID(testId)?.data) }}
               </textarea>
-            </div>
-            <ng-template #vegaPlot>
-              <br>
-                <div>
-                  <app-vega-plot [testObject]="data.byID(testId)"></app-vega-plot>
-                </div>
-            </ng-template>
+              </div>
+              <div *ngSwitchCase="'diff'">
+                  <div *ngFor='let results of data.byID(testId)?.diff; let i = index'>
+                    <p> For model "{{ results.model }}" : {{ results.message }} </p>
+                  </div>
+                  <br>
+                  <textarea rows="4" style="overflow-wrap: break-word; width:100%">
+                      {{ data.extractData(testId) }}
+                  </textarea>
+              </div>
+              <div *ngSwitchCase="'history'">
+                  <br>
+                    <div>
+                      <app-vega-plot [testObject]="data.byID(testId)"></app-vega-plot>
+                    </div>
+              </div>
+             </div>
           </div>
       </mat-expansion-panel>
   </mat-accordion>
