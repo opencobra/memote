@@ -131,7 +131,7 @@ class ResultCollectionPlugin(object):
             A test report object from pytest with test case result.
 
         """
-        if report.when != "call":
+        if report.when == 'teardown':
             return
         item_name = report.location[2]
 
