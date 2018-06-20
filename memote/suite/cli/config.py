@@ -31,6 +31,7 @@ class ConfigSectionSchema(object):
     class Memote(SectionSchema):
         """Describes the memote configuration keys and values."""
 
+        yaml = Param(type=click.Path(exists=True, dir_okay=False))
         collect = Param(type=bool, default=True)
         git = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
