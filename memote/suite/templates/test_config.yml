@@ -40,9 +40,6 @@ cards:
         - test_gene_sbo_presence
         - test_gene_specific_sbo_presence
         - test_biomass_specific_sbo_presence
-      sequence:
-        title: "Sequence Cross References"
-        weight: 2.0
   test_basic:
     title: "Basic Information"
     cases:
@@ -96,6 +93,11 @@ cards:
     - test_number_steady_state_flux_solutions
     - test_matrix_rank
     - test_degrees_of_freedom
+  experimental:
+    title: "Experimental Data Comparison"
+    cases:
+    - test_growth_from_data_qualitative
+    - test_gene_essentiality_from_data_qualitative
 weights:
   test_reaction_mass_balance: 1.0
   test_find_disconnected: 1.0

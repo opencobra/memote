@@ -1,27 +1,57 @@
 {
-    "fields": [
-        {
-            "name": "growth",
-            "title": "Growth Rate",
-            "description": "The measured growth rate of a strain.",
-            "type": "number",
-            "constraints": {
-                "required": true,
-                "minimum": 0,
-                "maximum": 10
-            }
-        },
-        {
-            "name": "medium",
-            "title": "Medium Composition",
-            "description": "The identifier of the medium composition used (if any).",
-            "type": "string"
-        },
-        {
-            "name": "comment",
-            "title": "Comment",
-            "description": "Optional comment which is not processed further.",
-            "type": "string"
-        }
-    ]
+  "fields": [
+    {
+      "name": "exchange",
+      "title": "Exchange Reaction Identifier",
+      "description": "The exchange reaction identifier of the variable medium component. Typically, this is a carbon source which will be added to a configured base medium.",
+      "type": "string",
+      "constraints": {
+        "required": true
+      }
+    },
+    {
+      "name": "uptake",
+      "title": "Uptake Rate",
+      "description": "The uptake rate for the exchange reaction. For models following common practices this modifies the lower bound.",
+      "type": "number",
+      "constraints": {
+        "required": true,
+        "minimum": 0,
+        "maximum": 1000
+      }
+    },
+    {
+      "name": "growth",
+      "title": "Growth",
+      "description": "A binary indicator whether growth was observed according to the processed biolog data.",
+      "type": "boolean",
+      "constraints": {
+        "required": true
+      },
+      "trueValues": [
+        "true",
+        "True",
+        "TRUE",
+        "1",
+        "yes",
+        "Yes",
+        "YES"
+      ],
+      "falseValues": [
+        "false",
+        "False",
+        "FALSE",
+        "0",
+        "no",
+        "No",
+        "NO"
+      ]
+    },
+    {
+      "name": "comment",
+      "title": "Comment",
+      "description": "Optional comment which is not processed further.",
+      "type": "string"
+    }
+  ]
 }

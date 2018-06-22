@@ -42,6 +42,7 @@ class Experiment(ExperimentalBase):
 
         """
         super(Experiment, self).__init__(obj=obj, **kwargs)
+        self.medium = obj.get("medium")
         self.objective = obj.get("objective")
         # TODO: This is a placeholder. Constraints need to be loaded with
         # optlang.

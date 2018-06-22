@@ -68,32 +68,31 @@ def test_load_medium(filename, model, media, growth):
             assert isclose(model.slim_optimize(), value, atol=1E-03)
 
 
-@pytest.mark.parametrize("filename, model, experiment, genes, essentiality", [
-    (u"essentiality_only.yml", "textbook",
-     u"core_deletion",
-     [u"b1779", u"b2416", u"b0356", u"b3213"],
-     [True, True, False, False])
+@pytest.mark.parametrize("filename, model, experiment", [
+    (u"essentiality_only.yml", u"textbook", u"core_deletion")
 ], indirect=["model"])
-def test_load_essentiality(filename, model, experiment, genes, essentiality):
+def test_load_essentiality(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
-    config.load_essentiality(model)
-    test = config.essentiality[experiment].evaluate(model)
-    assert test.loc[genes, "essential"].tolist() == essentiality
+    config.load_data(model)
+    exp = config.essentiality[experiment]
+    expected = exp.data
+    expected.sort_values("gene", inplace=True)
+    test = exp.evaluate(model)
+    test.sort_values("gene", inplace=True)
+    assert (test["essential"].values == expected["essential"].values).all()
 
 
-@pytest.mark.parametrize("filename, model, growth", [
-    ("growth.yml", "textbook",
-     [0.874, 0.416, 0.291])
+@pytest.mark.parametrize("filename, model, experiment", [
+    (u"growth.yml", u"textbook", u"core")
 ], indirect=["model"])
-def test_load_growth(filename, model, growth):
+def test_load_growth(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
-    config.load_medium(model)
-    config.load_growth(model)
-    test = config.growth["core"]
-    with model:
-        for row in test.data.itertuples(index=False):
-            config.media[row.medium].apply(model)
-            value = model.slim_optimize()
-            assert isclose(value, row.growth, atol=1E-03)
+    config.load_data(model)
+    exp = config.growth[experiment]
+    expected = exp.data
+    expected.sort_values("exchange", inplace=True)
+    test = exp.evaluate(model)
+    test.sort_values("exchange", inplace=True)
+    assert (test["growth"].values == expected["growth"].values).all()

@@ -62,29 +62,29 @@ def confusion_matrix(predicted_essential, expected_essential,
     try:
         tpr = tp / (tp + fn)
     except ZeroDivisionError:
-        tpr = float("nan")
+        tpr = None
     # specificity or true negative rate
     try:
         tnr = tn / (tn + fp)
     except ZeroDivisionError:
-        tnr = float("nan")
+        tnr = None
     # precision or positive predictive value
     try:
         ppv = tp / (tp + fp)
     except ZeroDivisionError:
-        ppv = float("nan")
+        ppv = None
     # false discovery rate
     fdr = 1 - ppv
     # accuracy
     try:
         acc = (tp + tn) / (tp + tn + fp + fn)
     except ZeroDivisionError:
-        acc = float("nan")
+        acc = None
     # Compute Matthews correlation coefficient.
     try:
         mcc = (tp * tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fn))
     except ZeroDivisionError:
-        mcc = float("nan")
+        mcc = None
     return {
         "TP": list(true_positive),
         "TN": list(true_negative),

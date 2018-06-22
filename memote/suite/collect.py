@@ -88,6 +88,7 @@ class ResultCollectionPlugin(object):
         if self._exp_config is None:
             memote["experimental"] = dict()
             memote["experimental"]["essentiality"] = list()
+            memote["experimental"]["growth"] = list()
         else:
             # Load experimental data.
             self._exp_config.load_data(self._model)
@@ -130,7 +131,7 @@ class ResultCollectionPlugin(object):
             A test report object from pytest with test case result.
 
         """
-        if report.when != "call":
+        if report.when == 'teardown':
             return
         item_name = report.location[2]
 

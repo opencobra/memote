@@ -1,4 +1,5 @@
-growth,medium,comment
-0.874,glucose,
-0.416,m9_fructose,
-0.291,pyruvate,
+exchange,uptake,growth,comment
+EX_glc__D_e,10,true,
+EX_fru_e,5,true,
+EX_pyr_e,10,true,
+EX_glc__D_e,0,false,
