@@ -39,12 +39,15 @@ ESSENTIALITY_DATA = list(pytest.memote.experimental.essentiality)
 @annotate(title="Gene Essentiality Prediction", format_type="number",
           data=dict(), message=dict(), metric=dict())
 def test_gene_essentiality_from_data_qualitative(model, experiment,
-                                                 threshold=0.8):
+                                                 threshold=0.95):
     """
-    Expect a perfect Matthew's coefficient.
+    Expect a perfect accuracy when predicting gene essentiality.
 
-    The in-silico gene essentiality prediction is compared with experimental
-    data and the Matthew's coefficient is used as a metric.
+    The in-silico gene essentiality is compared with experimental
+    data and the accuracy is expected to be better than 0.95.
+    In principal, Matthews' correlation coefficient is a more comprehensive
+    metric but is a little fragile to not having any false negatives or false
+    positives in the output.
     """
     ann = test_gene_essentiality_from_data_qualitative.annotation
     exp = pytest.memote.experimental.essentiality[experiment]
@@ -62,4 +65,4 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
         coefficient of 1. In experiment '{}' the model has a coefficient
         of {:.2}.""".format(experiment, ann["data"][experiment]["MCC"])
     )
-    assert ann["data"][experiment]["MCC"] > threshold
+    assert ann["data"][experiment]["ACC"] > threshold
