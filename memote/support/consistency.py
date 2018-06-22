@@ -26,6 +26,7 @@ import numpy as np
 from cobra import Reaction
 from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
+from optlang.interface import OPTIMAL, INFEASIBLE
 from optlang.symbolics import Zero
 
 import memote.support.consistency_helpers as con_helpers
@@ -97,9 +98,9 @@ def check_stoichiometric_consistency(model):
     stoich_trans.objective.set_linear_coefficients(
         {var: 1. for var in stoich_trans.variables})
     status = stoich_trans.optimize()
-    if status == problem.OPTIMAL:
+    if status == OPTIMAL:
         return True
-    elif status == problem.INFEASIBLE:
+    elif status == INFEASIBLE:
         return False
     else:
         raise RuntimeError(
@@ -153,7 +154,7 @@ def find_unconserved_metabolites(model):
     stoich_trans.objective.set_linear_coefficients(
         {var: 1. for var in k_vars})
     status = stoich_trans.optimize()
-    if status == problem.OPTIMAL:
+    if status == OPTIMAL:
         # TODO: See if that could be a Boolean test `bool(var.primal)`.
         return set([model.metabolites.get_by_id(var.name[2:])
                     for var in k_vars if var.primal < 0.8])
