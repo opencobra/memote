@@ -62,12 +62,6 @@ jobs:
           on:
             tags: true
             repo: $GITHUB_REPO
-        - provider: script
-          skip_cleanup: true
-          script: ci/travis/update_docker.sh
-          on:
-            tags: true
-            repo: $GITHUB_REPO
 notifications:
   email: false
   slack:
