@@ -60,10 +60,9 @@ def test_growth_from_data_qualitative(model, experiment, threshold=0.95):
         set(test.loc[~test["growth"], "exchange"].index),
         set(expected.loc[~expected["growth"], "exchange"].index)
     )
-    ann["metric"][experiment] = ann["data"][experiment]["MCC"]
+    ann["metric"][experiment] = ann["data"][experiment]["ACC"]
     ann["message"][experiment] = wrapper.fill(
-        """Ideally, every model would show a perfect Matthews correlation
-        coefficient of 1. In experiment '{}' the model has a coefficient
-        of {:.2}.""".format(experiment, ann["data"][experiment]["MCC"])
-    )
+        """Ideally, every model would show a perfect accuracy of 1. In 
+        experiment '{}' the model has  {:.2}.""".format(
+            experiment, ann["data"][experiment]["MCC"]))
     assert ann["data"][experiment]["ACC"] > threshold

@@ -57,11 +57,5 @@ class Medium(ExperimentalBase):
 
     def apply(self, model):
         """Set the defined medium on the given model."""
-        for rxn in model.exchanges:
-            rxn.lower_bound = 0
-        for row in self.data.itertuples(index=False):
-            rxn = model.reactions.get_by_id(row.reaction)
-            if isfinite(row.lower):
-                rxn.lower_bound = row.lower
-            if isfinite(row.upper):
-                rxn.upper_bound = row.upper
+        model.medium = {row.exchange: row.uptake
+                  for row in self.data.itertuples(index=False)}

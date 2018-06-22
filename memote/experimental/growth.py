@@ -59,9 +59,11 @@ class GrowthExperiment(Experiment):
             growth = list()
             for row in self.data.itertuples(index=False):
                 with model:
-                    model.reactions.get_by_id(row.exchange).bounds = \
-                        -inf if isnan(row.lower) else row.lower, \
-                        inf if isnan(row.upper) else row.upper
+                    exchange = model.reactions.get_by_id(row.exchange)
+                    if bool(exchange.reactants):
+                        exchange.lower_bound = -row.uptake
+                    else:
+                        exchange.upper_bound = row.uptake
                     growth.append(model.slim_optimize() >= threshold)
         return DataFrame({
             "exchange": self.data["exchange"],

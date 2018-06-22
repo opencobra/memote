@@ -59,10 +59,9 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
         set(test.loc[~test["essential"], "gene"]),
         set(expected.loc[~expected["essential"], "gene"])
     )
-    ann["metric"][experiment] = ann["data"][experiment]["MCC"]
+    ann["metric"][experiment] = ann["data"][experiment]["ACC"]
     ann["message"][experiment] = wrapper.fill(
-        """Ideally, every model would show a perfect Matthews correlation
-        coefficient of 1. In experiment '{}' the model has a coefficient
-        of {:.2}.""".format(experiment, ann["data"][experiment]["MCC"])
-    )
+        """Ideally, every model would show a perfect accuracy of 1. In 
+        experiment '{}' the model has  {:.2}.""".format(
+            experiment, ann["data"][experiment]["MCC"]))
     assert ann["data"][experiment]["ACC"] > threshold
