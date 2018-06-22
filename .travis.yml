@@ -25,17 +25,16 @@ matrix:
   fast_finish: true
 install:
 - make reports
-- pip install -U pip setuptools wheel tox tox-travis
+- pip install --upgrade pip setuptools wheel tox tox-travis
 script:
-- travis_wait tox
+- travis_wait tox -- --cov-report=xml --cov-report=term --cov=memote
 after_success:
-- pip install -U codecov
-- codecov
+- bash <(curl -s https://codecov.io/bash)
 
 stages:
   - test
   - name: deploy
-    if: (repo = env(GITHUB_REPO)) AND (tag IS present)
+    if: tag IS present
 
 jobs:
   include:
@@ -43,7 +42,7 @@ jobs:
       install: skip
       script:
         - make reports
-        - pip install -U pip setuptools wheel
+        - pip install --upgrade pip setuptools wheel
       after_success:
         - pip --version
       deploy:
