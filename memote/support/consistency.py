@@ -26,6 +26,8 @@ import numpy as np
 from cobra import Reaction
 from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
+from optlang.interface import OPTIMAL, INFEASIBLE
+from optlang.symbolics import Zero
 
 import memote.support.consistency_helpers as con_helpers
 import memote.support.helpers as helpers
@@ -76,29 +78,29 @@ def check_stoichiometric_consistency(model):
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
-    Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
+    problem = model.problem
     # The transpose of the stoichiometric matrix N.T in the paper.
-    stoich_trans = Model()
+    stoich_trans = problem.Model()
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     LOGGER.info("model '%s' has %d internal reactions", model.id,
                 len(internal_rxns))
     LOGGER.info("model '%s' has %d internal metabolites", model.id,
                 len(metabolites))
-    for metabolite in metabolites:
-        stoich_trans.add(Variable(metabolite.id, lb=1))
+
+    stoich_trans.add([problem.Variable(m.id, lb=1) for m in metabolites])
     stoich_trans.update()
     con_helpers.add_reaction_constraints(
-        stoich_trans, internal_rxns, Constraint)
+        stoich_trans, internal_rxns, problem.Constraint)
     # The objective is to minimize the metabolite mass vector.
-    stoich_trans.objective = Objective(1)
+    stoich_trans.objective = problem.Objective(
+        Zero, direction="min", sloppy=True)
     stoich_trans.objective.set_linear_coefficients(
         {var: 1. for var in stoich_trans.variables})
-    stoich_trans.objective.direction = "min"
     status = stoich_trans.optimize()
-    if status == "optimal":
+    if status == OPTIMAL:
         return True
-    elif status == "infeasible":
+    elif status == INFEASIBLE:
         return False
     else:
         raise RuntimeError(
@@ -127,42 +129,43 @@ def find_unconserved_metabolites(model):
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
-    Model, Constraint, Variable, Objective = con_helpers.get_interface(model)
-    stoich_trans = Model()
+    problem = model.problem
+    stoich_trans = problem.Model()
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     # The binary variables k[i] in the paper.
     k_vars = list()
     for met in metabolites:
         # The element m[i] of the mass vector.
-        m_var = Variable(met.id)
-        k_var = Variable("k_{}".format(met.id), type="binary")
+        m_var = problem.Variable(met.id)
+        k_var = problem.Variable("k_{}".format(met.id), type="binary")
         k_vars.append(k_var)
         stoich_trans.add([m_var, k_var])
         # This constraint is equivalent to 0 <= k[i] <= m[i].
-        stoich_trans.add(Constraint(
+        stoich_trans.add(problem.Constraint(
             k_var - m_var, ub=0, name="switch_{}".format(met.id)))
     stoich_trans.update()
     con_helpers.add_reaction_constraints(
-        stoich_trans, internal_rxns, Constraint)
+        stoich_trans, internal_rxns, problem.Constraint)
     # The objective is to maximize the binary indicators k[i], subject to the
     # above inequality constraints.
-    stoich_trans.objective = Objective(1)
+    stoich_trans.objective = problem.Objective(
+        Zero, sloppy=True, direction="max")
     stoich_trans.objective.set_linear_coefficients(
         {var: 1. for var in k_vars})
-    stoich_trans.objective.direction = "max"
     status = stoich_trans.optimize()
-    if status == "optimal":
+    if status == OPTIMAL:
         # TODO: See if that could be a Boolean test `bool(var.primal)`.
         return set([model.metabolites.get_by_id(var.name[2:])
                     for var in k_vars if var.primal < 0.8])
     else:
         raise RuntimeError(
             "Could not compute list of unconserved metabolites."
-            " Solver status is '{}'"
-            " (only optimal or infeasible expected).".format(status))
+            " Solver status is '{}' (only optimal expected).".format(status))
 
 
+# FIXME: The results of this function are currently inconsistent with
+# published results.
 def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     """
     Detect inconsistent minimal net stoichiometries.

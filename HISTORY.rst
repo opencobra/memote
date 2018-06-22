@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+* Temporarily disable ``test_find_inconsistent_min_stoichiometry``.
+* Update the nullspace function.
+* Improve optlang compatibility.
 * Add test ``find_medium_metabolites`` to detect and display all substrates
   capable of being taken up by model
 * Display the score on History and Snapshot reports.
