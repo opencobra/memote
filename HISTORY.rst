@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Finalize testing comparing with experimental data (growth and esentiality).
 * Temporarily disable ``test_find_inconsistent_min_stoichiometry``.
 * Update the nullspace function.
 * Improve optlang compatibility.
