@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import os
-from os.path import join, isabs, basename, abspath
+from os.path import join, isabs, basename
 
 from jinja2.ext import Extension
 
@@ -47,4 +47,4 @@ class MemoteExtension(Extension):
         if isabs(filename):
             return filename
         else:
-            return join(abspath(os.curdir), filename)
+            return join(os.getcwd(), filename)
