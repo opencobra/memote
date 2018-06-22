@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.8.0 (2018-06-22)
+------------------
 * Finalize testing comparing with experimental data (growth and esentiality).
 * Temporarily disable ``test_find_inconsistent_min_stoichiometry``.
 * Update the nullspace function.
@@ -12,7 +15,7 @@ Next Release
 * Display the score on History and Snapshot reports.
 * Invert the colour coding.
 * Display results as percentages.
-* Add ability to generate a diff report which compares two or more models. 
+* Add ability to generate a diff report which compares two or more models.
 * Annotation of metabolite shortlist simplified.
 
 0.7.6 (2018-05-28)
