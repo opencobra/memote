@@ -21,7 +21,6 @@ from __future__ import absolute_import
 
 import logging
 
-from numpy import isnan, inf
 from pandas import DataFrame
 
 from memote.experimental.experiment import Experiment

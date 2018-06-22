@@ -21,8 +21,6 @@ from __future__ import absolute_import
 
 import logging
 
-from numpy import isfinite
-
 from memote.experimental.experimental_base import ExperimentalBase
 from memote.experimental.checks import check_partial, reaction_id_check
 
@@ -58,4 +56,4 @@ class Medium(ExperimentalBase):
     def apply(self, model):
         """Set the defined medium on the given model."""
         model.medium = {row.exchange: row.uptake
-                  for row in self.data.itertuples(index=False)}
+                        for row in self.data.itertuples(index=False)}
