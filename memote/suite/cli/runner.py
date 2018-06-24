@@ -233,6 +233,7 @@ def history(model, solver, location, pytest_args, commits, skip,
        model repositories.
     2. By giving memote specific commit hashes, it will re-compute test results
        for those only.
+
     """
     if "--tb" not in pytest_args:
         pytest_args = ["--tb", "no"] + pytest_args
@@ -352,18 +353,6 @@ def online(note, github_repository, github_username):
     repo.index.add([".travis.yml"])
     repo.index.commit("chore: add encrypted GitHub access token")
     repo.remotes.origin.push(all=True)
-
-
-@cli.command(context_settings=CONTEXT_SETTINGS)
-@click.help_option("--help", "-h")
-@click.argument("message")
-def save(message):
-    """
-    Save current model changes with the given message.
-
-    If a remote repository 'origin' exists the changes will also be uploaded.
-    """
-    raise NotImplementedError(u"Coming soon™.")
 
 
 cli.add_command(report)
