@@ -316,5 +316,5 @@ def check_transport_reaction_gpr_presence(model):
 
 def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
-    return set([met.id for rxn in model.medium
-                for met in model.reactions.get_by_id(rxn).metabolites])
+    return [met.id for rxn in model.medium
+            for met in model.reactions.get_by_id(rxn).metabolites]

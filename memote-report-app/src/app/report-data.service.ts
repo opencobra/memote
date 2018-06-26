@@ -33,7 +33,7 @@ export class ReportDataService {
         break;
       }
       case 'diff': {
-        this.convertResults((<any>window).data);
+        this.convertDiffResults((<any>window).data);
         break;
       }
       default: {
