@@ -63,11 +63,9 @@ def register_with(registry):
     return decorator
 
 
-# TODO: Change naming of the 'type' argument once the angular app is completed.
-# It is misleading.
 def annotate(title, format_type, message=None, data=None, metric=1.0):
     """
-    Annotate a test case.
+    Annotate a test case with info that should be displayed in the reports.
 
     Parameters
     ----------
@@ -190,7 +188,7 @@ def extended_summary(func):
     Parameters
     ----------
     func : function
-        A scored or unscored test function used in `memote report snapshot`
+        A test function used in `memote report snapshot`
 
     Returns
     -------
