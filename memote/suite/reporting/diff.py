@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Compare two models with one another."""
+"""Compare two or more models with one another side-by-side."""
 
 from __future__ import absolute_import
 
@@ -25,7 +25,7 @@ from memote.suite.reporting.report import Report
 
 class DiffReport(Report):
     """
-    Render a report displaying the results of two or more models.
+    Render a report displaying the results of two or more models side-by-side.
 
     Attributes
     ----------

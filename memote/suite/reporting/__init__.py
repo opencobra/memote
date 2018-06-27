@@ -20,11 +20,12 @@ Subpackage for creating visually pleasing reports of test results.
 
 There are three types of reports that we support:
 
-1. A one-time report of a model giving a good insight into its current state.
-2. A more elaborate report that makes use of the model development over time
-   (aka git history).
-3. A comparison report between two different versions of the same model or
-   across different models (similar to a diff).
+1. ``Snapshot Report``: A one-time report of a model giving a good insight
+into its current state.
+2. ``History Report``: A more elaborate report that makes use of the model
+development over time (aka git history).
+3. ``Diff Report``: A comparison report between two different versions of the
+same model or across different models (similar to a diff).
 """
 
 from __future__ import absolute_import

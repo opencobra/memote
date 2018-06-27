@@ -66,9 +66,10 @@ def cli():
     Metabolic model testing command line tool.
 
     In its basic invocation memote runs a test suite on a metabolic model.
-    Through various subcommands it can further generate a pretty HTML report,
-    generate a model repository structure for starting a new project, and
-    recreate the test result history.
+    Through various subcommands it can further generate three types of pretty
+    HTML reports (snapshot, diff and history), generate a model repository
+    structure for starting a new project, and recreate the test result history.
+
     """
     pass
 
@@ -109,17 +110,19 @@ def cli():
               multiple=True,
               help="A path to a directory containing custom test "
                    "modules. Please refer to the documentation for more "
-                   "information on how to write custom tests. May be "
-                   "specified multiple times.")
+                   "information on how to write custom tests "
+                   "(memote.readthedocs.io). This option can be specified "
+                   "multiple times.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         skip, solver, experimental, custom_tests):
     """
-    Run the test suite and collect results.
+    Run the test suite on a single model and collect results.
 
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
+
     """
     if ignore_git:
         repo = None
@@ -174,6 +177,7 @@ def new(directory, replay):
     and set up a new directory structure that will make your life easier. The
     new directory will be placed in the current directory or respect the given
     --directory option.
+
     """
     if directory is None:
         directory = os.getcwd()

@@ -179,22 +179,24 @@ def history(location, filename, custom_config):
               multiple=True,
               help="A path to a directory containing custom test "
                    "modules. Please refer to the documentation for more "
-                   "information on how to write custom tests. May be "
-                   "specified multiple times.")
+                   "information on how to write custom tests "
+                   "(memote.readthedocs.io). This option can be specified "
+                   "multiple times.")
 @click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
               multiple=True,
               help="A path to a report configuration file that will be merged "
                    "into the default configuration. It's primary use is to "
                    "configure the placement and scoring of custom tests but "
                    "it can also alter the default behavior. Please refer to "
-                   "the documentation for the expected YAML format used. This "
-                   "option can be specified multiple times.")
+                   "the documentation for the expected YAML format used "
+                   "(memote.readthedocs.io). This option can be specified "
+                   "multiple times.")
 def diff(models, filename, pytest_args, exclusive, skip, solver,
          experimental, custom_tests, custom_config):
     """
     Take a snapshot of all the supplied models and generate a diff report.
 
-    MODELS: List of paths to model files.
+    MODELS: List of paths to two or more model files.
     """
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args

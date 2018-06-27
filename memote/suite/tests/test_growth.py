@@ -47,6 +47,7 @@ def test_growth_from_data_qualitative(model, experiment, threshold=0.95):
     In principal, Matthews' correlation coefficient is a more comprehensive
     metric but is a little fragile to not having any false negatives or false
     positives in the output.
+
     """
     ann = test_growth_from_data_qualitative.annotation
     exp = pytest.memote.experimental.growth[experiment]

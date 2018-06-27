@@ -48,6 +48,7 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
     In principal, Matthews' correlation coefficient is a more comprehensive
     metric but is a little fragile to not having any false negatives or false
     positives in the output.
+
     """
     ann = test_gene_essentiality_from_data_qualitative.annotation
     exp = pytest.memote.experimental.essentiality[experiment]

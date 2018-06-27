@@ -18,7 +18,7 @@
 """
 Provide the memote result object and managers for various situations.
 
-* The ``MemoteResult` represents the collective result of running the
+* The ``MemoteResult`` represents the collective result of running the
   metabolic model test suite on a given model at a certain point in time.
 * The ``ResultManager`` and its subclasses knows how to store a
 ``MemoteResult`` in various data backends (file, SQL, NoSQL).

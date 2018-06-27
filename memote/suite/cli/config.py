@@ -29,7 +29,13 @@ class ConfigSectionSchema(object):
 
     @matches_section("memote")
     class Memote(SectionSchema):
-        """Describes the memote configuration keys and values."""
+        """
+        Describes the memote configuration keys and values.
+
+        Memote configuration should be carried out either in 'setup.cfg' or
+        a dedicated 'memote.ini' file.
+
+        """
 
         collect = Param(type=bool, default=True)
         git = Param(type=bool, default=True)

@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 BIOMASS_IDS = pytest.memote.biomass_ids
 
 
-@annotate(title="Amount of Biomass Reactions", format_type="count")
+@annotate(title="Biomass Reactions Identified", format_type="count")
 def test_biomass_presence():
     """
     Expect the model to contain at least one biomass reaction.
@@ -93,7 +93,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Biomass Production At Default State", format_type="number",
+@annotate(title="Biomass Production In Default Medium", format_type="number",
           data=dict(), message=dict(), metric=dict())
 def test_biomass_default_production(model, reaction_id):
     """
@@ -138,7 +138,7 @@ def test_biomass_open_production(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Blocked Biomass Precursors At Default State",
+@annotate(title="Blocked Biomass Precursors In Default Medium",
           format_type="count", data=dict(), metric=dict(), message=dict())
 def test_biomass_precursors_default_production(read_only_model, reaction_id):
     """
@@ -209,7 +209,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
           format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_gam_in_biomass(model, reaction_id):
     """
-    Expect the biomass reactions to contain atp and adp.
+    Expect the biomass reactions to contain  ATP and ADP.
 
     The growth-associated maintenance (GAM) term accounts for the energy in
     the form of ATP that is required to synthesize macromolecules such as
@@ -227,7 +227,7 @@ def test_gam_in_biomass(model, reaction_id):
 
 
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
-@annotate(title="Unrealistic Growth Rate In Default Condition",
+@annotate(title="Unrealistic Growth Rate In Default Medium",
           format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_fast_growth_default(model, reaction_id):
     """
@@ -253,7 +253,7 @@ def test_fast_growth_default(model, reaction_id):
           format_type="percent", data=dict(), message=dict(), metric=dict())
 def test_direct_metabolites_in_biomass(model, reaction_id):
     """
-    Expect the biomass reactions to contain atp and adp.
+    Expect the ratio of direct metabolites to be below 0.5.
 
     Some biomass precursors are taken from the media and directly consumed by
     the biomass reaction. It might not be a problem for ions or
@@ -323,7 +323,7 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
     RNA: atp, ctp, utp, gtp
     Cofactors: nad, nadp, amet, fad, pydx5p, coa, thmpp, fmn and h2o
 
-    These metabolties were selected based on the results presented by
+    These metabolites were selected based on the results presented by
     DOI:10.1016/j.ymben.2016.12.002
     """
     ann = test_essential_precursors_not_in_biomass.annotation
