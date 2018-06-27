@@ -3,11 +3,13 @@ History
 
 Next Release
 ------------
+* Allow users to selective recompute the history of results.
+* Skip commits in the history that did not change the model file.
 * Change format_type on experimental tests from `count` to `percent`
 * Fix typo in `test_basic.py` that lead to tests returning `null` which breaks
   the diff report frontend.
 * Update the diff report to properly show errored and skipped tests
-* Fix issues with asynchronicity on the diff report 
+* Fix issues with asynchronicity on the diff report.
 
 0.8.0 (2018-06-22)
 ------------------
