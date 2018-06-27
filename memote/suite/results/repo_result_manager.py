@@ -125,8 +125,6 @@ class RepoResultManager(ResultManager):
 
         """
         git_info = self.record_git_info(commit)
-        LOGGER.critical(git_info)
-        LOGGER.critical(self._backend)
         self.add_git(result.meta, git_info)
         filename = self.get_filename(git_info)
         super(RepoResultManager, self).store(

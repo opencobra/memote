@@ -120,3 +120,8 @@ class HistoryManager(object):
         assert self._results is not None, \
             "Please call the method `load_history` first."
         return self._results.get(commit, default)
+
+    def __contains__(self, commit):
+        assert self._results is not None, \
+            "Please call the method `load_history` first."
+        return commit in self._results
