@@ -58,13 +58,8 @@ class HistoryManager(object):
         super(HistoryManager, self).__init__(**kwargs)
         self._repo = repository
         self.manager = manager
-        self._latest = self._repo.active_branch
         self._history = None
         self._results = None
-
-    def reset(self):
-        """Reset the git repository to head of the previously active branch."""
-        self._repo.git.checkout(self._latest)
 
     def build_branch_structure(self):
         """Inspect and record the repo's branches and their history."""
@@ -87,7 +82,6 @@ class HistoryManager(object):
                     sub["author"] = commit.author.name
                     sub["email"] = commit.author.email
         LOGGER.debug("%s", json.dumps(self._history, indent=2))
-        self.reset()
 
     def iter_branches(self):
         """Iterate over branch names and their commit histories."""

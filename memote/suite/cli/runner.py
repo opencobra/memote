@@ -24,7 +24,7 @@ import os
 import sys
 import logging
 from functools import partial
-from itertools import chain
+from gzip import GzipFile
 from os.path import join
 from multiprocessing import Process
 from getpass import getpass
@@ -34,6 +34,7 @@ import click
 import click_log
 import git
 import ruamel.yaml as yaml
+from cobra.io import read_sbml_model
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
@@ -180,9 +181,17 @@ def new(directory, replay):
                  replay=replay)
 
 
+def _model_from_stream(stream, filename):
+    if filename.endswith(".gz"):
+        with GzipFile(fileobj=stream) as file_handle:
+            model = read_sbml_model(file_handle)
+    else:
+        model = read_sbml_model(stream)
+    return model
+
+
 def _test_history(model, solver, manager, commit, pytest_args, skip,
                   exclusive, experimental):
-    model = callbacks.validate_model(None, "model", model)
     model.solver = solver
     _, result = api.test_model(
         model, results=True, pytest_args=pytest_args, skip=skip,
@@ -250,36 +259,38 @@ def history(model, rewrite, solver, location, pytest_args, commits, skip,
         manager = SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
         manager = RepoResultManager(repository=repo, location=location)
+    history = HistoryManager(repository=repo, manager=manager)
+    history.build_branch_structure()
+    history.load_history()
     if len(commits) > 0:
         # TODO: Convert hashes to `git.Commit` instances.
         raise NotImplementedError(u"Coming soon™.")
     else:
-        history = HistoryManager(repository=repo, manager=manager)
-        history.build_branch_structure()
-        history.load_history()
-    for commit in history.iter_commits():
-        # FIXME: Don't checkout commit, access commit from DB and read blob.
-        repo.git.checkout(commit)
-        # Find model in added, deleted, and modified files.
+        commits = list(history.iter_commits())
+    for commit in commits:
         cmt = repo.commit(commit)
+        # Find model in added, deleted, and modified files.
         if model not in cmt.stats.files:
             LOGGER.info(
                 "The model was not modified in commit '{}'. Skipping.".format(
                     commit))
             continue
+        # Should we overwrite an existing result?
         if commit in history and not rewrite:
             LOGGER.info(
                 "Result for commit '{}' exists. Skipping.".format(commit))
             continue
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit))
+        blob = cmt.tree[model]
+        model_obj = _model_from_stream(blob.data_stream, blob.name)
         proc = Process(
             target=_test_history,
-            args=(model, solver, manager, commit, pytest_args, skip,
+            args=(model_obj, solver, manager, commit, pytest_args, skip,
                   exclusive, experimental))
         proc.start()
         proc.join()
-    history.reset()
+    LOGGER.info("Done.")
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
