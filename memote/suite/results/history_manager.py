@@ -116,6 +116,7 @@ class HistoryManager(object):
         return self._results.get(commit, default)
 
     def __contains__(self, commit):
+        """Test for the existence of a result for a commit."""
         assert self._results is not None, \
             "Please call the method `load_history` first."
         return commit in self._results
