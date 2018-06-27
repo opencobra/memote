@@ -24,6 +24,7 @@ import os
 import sys
 import logging
 from functools import partial
+from itertools import chain
 from os.path import join
 from multiprocessing import Process
 from getpass import getpass
@@ -191,9 +192,8 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.option("--yes", "-y", is_flag=True, callback=callbacks.abort_if_false,
-              expose_value=False, help="Confirm overwriting previous results.",
-              prompt="Are you sure that you want to change history?")
+@click.option("--rewrite/--no-rewrite", default=False,
+              help="Whether to overwrite existing results.")
 @click.option("--location", type=str, envvar="MEMOTE_LOCATION",
               help="Generated JSON files from the commit history will be "
                    "written to this directory.")
@@ -216,7 +216,7 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-def history(model, solver, location, pytest_args, commits, skip,
+def history(model, rewrite, solver, location, pytest_args, commits, skip,
             exclusive, experimental):  # noqa: D301
     """
     Re-compute test results for the git branch history.
@@ -256,13 +256,20 @@ def history(model, solver, location, pytest_args, commits, skip,
     else:
         history = HistoryManager(repository=repo, manager=manager)
         history.build_branch_structure()
+        history.load_history()
     for commit in history.iter_commits():
+        # FIXME: Don't checkout commit, access commit from DB and read blob.
         repo.git.checkout(commit)
-        modified = {blob[0] for blob in repo.index.entries}
-        if model not in modified:
+        # Find model in added, deleted, and modified files.
+        cmt = repo.commit(commit)
+        if model not in cmt.stats.files:
             LOGGER.info(
                 "The model was not modified in commit '{}'. Skipping.".format(
                     commit))
+            continue
+        if commit in history and not rewrite:
+            LOGGER.info(
+                "Result for commit '{}' exists. Skipping.".format(commit))
             continue
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit))
