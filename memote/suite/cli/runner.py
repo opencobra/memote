@@ -258,7 +258,12 @@ def history(model, solver, location, pytest_args, commits, skip,
         history.build_branch_structure()
     for commit in history.iter_commits():
         repo.git.checkout(commit)
-        # TODO: Skip this commit if model was not touched.
+        modified = {blob[0] for blob in repo.index.entries}
+        if model not in modified:
+            LOGGER.info(
+                "The model was not modified in commit '{}'. Skipping.".format(
+                    commit))
+            continue
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit))
         proc = Process(
