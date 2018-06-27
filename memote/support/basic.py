@@ -304,7 +304,7 @@ def find_duplicate_reactions(model):
         ann_rxns.append((rxn, frozenset(ann)))
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
-            duplicates.append((rxn_a, rxn_b))
+            duplicates.append((rxn_a.id, rxn_b.id))
     return duplicates
 
 
@@ -316,5 +316,5 @@ def check_transport_reaction_gpr_presence(model):
 
 def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
-    return set([met.id for rxn in model.medium
-                for met in model.reactions.get_by_id(rxn).metabolites])
+    return [met.id for rxn in model.medium
+            for met in model.reactions.get_by_id(rxn).metabolites]

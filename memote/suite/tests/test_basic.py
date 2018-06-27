@@ -37,6 +37,7 @@ def test_model_id_presence(read_only_model):
     ann = test_model_id_presence.annotation
     assert hasattr(read_only_model, "id")
     ann["data"] = read_only_model.id
+    ann["message"] = "The model ID is {}".format(ann["data"])
     assert bool(read_only_model.id)
 
 
@@ -487,7 +488,7 @@ def test_find_duplicate_reactions(read_only_model):
     (i.e. unique BRENDA, BiGG, KEGG, etc. values).
     """
     ann = test_find_duplicate_reactions.annotation
-    ann["data"] = basic.test_find_duplicate_reactions(read_only_model)
+    ann["data"] = basic.find_duplicate_reactions(read_only_model)
     ann["message"] = wrapper.fill(
         """There are a total of {} reactions in the model which
         have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
@@ -503,7 +504,7 @@ def test_find_medium_metabolites(read_only_model):
     towards creating a metabolite, and reports on those metabolites.
     """
     ann = test_find_medium_metabolites.annotation
-    ann["data"] = basic.test_find_medium_metabolites(read_only_model)
+    ann["data"] = basic.find_medium_metabolites(read_only_model)
     ann["message"] = wrapper.fill(
         """There are a total of {} metabolites in the currently set medium
         in the model: {}""".format(len(ann["data"]), truncate(ann["data"])))

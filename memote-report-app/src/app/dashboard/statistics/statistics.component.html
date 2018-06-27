@@ -16,7 +16,7 @@
                         Compared Models
                     </td>
                     <div style="margin-right: 10px">
-                    <td *ngFor="let results of data.byID(case).diff">
+                    <td *ngFor="let results of data.byID(case)?.diff">
                       <div class="MatButtonEmulation" style="background: white; color:black"> {{ results.model }} </div>
                     </td>
                     </div>
