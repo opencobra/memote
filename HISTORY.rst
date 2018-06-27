@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.8.1 (2018-06-27)
+------------------
 * Allow users to selective recompute the history of results.
 * Skip commits in the history that did not change the model file.
 * Change format_type on experimental tests from `count` to `percent`
