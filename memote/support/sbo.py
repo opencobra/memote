@@ -31,7 +31,7 @@ def find_components_without_sbo_terms(model, components):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model.
+        The metabolic model under investigation.
     components : {"metabolites", "reactions", "genes"}
         A string denoting `cobra.Model` components.
 

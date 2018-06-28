@@ -64,7 +64,7 @@ def test_biomass_presence():
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) > 0, ann["message"]
 
-
+#TODO: Mark this test as skipped if the biomass components lack formulas!
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Biomass Consistency", format_type="number", data=dict(),
           message=dict(), metric=dict())
@@ -72,6 +72,8 @@ def test_biomass_consistency(read_only_model, reaction_id):
     """
     Expect biomass components to sum up to 1 g[CDW].
 
+    This test only yields sensible results if all biomass precursor
+    metabolites have chemical formulas assigned to them.
     The molecular weight of the biomass reaction in metabolic models is
     defined to be equal to 1 g/mmol. Conforming to this is essential in order
     to be able to reliably calculate growth yields, to cross-compare models,

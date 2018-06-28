@@ -61,7 +61,7 @@ ENERGY_COUPLES = {
 
 def check_stoichiometric_consistency(model):
     """
-    Verify the consistency of the model stoichiometry.
+    Verify the consistency of the model's stoichiometry.
 
     Parameters
     ----------

@@ -50,7 +50,7 @@ def find_rxn_id_compartment_suffix(model, suffix):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model.
+        The metabolic model under investigation.
     suffix : str
         The suffix of the compartment to be checked.
 
@@ -90,7 +90,7 @@ def find_rxn_id_suffix_compartment(model, suffix):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model.
+        The metabolic model under investigation.
     suffix : str
         The suffix of the compartment to be checked.
 
@@ -131,7 +131,7 @@ def find_reaction_tag_transporter(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     Notes
     -----
@@ -172,7 +172,7 @@ def find_abc_tag_transporter(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     Notes
     -----
@@ -213,7 +213,7 @@ def find_upper_case_mets(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     Notes
     -----
@@ -237,7 +237,7 @@ def find_untagged_demand_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     demand_rxns = helpers.find_demand_reactions(model)
@@ -253,7 +253,7 @@ def find_false_demand_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     true_demand_rxns = helpers.find_demand_reactions(model)
@@ -271,7 +271,7 @@ def find_untagged_sink_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     sink_rxns = helpers.find_sink_reactions(model)
@@ -287,7 +287,7 @@ def find_false_sink_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     true_sink_rxns = helpers.find_sink_reactions(model)
@@ -305,7 +305,7 @@ def find_untagged_exchange_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     exchange_rxns = helpers.find_exchange_rxns(model)
@@ -321,7 +321,7 @@ def find_false_exchange_rxns(model):
     Parameters
     ----------
     model : cobra.Model
-        A cobrapy metabolic model
+        The metabolic model under investigation.
 
     """
     true_exchange_rxns = helpers.find_exchange_rxns(model)
