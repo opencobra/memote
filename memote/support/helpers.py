@@ -682,7 +682,7 @@ def find_compartment_id_in_model(model, compartment_id):
 
 def find_met_in_model(model, mnx_id, compartment_id=None):
     """
-    Returns specific metabolites by looking up IDs in METANETX_SHORTLIST.
+    Return specific metabolites by looking up IDs in METANETX_SHORTLIST.
 
     Parameters
     ----------

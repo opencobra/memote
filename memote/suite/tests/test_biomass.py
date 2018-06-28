@@ -64,7 +64,8 @@ def test_biomass_presence():
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) > 0, ann["message"]
 
-#TODO: Mark this test as skipped if the biomass components lack formulas!
+
+# TODO: Mark this test as skipped if the biomass components lack formulas!
 @pytest.mark.parametrize("reaction_id", BIOMASS_IDS)
 @annotate(title="Biomass Consistency", format_type="number", data=dict(),
           message=dict(), metric=dict())

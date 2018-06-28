@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import, division
 
-from warnings import warn
 from builtins import dict
 
 import pytest
