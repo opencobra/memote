@@ -46,7 +46,8 @@ class ExperimentalBase(object):
         ----------
         identifier : str
         obj : dict
-        data : pandas.DataFrame
+        filename : str or pathlib.Path
+            The full file path. May be a compressed file.
         kwargs
 
         """

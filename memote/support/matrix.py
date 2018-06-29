@@ -27,7 +27,15 @@ LOGGER = logging.getLogger(__name__)
 
 
 def absolute_extreme_coefficient_ratio(model):
-    """Return the absolute max and absolute non-zero min coefficients."""
+    """
+    Return the absolute max and absolute non-zero min coefficients.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
     # S-Matrix with absolute values:
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
@@ -41,7 +49,15 @@ def absolute_extreme_coefficient_ratio(model):
 
 
 def number_independent_conservation_relations(model):
-    """Return the amount of conserved metabolic pools."""
+    """
+    Return the amount of conserved metabolic pools.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
@@ -50,7 +66,15 @@ def number_independent_conservation_relations(model):
 
 
 def number_steady_state_flux_solutions(model):
-    """Return the amount of steady-state flux solutions of this model."""
+    """
+    Return the amount of steady-state flux solutions of this model.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
@@ -59,7 +83,15 @@ def number_steady_state_flux_solutions(model):
 
 
 def matrix_rank(model):
-    """Return the rank of the model's stoichiometric matrix."""
+    """
+    Return the rank of the model's stoichiometric matrix.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    """
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
@@ -69,6 +101,11 @@ def matrix_rank(model):
 def degrees_of_freedom(model):
     """
     Return the degrees of freedom, i.e. number of "free variables".
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
 
     Notes:
     ------

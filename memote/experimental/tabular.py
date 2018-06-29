@@ -24,7 +24,7 @@ import pandas as pd
 
 def read_tabular(filename):
     """
-    Read a tabular data file which can be CSV, TSV, XLS, XLSX, or ODS.
+    Read a tabular data file which can be CSV, TSV, XLS or XLSX.
 
     Parameters
     ----------

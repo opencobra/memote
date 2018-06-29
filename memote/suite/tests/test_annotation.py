@@ -15,11 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Annotation tests performed on an instance of ``cobra.Model``."""
+"""Tests performed on the annotations of an instance of ``cobra.Model``."""
 
 from __future__ import absolute_import, division
 
-from warnings import warn
 from builtins import dict
 
 import pytest
@@ -28,7 +27,7 @@ import memote.support.annotation as annotation
 from memote.utils import annotate, truncate, get_ids, wrapper
 
 
-@annotate(title="Metabolites without Annotation", format_type="count")
+@annotate(title="Presence of Metabolite Annotation", format_type="count")
 def test_metabolite_annotation_presence(read_only_model):
     """
     Expect all metabolites to have a non-empty annotation attribute.
@@ -49,7 +48,7 @@ def test_metabolite_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions without Annotation", format_type="count")
+@annotate(title="Presence of Reaction Annotation", format_type="count")
 def test_reaction_annotation_presence(read_only_model):
     """
     Expect all reactions to have a non-empty annotation attribute.
@@ -70,7 +69,7 @@ def test_reaction_annotation_presence(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Genes without Annotation", format_type="count")
+@annotate(title="Presence of Gene Annotation", format_type="count")
 def test_gene_product_annotation_presence(read_only_model):
     """
     Expect all genes to have a non-empty annotation attribute.
@@ -94,7 +93,7 @@ def test_gene_product_annotation_presence(read_only_model):
 
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
-@annotate(title="Missing Metabolite Annotations Per Database",
+@annotate(title="Metabolite Annotations Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_metabolite_annotation_overview(read_only_model, db):
     """
@@ -108,10 +107,12 @@ def test_metabolite_annotation_overview(read_only_model, db):
     knowledge base.
 
     For this test to pass, each metabolite annotation should contain
-    cross-references to a number of databases (listed in `annotation.py`).
-    For each database this test checks for the presence of its corresponding
-    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
-    those defined on https://identifiers.org/.
+    cross-references to a number of databases. The currently selection is
+    listed in `annotation.py`, but an ongoing discussion can be found at
+    https://github.com/opencobra/memote/issues/332. For each database this
+    test checks for the presence of its corresponding namespace ID to comply
+    with the MIRIAM guidelines i.e. they have to match those defined on
+    https://identifiers.org/.
 
     Since each database is quite different and some potentially incomplete, it
     may not be feasible to achieve 100% coverage for each of them. Generally
@@ -131,7 +132,7 @@ def test_metabolite_annotation_overview(read_only_model, db):
 
 
 @pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
-@annotate(title="Missing Reaction Annotations Per Database",
+@annotate(title="Reaction Annotations Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_reaction_annotation_overview(read_only_model, db):
     """
@@ -145,10 +146,12 @@ def test_reaction_annotation_overview(read_only_model, db):
     knowledge base.
 
     For this test to pass, each reaction annotation should contain
-    cross-references to a number of databases (listed in `annotation.py`).
-    For each database this test checks for the presence of its corresponding
-    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
-    those defined on https://identifiers.org/.
+    cross-references to a number of databases. The currently selection is
+    listed in `annotation.py`, but an ongoing discussion can be found at
+    https://github.com/opencobra/memote/issues/332. For each database this
+    test checks for the presence of its corresponding namespace ID to comply
+    with the MIRIAM guidelines i.e. they have to match those defined on
+    https://identifiers.org/.
 
     Since each database is quite different and some potentially incomplete, it
     may not be feasible to achieve 100% coverage for each of them. Generally
@@ -168,7 +171,7 @@ def test_reaction_annotation_overview(read_only_model, db):
 
 
 @pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
-@annotate(title="Missing Gene Annotations Per Database",
+@annotate(title="Gene Annotations Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_overview(read_only_model, db):
     """
@@ -181,11 +184,13 @@ def test_gene_product_annotation_overview(read_only_model, db):
     it also promotes the metabolic model itself to become an organism-specific
     knowledge base.
 
-    For this test to pass, each gene product annotation should contain
-    cross-references to a number of databases (listed in `annotation.py`).
-    For each database this test checks for the presence of its corresponding
-    namespace ID to comply with the MIRIAM guidelines i.e. they have to match
-    those defined on https://identifiers.org/.
+    For this test to pass, each gene annotation should contain
+    cross-references to a number of databases. The currently selection is
+    listed in `annotation.py`, but an ongoing discussion can be found at
+    https://github.com/opencobra/memote/issues/332. For each database this
+    test checks for the presence of its corresponding namespace ID to comply
+    with the MIRIAM guidelines i.e. they have to match those defined on
+    https://identifiers.org/.
 
     Since each database is quite different and some potentially incomplete, it
     may not be feasible to achieve 100% coverage for each of them. Generally
@@ -205,7 +210,7 @@ def test_gene_product_annotation_overview(read_only_model, db):
 
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
-@annotate(title="Wrong Metabolite Annotations Per Database",
+@annotate(title="Metabolite Annotation Conformity Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_metabolite_annotation_wrong_ids(read_only_model, db):
     """
@@ -237,16 +242,16 @@ def test_metabolite_annotation_wrong_ids(read_only_model, db):
             read_only_model.metabolites, "metabolites", db))
     ann["metric"][db] = len(ann["data"][db]) / len(total)
     ann["message"][db] = wrapper.fill(
-        """The provided metabolite annotations for the {} database do not match
-        the regular expression patterns defined on identifiers.org. A total of
-        {} metabolite annotations ({:.2%}) needs to be fixed: {}""".format(
-            db, len(ann["data"][db]), ann["metric"][db],
+        """A total of {} metabolite annotations ({:.2%}) do not match the
+        regular expression patterns defined on identifiers.org for the {}
+        database: {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db,
             truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", annotation.REACTION_ANNOTATIONS)
-@annotate(title="Wrong Reaction Annotations Per Database",
+@annotate(title="Reaction Annotation Conformity Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_reaction_annotation_wrong_ids(read_only_model, db):
     """
@@ -278,16 +283,16 @@ def test_reaction_annotation_wrong_ids(read_only_model, db):
             read_only_model.reactions, "reactions", db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.reactions)
     ann["message"][db] = wrapper.fill(
-        """The provided reaction annotations for the {} database do not match
-        the regular expression patterns defined on identifiers.org. A total of
-        {} reaction annotations ({:.2%}) needs to be fixed: {}""".format(
-            db, len(ann["data"][db]), ann["metric"][db],
+        """A total of {} reaction annotations ({:.2%}) do not match the
+        regular expression patterns defined on identifiers.org for the {}
+        database: {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db,
             truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", annotation.GENE_PRODUCT_ANNOTATIONS)
-@annotate(title="Wrong Gene Annotations Per Database",
+@annotate(title="Gene Annotation Conformity Per Database",
           format_type="percent", message=dict(), data=dict(), metric=dict())
 def test_gene_product_annotation_wrong_ids(read_only_model, db):
     """
@@ -319,11 +324,10 @@ def test_gene_product_annotation_wrong_ids(read_only_model, db):
             read_only_model.genes, "genes", db))
     ann["metric"][db] = len(ann["data"][db]) / len(read_only_model.genes)
     ann["message"][db] = wrapper.fill(
-        """The provided gene/gene-product annotations for the {} database do
-        not match the regular expression patterns defined on identifiers.org.
-        A total of {} gene product annotations ({:.2%}) needs to be
-        fixed: {}""".format(
-            db, len(ann["data"][db]), ann["metric"][db],
+        """A total of {} gene annotations ({:.2%}) do not match the
+        regular expression patterns defined on identifiers.org for the {}
+        database: {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db,
             truncate(ann["data"][db])))
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
@@ -349,17 +353,12 @@ def test_metabolite_id_namespace_consistency(read_only_model):
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
-    if largest != 'bigg.metabolite':
-        warn(wrapper.fill(
-            """memote currently only supports syntax checks for BiGG
-            identifiers. Please consider mapping your IDs from {} to BiGG
-            """.format(largest)))
     # Assume that all identifiers match the largest namespace.
     ann["data"] = list(set(get_ids(read_only_model.metabolites)).difference(
         overview[overview[largest]].index.tolist()))
     ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
     ann["message"] = wrapper.fill(
-        """{} metabolite identifiers ({:.2%}) do not match the largest found
+        """{} metabolite identifiers ({:.2%}) deviate from the largest found
         namespace ({}): {}""".format(
             len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
@@ -386,17 +385,12 @@ def test_reaction_id_namespace_consistency(read_only_model):
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
-    if largest != 'bigg.reaction':
-        warn(wrapper.fill(
-            """memote currently only supports syntax checks for BiGG
-            identifiers. Please consider mapping your IDs from {} to BiGG
-            """.format(largest)))
     # Assume that all identifiers match the largest namespace.
     ann["data"] = list(set(get_ids(read_only_model.reactions)).difference(
         overview[overview[largest]].index.tolist()))
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
-        """{} reaction identifiers ({:.2%}) do not match the largest found
+        """{} reaction identifiers ({:.2%}) deviate from the largest found
         namespace ({}): {}""".format(
             len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]

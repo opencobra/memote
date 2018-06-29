@@ -3,6 +3,12 @@ History
 
 Next Release
 ------------
+* Proofread and update all docstrings and comments inside the ``memote`` 
+  subfolder
+* Reworded all test titles to be a) shorter and b) as neutral as was 
+  sensibly possible.
+* Reordered tests in the `test-config.yaml` such that results belonging to a 
+  category are grouped logically.
 
 0.8.1 (2018-06-27)
 ------------------
@@ -13,6 +19,11 @@ Next Release
   the diff report frontend.
 * Update the diff report to properly show errored and skipped tests
 * Fix issues with asynchronicity on the diff report.
+* Change format_type on experimental tests from ``count` to ``percent`
+* Fix typo in ``test_basic.py`` that lead to tests returning `null` which 
+  breaks the diff report frontend.
+* Update the diff report to properly show errored and skipped tests
+
 
 0.8.0 (2018-06-22)
 ------------------

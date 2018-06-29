@@ -52,10 +52,18 @@ def sum_biomass_weight(reaction):
     """
     Compute the sum of all reaction compounds.
 
+    This function expects all metabolites of the biomass reaction to have
+    formula information assigned.
+
     Parameters
     ----------
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
+
+    Returns
+    -------
+    float
+        The molecular weight of the biomass reaction in units of g/mmol.
 
     """
     return sum(-coef * met.formula_weight
@@ -70,6 +78,14 @@ def find_biomass_precursors(model, reaction):
     ----------
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns
+    -------
+    list
+        Metabolite objects that are reactants of the biomass reaction excluding
+        ATP and H2O.
 
     """
     id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
@@ -100,9 +116,14 @@ def find_blocked_biomass_precursors(reaction, model):
     ----------
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
-
     model : cobra.Model
         The metabolic model under investigation.
+
+    Returns
+    -------
+    list
+        Metabolite objects that are reactants of the biomass reaction excluding
+        ATP and H2O that cannot be produced by flux balance analysis.
 
     """
     LOGGER.debug("Finding blocked biomass precursors")
@@ -130,8 +151,16 @@ def gam_in_biomass(model, reaction):
 
     Parameters
     ----------
+    model : cobra.Model
+        The metabolic model under investigation.
     reaction : cobra.core.reaction.Reaction
         The biomass reaction of the model under investigation.
+
+    Returns
+    -------
+    boolean
+        True if the biomass reaction includes ATP and H2O as reactants and ADP,
+        Pi and H as products, False otherwise.
 
     """
     id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
@@ -163,17 +192,9 @@ def find_direct_metabolites(model, reaction, tolerance=1E-06):
     """
     Return list of possible direct biomass precursor metabolites.
 
-    Direct metabolites are metabolites that are involved only in transport
-    and/or boundary reactions, as well as the biomass reaction(s).
-    This function detects and excludes false positives from being part of the
-    count of direct metabolites. A false positive is specifically defined as
-    a metabolite that is taken up by the biomass reaction, and only involved
-    in transport and/or boundary reactions, but is transported from the cytosol
-    into the extracellular space where it isomerizes and is taken up by the
-    biomass reaction. Such isomerization reactions are frequently not part of
-    the model thus a metabolite is wrongly identified as a direct
-    metabolite. The most common examples of this occur in various E. coli
-    models.
+    The term direct metabolites describes metabolites that are involved only
+    in either transport and/or boundary reactions, AND the biomass reaction(s),
+    but not in any purely metabolic reactions.
 
     Parameters
     ----------

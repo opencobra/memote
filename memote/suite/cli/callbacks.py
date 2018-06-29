@@ -34,7 +34,17 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _load_model(filename):
-    """Load the model defined in SBML."""
+    """
+    Load the model defined in SBMLFBCv2.
+
+    Loading the model uses Cobrapy which has native support for reading and
+    writing SBML with FBCv2.
+
+    Parameters
+    ----------
+    filename: click.Path
+
+    """
     # TODO: Record the SBML warnings and add them to the report.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)

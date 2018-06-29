@@ -23,7 +23,7 @@ import memote.support.matrix as matrix
 from memote.utils import annotate, wrapper
 
 
-@annotate(title="Ratio between largest and smallest non-zero coefficients",
+@annotate(title="Ratio Min/Max Non-Zero Coefficients",
           format_type="percent")
 def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     """
@@ -37,6 +37,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     To pass this test the ratio should not exceed 10^9. This threshold has
     been selected based on experience, and is likely to be adapted when more
     data on solver performance becomes available.
+
     """
     ann = test_absolute_extreme_coefficient_ratio.annotation
     high, low = matrix.absolute_extreme_coefficient_ratio(model)
@@ -50,7 +51,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     assert ann["data"] < threshold, ann["message"]
 
 
-@annotate(title="Number of independent conservation relations in model",
+@annotate(title="Independent Conservation Relations",
           format_type="number")
 def test_number_independent_conservation_relations(model):
     """
@@ -61,6 +62,7 @@ def test_number_independent_conservation_relations(model):
 
     This test is not scored, as the dimension of the left null space
     depends on the S-Matrix constructed, which is system-specific.
+
     """
     ann = test_number_independent_conservation_relations.annotation
     ann["data"] = matrix.number_independent_conservation_relations(model)
@@ -69,17 +71,18 @@ def test_number_independent_conservation_relations(model):
             ann["data"]))
 
 
-@annotate(title="Number of steady-state flux solution vectors",
+@annotate(title="Steady-state Flux Solution Vectors",
           format_type="number")
 def test_number_steady_state_flux_solutions(model):
     """
     Show number of independent steady-state flux solution vectors for model.
 
-    This test will return the number of steady-state flux solution vectors
-    through the null space of the S-Matrix.
+    This test will return the number of independent steady-state flux solution
+    vector through the null space of the S-Matrix.
 
     This test is not scored, as the dimension of the null space depends on the
     S-Matrix constructed, which is system-specific.
+
     """
     ann = test_number_steady_state_flux_solutions.annotation
     ann["data"] = matrix.number_steady_state_flux_solutions(model)
@@ -88,7 +91,7 @@ def test_number_steady_state_flux_solutions(model):
         """.format(ann["data"]))
 
 
-@annotate(title="Rank of S-Matrix", format_type="number")
+@annotate(title="Rank", format_type="number")
 def test_matrix_rank(model):
     """
     Show rank of the S-Matrix.
@@ -97,6 +100,7 @@ def test_matrix_rank(model):
 
     This test is not scored, as the rank depends on the S-Matrix constructed,
     which is system-specific.
+
     """
     ann = test_matrix_rank.annotation
     ann["data"] = matrix.matrix_rank(model)
@@ -104,7 +108,7 @@ def test_matrix_rank(model):
         """The rank of the S-Matrix is {}.""".format(ann["data"]))
 
 
-@annotate(title="Degrees of freedom of S-Matrix", format_type="number")
+@annotate(title="Degrees Of Freedom", format_type="number")
 def test_degrees_of_freedom(model):
     """
     Show degrees of freedom of the S-Matrix.
@@ -114,9 +118,10 @@ def test_degrees_of_freedom(model):
 
     This test is not scored, as the degrees of freedom depends on S-Matrix
     constructed, which is system-specific.
+
     """
     ann = test_degrees_of_freedom.annotation
     ann["data"] = matrix.degrees_of_freedom(model)
     ann["message"] = wrapper.fill(
-        """The degrees of freedom of the S-Matrix is {}.""".format(
+        """The degrees of freedom of the S-Matrix are {}.""".format(
             ann["data"]))

@@ -43,6 +43,7 @@ class JSON(TypeDecorator):
     Most SQL databases now implement JSON blobs but unfortunately, SQLite
     only provides this via a compiled extension. So we encode to and decode
     from JSON in a normal text column.
+
     """
 
     impl = UnicodeText
@@ -68,6 +69,7 @@ class Result(Base):
 
     The class attributes correspond both to the columns in the database table
     and to instance attributes.
+
     """
 
     __tablename__ = "results"

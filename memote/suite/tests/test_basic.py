@@ -31,8 +31,9 @@ def test_model_id_presence(read_only_model):
     Expect that the model has an identifier.
 
     The MIRIAM guidelines require a model to be identified via an ID.
-    While it is not required, the ID will be displayed on the memote
-    reports, which helps to distinguish the output clearly.
+    Further, the ID will be displayed on the memote snapshot
+    report, which helps to distinguish the output clearly.
+
     """
     ann = test_model_id_presence.annotation
     assert hasattr(read_only_model, "id")
@@ -41,7 +42,7 @@ def test_model_id_presence(read_only_model):
     assert bool(read_only_model.id)
 
 
-@annotate(title="Total Number of Genes", format_type="count")
+@annotate(title="Total Genes", format_type="count")
 def test_genes_presence(read_only_model):
     """
     Expect that at least one gene is defined in the model.
@@ -50,6 +51,7 @@ def test_genes_presence(read_only_model):
     genes, however there are certain methods which rely on the presence of
     genes and, more importantly, the corresponding gene-protein-reaction
     rules. This test requires that there is at least one gene defined.
+
     """
     ann = test_genes_presence.annotation
     assert hasattr(read_only_model, "genes")
@@ -59,7 +61,7 @@ def test_genes_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Reactions", format_type="count")
+@annotate(title="Total Reactions", format_type="count")
 def test_reactions_presence(read_only_model):
     """
     Expect that at least one reaction is defined in the model.
@@ -75,7 +77,7 @@ def test_reactions_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Metabolites", format_type="count")
+@annotate(title="Total Metabolites", format_type="count")
 def test_metabolites_presence(read_only_model):
     """
     Expect that at least one metabolite is defined in the model.
@@ -98,7 +100,11 @@ def test_metabolites_formula_presence(read_only_model):
     Expect all metabolites to have a formula.
 
     To be able to ensure that reactions are mass-balanced, all model
-    metabolites ought to be provided with a chemical formula.
+    metabolites ought to be provided with a chemical formula. Since it may be
+    difficult to obtain formulas for certain metabolites this test serves as a
+    mere report. Models can still be stoichiometrically consistent even
+    when chemical formulas are not defined for each metabolite.
+
     """
     ann = test_metabolites_formula_presence.annotation
     ann["data"] = get_ids(
@@ -117,7 +123,10 @@ def test_metabolites_charge_presence(read_only_model):
     Expect all metabolites to have charge information.
 
     To be able to ensure that reactions are charge-balanced, all model
-    metabolites ought to be provided with a charge.
+    metabolites ought to be provided with a charge. Since it may be
+    difficult to obtain charges for certain metabolites this test serves as a
+    mere report. Models can still be stoichiometrically consistent even
+    when charge information is not defined for each metabolite.
     """
     ann = test_metabolites_charge_presence.annotation
     ann["data"] = get_ids(
@@ -163,7 +172,10 @@ def test_ngam_presence(read_only_model):
     The Non-Growth Associated Maintenance reaction (NGAM) is an
     ATP-hydrolysis reaction added to metabolic models to represent energy
     expenses that the cell invests in continuous processes independent of
-    the growth rate.
+    the growth rate. Memote tries to infer this reaction from a list of
+    buzzwords, and the stoichiometry and components of a simple ATP-hydrolysis
+    reaction. Please see the API documentation for ``basic.find_ngam`` for a
+    more detailed explanation.
     """
     ann = test_ngam_presence.annotation
     ann["data"] = get_ids(basic.find_ngam(read_only_model))
@@ -194,7 +206,7 @@ def test_metabolic_coverage(read_only_model):
     assert ann["metric"] >= 1, ann["message"]
 
 
-@annotate(title="Total Number of Compartments", format_type="count")
+@annotate(title="Total Compartments", format_type="count")
 def test_compartments_presence(read_only_model):
     """
     Expect that more than two compartments are defined in the model.
@@ -218,7 +230,7 @@ def test_compartments_presence(read_only_model):
     assert len(ann["data"]) >= 3, ann["message"]
 
 
-@annotate(title="Number of Enzyme Complexes", format_type="count")
+@annotate(title="Enzyme Complexes", format_type="count")
 def test_protein_complex_presence(read_only_model):
     """
     Expect that more than one enzyme complex is present in the model.
@@ -240,7 +252,7 @@ def test_protein_complex_presence(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Purely Metabolic Reactions", format_type="count")
+@annotate(title="Purely Metabolic Reactions", format_type="count")
 def test_find_pure_metabolic_reactions(read_only_model):
     """
     Expect at least one pure metabolic reaction to be defined in the model.
@@ -263,7 +275,7 @@ def test_find_pure_metabolic_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Purely Metabolic Reactions with Constraints",
+@annotate(title="Purely Metabolic Reactions with Constraints",
           format_type="count")
 def test_find_constrained_pure_metabolic_reactions(read_only_model):
     """
@@ -289,7 +301,7 @@ def test_find_constrained_pure_metabolic_reactions(read_only_model):
                                        truncate(ann["data"])))
 
 
-@annotate(title="Number of Transport Reactions", format_type="count")
+@annotate(title="Transport Reactions", format_type="count")
 def test_find_transport_reactions(read_only_model):
     """
     Expect >= 1 transport reactions are present in the read_only_model.
@@ -310,17 +322,17 @@ def test_find_transport_reactions(read_only_model):
     3. The transported metabolite(s) are transported into a compartment through
     the exchange of a phosphate.
 
-    An example of tranport via PTS would be
+    An example of transport via PTS would be
     pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
 
     Reactions similar to transport via PTS (referred to as "modified transport
     reactions") follow a similar pattern:
     A(x) + B-R(y) -> A-R(y) + B(y)
 
-    Such modified transport reactions can be detected, but only when a formula
-    field exists for all metabolites in a particular reaction. If this is not
-    the case, transport reactions are identified through annotations, which
-    cannot detect modified tranport reactions.
+    Such modified transport reactions can be detected, but only when the
+    formula is defined for all metabolites in a particular reaction. If this
+    is not the case, transport reactions are identified through annotations,
+    which cannot detect modified transport reactions.
 
     """
     ann = test_find_transport_reactions.annotation
@@ -334,7 +346,7 @@ def test_find_transport_reactions(read_only_model):
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Number of Tranport Reactions with Constraints",
+@annotate(title="Transport Reactions with Constraints",
           format_type="count")
 def test_find_constrained_transport_reactions(read_only_model):
     """
@@ -356,7 +368,7 @@ def test_find_constrained_transport_reactions(read_only_model):
     3. The transported metabolite(s) are transported into a compartment through
     the exchange of a phosphate.
 
-    An example of tranport via PTS would be
+    An example of transport via PTS would be
     pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
 
     Reactions similar to transport via PTS (referred to as "modified transport
@@ -366,7 +378,8 @@ def test_find_constrained_transport_reactions(read_only_model):
     Such modified transport reactions can be detected, but only when a formula
     field exists for all metabolites in a particular reaction. If this is not
     the case, transport reactions are identified through annotations, which
-    cannot detect modified tranport reactions.
+    cannot detect modified transport reactions.
+
     """
     ann = test_find_constrained_transport_reactions.annotation
     transporters = helpers.find_transport_reactions(read_only_model)
@@ -388,11 +401,12 @@ def test_transport_reaction_gpr_presence(read_only_model):
 
     As it is hard to identify the exact transport processes within a cell,
     transport reactions are often added purely for modeling purposes.
-    Highlighting where assumptions have been made vs where
+    Highlighting where assumptions have been made versus where
     there is proof may help direct the efforts to improve transport and
     transport energetics of the tested metabolic model.
     However, transport reactions without GPR may also be valid:
     Diffusion, or known reactions with yet undiscovered genes likely lack GPR.
+
     """
     # TODO: Update threshold with improved insight from meta study.
     ann = test_transport_reaction_gpr_presence.annotation
@@ -431,7 +445,7 @@ def test_find_reversible_oxygen_reactions(read_only_model):
             len(ann["data"]), ann["metric"], truncate(ann["data"])))
 
 
-@annotate(title="Number of Unique Metabolites", format_type="count")
+@annotate(title="Unique Metabolites", format_type="count")
 def test_find_unique_metabolites(read_only_model):
     """
     Expect there to be less metabolites when removing compartment tag.
@@ -454,17 +468,18 @@ def test_find_unique_metabolites(read_only_model):
     assert len(ann["data"]) < len(read_only_model.metabolites), ann["message"]
 
 
-@annotate(title="Number of Duplicate Metabolites in Identical Compartments",
+@annotate(title="Duplicate Metabolites in Identical Compartments",
           format_type="count")
 def test_find_duplicate_metabolites_in_compartments(read_only_model):
     """
     Expect there to be zero duplicate metabolites in the same compartments.
 
-    The main reason for having this test is to clean up merged models or models
-    from automated reconstruction pipelines as these are prone to having
-    identical metabolites from different namespaces (hence different IDs). This
-    test therefore expects that every metabolite in any particular compartment
-    has unique inchikey values.
+    The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical metabolites from different namespaces
+    (hence different IDs). This test therefore expects that every metabolite
+    in any particular compartment has unique inchikey values.
+
     """
     ann = test_find_duplicate_metabolites_in_compartments.annotation
     ann["data"] = basic.find_duplicate_metabolites_in_compartments(
@@ -476,16 +491,16 @@ def test_find_duplicate_metabolites_in_compartments(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Number of Duplicate Reactions", format_type="count")
+@annotate(title="Duplicate Reactions", format_type="count")
 def test_find_duplicate_reactions(read_only_model):
     """
     Expect there to be zero duplicate reactions.
 
-    The main reason for having this test is to clean up merged models or models
-    from automated reconstruction pipelines as these are prone to having
-    identical reactions from different namespaces (hence different IDs). This
-    test therefore expects that every reaction has unique identifier values
-    (i.e. unique BRENDA, BiGG, KEGG, etc. values).
+     The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical reactions from different namespaces (hence different IDs).
+    This test therefore expects that every reaction has unique identifier
+    values (i.e. unique BRENDA, BiGG, KEGG, etc. values).
     """
     ann = test_find_duplicate_reactions.annotation
     ann["data"] = basic.find_duplicate_reactions(read_only_model)
@@ -498,10 +513,11 @@ def test_find_duplicate_reactions(read_only_model):
 @annotate(title="Medium Components", format_type="count")
 def test_find_medium_metabolites(read_only_model):
     """
-    Expect zero or more metabolites in currently set medium.
+    Expect zero or more metabolites to be set as medium.
 
     This test checks all boundary reactions in the model that permit flux
-    towards creating a metabolite, and reports on those metabolites.
+    towards creating a metabolite, and reports those metabolites. This test
+    does not have any mandatory 'pass' criteria.
     """
     ann = test_find_medium_metabolites.annotation
     ann["data"] = basic.find_medium_metabolites(read_only_model)
