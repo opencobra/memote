@@ -75,8 +75,8 @@ Users that have already followed this tutorial once may want to refer to the
 Benchmark
 =========
 
-Single Model
-------------
+Snapshot
+--------
 
 To benchmark the performance of a single model, run this command in your
 terminal:
@@ -94,25 +94,36 @@ To illustrate here it is changed to ``report.html``.
 
     $ memote report snapshot --filename "report.html" path/to/model.xml
 
-While the html report is still a work in progress, we recommend relying on the
-verbose output of the command line tool above. Users can tweak the console
-output by passing additional arguments directly to pytest through the
-``--pytest-args`` or simply ``-a`` option. This can be done by
-writing the pytest arguments as one continuous string.
+In both cases the generated report will look something like this:
+
+.. image:: ReportSnapshot.png
+
+While we recommend using the html report, frequent users may want to skip the 
+generation of the html report, and only use the raw console output to get a 
+quick overview.
+
+.. code-block:: console
+
+    $ memote run path/to/model.xml
+
+Here, it is possible to tweak the console output by passing 
+additional arguments directly to pytest through the ``--pytest-args`` or 
+simply ``-a`` option. This can be done by writing the pytest arguments as one 
+continuous string.
 
 For a more detailed traceback try:
 
 .. code-block:: console
 
-    $ memote report snapshot -a "--tb long" --filename "report.html" path/to/model.xml
+    $ memote run -a "--tb long" path/to/model.xml
 
 For a full list of possible arguments please refer to the `pytest
 documentation`_.
 
 .. _pytest documentation: https://docs.pytest.org/en/latest/usage.html
 
-Comparative
------------
+Diff
+----
 
 **This functionality is coming soon.**
 
