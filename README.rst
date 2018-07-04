@@ -116,6 +116,17 @@ The Memote Report App user interface is built with `Angular 5`_,
 `Angular Flex-Layout`_, and `Angular Material`_. We rely on Vega_ for plotting 
 results.
 
+The initial development of memote has received funding from:
+
+.. image:: https://upload.wikimedia.org/wikipedia/commons/d/d5/Novo_nordisk_foundation_Logo.png
+        :target: http://novonordiskfonden.dk/en
+
+.. image:: https://innovationsfonden.dk/sites/all/themes/novigo/logo.png
+        :target: https://innovationsfonden.dk/da
+
+.. image:: http://dd-decaf.eu/images/decaf-logo-md.svg
+        :target: http://dd-decaf.eu/
+
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: 
   https://github.com/audreyr/cookiecutter-pypackage
