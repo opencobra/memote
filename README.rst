@@ -35,8 +35,8 @@ model building community:
 The `memote` tool therefore performs four subfunctions:
 
 1. Create a skeleton git repository for the model.
-2. Run the current model through a test suite that represents the community
-   standard.
+2. Run the current model through a `test suite that represents the community
+   standard`_.
 3. Generate an informative report which details the results of the test suite in
    a visually appealing manner.
 4. (Re-)compute test statistics for an existing version controlled history of
@@ -49,6 +49,9 @@ suite will be run automatically and a report will be available for you to look
 at via GitHub pages for your repository.
 
 .. summary-end
+
+.. _test suite that represents the community    standard: 
+  https://github.com/opencobra/memote/wiki/Test-Catalog
 
 * Documentation: https://memote.readthedocs.io/.
 
@@ -114,7 +117,8 @@ The Memote Report App user interface is built with `Angular 5`_,
 results.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _`audreyr/cookiecutter-pypackage`: 
+  https://github.com/audreyr/cookiecutter-pypackage
 .. _click: http://click.pocoo.org/5/
 .. _pytest: https://docs.pytest.org/en/latest/
 .. _gitpython: https://github.com/gitpython-developers/GitPython
