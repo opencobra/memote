@@ -109,7 +109,9 @@ sphinx_, pylru_ for caching, goodtables_ for validation of tabular data,
 depinfo_ for pretty printing our dependencies, six_ and future_ for backward 
 and forward compatibility.
 
-The Memote Report App relies on 
+The Memote Report App user interface is built with `Angular 5`_, 
+`Angular Flex-Layout`_, and `Angular Material`_. We rely on Vega_ for plotting 
+results.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
@@ -134,3 +136,7 @@ The Memote Report App relies on
 .. _depinfo: https://pypi.org/project/depinfo/
 .. _six: https://pypi.org/project/six/
 .. _future: https://pypi.org/project/future/
+.. _Angular 5: https://angular.io/
+.. _Angular Flex-Layout: https://github.com/angular/flex-layout
+.. _Angular Material: https://material.angular.io/
+.. _Vega: https://vega.github.io/vega/
