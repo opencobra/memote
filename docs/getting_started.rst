@@ -4,69 +4,16 @@
 Getting Started
 ===============
 
-Installation
-============
+After installation, memote can be employed in two different ways:
 
-We highly recommend creating a Python `virtualenv`_ for your model testing
-purposes.
+* As a benchmarking tool for ad hoc model assessment and as an automated testing
+  suite to aid with the reconstruction of metabolic models. When using memote to benchmark a
+  model, the tests are run once and a report is generated which describes the
+  status-quo.
 
-.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
-
-Stable release
---------------
-
-To install memote, run this command in your terminal:
-
-.. code-block:: console
-
-    $ pip install memote
-
-This is the preferred method to install memote, as it will always install the most recent stable release.
-
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io/en/stable/
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
-From sources
-------------
-
-The sources for memote can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
-
-.. code-block:: console
-
-    $ git clone https://github.com/opencobra/memote.git
-
-Or download the `tarball
-<https://github.com/opencobra/memote/archive/master.tar.gz>`_ or
-`zip <https://github.com/opencobra/memote/archive/master.zip>`_ archive:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/opencobra/memote/archive/master.zip
-
-Once you have a copy of the source files, you can install it with:
-
-.. code-block:: console
-
-    $ pip install .
-
-
-.. _Github repo: https://github.com/opencobra/memote
-
-
-After installation, memote can be employed in two different ways: As a
-benchmarking tool for ad hoc model assessment and as an automated testing
-suite to aid
-with the reconstruction of metabolic models. When using memote to benchmark a
-model, the tests are run once and a report is generated which describes the
-status-quo.
-As an automated testing suite, memote facilitates tracking incremental model
-changes in a version controlled repository and can enable continuous testing and
-reporting if desired.
+* As an automated testing suite, memote facilitates tracking incremental model
+  changes in a version controlled repository and can enable continuous testing and
+  reporting if desired.
 
 Here, we explain step-by-step the basic commands to pursue either workflow.
 Users that have already followed these steps once may want to refer to the
@@ -118,6 +65,8 @@ short traceback showing why certain tests failed:
 
 .. image:: ConsoleSnapshot.gif
 
+******************************************************************************
+
 Here, it is possible to tweak the console output by passing 
 additional arguments directly to pytest through the ``--pytest-args`` or 
 simply ``-a`` option. This can be done by writing the pytest arguments as one 
@@ -148,6 +97,8 @@ This will generate a comparative report as ``index.html`` showing the snapshot
 performance of two models side-by-side:
 
 .. image:: ReportDiff.png
+
+******************************************************************************
 
 Reconstruction
 ==============
@@ -203,6 +154,8 @@ branch.
 The continuous report will look like this:
 
 .. image:: ReportHistory.png
+
+******************************************************************************
 
 Since memote uses `git`_ for version control in memote repositories, 
 regular git commands can be used. For instance:
@@ -277,6 +230,6 @@ results by running again:
 
 *******************************************************************************
 
-We recommend the public workflow not only to promote open, collaborative
-science but also to benefit from the full functionality of memote.
+*We highly recommend the public workflow not only to promote open, collaborative
+science but also to benefit from the full functionality of memote.*
 
