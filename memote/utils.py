@@ -51,10 +51,12 @@ def register_with(registry):
 
     Examples
     --------
-    REGISTRY = dict()
-    @register_with(REGISTRY)
-    def build_empty(base):
-        return base
+    .. code-block:: python
+
+        REGISTRY = dict()
+        @register_with(REGISTRY)
+        def build_empty(base):
+            return base
 
     """
     def decorator(func):
@@ -74,16 +76,18 @@ def annotate(title, format_type, message=None, data=None, metric=1.0):
     format_type : str
         A string that determines how the result data is formatted in the
         report. It is expected not to be None.
-        - 'number' : 'data' is a single number which can be an integer or
+
+        * 'number' : 'data' is a single number which can be an integer or
           float and should be represented as such.
-        - 'count' : 'data' is a list, set or tuple. Choosing 'count' will
+        * 'count' : 'data' is a list, set or tuple. Choosing 'count' will
           display the length of that list e.g. number of metabolites without
           formula.
-        - 'percent' : Instead of 'data' the content of 'metric' ought to be
+        * 'percent' : Instead of 'data' the content of 'metric' ought to be
           displayed e.g. percentage of metabolites without charge.
           'metric' is expected to be a floating point number.
-        - 'raw' : 'data' is ought to be displayed "as is" without formatting.
+        * 'raw' : 'data' is ought to be displayed "as is" without formatting.
           This option is appropriate for single strings or a boolean output.
+
     message : str
         A short written explanation that states and possibly explains the test
         result.

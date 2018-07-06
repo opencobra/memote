@@ -48,10 +48,10 @@ Travis CI, which means that anytime you push a model change to GitHub, the test
 suite will be run automatically and a report will be available for you to look
 at via GitHub pages for your repository.
 
-.. summary-end
-
 .. _test suite that represents the community    standard: 
   https://github.com/opencobra/memote/wiki/Test-Catalog
+
+.. summary-end
 
 * Documentation: https://memote.readthedocs.io/.
 

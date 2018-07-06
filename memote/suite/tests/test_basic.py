@@ -496,11 +496,12 @@ def test_find_duplicate_reactions(read_only_model):
     """
     Expect there to be zero duplicate reactions.
 
-     The main reason for having this test is to help cleaning up merged models
+    The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
     having identical reactions from different namespaces (hence different IDs).
     This test therefore expects that every reaction has unique identifier
     values (i.e. unique BRENDA, BiGG, KEGG, etc. values).
+
     """
     ann = test_find_duplicate_reactions.annotation
     ann["data"] = basic.find_duplicate_reactions(read_only_model)

@@ -182,7 +182,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     -----
     See [1]_ section 3.3 for a complete description of the algorithm.
 
-
+    References
+    ----------
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular
            Models."
