@@ -182,7 +182,8 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     -----
     See [1]_ section 3.3 for a complete description of the algorithm.
 
-
+    References
+    ----------
     .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
            "Detection of Stoichiometric Inconsistencies in Biomolecular
            Models."
@@ -380,7 +381,7 @@ def find_mass_unbalanced_reactions(reactions):
     Parameters
     ----------
     reactions : iterable
-        An iterable of ``cobra.Reaction``s.
+        An iterable of cobra.Reaction's.
 
     """
     return [
@@ -394,7 +395,7 @@ def find_charge_unbalanced_reactions(reactions):
     Parameters
     ----------
     reactions : iterable
-        An iterable of ``cobra.Reaction``s.
+        An iterable of cobra.Reaction's.
 
     """
     return [
@@ -612,8 +613,8 @@ def find_reactions_with_unbounded_flux_default_condition(model):
     model : cobra.Model
         The metabolic model under investigation.
 
-    Returns:
-    --------
+    Returns
+    -------
     unlimited_reactions: list
         A list of reactions that in default modeling conditions are able to
         carry flux as high/low as the systems maximal and minimal bounds.

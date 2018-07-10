@@ -29,10 +29,3 @@ Annotation
 .. automodule:: test_annotation
     :members:
     :show-inheritance:
-
-Syntax
-======
-
-.. automodule:: test_syntax
-    :members:
-    :show-inheritance:

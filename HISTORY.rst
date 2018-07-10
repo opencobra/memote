@@ -9,6 +9,8 @@ Next Release
   sensibly possible.
 * Reordered tests in the `test-config.yaml` such that results belonging to a 
   category are grouped logically.
+* Updated the documentation to include a newer flowchart, up-to-date getting
+  started and custom test sections.
 
 0.8.1 (2018-06-27)
 ------------------

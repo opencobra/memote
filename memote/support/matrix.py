@@ -117,10 +117,10 @@ def degrees_of_freedom(model):
     References:
     -----------
     .. [1] Fukuda, K. & Terlaky, T. Criss-cross methods: A fresh view on
-           pivot algorithms. Mathematical Programming 79, 369-395 (1997).
+       pivot algorithms. Mathematical Programming 79, 369-395 (1997).
 
     .. [2] Alama, J. The Rank+Nullity Theorem. Formalized Mathematics 15,
-           (2007).
+       (2007).
 
     """
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(

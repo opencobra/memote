@@ -180,8 +180,8 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):
         nullspace will be an array with shape ``(k, n)``, where n is the
         estimated dimension of the nullspace.
 
-    Notes
-    -----
+    References
+    ----------
     Adapted from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
 

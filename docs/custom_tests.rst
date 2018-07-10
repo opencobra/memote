@@ -60,7 +60,7 @@ The minimal content of a custom test module should look like this:
     """
     ann = test_your_custom_case.annotation
     ann["data"] = list(your_support_module.specific_model_quality(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["metric"] = len(ann["data"]) / len(read_only_model.total_model_quality)
     ann["message"] = wrapper.fill(
         """A concise message that displays and explains the test results.
         For instance, if data is a list of items the amount: {} and
@@ -82,7 +82,7 @@ in the support module.
 
 The following components are requirements of ``test_your_custom_case``:
 
-- Each test has to be decoreated with the ``annotate()`` decorator, which
+- Each test has to be decorated with the ``annotate()`` decorator, which
   collects:
 
   - The ``data`` that the test is run on. Can be of the following type: ``list``,
@@ -91,15 +91,16 @@ The following components are requirements of ``test_your_custom_case``:
     tests (see example below).
 
   - The ``format_type`` of data. This is not the actual python type
-    of ``data``! Choose it according to how you'd like the results to be
-    displayed in the reports. For example: In the case above ``data``
-    is a list, for instance it could be list of unbalanced reactions. 
-    If you choose ``format_type="count"``, the report will display its length.
-    If you would like to display data 'as is' for instance when ``data`` is
-    single string then ``format_type="raw"`` is best. In case, you'd rather
-    display the ``metric`` as opposed to the contents of ``data`` use
-    ``format_type="percent"``. ``format_type="number"`` is appropriate for
-    displaying single integer and float ``data``.
+    of ``data`` but it correlates closely with it.
+    If ``data`` is a ``set``, ``tuple`` or ``list`` ``format_type="count"`` 
+    configures the report to display its length.
+    If ``data`` is an ``integer`` or ``float`` use ``format_type="number"``.
+    If ``data`` is a single string, then choose ``format_type="raw"``. This 
+    ``format_type`` also works for any other data type. 
+    In case, you'd rather display the ``metric`` as opposed to the contents of 
+    ``data`` use ``format_type="percent"``.
+    It is important that the custom test case does not return ``nan``, 
+    ``None`` or ``null`` as this will lead to errors on the report.
 
   - A human-readable, descriptive ``title`` that will be displayed in the report
     as opposed to the test function name ``test_your_custom_case`` which will
@@ -119,7 +120,7 @@ The following components are requirements of ``test_your_custom_case``:
   with the configuration to find custom tests.
 
 - ``read_only_model`` is the required parameter to access the loaded
-  metabolic model.
+  metabolic model at runtime.
 
 - In the report the docstring is taken as a tooltip for each test. It should
   generally adhere to the `conventions`_ of the NumPy/SciPy documentation. It
@@ -171,40 +172,45 @@ Custom Test Configuration
 =========================
 
 Finally, there are two ways of configuring memote to find custom tests. The
-first involves the ``--custom`` option of the memote CLI and requires the user
-to provide a corresponding config file with the custom test modules, while the second
-involves passing arguments directly to pytest through the use of the
-``--pytest-args`` option, which can be abbreviated to ``-a``. This option only
-requires the user to set up the custom test module. No config file is needed
-here.
+first involves the ``--custom-*`` options of the memote CLI and requires the 
+user to provide a corresponding config file with the custom test modules, 
+while the second involves passing arguments directly to pytest through the use 
+of the ``--pytest-args`` option, which can be abbreviated to ``-a``. This 
+option only requires the user to set up the custom test module. No config file 
+is needed here.
 
 The Custom Option
 -----------------
 
-When invoking the ``memote run`` or ``memote report snapshot`` commands in
-the terminal, it is possible to add the ``--custom`` option. This option takes
-two parameters in a fixed order:
+When invoking the ``memote run``, ``memote report snapshot`` or 
+``memote report diff`` commands in the terminal, it is possible to add the 
+``--custom-*`` options:
 
-1. The absolute path to any directory in which pytest is to check for custom
-   tests modules. By default test discovery is recursive. More information is
-   provided `here`_.
+1. ``--custom-tests`` takes the absolute path to any directory in which pytest 
+   is to check for custom tests modules. By default test discovery is 
+   recursive. More information is provided `here`_.
 
-2. The absolute path to a valid configuration file.
+2. ``--custom-config`` The absolute path to a valid configuration file.
+
+To simply insert custom tests into the test suite, it suffices to use the 
+first option ``--custom-tests``. Providing the custom configuration file with 
+``--custom-config`` further gives you the means to weigh, categorise and 
+layout where on the report your results will be displayed.
 
 .. _here: https://docs.pytest.org/en/latest/goodpractices.html
 
 .. code-block:: console
 
-    $ memote report snapshot --custom path/to/dir/ path/to/config.yml --filename "report.html" path/to/model.xml
+    $ memote report snapshot --custom-tests path/to/dir/ --custom-config path/to/config.yml --filename "report.html" path/to/model.xml
 
 The Pytest Option
 -----------------
 
-In case you want to avoid setting up a configuration file, it is possible to
-pass any number of absolute paths to custom test directories directly to pytest,
-as long as they are placed behind any other parameters that you might want to pass in.
-For instance here we want to get a list of the ten slowest running tests while
-including two custom test module directories:
+In addition, it is possible to pass any number of absolute paths to custom 
+test directories directly to pytest, as long as they are placed behind any 
+other parameters that you might want to pass in. For instance here we want to 
+get a list of the ten slowest running tests while including two custom test 
+module directories:
 
 .. code-block:: console
 

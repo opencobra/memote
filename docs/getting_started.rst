@@ -4,79 +4,28 @@
 Getting Started
 ===============
 
-Installation
-============
+After installation, memote can be employed in two different ways:
 
-We highly recommend creating a Python `virtualenv`_ for your model testing
-purposes.
+* As a benchmarking tool for ad hoc model assessment and as an automated testing
+  suite to aid with the reconstruction of metabolic models. When using memote to benchmark a
+  model, the tests are run once and a report is generated which describes the
+  status-quo.
 
-.. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+* As an automated testing suite, memote facilitates tracking incremental model
+  changes in a version controlled repository and can enable continuous testing and
+  reporting if desired.
 
-Stable release
---------------
-
-To install memote, run this command in your terminal:
-
-.. code-block:: console
-
-    $ pip install memote
-
-This is the preferred method to install memote, as it will always install the most recent stable release.
-
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io/en/stable/
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
-From sources
-------------
-
-The sources for memote can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
-
-.. code-block:: console
-
-    $ git clone https://github.com/opencobra/memote.git
-
-Or download the `tarball
-<https://github.com/opencobra/memote/archive/master.tar.gz>`_ or
-`zip <https://github.com/opencobra/memote/archive/master.zip>`_ archive:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/opencobra/memote/archive/master.zip
-
-Once you have a copy of the source files, you can install it with:
-
-.. code-block:: console
-
-    $ pip install .
-
-
-.. _Github repo: https://github.com/opencobra/memote
-
-
-After installation, memote can be employed in two different ways: As a
-benchmarking tool for ad hoc model assessment and as an automated testing
-suite to aid
-with the reconstruction of metabolic models. When using memote to benchmark a
-model, the tests are run once and a report is generated which describes the
-status-quo.
-As an automated testing suite, memote facilitates tracking incremental model
-changes in a version controlled repository and can enable continuous testing and
-reporting if desired.
-
-Here, we explain step-by-step the necessary commands to pursue either workflow.
-Users that have already followed this tutorial once may want to refer to the
-:doc:`cheat-sheet flowchart <flowchart>` to refresh their memory.
+Here, we explain step-by-step the basic commands to pursue either workflow.
+Users that have already followed these steps once may want to refer to the
+:doc:`cheat-sheet flowchart <flowchart>` to refresh their memory. For a more 
+comprehensive insight into all optional parameters of the CLI please refer to
+the :doc:`corresponding API reference <_autogen/memote.suite.cli>`.
 
 Benchmark
 =========
 
-Single Model
-------------
+Snapshot
+--------
 
 To benchmark the performance of a single model, run this command in your
 terminal:
@@ -94,34 +43,67 @@ To illustrate here it is changed to ``report.html``.
 
     $ memote report snapshot --filename "report.html" path/to/model.xml
 
-While the html report is still a work in progress, we recommend relying on the
-verbose output of the command line tool above. Users can tweak the console
-output by passing additional arguments directly to pytest through the
-``--pytest-args`` or simply ``-a`` option. This can be done by
-writing the pytest arguments as one continuous string.
+In both cases the generated report will look something like this:
 
-For a more detailed traceback try:
+.. image:: ReportSnapshot.png
+
+
+******************************************************************************
+
+
+While we recommend using the html report, frequent users may want to skip the 
+generation of the html report, and only use the raw console output to get a 
+quick overview.
 
 .. code-block:: console
 
-    $ memote report snapshot -a "--tb long" --filename "report.html" path/to/model.xml
+    $ memote run path/to/model.xml
+
+In the console you'll first see a list of all the tests and their pytest status
+reading either "PASSED", "FAILED", "SKIPPED" or "ERRORED", followed by a 
+short traceback showing why certain tests failed:
+
+.. image:: ConsoleSnapshot.gif
+
+******************************************************************************
+
+Here, it is possible to tweak the console output by passing 
+additional arguments directly to pytest through the ``--pytest-args`` or 
+simply ``-a`` option. This can be done by writing the pytest arguments as one 
+continuous string.
+
+For a more detailed traceback, for instance, try:
+
+.. code-block:: console
+
+    $ memote run -a "--tb long" path/to/model.xml
 
 For a full list of possible arguments please refer to the `pytest
 documentation`_.
 
 .. _pytest documentation: https://docs.pytest.org/en/latest/usage.html
 
-Comparative
------------
+Diff
+----
 
-**This functionality is coming soon.**
+To compare the performance of a two [or more] models, run this command in your
+terminal:
 
-Comparing two models against each other and quickly identify the differences.
+.. code-block:: console
+
+    $ memote report diff path/to/model1.xml path/to/model2.xml [path/to/model3.xml ...]
+
+This will generate a comparative report as ``index.html`` showing the snapshot
+performance of two models side-by-side:
+
+.. image:: ReportDiff.png
+
+******************************************************************************
 
 Reconstruction
 ==============
 
-When starting a memote repository, users need to provide an SBMLv3-FBC formatted
+When starting a memote repository, users need to provide an SBMLv3-FBC2 formatted
 file. Automatic draft reconstruction tools such as `Pathway Tools`_,
 `Model SEED`_, `The RAVEN Toolbox`_ and `others`_ are able to output files in
 this format. Model repositories such as `BiGG`_ or `BioModels`_ further serve
@@ -141,9 +123,6 @@ simple as running the following command:
 
     $ memote new
 
-CI tested, online and public workflow:
---------------------------------------
-
 After this, the user will be prompted with a few questions regarding details of
 the project. If the project is to be kept strictly locally, the user does
 not need to supply `GitHub`_ (or `GitLab`_ - not implemented yet) credentials.
@@ -152,6 +131,9 @@ distributed version control such as cloud-based development, remote
 collaboration and community feedback. It is important to note that furthermore
 a public repository is needed to set up automatic testing through continuous
 integration, one of the key features of memote.
+
+CI tested, online and public workflow:
+--------------------------------------
 
 Once all the questions following ``memote new`` have been answered, a public
 repository has been created under either the user's GitHub or GitLab account.
@@ -167,39 +149,87 @@ executed:
 
 Now, after each edit to the model in the repository, the user can generate
 an update to the continuous model report shown at the project's gh-pages
-branch by saving the changes with the following command:
+branch. 
 
-**This functionality is coming soon, for now please utilize the steps outlined for advanced users.**
+The continuous report will look like this:
 
-.. code-block:: console
+.. image:: ReportHistory.png
 
-    $ memote save
+******************************************************************************
 
-For advanced users: ``memote save`` is the equivalent of executing ``git add .``,
-``git commit`` and ``git push`` in sequence.
+Since memote uses `git`_ for version control in memote repositories, 
+regular git commands can be used. For instance:
+
+* ``git status`` to lists all new or modified files.
+* ``git branch`` to lists all local branches of the current repository.
+
+To make a new version execute the following commands in sequence: 
+
+1. All files that have been changed since the last version are staged 
+   with ``git add .``
+2. Using ``git commit -m "<Short Description of Change Here>"`` a user creates 
+   a new version with a specific short description and a unique hash.
+3. Finally ``git push`` applies that new version to the central repository in 
+   the cloud.
+
+Please refer to the `git documentation`_ for more information on these and more
+advanced commands to interact with memote repositories.
+
+.. _git documentation: https://git-scm.com/docs
+
 
 Offline, local or private workflow:
 -----------------------------------
 
-Users that have decided to not to use `GitHub`_ (or `GitLab`_ **Not implemented yet**) or those that
-have decided to set the model repository to private, will need to execute:
+Users that have decided to not to use `GitHub`_ (or `GitLab`_ **Not implemented yet**), or those that
+have decided to set up a private model repository, will need to manually 
+execute the commands that would otherwise be carried out by the continuous 
+integration server after each modification of the model:
 
-.. code-block:: console
+In sequence, these are:
 
-    $ memote run
+1. .. code-block:: console
 
-to run the testing suite on their commit history followed by:
+      $ git add .
 
-.. code-block:: console
+2. .. code-block:: console
 
-    $ memote report history
+      $ git commit -m <Some Description>
 
-to generate the same type of report that would be shown automatically with
-continuous integration. After this it is crucial to save the generated test
-results by running ``memote save`` again.
+3. .. code-block:: console
 
-We recommend the public workflow not only to promote open, collaborative
-science but also to benefit from the full functionality of memote.
+      $ git push
+
+4. .. code-block:: console
+
+      $ memote run
+
+5. .. code-block:: console
+
+      $ memote report history
+
+This will generate the same type of report that would be shown automatically 
+with continuous integration. After this it is crucial to save the generated test
+results by running again:
+
+6. .. code-block:: console
+
+      $ git add .
+
+7. .. code-block:: console
+
+      $ git commit -m "chore: add test results"
+
+8. .. code-block:: console
+
+      $ git push
+
 
 .. _GitHub: https://github.com
 .. _GitLab: https://gitlab.com
+
+*******************************************************************************
+
+*We highly recommend the public workflow not only to promote open, collaborative
+science but also to benefit from the full functionality of memote.*
+

@@ -35,8 +35,8 @@ model building community:
 The `memote` tool therefore performs four subfunctions:
 
 1. Create a skeleton git repository for the model.
-2. Run the current model through a test suite that represents the community
-   standard.
+2. Run the current model through a `test suite that represents the community
+   standard`_.
 3. Generate an informative report which details the results of the test suite in
    a visually appealing manner.
 4. (Re-)compute test statistics for an existing version controlled history of
@@ -48,6 +48,9 @@ Travis CI, which means that anytime you push a model change to GitHub, the test
 suite will be run automatically and a report will be available for you to look
 at via GitHub pages for your repository.
 
+.. _test suite that represents the community    standard: 
+  https://github.com/opencobra/memote/wiki/Test-Catalog
+
 .. summary-end
 
 * Documentation: https://memote.readthedocs.io/.
@@ -55,7 +58,7 @@ at via GitHub pages for your repository.
 Installation
 ============
 
-We highly recommend creating a Python virtualenv for your model tesing purposes.
+We highly recommend creating a Python virtualenv for your model testing purposes.
 
 To install memote, run this command in your terminal:
 
@@ -96,5 +99,59 @@ Credits
 This package was created with Cookiecutter_ and the
 `audreyr/cookiecutter-pypackage`_ project template.
 
+Memote relies on click_ for the command line interface, pytest_ for unit 
+and model tests, gitpython_ for interacting with git repositories, 
+pandas_ for tabular datastructures and data input, jinja2_ for interacting 
+with HTML templates, cobrapy_ for analysing genome-scale metabolic 
+models, python_libsbml_ for reading and writing Systems Biology Markup 
+Language (SBML_), ruamel_ for handling YAML generation, travispy_ and 
+travis-encrypt_ for interacting with Travis CI, pygithub_ for access to the 
+Github API, sympy_ for matrix calculations, sqlalchemy_ for managing 
+``history`` results, numpydoc_ for beautifully formatted doc strings using 
+sphinx_, pylru_ for caching, goodtables_ for validation of tabular data, 
+depinfo_ for pretty printing our dependencies, six_ and future_ for backward 
+and forward compatibility.
+
+The Memote Report App user interface is built with `Angular 5`_, 
+`Angular Flex-Layout`_, and `Angular Material`_. We rely on Vega_ for plotting 
+results.
+
+The initial development of memote has received funding from:
+
+.. image:: https://upload.wikimedia.org/wikipedia/commons/d/d5/Novo_nordisk_foundation_Logo.png
+        :target: http://novonordiskfonden.dk/en
+
+.. image:: https://innovationsfonden.dk/sites/all/themes/novigo/logo.png
+        :target: https://innovationsfonden.dk/da
+
+.. image:: http://dd-decaf.eu/images/decaf-logo-md.svg
+        :target: http://dd-decaf.eu/
+
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _`audreyr/cookiecutter-pypackage`: 
+  https://github.com/audreyr/cookiecutter-pypackage
+.. _click: http://click.pocoo.org/5/
+.. _pytest: https://docs.pytest.org/en/latest/
+.. _gitpython: https://github.com/gitpython-developers/GitPython
+.. _pandas: https://pypi.org/project/pandas/
+.. _jinja2: http://jinja.pocoo.org/
+.. _cobrapy: https://github.com/opencobra/cobrapy
+.. _python_libsbml: https://pypi.org/project/python-libsbml/
+.. _SBML: http://sbml.org/Main_Page
+.. _ruamel: https://pypi.org/project/ruamel.yaml/
+.. _travispy: https://pypi.org/project/TravisPy/
+.. _travis-encrypt: https://pypi.org/project/travis-encrypt/
+.. _pygithub: https://github.com/PyGithub/PyGithub
+.. _sympy: http://www.sympy.org/en/index.html
+.. _sqlalchemy: http://www.sqlalchemy.org/
+.. _numpydoc: https://github.com/numpy/numpydoc
+.. _sphinx: http://www.sphinx-doc.org/en/stable/
+.. _pylru: https://pypi.org/project/pylru/
+.. _goodtables: https://github.com/frictionlessdata/goodtables-py
+.. _depinfo: https://pypi.org/project/depinfo/
+.. _six: https://pypi.org/project/six/
+.. _future: https://pypi.org/project/future/
+.. _Angular 5: https://angular.io/
+.. _Angular Flex-Layout: https://github.com/angular/flex-layout
+.. _Angular Material: https://material.angular.io/
+.. _Vega: https://vega.github.io/vega/
