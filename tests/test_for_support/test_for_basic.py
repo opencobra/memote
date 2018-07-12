@@ -487,6 +487,7 @@ def rxns_no_exchange(base):
     met_b = cobra.Metabolite("b_c", compartment="c")
     rxn_1 = cobra.Reaction("rxn1")
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn_1])
     return base
 
 
