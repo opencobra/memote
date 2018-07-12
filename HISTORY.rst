@@ -3,11 +3,13 @@ History
 
 Next Release
 ------------
-* Proofread and update all docstrings and comments inside the ``memote`` 
-  subfolder
-* Reworded all test titles to be a) shorter and b) as neutral as was 
+* Allow running of ``memote history`` from any branch.
+* Let the history report only use commits where the model actually changed.
+* Proofread and update all docstrings and comments inside the ``memote``
+  subfolder.
+* Reworded all test titles to be a) shorter and b) as neutral as was
   sensibly possible.
-* Reordered tests in the `test-config.yaml` such that results belonging to a 
+* Reordered tests in the `test-config.yaml` such that results belonging to a
   category are grouped logically.
 * Updated the documentation to include a newer flowchart, up-to-date getting
   started and custom test sections.
