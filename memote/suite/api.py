@@ -25,7 +25,6 @@ import pytest
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
-from memote.suite.results import HistoryManager
 from memote.suite.reporting import (
     SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
 
