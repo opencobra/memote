@@ -109,10 +109,18 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
 
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
-@click.argument("location", envvar="MEMOTE_LOCATION")
+@click.option("--location", envvar="MEMOTE_LOCATION",
+              help="Location of test results. Can either by a directory or an "
+                   "rfc1738 compatible database URL.")
+@click.option("--model", envvar="MEMOTE_MODEL",
+              help="The path of the model file. Used to check if it was "
+                   "modified.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
+@click.option("--deployment", default="gh-pages", show_default=True,
+              help="Results will be read from and committed to the given "
+                   "branch.")
 @click.option("--custom-config", type=click.Path(exists=True, dir_okay=False),
               multiple=True,
               help="A path to a report configuration file that will be merged "
@@ -121,23 +129,24 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "it can also alter the default behavior. Please refer to "
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
-def history(location, filename, custom_config):
+def history(location, model, filename, deployment, custom_config):
     """
     Generate a report over a model's git commit history.
 
-    DIRECTORY: Expect JSON files corresponding to the branch's commit history
-    to be found here. Or it can be an rfc1738 compatible database URL. Can
-    also be supplied via the environment variable
-    MEMOTE_DIRECTORY or configured in 'setup.cfg' or 'memote.ini'.
-
     """
+    if model is None:
+        raise click.BadParameter("No 'model' path given or configured.")
+    if location is None:
+        raise click.BadParameter("No 'location' given or configured.")
     try:
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
             "The history report requires a git repository in order to check "
-            "the current branch's commit history.")
+            "the model's commit history.")
         sys.exit(1)
+    previous = repo.active_branch
+    repo.heads[deployment].checkout()
     try:
         manager = managers.SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
@@ -147,9 +156,12 @@ def history(location, filename, custom_config):
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
+    history = managers.HistoryManager(repository=repo, manager=manager)
+    history.load_history(model, skip={deployment})
+    report = api.history_report(history, config=config)
+    previous.checkout()
     with open(filename, "w", encoding="utf-8") as file_handle:
-        file_handle.write(api.history_report(
-            repo, manager, config=config))
+        file_handle.write(report)
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)

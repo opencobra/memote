@@ -84,14 +84,8 @@ class Report(object):
             results=self.render_json()
         )
 
-    def determine_miscellaneous_tests(self):
-        """
-        Identify tests not explicitly configured in test organization.
-
-        List them as an additional card called `Misc`, which is where they will
-        now appear in the report.
-
-        """
+    def get_configured_tests(self):
+        """Get tests explicitly configured."""
         tests_on_cards = set()
         # Add scored tests to the set.
         for card in itervalues(self.config["cards"]["scored"]["sections"]):
@@ -101,7 +95,17 @@ class Report(object):
             if card == "scored":
                 continue
             tests_on_cards.update(content.get("cases", []))
+        return tests_on_cards
 
+    def determine_miscellaneous_tests(self):
+        """
+        Identify tests not explicitly configured in test organization.
+
+        List them as an additional card called `Misc`, which is where they will
+        now appear in the report.
+
+        """
+        tests_on_cards = self.get_configured_tests()
         self.config["cards"].setdefault("misc", dict())
         self.config["cards"]["misc"]["title"] = "Misc. Tests"
         self.config["cards"]["misc"]["cases"] = list(
@@ -110,8 +114,9 @@ class Report(object):
     def compute_score(self):
         """Calculate the overall test score using the configuration."""
         # LOGGER.info("Begin scoring")
+        cases = self.get_configured_tests() | set(self.result.cases)
         scores = DataFrame({"score": 1.0, "max": 1.0},
-                           index=list(self.result.cases))
+                           index=sorted(cases))
         self.result.setdefault("score", dict())
         self.result["score"]["sections"] = list()
         # Calculate the scores for each test individually.
