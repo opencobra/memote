@@ -130,10 +130,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
-    """
-    Generate a report over a model's git commit history.
-
-    """
+    """Generate a report over a model's git commit history."""
     if model is None:
         raise click.BadParameter("No 'model' path given or configured.")
     if location is None:
