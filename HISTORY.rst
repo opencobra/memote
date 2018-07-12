@@ -26,6 +26,8 @@ Next Release
   category are grouped logically.
 * Updated the documentation to include a newer flowchart, up-to-date getting
   started and custom test sections.
+* Update code to account for breaking changes in the most recent version of 
+  cobrapy (0.13.0) and subsequently unpin cobrapy dependency (set to >=0.13.0).
 
 0.8.1 (2018-06-27)
 ------------------
