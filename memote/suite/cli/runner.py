@@ -25,10 +25,12 @@ import sys
 import logging
 from functools import partial
 from gzip import GzipFile
-from os.path import join
+from os.path import join, isfile
 from multiprocessing import Process
 from getpass import getpass
 from time import sleep
+from tempfile import mkdtemp
+from shutil import copy2, move
 
 import click
 import click_log
@@ -38,6 +40,7 @@ from cobra.io import read_sbml_model
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
+from sqlalchemy import create_engine
 from sqlalchemy.exc import ArgumentError
 from travispy import TravisPy
 from travispy.errors import TravisError
@@ -83,7 +86,7 @@ def cli():
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="result.json", show_default=True,
               help="Path for the collected results as JSON.")
-@click.option("--location", type=str, envvar="MEMOTE_LOCATION",
+@click.option("--location", envvar="MEMOTE_LOCATION",
               help="If invoked inside a git repository, try to interpret "
               "the string as an rfc1738 compatible database URL which will be "
               "used to store the test results. Otherwise write to this "
@@ -93,11 +96,11 @@ def cli():
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string in quotes.")
-@click.option("--exclusive", type=str, multiple=True, metavar="TEST",
+@click.option("--exclusive", multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
                    "multiple times and takes precedence over '--skip'.")
-@click.option("--skip", type=str, multiple=True, metavar="TEST",
+@click.option("--skip", multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
@@ -207,36 +210,37 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.help_option("--help", "-h")
 @click.option("--rewrite/--no-rewrite", default=False,
               help="Whether to overwrite existing results.")
-@click.option("--location", type=str, envvar="MEMOTE_LOCATION",
-              help="Generated JSON files from the commit history will be "
-                   "written to this directory.")
+@click.option("--location", envvar="MEMOTE_LOCATION",
+              help="Location of test results. Can either by a directory or an "
+                   "rfc1738 compatible database URL.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
                    "Should be given as one continuous string.")
+@click.option("--deployment", default="gh-pages", show_default=True,
+              help="Results will be read from and committed to the given "
+                   "branch.")
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
               default=None, callback=callbacks.validate_experimental,
               help="Define additional tests using experimental data.")
-@click.option("--exclusive", type=str, multiple=True, metavar="TEST",
+@click.option("--exclusive", multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
                    "multiple times and takes precedence over '--skip'.")
-@click.option("--skip", type=str, multiple=True, metavar="TEST",
+@click.option("--skip", multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
-@click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL")
+@click.option("--model", type=click.Path(dir_okay=False), envvar="MEMOTE_MODEL")
+@click.argument("message")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-def history(model, rewrite, solver, location, pytest_args, commits, skip,
-            exclusive, experimental):  # noqa: D301
+def history(model, message, rewrite, solver, location, pytest_args, deployment,
+            commits, skip, exclusive, experimental):  # noqa: D301
     """
     Re-compute test results for the git branch history.
 
-    This command requires the model file to be supplied either by the
-    environment variable MEMOTE_MODEL or configured in a 'setup.cfg' or
-    'memote.ini' file.
+    MESSAGE is a commit message in case results were modified or added.
 
     There are two distinct modes:
 
@@ -248,36 +252,59 @@ def history(model, rewrite, solver, location, pytest_args, commits, skip,
        for those only.
 
     """
+    if model is None:
+        raise click.BadParameter("No 'model' path given or configured.")
+    if location is None:
+        raise click.BadParameter("No 'location' given or configured.")
     if "--tb" not in pytest_args:
         pytest_args = ["--tb", "no"] + pytest_args
     try:
         repo = git.Repo()
-    # TODO: If no directory was given use system tempdir and create report in
-    #  gh-pages.
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
             "The history requires a git repository in order to follow "
-            "the current branch's commit history.")
+            "the model's commit history.")
         sys.exit(1)
+    previous = repo.active_branch
+    # Temporarily move the results to a new location so that they are
+    # available while checking out the various commits.
+    repo.heads[deployment].checkout()
+    engine = None
+    tmp_location = mkdtemp()
     try:
-        manager = SQLResultManager(repository=repo, location=location)
+        # Test if the location can be opened as a database.
+        engine = create_engine(location)
+        engine.dispose()
+        new_location = location
+        if location.startswith("sqlite"):
+            # Copy the SQLite database to a temporary location. Other
+            # databases are not file-based and thus git independent.
+            url = location.split("/", maxsplit=3)
+            if isfile(url[3]):
+                copy2(url[3], tmp_location)
+            new_location = "{}/{}".format(
+                "/".join(url[:3] + [tmp_location]), url[3])
+            LOGGER.info("Temporarily moving database from '%s' to '%s'.",
+                        url[3], join(tmp_location, url[3]))
+        manager = SQLResultManager(repository=repo, location=new_location)
     except (AttributeError, ArgumentError):
-        manager = RepoResultManager(repository=repo, location=location)
+        LOGGER.info("Temporarily moving results from '%s' to '%s'.",
+                    location, tmp_location)
+        move(location, tmp_location)
+        new_location = join(tmp_location, location)
+        manager = RepoResultManager(repository=repo, location=new_location)
     history = HistoryManager(repository=repo, manager=manager)
-    history.build_branch_structure()
-    history.load_history()
-    if len(commits) > 0:
-        # TODO: Convert hashes to `git.Commit` instances.
-        raise NotImplementedError(u"Coming soon™.")
-    else:
+    history.load_history(model, skip={deployment})
+    if len(commits) == 0:
         commits = list(history.iter_commits())
     for commit in commits:
         cmt = repo.commit(commit)
-        # Find model in added, deleted, and modified files.
+        # Rewrite to full length hexsha.
+        commit = cmt.hexsha
         if model not in cmt.stats.files:
             LOGGER.info(
-                "The model was not modified in commit '{}'. Skipping.".format(
-                    commit))
+                "The model was not modified in commit '{}'. "
+                "Skipping.".format(commit))
             continue
         # Should we overwrite an existing result?
         if commit in history and not rewrite:
@@ -294,6 +321,18 @@ def history(model, rewrite, solver, location, pytest_args, commits, skip,
                   exclusive, experimental))
         proc.start()
         proc.join()
+    # Copy back all new and modified files and add them to the index.
+    repo.heads[deployment].checkout()
+    if engine is not None:
+        manager.session.close()
+        if location.startswith("sqlite"):
+            copy2(join(tmp_location, url[3]), url[3])
+    else:
+        move(new_location, os.getcwd())
+    repo.git.add(".")
+    repo.index.commit(message)
+    # Checkout the original branch.
+    previous.checkout()
     LOGGER.info("Done.")
 
 

@@ -55,8 +55,6 @@ class HistoryReport(Report):
         self._report_type = "history"
         self._history = history
         self.config = configuration
-        self._history.build_branch_structure()
-        self._history.load_history()
         self.result = self.collect_history()
         self.result.update(self.config)
 
@@ -79,8 +77,8 @@ class HistoryReport(Report):
         score = base.setdefault("score", dict())
         score_collection = score.setdefault("total_score", dict())
         for branch, commits in self._history.iter_branches():
-            for commit in commits:
-                result = self.result = self._history.get_result(commit, )
+            for commit in reversed(commits):
+                result = self.result = self._history.get_result(commit)
                 # Calculate the score for each result and store all the total
                 # scores for each commit in the base dictionary.
                 self.compute_score()

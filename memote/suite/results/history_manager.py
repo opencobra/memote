@@ -61,12 +61,11 @@ class HistoryManager(object):
         self._history = None
         self._results = None
 
-    def build_branch_structure(self):
+    def build_branch_structure(self, model, skip):
         """Inspect and record the repo's branches and their history."""
         self._history = dict()
         self._history["commits"] = commits = dict()
         self._history["branches"] = branches = dict()
-        skip = frozenset(["gh-pages"])
         for branch in self._repo.refs:
             LOGGER.debug(branch.name)
             if branch.name in skip:
@@ -75,6 +74,12 @@ class HistoryManager(object):
             latest = branch.commit
             history = [latest] + list(latest.iter_parents())
             for commit in history:
+                # Find model in committed files.
+                if model not in commit.stats.files:
+                    LOGGER.info(
+                        "The model was not modified in commit '{}'. "
+                        "Skipping.".format(commit))
+                    continue
                 branch_history.append(commit.hexsha)
                 if commit.hexsha not in commits:
                     commits[commit.hexsha] = sub = dict()
@@ -91,15 +96,15 @@ class HistoryManager(object):
         """Iterate over all commit hashes in the repository."""
         return iterkeys(self._history["commits"])
 
-    def load_history(self):
+    def load_history(self, model, skip={"gh-pages"}):
         """
         Load the entire results history into memory.
 
         Could be a bad idea in a far future.
 
         """
-        assert self._history is not None, \
-            "Please call the method `build_branch_structure` first."
+        if self._history is None:
+            self.build_branch_structure(model, skip)
         self._results = dict()
         all_commits = list(self._history["commits"])
         for commit in all_commits:
