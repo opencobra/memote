@@ -154,7 +154,7 @@ def test_gene_protein_reaction_rule_presence(read_only_model):
     ann = test_gene_protein_reaction_rule_presence.annotation
     missing_gpr_metabolic_rxns = set(
         basic.check_gene_protein_reaction_rule_presence(read_only_model)
-    ).difference(set(read_only_model.exchanges))
+    ).difference(set(read_only_model.boundary))
     ann["data"] = get_ids(missing_gpr_metabolic_rxns)
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(

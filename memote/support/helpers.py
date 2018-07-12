@@ -31,6 +31,7 @@ from six import iteritems, itervalues
 from sympy import expand
 from importlib_resources import open_text
 from cobra.exceptions import Infeasible
+from cobra.medium import find_boundary_types
 from pylru import lrudecorator
 
 import memote.utils as utils
@@ -156,7 +157,7 @@ def find_transport_reactions(model):
 
     """
     transport_reactions = []
-    transport_rxn_candidates = set(model.reactions) - set(model.exchanges) \
+    transport_rxn_candidates = set(model.reactions) - set(model.boundary) \
         - set(find_biomass_reaction(model))
     # Add all labeled transport reactions
     sbo_matches = set([rxn for rxn in transport_rxn_candidates if
@@ -322,7 +323,7 @@ def find_biomass_reaction(model):
     if biomass_met == 1:
         biomass_met_matches = set(
             biomass_met.reactions
-        ) - set(model.exchanges)
+        ) - set(model.boundary)
     else:
         biomass_met_matches = set()
 
@@ -366,10 +367,7 @@ def find_demand_reactions(model):
         extracellular = find_compartment_id_in_model(model, 'e')
     except KeyError:
         extracellular = None
-    demand_and_exchange_rxns = set(model.exchanges)
-    return [rxn for rxn in demand_and_exchange_rxns
-            if not rxn.reversibility and
-            extracellular not in rxn.get_compartments()]
+    return find_boundary_types(model, 'demand', extracellular)
 
 
 @lrudecorator(size=2)
@@ -408,10 +406,7 @@ def find_sink_reactions(model):
         extracellular = find_compartment_id_in_model(model, 'e')
     except KeyError:
         extracellular = None
-    demand_and_exchange_rxns = set(model.exchanges)
-    return [rxn for rxn in demand_and_exchange_rxns
-            if rxn.reversibility and
-            extracellular not in rxn.get_compartments()]
+    return find_boundary_types(model, 'sink', extracellular)
 
 
 @lrudecorator(size=2)
@@ -449,9 +444,7 @@ def find_exchange_rxns(model):
         extracellular = find_compartment_id_in_model(model, 'e')
     except KeyError:
         extracellular = None
-    demand_and_exchange_rxns = set(model.exchanges)
-    return [rxn for rxn in demand_and_exchange_rxns
-            if extracellular in rxn.get_compartments()]
+    return find_boundary_types(model, 'exchange', extracellular)
 
 
 def find_interchange_biomass_reactions(model, biomass=None):
@@ -470,12 +463,11 @@ def find_interchange_biomass_reactions(model, biomass=None):
         A list of cobrapy biomass reactions.
 
     """
-    # exchanges in this case also refer to sink and demand reactions.
-    exchanges = set(model.exchanges)
+    boundary = set(model.boundary)
     transporters = find_transport_reactions(model)
     if biomass is None:
         biomass = set(find_biomass_reaction(model))
-    return exchanges | transporters | biomass
+    return boundary | transporters | biomass
 
 
 def find_functional_units(gpr_str):
@@ -565,8 +557,8 @@ def close_boundaries_sensibly(model):
             rxn.bounds = -1, 1
         else:
             rxn.bounds = 0, 1
-    for exchange in model.exchanges:
-        exchange.bounds = (0, 0)
+    for boundary in model.boundary:
+        boundary.bounds = (0, 0)
 
 
 def open_boundaries(model):
@@ -584,8 +576,8 @@ def open_boundaries(model):
         A cobra model with all boundary reactions opened.
 
     """
-    for exchange in model.exchanges:
-        exchange.bounds = (-1000, 1000)
+    for boundary in model.boundary:
+        boundary.bounds = (-1000, 1000)
 
 
 def metabolites_per_compartment(model, compartment_id):

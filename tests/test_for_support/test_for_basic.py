@@ -555,7 +555,7 @@ def test_gene_protein_reaction_rule_presence(model, num):
             basic.check_gene_protein_reaction_rule_presence(
                 model
             )
-        ).difference(set(model.exchanges))
+        ).difference(set(model.boundary))
     assert len(missing_gpr_metabolic_rxns) == num
 
 
