@@ -170,7 +170,6 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                                   "cookiecutter-memote.json")))
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
-              envvar="MEMOTE_DIRECTORY",
               help="Create a new model repository in the given directory.")
 def new(directory, replay):
     """
