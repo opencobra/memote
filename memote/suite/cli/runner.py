@@ -349,7 +349,7 @@ def online(note, github_repository, github_username):
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
-            "The history requires a git repository in order to follow "
+            "'memote online' requires a git repository in order to follow "
             "the current branch's commit history.")
         sys.exit(1)
     password = getpass("GitHub Password: ")
