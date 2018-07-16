@@ -39,7 +39,7 @@ def test_run_simple(runner, model_file):
     """Expect a simple run to function."""
     result = runner.invoke(cli, [
         "run", "--no-collect", "--ignore-git", model_file])
-    assert result.exit_code != 0
+    assert result.exit_code == 0
 
 
 def test_run_output(runner, model_file):
@@ -47,7 +47,7 @@ def test_run_output(runner, model_file):
     output = model_file.split(".", 1)[0] + ".json"
     result = runner.invoke(cli, [
         "run", "--filename", output, "--ignore-git", model_file])
-    assert result.exit_code != 0
+    assert result.exit_code == 0
     assert exists(output)
 
 
