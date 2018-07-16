@@ -23,7 +23,6 @@ import io
 import os
 import sys
 import logging
-from functools import partial
 from gzip import GzipFile
 from os.path import join, isfile
 from multiprocessing import Process
