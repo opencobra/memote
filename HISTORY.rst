@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.8.2 (2018-07-16)
+------------------
 * Allow running of ``memote history`` from any branch.
 * Let the history report only use commits where the model actually changed.
 * Proofread and update all docstrings and comments inside the ``memote``
@@ -23,8 +26,8 @@ Next Release
   the diff report frontend.
 * Update the diff report to properly show errored and skipped tests
 * Fix issues with asynchronicity on the diff report.
-* Change format_type on experimental tests from ``count` to ``percent`
-* Fix typo in ``test_basic.py`` that lead to tests returning `null` which 
+* Change format_type on experimental tests from ``count`` to ``percent``
+* Fix typo in ``test_basic.py`` that lead to tests returning `null` which
   breaks the diff report frontend.
 * Update the diff report to properly show errored and skipped tests
 
