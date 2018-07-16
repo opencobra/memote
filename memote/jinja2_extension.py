@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import os
-from os.path import join, isabs, basename
+from os.path import join, isabs, basename, expanduser
 
 from jinja2.ext import Extension
 
@@ -44,6 +44,7 @@ class MemoteExtension(Extension):
         # Default value means we do not resolve a model file.
         if filename == "default":
             return filename
+        filename = expanduser(filename)
         if isabs(filename):
             return filename
         else:

@@ -170,7 +170,6 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                                   "cookiecutter-memote.json")))
 @click.option("--directory", type=click.Path(exists=True, file_okay=False,
                                              writable=True),
-              envvar="MEMOTE_DIRECTORY",
               help="Create a new model repository in the given directory.")
 def new(directory, replay):
     """
@@ -222,9 +221,6 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
-              default=None, callback=callbacks.validate_experimental,
-              help="Define additional tests using experimental data.")
 @click.option("--exclusive", multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
@@ -232,11 +228,12 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.option("--skip", multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
-@click.option("--model", type=click.Path(dir_okay=False), envvar="MEMOTE_MODEL")
+@click.argument("model", type=click.Path(exists=False, dir_okay=False),
+                envvar="MEMOTE_MODEL")
 @click.argument("message")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 def history(model, message, rewrite, solver, location, pytest_args, deployment,
-            commits, skip, exclusive, experimental):  # noqa: D301
+            commits, skip, exclusive, experimental=None):  # noqa: D301
     """
     Re-compute test results for the git branch history.
 
@@ -352,7 +349,7 @@ def online(note, github_repository, github_username):
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
-            "The history requires a git repository in order to follow "
+            "'memote online' requires a git repository in order to follow "
             "the current branch's commit history.")
         sys.exit(1)
     password = getpass("GitHub Password: ")
@@ -372,13 +369,16 @@ def online(note, github_repository, github_username):
             "settings.".format(github_repository))
     except UnknownObjectException:
         gh_repo = user.create_repo(github_repository)
+    if note == "memote-ci access":
+        note = "{} to {}".format(note, github_repository)
     try:
         LOGGER.info("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
     except GithubException:
         LOGGER.critical(
             "A personal access token with the note '{}' already exists. "
-            "Either delete it or choose another note.".format(note))
+            "Either delete it or choose another note using the option "
+            "'--note'.".format(note))
         sys.exit(1)
     try:
         LOGGER.info("Authorizing with TravisCI.")
@@ -413,7 +413,10 @@ def online(note, github_repository, github_username):
     LOGGER.info("Storing GitHub token in '.travis.yml'.")
     with io.open(".travis.yml", "r") as file_h:
         config = yaml.load(file_h, yaml.RoundTripLoader)
-    config["env"]["global"].append({"secure": secret})
+    global_env = config.setdefault("env", {}).setdefault("global", [])
+    if global_env is None:
+        config["env"]["global"] = global_env = []
+    global_env.append({"secure": secret})
     with io.open(".travis.yml", "w") as file_h:
         yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
     repo.index.add([".travis.yml"])
