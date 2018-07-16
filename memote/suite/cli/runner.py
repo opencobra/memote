@@ -85,7 +85,8 @@ def cli():
                    "generating a report.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="result.json", show_default=True,
-              help="Path for the collected results as JSON.")
+              help="Path for the collected results as JSON. Ignored when "
+                   "working with a git repository.")
 @click.option("--location", envvar="MEMOTE_LOCATION",
               help="If invoked inside a git repository, try to interpret "
               "the string as an rfc1738 compatible database URL which will be "
@@ -116,10 +117,13 @@ def cli():
                    "information on how to write custom tests "
                    "(memote.readthedocs.io). This option can be specified "
                    "multiple times.")
+@click.option("--deployment", default="gh-pages", show_default=True,
+              help="Results will be read from and committed to the given "
+                   "branch.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests):
+        skip, solver, experimental, custom_tests, deployment):
     """
     Run the test suite on a single model and collect results.
 
@@ -131,6 +135,12 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         repo = None
     else:
         repo = callbacks.probe_git()
+    if collect:
+        if repo is not None:
+            if location is None:
+                LOGGER.critical(
+                    "Working with a repository requires a storage location.")
+                sys.exit(1)
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(a.startswith("-v") for a in pytest_args):
@@ -138,26 +148,29 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     model.solver = solver
-    if collect:
-        if repo is None:
-            manager = ResultManager()
-            store = partial(manager.store, filename=filename)
-        else:
-            if location is None:
-                LOGGER.critical(
-                    "Working with a repository requires a storage location.")
-                sys.exit(1)
-            try:
-                manager = SQLResultManager(repository=repo, location=location)
-            except (AttributeError, ArgumentError):
-                manager = RepoResultManager(repository=repo, location=location)
-            store = manager.store
     code, result = api.test_model(
         model=model, results=True, pytest_args=pytest_args, skip=skip,
         exclusive=exclusive, experimental=experimental)
     if collect:
-        store(result=result)
-    sys.exit(code)
+        if repo is None:
+            manager = ResultManager()
+            manager.store(result, filename=filename)
+        else:
+            LOGGER.info("Checking out deployment branch.")
+            previous = repo.active_branch
+            previous_cmt = previous.commit
+            repo.heads[deployment].checkout()
+            try:
+                manager = SQLResultManager(repository=repo, location=location)
+            except (AttributeError, ArgumentError):
+                manager = RepoResultManager(repository=repo, location=location)
+            LOGGER.info(
+                "Committing result and changing back to working branch.")
+            manager.store(result, commit=previous_cmt.hexsha)
+            repo.git.add(".")
+            repo.index.commit(
+                "chore: add result for {}".format(previous_cmt.hexsha))
+            previous.checkout()
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
