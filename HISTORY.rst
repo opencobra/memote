@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.8.3 (2018-07-16)
+------------------
+* ``memote run`` in a repository now immediately commits the result to the
+  deployment branch.
+
 0.8.2 (2018-07-16)
 ------------------
 * Allow running of ``memote history`` from any branch.
