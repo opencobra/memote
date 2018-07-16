@@ -369,6 +369,8 @@ def online(note, github_repository, github_username):
             "settings.".format(github_repository))
     except UnknownObjectException:
         gh_repo = user.create_repo(github_repository)
+    if note == "memote-ci access":
+        note = "{} {}".format(note, github_repository)
     try:
         LOGGER.info("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
