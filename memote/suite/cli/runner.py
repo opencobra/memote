@@ -370,14 +370,15 @@ def online(note, github_repository, github_username):
     except UnknownObjectException:
         gh_repo = user.create_repo(github_repository)
     if note == "memote-ci access":
-        note = "{} {}".format(note, github_repository)
+        note = "{} to {}".format(note, github_repository)
     try:
         LOGGER.info("Creating token.")
         auth = user.create_authorization(scopes=["repo"], note=note)
     except GithubException:
         LOGGER.critical(
             "A personal access token with the note '{}' already exists. "
-            "Either delete it or choose another note.".format(note))
+            "Either delete it or choose another note using the option "
+            "'--note'.".format(note))
         sys.exit(1)
     try:
         LOGGER.info("Authorizing with TravisCI.")
@@ -412,7 +413,10 @@ def online(note, github_repository, github_username):
     LOGGER.info("Storing GitHub token in '.travis.yml'.")
     with io.open(".travis.yml", "r") as file_h:
         config = yaml.load(file_h, yaml.RoundTripLoader)
-    config["env"]["global"].append({"secure": secret})
+    global_env = config.setdefault("env", {}).setdefault("global", [])
+    if global_env is None:
+        config["env"]["global"] = global_env = []
+    global_env.append({"secure": secret})
     with io.open(".travis.yml", "w") as file_h:
         yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
     repo.index.add([".travis.yml"])
