@@ -221,9 +221,6 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
-              default=None, callback=callbacks.validate_experimental,
-              help="Define additional tests using experimental data.")
 @click.option("--exclusive", multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
@@ -231,11 +228,12 @@ def _test_history(model, solver, manager, commit, pytest_args, skip,
 @click.option("--skip", multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
-@click.option("--model", type=click.Path(dir_okay=False), envvar="MEMOTE_MODEL")
+@click.argument("model", type=click.Path(exists=False, dir_okay=False),
+                envvar="MEMOTE_MODEL")
 @click.argument("message")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
 def history(model, message, rewrite, solver, location, pytest_args, deployment,
-            commits, skip, exclusive, experimental):  # noqa: D301
+            commits, skip, exclusive, experimental=None):  # noqa: D301
     """
     Re-compute test results for the git branch history.
 

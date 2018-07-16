@@ -40,7 +40,7 @@ class ConfigSectionSchema(object):
         collect = Param(type=bool, default=True)
         git = Param(type=bool, default=True)
         addargs = Param(type=str, default="")
-        model = Param(type=click.Path(dir_okay=False))
+        model = Param(type=click.Path(exists=False, dir_okay=False))
         deployment = Param(type=str, default="gh-pages")
         location = Param(type=str)
         github_repository = Param(type=str)
@@ -49,7 +49,8 @@ class ConfigSectionSchema(object):
         skip = Param(type=str, multiple=True)
         solver = Param(type=click.Choice(["cplex", "glpk", "gurobi"]),
                        default="glpk")
-        experimental = Param(type=click.Path(dir_okay=False), default=None)
+        experimental = Param(type=click.Path(exists=False, dir_okay=False),
+                             default=None)
 
 
 class ConfigFileProcessor(ConfigFileReader):
