@@ -24,6 +24,7 @@ Contents
    installation
    getting_started
    flowchart
+   experimental_data
    custom_tests
    test_suite
    api
