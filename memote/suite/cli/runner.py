@@ -34,7 +34,7 @@ from shutil import copy2, move
 import click
 import click_log
 import git
-import ruamel.yaml as yaml
+import travis.encrypt as te
 from cobra.io import read_sbml_model
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
@@ -43,7 +43,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import ArgumentError
 from travispy import TravisPy
 from travispy.errors import TravisError
-from travis.encrypt import encrypt_key, retrieve_public_key
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
@@ -130,6 +129,11 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
 
     """
+    def is_verbose(arg):
+        return (arg.startswith("--verbosity") or
+                arg.startswith("-v") or arg.startswith("--verbose") or
+                arg.startswith("-q") or arg.startswith("--quiet"))
+
     if ignore_git:
         repo = None
     else:
@@ -142,7 +146,7 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                 sys.exit(1)
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "short"] + pytest_args
-    if not any(a.startswith("-v") for a in pytest_args):
+    if not any(is_verbose(a) for a in pytest_args):
         pytest_args.append("-vv")
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
@@ -420,17 +424,18 @@ def online(note, github_repository, github_username):
         sys.exit(1)
     LOGGER.info(
         "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
-    key = retrieve_public_key(gh_repo.full_name)
-    secret = encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
+    key = te.retrieve_public_key(gh_repo.full_name)
+    secret = te.encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
     LOGGER.info("Storing GitHub token in '.travis.yml'.")
-    with io.open(".travis.yml", "r") as file_h:
-        config = yaml.load(file_h, yaml.RoundTripLoader)
-    global_env = config.setdefault("env", {}).setdefault("global", [])
+    config = te.load_travis_configuration(".travis.yml")
+    global_env = config.setdefault("env", {}).get("global")
     if global_env is None:
-        config["env"]["global"] = global_env = []
-    global_env.append({"secure": secret})
-    with io.open(".travis.yml", "w") as file_h:
-        yaml.dump(config, file_h, Dumper=yaml.RoundTripDumper)
+        config["env"]["global"] = global_env = {}
+    try:
+        global_env["secure"] = secret
+    except TypeError:
+        global_env.append({"secure": secret})
+    te.dump_travis_configuration(config, ".travis.yml")
     repo.index.add([".travis.yml"])
     repo.index.commit("chore: add encrypted GitHub access token")
     repo.remotes.origin.push(all=True)
