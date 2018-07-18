@@ -164,8 +164,8 @@ The continuous report will look like this:
 Since memote uses ``git`` for version control in memote repositories, regular git
 commands can be used. For instance:
 
-* ``git status`` to lists all new or modified files.
-* ``git branch`` to lists all local branches of the current repository.
+* ``git status`` lists all new or modified files.
+* ``git branch`` lists all local branches of the current repository.
 
 To make a new version execute the following commands in sequence:
 
@@ -199,7 +199,7 @@ In sequence, these are:
       $ git add .
       $ git commit -m <Some Description>
 
-2. After committing your changes run memote
+2. After committing your changes initiate the test suite with
 
    .. code-block:: console
 

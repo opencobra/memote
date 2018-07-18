@@ -63,9 +63,10 @@ experiments. So you could add:
         m9_minimal:
 
 which by default would look for a medium file ``media/m9_minimal.csv``.
-Definition keys need to be valid YAML keys. Other data formats such as TSV, XLS,
-or XLSX are also allowed. You can specify the filename which also allows you to
-use a different name, although that would probably be confusing.
+Definition keys need to be valid YAML keys. In addition to CSV, other data
+formats such as TSV, XLS or XLSX are also allowed. You can specify the filename
+which also allows you to use a different name, although that would probably be
+confusing.
 
 .. code-block:: yaml
 
