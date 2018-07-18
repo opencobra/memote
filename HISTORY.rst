@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.8.4 (2018-07-18)
+------------------
+* Handle various pytest verbosity options better.
+* Improve ``memote new`` behavior.
+
 0.8.3 (2018-07-16)
 ------------------
 * ``memote run`` in a repository now immediately commits the result to the
