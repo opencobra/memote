@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Unpin cobrapy dependency and set it to >=0.13.2
 
 0.8.4 (2018-07-18)
 ------------------
