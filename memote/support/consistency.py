@@ -418,8 +418,7 @@ def find_universally_blocked_reactions(model):
 
     """
     with model:
-        for rxn in model.exchanges:
-            rxn.bounds = (-1000, 1000)
+        helpers.open_boundaries(model)
         fva_result = flux_variability_analysis(model)
 
     blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
