@@ -487,6 +487,7 @@ def rxns_no_exchange(base):
     met_b = cobra.Metabolite("b_c", compartment="c")
     rxn_1 = cobra.Reaction("rxn1")
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    base.add_reactions([rxn_1])
     return base
 
 
@@ -555,7 +556,7 @@ def test_gene_protein_reaction_rule_presence(model, num):
             basic.check_gene_protein_reaction_rule_presence(
                 model
             )
-        ).difference(set(model.exchanges))
+        ).difference(set(model.boundary))
     assert len(missing_gpr_metabolic_rxns) == num
 
 

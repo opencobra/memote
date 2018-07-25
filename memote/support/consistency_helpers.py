@@ -215,9 +215,9 @@ def get_interface(model):
 @lrudecorator(size=2)
 def get_internals(model):
     """
-    Return non-exchange reactions and their metabolites.
+    Return non-boundary reactions and their metabolites.
 
-    Exchange reactions are unbalanced by their nature. They are excluded here
+    Boundary reactions are unbalanced by their nature. They are excluded here
     and only the metabolites of the others are considered.
 
     Parameters
@@ -230,7 +230,7 @@ def get_internals(model):
     if len(biomass) == 0:
         LOGGER.warn("No biomass reaction detected. Consistency test results "
                     "are unreliable if one exists.")
-    return set(model.reactions) - (set(model.exchanges) | biomass)
+    return set(model.reactions) - (set(model.boundary) | biomass)
 
 
 def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
