@@ -162,8 +162,8 @@ def find_transport_reactions(model):
     # Add all labeled transport reactions
     sbo_matches = set([rxn for rxn in transport_rxn_candidates if
                        rxn.annotation is not None and
-                       'SBO' in rxn.annotation and
-                       rxn.annotation['SBO'] in TRANSPORT_RXN_SBO_TERMS])
+                       'sbo' in rxn.annotation and
+                       rxn.annotation['sbo'] in TRANSPORT_RXN_SBO_TERMS])
     if len(sbo_matches) > 0:
         transport_reactions += list(sbo_matches)
     # Find unlabeled transport reactions via formula or annotation checks
@@ -303,8 +303,8 @@ def find_biomass_reaction(model):
     """
     sbo_matches = set([rxn for rxn in model.reactions if
                        rxn.annotation is not None and
-                       'SBO' in rxn.annotation and
-                       rxn.annotation['SBO'] == 'SBO:0000629'])
+                       'sbo' in rxn.annotation and
+                       rxn.annotation['sbo'] == 'SBO:0000629'])
 
     if len(sbo_matches) > 0:
         return list(sbo_matches)
