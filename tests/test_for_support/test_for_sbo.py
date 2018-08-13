@@ -45,7 +45,7 @@ def no_annotations(base):
 @register_with(MODEL_REGISTRY)
 def specific_sbo_term(base):
     met = cobra.Metabolite(id='met_c', name="Met")
-    met.annotation = {'SBO': 'SBO:1', 'bigg.metabolite': 'dad_2'}
+    met.annotation = {'sbo': 'SBO:1', 'bigg.metabolite': 'dad_2'}
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.add_metabolites({met: -1})
     rxn.annotation = {'bigg.reaction': 'DADNt2pp'}

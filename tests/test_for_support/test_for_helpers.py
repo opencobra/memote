@@ -221,7 +221,7 @@ def labeled_reaction(base):
     a = cobra.Metabolite("a")
     b = cobra.Metabolite("b")
     rxn = cobra.Reaction("rxn")
-    rxn.annotation["SBO"] = "SBO:0000655"
+    rxn.annotation["sbo"] = "SBO:0000655"
     rxn.add_metabolites({a: -1, b: 1})
     base.add_reactions([rxn])
     return base
@@ -394,7 +394,7 @@ def biomass_sbo(base):
     c = cobra.Metabolite("RNA_c", compartment="c")
     d = cobra.Metabolite("GAM_c", compartment="c")
     rxn1 = cobra.Reaction("R0001")
-    rxn1.annotation = {'SBO': 'SBO:0000629'}
+    rxn1.annotation = {'sbo': 'SBO:0000629'}
     rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1})
     base.add_reactions([rxn1])
     return base

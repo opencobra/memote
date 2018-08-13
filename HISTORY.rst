@@ -7,6 +7,8 @@ Next Release
 * Add a test that checks if reactions are annotated with reactome identifiers.
 * Add a feature that allows identifying specific metabolites by matching
   annotation information against the metabolite shortlist for a given MNX ID.
+* Change every usage of SBO key to lower case to conform to the identifiers.org 
+  namespace for the Systems Biology Ontology
 
 0.8.6 (2018-09-13)
 ------------------
@@ -15,7 +17,6 @@ Next Release
 0.8.5 (2018-08-20)
 ------------------
 * Unpin cobra dependency and set it to >0.13.3.
-* Set ruamel.yaml to >=0.15 to keep up with cobra.
 
 0.8.4 (2018-07-18)
 ------------------

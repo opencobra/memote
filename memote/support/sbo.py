@@ -42,7 +42,7 @@ def find_components_without_sbo_terms(model, components):
 
     """
     return [elem for elem in getattr(model, components) if
-            elem.annotation is None or 'SBO' not in elem.annotation]
+            elem.annotation is None or 'sbo' not in elem.annotation]
 
 
 def check_component_for_specific_sbo_term(items, term):
@@ -66,5 +66,5 @@ def check_component_for_specific_sbo_term(items, term):
     """
     return [elem for elem in items if
             elem.annotation is None or
-            'SBO' not in elem.annotation or
-            elem.annotation['SBO'] not in term]
+            'sbo' not in elem.annotation or
+            elem.annotation['sbo'] not in term]
