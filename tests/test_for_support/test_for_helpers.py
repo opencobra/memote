@@ -26,6 +26,7 @@ import memote.support.helpers as helpers
 from memote.utils import register_with
 
 MODEL_REGISTRY = dict()
+REACTION_REGISTRY = dict()
 
 
 @register_with(MODEL_REGISTRY)
@@ -415,6 +416,51 @@ def biomass_metabolite(base):
     base.add_reactions([rxn1, rxn2])
     return base
 
+@register_with(REACTION_REGISTRY)
+def transport_reaction_true():
+    """Provide a transport reaction identifiable through met annotations"""
+    a = cobra.Metabolite("X", compartment="c")
+    a.annotation["bigg.metabolite"] = "co2"
+    b = cobra.Metabolite("x", compartment="e")
+    b.annotation["bigg.metabolite"] = "co2"
+    r = cobra.Reaction("Transporter")
+    r.add_metabolites({a: -1, b: 1})
+    return r
+
+@register_with(REACTION_REGISTRY)
+def transport_reaction_missing_annotation():
+    """Provide a transport reaction identifiable through met annotations"""
+    a = cobra.Metabolite("X", compartment="c")
+    b = cobra.Metabolite("x", compartment="e")
+    r = cobra.Reaction("Transporter_Missing_Ann")
+    r.add_metabolites({a: -1, b: 1})
+    return r
+
+@register_with(REACTION_REGISTRY)
+def transport_reaction_missing_values():
+    """Provide a transport reaction identifiable through met annotations"""
+    a = cobra.Metabolite("X", compartment="c")
+    a.annotation["bigg.metabolite"] = None
+    b = cobra.Metabolite("x", compartment="e")
+    b.annotation["bigg.metabolite"] = None
+    r = cobra.Reaction("Transporter_Missing_Values")
+    r.add_metabolites({a: -1, b: 1})
+    return r
+
+@register_with(REACTION_REGISTRY)
+def transport_reaction_false():
+    """Provide a fake transport reaction that uses SBO terms"""
+    a = cobra.Metabolite("X", compartment="c")
+    a.annotation["sbo"] = "SBO:00001"
+    b = cobra.Metabolite("XH", compartment="c")
+    b.annotation["sbo"] = "SBO:00001"
+    c = cobra.Metabolite("DH", compartment="e")
+    c.annotation["sbo"] = "SBO:00001"
+    d = cobra.Metabolite("D", compartment="e")
+    d.annotation["sbo"] = "SBO:00001"
+    r = cobra.Reaction("ElectronTransfer")
+    r.add_metabolites({a: -1, b: 1, c: -1, d: 1})
+    return r
 
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport_formulae", 3),
@@ -564,3 +610,15 @@ def test_find_biomass_reaction(model, expected):
     Expect the biomass reaction to be identified correctly.
     """
     assert len(helpers.find_biomass_reaction(model)) == expected
+
+@pytest.mark.parametrize("reaction, boolean", [
+    ("transport_reaction_true", True),
+    ("transport_reaction_false", None),
+    ("transport_reaction_missing_annotation", None),
+    ("transport_reaction_missing_values", None)
+], indirect=["reaction"])
+def test_is_transport_reaction_annotations(reaction, boolean):
+    """
+    Expect the reaction to be identified as transport reaction by annotations.
+    """
+    assert helpers.is_transport_reaction_annotations(reaction) == boolean

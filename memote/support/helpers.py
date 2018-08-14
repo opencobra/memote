@@ -31,7 +31,7 @@ from six import iteritems, itervalues
 from sympy import expand
 from importlib_resources import open_text
 from cobra.exceptions import Infeasible
-from cobra.medium import find_boundary_types
+from cobra.medium.boundary_types import find_boundary_types
 from pylru import lrudecorator
 
 import memote.utils as utils
@@ -227,10 +227,12 @@ def is_transport_reaction_annotations(rxn):
     """
     reactants = set([(k, tuple(v)) for met in rxn.reactants
                      for k, v in iteritems(met.annotation)
-                     if met.id is not "H" and k is not None and v is not None])
+                     if met.id is not "H"
+                     and k is not None and k is not 'sbo' and v is not None])
     products = set([(k, tuple(v)) for met in rxn.products
                     for k, v in iteritems(met.annotation)
-                    if met.id is not "H" and k is not None and v is not None])
+                    if met.id is not "H"
+                    and k is not None and k is not 'sbo' and v is not None])
     # Find intersection between reactant annotations and
     # product annotations to find common metabolites between them,
     # satisfying the requirements for a transport reaction. Reactions such
