@@ -58,6 +58,10 @@ def model(request, solver):
     model.solver = solver
     return model
 
+@pytest.fixture(scope="function")
+def reaction(request):
+    builder = getattr(request.module, "REACTION_REGISTRY")[request.param]
+    return builder()
 
 @pytest.fixture(scope="session",
                 params=["e", "pp", "c"])
