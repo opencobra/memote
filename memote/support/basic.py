@@ -280,7 +280,7 @@ def find_duplicate_metabolites_in_compartments(model):
                     "inchikey" in met.annotation]
         for a, b in combinations(ann_mets, 2):
             if a[1]["inchikey"] == b[1]["inchikey"]:
-                duplicates.append((a[0], b[0]))
+                duplicates.append((a[0].id, b[0].id))
     return duplicates
 
 
