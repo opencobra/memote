@@ -173,7 +173,7 @@ def find_transport_reactions(model):
         if (None not in rxn_mets) and (len(rxn_mets) != 0):
             if is_transport_reaction_formulae(rxn):
                 transport_reactions.append(rxn)
-        if is_transport_reaction_annotations(rxn):
+        elif is_transport_reaction_annotations(rxn):
             transport_reactions.append(rxn)
 
     return set(transport_reactions)
