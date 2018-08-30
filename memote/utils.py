@@ -134,7 +134,7 @@ def get_ids(iterable):
 
 
 def get_ids_and_bounds(iterable):
-    """Retrieve the identifier and bounds of a  number of objects."""
+    """Retrieve the identifier and bounds of a number of objects."""
     return ["{0.lower_bound} <= {0.id} <= {0.upper_bound}".format(elem) for
             elem in iterable]
 
