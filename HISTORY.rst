@@ -6,7 +6,8 @@ Next Release
 
 0.8.5 (2018-08-20)
 ------------------
-* Unpin cobrapy dependency and set it to >=0.13.2
+* Unpin cobra dependency and set it to >0.13.3.
+* Set ruamel.yaml to >=0.15 to keep up with cobra.
 
 0.8.4 (2018-07-18)
 ------------------
