@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import logging
 from builtins import open
 
-import ruamel.yaml as yaml
+from ruamel.yaml import YAML
 from importlib_resources import open_text
 
 import memote.suite.templates as templates
@@ -30,6 +30,7 @@ import memote.suite.templates as templates
 __all__ = ("ReportConfiguration",)
 
 LOGGER = logging.getLogger(__name__)
+yaml = YAML(typ="safe")
 
 
 class ReportConfiguration(dict):
