@@ -10,8 +10,8 @@ sudo: false
 git:
   depth: 2
 cache:
-- pip: true
-- directories:
+  pip: true
+  directories:
   - "memote-report-app/node_modules"
 branches:
   only:
