@@ -259,7 +259,7 @@ def test_demand_specific_sbo_presence(read_only_model):
     """Expect all demand reactions to be annotated with SBO:0000627.
 
     SBO:0000628 represents the term 'demand reaction'. The Systems Biology
-    Ontology defines an exchange reaction as follows: 'A modeling process
+    Ontology defines a demand reaction as follows: 'A modeling process
     analogous to exchange reaction, but which operates upon "internal"
     metabolites. Metabolites that are consumed by these reactions are assumed
     to be used in intra-cellular processes that are not part of the model.
@@ -295,7 +295,7 @@ def test_sink_specific_sbo_presence(read_only_model):
     """Expect all sink reactions to be annotated with SBO:0000632.
 
     SBO:0000632 represents the term 'sink reaction'. The Systems Biology
-    Ontology defines an exchange reaction as follows: 'A modeling process to
+    Ontology defines a sink reaction as follows: 'A modeling process to
     provide matter influx or efflux to a model, for example to replenish a
     metabolic network with raw materials (eg carbon / energy sources). Such
     reactions are conceptual, created solely for modeling purposes, and do not

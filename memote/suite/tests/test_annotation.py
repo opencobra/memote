@@ -364,7 +364,7 @@ def test_metabolite_id_namespace_consistency(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Uniform Metabolite Identifier Namespace", format_type="count")
+@annotate(title="Uniform Reaction Identifier Namespace", format_type="count")
 def test_reaction_id_namespace_consistency(read_only_model):
     """
     Expect reaction identifiers to be from the same namespace.
