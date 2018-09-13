@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.8.6 (2018-09-13)
+------------------
 * Fix test titles and descriptions.
 
 0.8.5 (2018-08-20)
