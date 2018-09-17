@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Add a feature to allow suppling a commit range to ``memote history``.
 
 0.8.6 (2018-09-13)
 ------------------

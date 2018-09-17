@@ -252,7 +252,14 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
     """
     Re-compute test results for the git branch history.
 
+    MODEL is the path to the model file.
+
     MESSAGE is a commit message in case results were modified or added.
+
+    [COMMIT] ... It is possible to list out individual commits that should be
+    re-computed or supply a range <oldest commit>..<newest commit>, for example,
+
+        memote history model.xml "chore: re-compute history" 6b84d05..cd49c85
 
     There are two distinct modes:
 
@@ -261,7 +268,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
        This should only be necessary when memote is first used with existing
        model repositories.
     2. By giving memote specific commit hashes, it will re-compute test results
-       for those only.
+       for those only. This can also be achieved by supplying a commit range.
 
     """
     if model is None:
@@ -309,6 +316,8 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
     history.load_history(model, skip={deployment})
     if len(commits) == 0:
         commits = list(history.iter_commits())
+    elif len(commits) == 1 and ".." in commits[0]:
+        commits = repo.git.rev_list(commits[0]).split(os.linesep)
     for commit in commits:
         cmt = repo.commit(commit)
         # Rewrite to full length hexsha.
