@@ -22,6 +22,8 @@ from __future__ import absolute_import
 import logging
 import sys
 from builtins import open
+from multiprocessing import Pool
+from functools import partial
 
 import click
 import git
@@ -161,6 +163,13 @@ def history(location, model, filename, deployment, custom_config):
         file_handle.write(report)
 
 
+def _test_diff(model, pytest_args, skip, exclusive, experimental):
+    _, diff_results = api.test_model(
+        model, results=True, pytest_args=pytest_args,
+        skip=skip, exclusive=exclusive, experimental=experimental)
+    return diff_results
+
+
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("models", type=click.Path(exists=True, dir_okay=False),
@@ -217,19 +226,29 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
         config.merge(ReportConfiguration.load(custom))
     # Build the diff report specific data structure
     diff_results = dict()
+    loaded_models = list()
     for model_path in models:
         try:
             model_filename = os.path.basename(model_path)
             diff_results.setdefault(model_filename, dict())
             model = callbacks._load_model(model_path)
             model.solver = solver
-            _, diff_results[model_filename] = api.test_model(
-                model, results=True, pytest_args=pytest_args,
-                skip=skip, exclusive=exclusive, experimental=experimental)
+            loaded_models.append(model)
         except Exception as e:
             LOGGER.warning(
                 "The following exception occurred while loading model {}: {}"
                 "".format(model_filename, e))
+    # Running pytest in individual processes to avoid interference
+    partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
+                                skip=skip, exclusive=exclusive,
+                                experimental=experimental)
+    pool = Pool(2)
+    results = pool.map(partial_test_diff, loaded_models)
+
+    for model_path, result in zip(models, results):
+        model_filename = os.path.basename(model_path)
+        diff_results[model_filename] = result
+
     with open(filename, "w", encoding="utf-8") as file_handle:
         LOGGER.info("Writing diff report to '%s'.", filename)
         file_handle.write(api.diff_report(diff_results, config))
