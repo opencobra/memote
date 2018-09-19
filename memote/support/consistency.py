@@ -520,7 +520,7 @@ def find_metabolites_produced_with_closed_bounds(model):
             exch = model.add_boundary(
                 met, type='irrex', reaction_id='IRREX', lb=0, ub=1
             )
-            if helpers.run_fba(model, exch.id) > 0:
+            if helpers.run_fba(model, exch.id, single_value=True) > 0:
                 mets_produced.append(met)
     return mets_produced
 
@@ -546,7 +546,8 @@ def find_metabolites_consumed_with_closed_bounds(model):
             exch = model.add_boundary(
                 met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
             )
-            if helpers.run_fba(model, exch.id, direction='min') < 0:
+            if helpers.run_fba(
+                model, exch.id, direction='min', single_value=True) < 0:
                 mets_consumed.append(met)
     return mets_consumed
 
@@ -557,7 +558,7 @@ def find_metabolites_not_produced_with_open_bounds(model):
 
     Inverse case from 'find_metabolites_produced_with_closed_bounds', just
     like metabolites should not be produced from nothing, metabolites should
-    all be produced with open exhanges.
+    all be produced with open exchanges.
 
     Parameters
     ----------
@@ -571,7 +572,7 @@ def find_metabolites_not_produced_with_open_bounds(model):
         with model:
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
-            solution = helpers.run_fba(model, exch.id)
+            solution = helpers.run_fba(model, exch.id, single_value=True)
             if solution is np.nan or solution == 0:
                 mets_not_produced.append(met)
     return mets_not_produced
@@ -597,7 +598,9 @@ def find_metabolites_not_consumed_with_open_bounds(model):
         with model:
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
-            solution = helpers.run_fba(model, exch.id, direction="min")
+            solution = helpers.run_fba(
+                model, exch.id, direction="min", single_value=True
+            )
             if solution is np.nan or solution == 0:
                 mets_not_consumed.append(met)
     return mets_not_consumed
