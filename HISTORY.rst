@@ -3,7 +3,8 @@ History
 
 Next Release
 ------------
-* Add a feature to allow suppling a commit range to ``memote history``.
+* Skip certain existing commits earlier when loading the history.
+* Add a feature to allow supplying a commit range to ``memote history``.
 
 0.8.6 (2018-09-13)
 ------------------

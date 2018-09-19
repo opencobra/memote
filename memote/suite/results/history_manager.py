@@ -74,6 +74,10 @@ class HistoryManager(object):
             latest = branch.commit
             history = [latest] + list(latest.iter_parents())
             for commit in history:
+                # Skip existing commits.
+                if commit.hexsha in commits:
+                    branch_history.append(commit.hexsha)
+                    continue
                 # Find model in committed files.
                 if model not in commit.stats.files:
                     LOGGER.info(
@@ -81,11 +85,10 @@ class HistoryManager(object):
                         "Skipping.".format(commit))
                     continue
                 branch_history.append(commit.hexsha)
-                if commit.hexsha not in commits:
-                    commits[commit.hexsha] = sub = dict()
-                    sub["timestamp"] = commit.authored_datetime.isoformat(" ")
-                    sub["author"] = commit.author.name
-                    sub["email"] = commit.author.email
+                commits[commit.hexsha] = sub = dict()
+                sub["timestamp"] = commit.authored_datetime.isoformat(" ")
+                sub["author"] = commit.author.name
+                sub["email"] = commit.author.email
         LOGGER.debug("%s", json.dumps(self._history, indent=2))
 
     def iter_branches(self):
@@ -114,8 +117,10 @@ class HistoryManager(object):
                 LOGGER.error("Could not load result '%s'.", commit)
                 LOGGER.debug("%s", str(err))
 
-    def get_result(self, commit, default=MemoteResult()):
+    def get_result(self, commit, default=None):
         """Return an individual result from the history if it exists."""
+        if default is None:
+            default = MemoteResult()
         assert self._results is not None, \
             "Please call the method `load_history` first."
         return self._results.get(commit, default)
