@@ -547,7 +547,7 @@ def find_metabolites_consumed_with_closed_bounds(model):
                 met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
             )
             if helpers.run_fba(
-                model, exch.id, direction='min', single_value=True) < 0:
+                    model, exch.id, direction='min', single_value=True) < 0:
                 mets_consumed.append(met)
     return mets_consumed
 
