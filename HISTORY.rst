@@ -4,6 +4,12 @@ History
 Next Release
 ------------
 * Add a feature to allow suppling a commit range to ``memote history``.
+* Replace slow-running 'optimize' with 'slim_optimize' to speed up the 
+  following tests:
+  ``test_find_metabolites_produced_with_closed_bounds``
+  ``test_find_metabolites_consumed_with_closed_bounds``
+  ``test_find_metabolites_not_produced_with_open_bounds``
+  ``test_find_metabolites_not_consumed_with_open_bounds``
 
 0.8.6 (2018-09-13)
 ------------------
