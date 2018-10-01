@@ -21,11 +21,7 @@ from __future__ import absolute_import
 
 import json
 import logging
-import platform
 from builtins import open
-from datetime import datetime
-
-from depinfo import get_pkg_info
 
 from memote.utils import jsonify
 from memote.suite.results.result import MemoteResult
@@ -42,16 +38,7 @@ class ResultManager(object):
         """Initialize a JSON file storage manager."""
         super(ResultManager, self).__init__(**kwargs)
 
-    @staticmethod
-    def add_environment(meta):
-        """Record environment information."""
-        meta["timestamp"] = datetime.utcnow().isoformat(" ")
-        meta["platform"] = platform.system()
-        meta["release"] = platform.release()
-        meta["python"] = platform.python_version()
-        meta["packages"] = get_pkg_info("memote")
-
-    def store(self, result, filename, env_info=True, pretty=True):
+    def store(self, result, filename, pretty=True):
         """
         Write a result to the given file.
 
@@ -61,14 +48,10 @@ class ResultManager(object):
             The dictionary structure of results.
         filename : str or pathlib.Path
             Store results directly to the given filename.
-        env_info : bool, optional
-            Add Python environment information to the result object.
         pretty : bool, optional
             Whether (default) or not to write JSON in a more legible format.
 
         """
-        if env_info:
-            self.add_environment(result.meta)
         LOGGER.info("Storing result in '%s'.", filename)
         with open(filename, "w", encoding="utf-8") as file_handle:
             file_handle.write(jsonify(result, pretty=pretty))

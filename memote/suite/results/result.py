@@ -18,6 +18,9 @@
 """Provide a collective access to a test suite result.."""
 
 from __future__ import absolute_import
+from datetime import datetime
+from depinfo import get_pkg_info
+import platform
 
 __all__ = ("MemoteResult",)
 
@@ -38,3 +41,13 @@ class MemoteResult(dict):
         super(MemoteResult, self).__init__(*args, **kwargs)
         self.meta = self.setdefault("meta", dict())
         self.cases = self.setdefault("tests", dict())
+        self.add_environment_information(self.meta)
+
+    @staticmethod
+    def add_environment_information(meta):
+        """Record environment information."""
+        meta["timestamp"] = datetime.utcnow().isoformat(" ")
+        meta["platform"] = platform.system()
+        meta["release"] = platform.release()
+        meta["python"] = platform.python_version()
+        meta["packages"] = get_pkg_info("memote")
