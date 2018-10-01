@@ -245,6 +245,8 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     pool = Pool(2)
     results = pool.map(partial_test_diff, loaded_models)
 
+    print("WHAT THE ACTUAL FUCK IS HAPPENING?!")
+
     for model_path, result in zip(models, results):
         model_filename = os.path.basename(model_path)
         diff_results[model_filename] = result
