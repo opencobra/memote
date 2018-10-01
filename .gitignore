@@ -64,6 +64,7 @@ target/
 .ipynb_checkpoints/
 
 .idea
+.vscode
 
 memote/suite/reporting/templates/node_modules/
 memote/suite/reporting/templates/.nvmrc
