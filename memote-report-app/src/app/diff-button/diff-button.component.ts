@@ -62,7 +62,7 @@ export class DiffButtonComponent implements OnInit {
       return 0;
     }
     if (minimum === 0) {
-      return (1 - (minimum + 1 / maximum + 1)) * 100;
+      return (1 - ((minimum + 1) / (maximum + 1))) * 100;
     } else {
       return (1 - (minimum / maximum)) * 100;
     }
