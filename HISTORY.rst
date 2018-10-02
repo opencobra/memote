@@ -8,7 +8,17 @@ Next Release
 * Add a feature that allows identifying specific metabolites by matching
   annotation information against the metabolite shortlist for a given MNX ID.
 * Change every usage of SBO key to lower case to conform to the identifiers.org 
-  namespace for the Systems Biology Ontology
+  namespace for the Systems Biology Ontology.
+* Remove that metabolite SBO terms are used when identifying transport 
+  reactions as this may lead to false positives.
+* Return metabolite IDs when finding duplicate metabolites to avoid 
+  serialization errors.
+* Identify transport reactions first by formula then by annotation.
+* For the diff report, run pytest in different processes to avoid accidentally
+  overwriting the results of the former with the results of the later runs.
+* In the diff report, fix a typo that allowed the diff button to depart the 
+  defined colour scheme (blue -> red) to cyan.
+* Fix the snapshot report not showing environment information.
 
 0.8.6 (2018-09-13)
 ------------------
