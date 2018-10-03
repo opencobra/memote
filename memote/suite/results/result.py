@@ -41,7 +41,6 @@ class MemoteResult(dict):
         super(MemoteResult, self).__init__(*args, **kwargs)
         self.meta = self.setdefault("meta", dict())
         self.cases = self.setdefault("tests", dict())
-        self.add_environment_information(self.meta)
 
     @staticmethod
     def add_environment_information(meta):

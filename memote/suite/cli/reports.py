@@ -25,6 +25,7 @@ from builtins import open
 from multiprocessing import Pool
 from functools import partial
 
+from libsbml import SBMLError
 import click
 import git
 from sqlalchemy.exc import ArgumentError
@@ -234,15 +235,22 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
             model = callbacks._load_model(model_path)
             model.solver = solver
             loaded_models.append(model)
-        except Exception as e:
-            LOGGER.warning(
-                "The following exception occurred while loading model {}: {}"
-                "".format(model_filename, e))
+        except (IOError, SBMLError):
+            LOGGER.debug(exc_info=True)
+            LOGGER.warning("An error occurred while loading the model '%s'. "
+                           "Skipping.", model_filename)
+    # Abort the diff report unless at least two models can be loaded
+    # successfully.
+    if len(loaded_models) < 2:
+        LOGGER.critical(
+            "Out of the {} provided models {} could be loaded. Check if the"
+            "models that could not e loaded are valid SBML. Aborting.")
+        sys.exit(1)
     # Running pytest in individual processes to avoid interference
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
-    pool = Pool(2)
+    pool = min(len(models), os.cpu_count())
     results = pool.map(partial_test_diff, loaded_models)
 
     for model_path, result in zip(models, results):
