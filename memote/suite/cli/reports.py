@@ -250,7 +250,7 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
-    pool = min(len(models), os.cpu_count())
+    pool = Pool(min(len(models), os.cpu_count()))
     results = pool.map(partial_test_diff, loaded_models)
 
     for model_path, result in zip(models, results):
