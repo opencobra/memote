@@ -23,7 +23,7 @@ import os
 import sys
 import logging
 from gzip import GzipFile
-from os.path import join, isfile
+from os.path import join, isfile, basename
 from multiprocessing import Process
 from getpass import getpass
 from time import sleep
@@ -117,10 +117,13 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
+@click.option("--ignore-unchanged", is_flag=True, show_default=True,
+              help="Skip running memote on commits where the model was not "
+                   "changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment):
+        skip, solver, experimental, custom_tests, deployment, ignore_unchanged):
     """
     Run the test suite on a single model and collect results.
 
@@ -147,6 +150,16 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(is_verbose(a) for a in pytest_args):
         pytest_args.append("-vv")
+    if ignore_unchanged and repo is not None:
+        commit = repo.active_branch.commit
+        staged_files = commit.stats.files
+        if not basename(
+            model
+        ) in [basename(path) for path in staged_files.keys()]:
+            LOGGER.info(
+                "The model was not modified in commit '{}'. Memote wont run. "
+                "This is the default setting.".format(commit))
+            sys.exit(0)
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     model.solver = solver
