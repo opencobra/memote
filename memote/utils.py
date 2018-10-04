@@ -139,6 +139,14 @@ def get_ids_and_bounds(iterable):
             elem in iterable]
 
 
+def filter_none(attribute, default):
+    """Handle attributes of model components that are optional in SBML."""
+    if attribute is None:
+        return default
+    else:
+        return attribute
+
+
 def truncate(sequence):
     """
     Create a potentially shortened text display of a list.
