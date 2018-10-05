@@ -117,11 +117,11 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
-@click.option("--ignore-unchanged", is_flag=True, show_default=True,
-              help="Skip running memote on commits where the model was not "
-                   "changed.")
+@click.option("--ignore-unchanged", default= True, is_flag=True,
+              show_default=True, help="Skip running memote on commits where "
+              "the model was not changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         skip, solver, experimental, custom_tests, deployment, ignore_unchanged):
     """
@@ -150,18 +150,26 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(is_verbose(a) for a in pytest_args):
         pytest_args.append("-vv")
+    # Check if the model was changed in this commit. Exit `memote run` if this
+    # was not the case.
     if ignore_unchanged and repo is not None:
+        LOGGER.critical("THIS IS RUNNING!")
         commit = repo.active_branch.commit
         staged_files = commit.stats.files
+        print(type(model))
         if not basename(
             model
         ) in [basename(path) for path in staged_files.keys()]:
             LOGGER.info(
-                "The model was not modified in commit '{}'. Memote wont run. "
-                "This is the default setting.".format(commit))
+                "The model was not modified in commit '{}'. By default, "
+                "memote wont run on commits where the model was not changed. "
+                "To run memote despite of this set the `ignore_unchanged` "
+                "flag to False.".format(commit))
             sys.exit(0)
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
+    # Check if the model can be loaded at all.
+    model = callbacks.validate_model(model)
     model.solver = solver
     code, result = api.test_model(
         model=model, results=True, pytest_args=pytest_args, skip=skip,
