@@ -178,7 +178,11 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             manager.store(result, filename=filename)
         else:
             LOGGER.info("Checking out deployment branch.")
-            #
+            # If the repo HEAD is pointing at the most recent branch then
+            # GitPython's `repo.active_branch` works. Yet, if the repo is in
+            # detached HEAD state i.e. when a user has checked out a specific
+            # commit as opposed to a branch, this won't work and throw a
+            # TypeError, which we are circumventing below.
             try:
                 previous = repo.active_branch
                 previous_cmt = previous.commit

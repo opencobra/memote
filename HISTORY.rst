@@ -19,6 +19,9 @@ Next Release
 * In the diff report, fix a typo that allowed the diff button to depart the 
   defined colour scheme (blue -> red) to cyan.
 * Fix the snapshot report not showing environment information.
+* Set ``memote run`` to default to skipping commits where the model was not 
+  changed, but implement a flag that enables testing nonetheless. The flag is 
+  ``--test-unchanged``.
 
 0.8.6 (2018-09-13)
 ------------------
