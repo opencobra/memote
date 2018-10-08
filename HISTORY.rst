@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 * Add a feature to allow suppling a commit range to ``memote history``.
+* Add a test that checks if reactions are annotated with reactome identifiers.
 
 0.8.6 (2018-09-13)
 ------------------

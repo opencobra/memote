@@ -44,7 +44,7 @@ LOGGER = logging.getLogger(__name__)
 # 'HMDB'        ['met']     'http://www.hmdb.ca/'
 #
 # 'BioCyc'      ['rxn','met']   'http://biocyc.org'
-# 'Reactome'    ['met']         'http://www.reactome.org/'
+# 'Reactome'    ['rxn','met']   'http://www.reactome.org/'
 # 'BiGG'        ['rxn','met']   'http://bigg.ucsd.edu/universal/'
 # 'PubChem'     ['met']         'https://pubchem.ncbi.nlm.nih.gov/'
 # 'RefSeq'      ['gen']         'http://www.ncbi.nlm.nih.gov/projects/RefSeq/'
@@ -84,6 +84,8 @@ REACTION_ANNOTATIONS = OrderedDict([
     ('kegg.reaction', re.compile(r"^R\d+$")),
     ('metanetx.reaction', re.compile(r"^MNXR\d+$")),
     ('bigg.reaction', re.compile(r"^[a-z_A-Z0-9]+$")),
+    ('reactome', re.compile(
+        r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)")),
     ('ec-code', re.compile(
         r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
         r"\d+\.\d+\.\d+\.-|"
