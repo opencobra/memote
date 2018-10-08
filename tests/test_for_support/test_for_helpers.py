@@ -287,7 +287,14 @@ def find_met_id(base):
     f = cobra.Metabolite("MNXM161", compartment='c')
     # Coenzyme A - Seed ID
     g = cobra.Metabolite("cpd00010", compartment='c')
-    base.add_metabolites([a, b, c, d, e, f, g])
+    # ADP - Cryptic ID - MNX ID in the annotation
+    h = cobra.Metabolite("OVER9000_c0", compartment='c')
+    h.annotation = {"metanetx.chemical":"MNXM7"}
+    # Proton - Cryptic ID - Chebi array in the annotation
+    i = cobra.Metabolite("x12", compartment='c')
+    i.annotation = {"chebi":["15378", "10744", "13357", "5584",
+                             "24636", "29233", "29234"]}
+    base.add_metabolites([a, b, c, d, e, f, g, h, i])
     return base
 
 
@@ -464,6 +471,8 @@ def test_open_boundaries(model, reaction_id, bounds):
     ("find_met_id", "MNXM29", None, "GLY"),
     ("find_met_id", "MNXM161", None, "MNXM161"),
     ("find_met_id", "MNXM12", None, "cpd00010"),
+    ("find_met_id", "MNXM7", "c", "OVER9000_c0"),
+    ("find_met_id", "MNXM1", "c", "x12"),
     ("no_compartments", "MNXM161", None, "MNXM161"),
 ], indirect=["model"])
 def test_find_met_in_model_accurate_results(
