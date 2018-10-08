@@ -117,13 +117,13 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
-@click.option("--ignore-unchanged", default= True, is_flag=True,
-              show_default=True, help="Skip running memote on commits where "
+@click.option("--test-unchanged", default=False, is_flag=True,
+              show_default=True, help="Run memote on commits where "
               "the model was not changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment, ignore_unchanged):
+        skip, solver, experimental, custom_tests, deployment, test_unchanged):
     """
     Run the test suite on a single model and collect results.
 
@@ -152,11 +152,9 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         pytest_args.append("-vv")
     # Check if the model was changed in this commit. Exit `memote run` if this
     # was not the case.
-    if ignore_unchanged and repo is not None:
-        LOGGER.critical("THIS IS RUNNING!")
-        commit = repo.active_branch.commit
+    if not test_unchanged and repo is not None:
+        commit = repo.head.commit
         staged_files = commit.stats.files
-        print(type(model))
         if not basename(
             model
         ) in [basename(path) for path in staged_files.keys()]:
@@ -164,12 +162,12 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                 "The model was not modified in commit '{}'. By default, "
                 "memote wont run on commits where the model was not changed. "
                 "To run memote despite of this set the `ignore_unchanged` "
-                "flag to False.".format(commit))
+                "flag to False.".format(commit.hexsha))
             sys.exit(0)
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     # Check if the model can be loaded at all.
-    model = callbacks.validate_model(model)
+    model = callbacks.validate_model(None, None, model)
     model.solver = solver
     code, result = api.test_model(
         model=model, results=True, pytest_args=pytest_args, skip=skip,
@@ -180,9 +178,15 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             manager.store(result, filename=filename)
         else:
             LOGGER.info("Checking out deployment branch.")
-            previous = repo.active_branch
-            previous_cmt = previous.commit
-            repo.heads[deployment].checkout()
+            #
+            try:
+                previous = repo.active_branch
+                previous_cmt = previous.commit
+                branch_head = True
+            except TypeError:
+                previous_cmt = repo.head.commit
+                branch_head = False
+            repo.git.checkout(deployment)
             try:
                 manager = SQLResultManager(repository=repo, location=location)
             except (AttributeError, ArgumentError):
@@ -193,7 +197,10 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             repo.git.add(".")
             repo.index.commit(
                 "chore: add result for {}".format(previous_cmt.hexsha))
-            previous.checkout()
+            if branch_head:
+                previous.checkout()
+            else:
+                repo.commit(previous_cmt)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
