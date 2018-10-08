@@ -236,3 +236,18 @@ def jsonify(obj, pretty=False):
     except TypeError as error:
         log_json_incompatible_types(obj)
         raise_with_traceback(error)
+
+
+def flatten(list_of_lists):
+    """Flatten a list of lists but maintain strings and ints as entries."""
+    flat_list = []
+    for sublist in list_of_lists:
+        if isinstance(sublist, str) or isinstance(sublist, int):
+            flat_list.append(sublist)
+        elif sublist is None:
+            continue
+        elif len(sublist) == 1:
+            flat_list.append(sublist[0])
+        else:
+            flat_list.append(tuple(sublist))
+    return flat_list

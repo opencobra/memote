@@ -693,28 +693,50 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
         cobra.Metabolite(s) matching the mnx_id.
 
     """
+
+    def compare_annotation(annotation):
+        """Return IDs that are METANETX_SHORTLIST and annotation dictionary."""
+        query_values = set(utils.flatten(annotation.values()))
+        ref_values = set(utils.flatten(METANETX_SHORTLIST[mnx_id]))
+        return query_values & ref_values
+
+    # Make sure that the MNX ID we're looking up exists in the metabolite
+    # shortlist.
     if mnx_id not in METANETX_SHORTLIST.columns:
         raise RuntimeError("{} is not in the MetaNetX Shortlist! Make sure "
                            "you typed the ID correctly, if yes, update the "
                            "shortlist by updating and re-running the script "
                            "generate_mnx_shortlists.py.".format(mnx_id))
-
     candidates = []
-    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(mnx_id))
+    # The MNX ID used in the model may or may not be tagged with a compartment
+    # tag e.g. `MNXM23141_c` vs. `MNXM23141`, which is tested with the
+    # following regex.
+    # If the MNX ID itself cannot be found as an ID, we try all other
+    # identifiers that are provided by our shortlist of MetaNetX' mapping
+    # table.
+    regex = re.compile('^{}(_[a-zA-Z0-9]+?)*?$'.format(mnx_id))
     if model.metabolites.query(regex):
         candidates = model.metabolites.query(regex)
+    elif model.metabolites.query(compare_annotation, attribute='annotation'):
+        candidates = model.metabolites.query(
+            compare_annotation, attribute='annotation'
+        )
     else:
         for value in METANETX_SHORTLIST[mnx_id]:
             if value:
                 for ident in value:
-                    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format(ident))
+                    regex = re.compile('^{}(_[a-zA-Z0-9]+?)*?$'.format(ident))
                     if model.metabolites.query(regex, attribute='id'):
                         candidates.extend(
                             model.metabolites.query(regex, attribute='id'))
 
+    # Return a list of all possible candidates if no specific compartment ID
+    # is provided.
+    # Otherwise, just return the candidate in one specific compartment. Raise
+    # an exception if there are more than one possible candidates for a given
+    # compartment.
     if compartment_id is None:
         return candidates
-
     else:
         candidates_in_compartment = \
             [cand for cand in candidates if cand.compartment == compartment_id]
