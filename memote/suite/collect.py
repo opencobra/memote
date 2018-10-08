@@ -66,8 +66,8 @@ class ResultCollectionPlugin(object):
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
         self._exp_config = experimental_config
-        self.results = results = MemoteResult()
-        results.add_environment_information(results.meta)
+        self.results = MemoteResult()
+        self.results.add_environment_information(self.results.meta)
         self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
         self._skip = frozenset() if skip is None else frozenset(skip)
 

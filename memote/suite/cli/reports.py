@@ -243,8 +243,10 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     # successfully.
     if len(loaded_models) < 2:
         LOGGER.critical(
-            "Out of the {} provided models {} could be loaded. Check if the"
-            "models that could not e loaded are valid SBML. Aborting.")
+            "Out of the %d provided models only %d could be loaded. Please, "
+            "check if the models that could not be loaded are valid SBML. "
+            "Aborting.",
+            len(models), len(loaded_models))
         sys.exit(1)
     # Running pytest in individual processes to avoid interference
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
