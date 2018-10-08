@@ -5,6 +5,8 @@ Next Release
 ------------
 * Add a feature to allow suppling a commit range to ``memote history``.
 * Add a test that checks if reactions are annotated with reactome identifiers.
+* Add a feature that allows identifying specific metabolites by matching
+  annotation information against the metabolite shortlist for a given MNX ID.
 
 0.8.6 (2018-09-13)
 ------------------
