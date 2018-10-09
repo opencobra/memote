@@ -150,6 +150,7 @@ def rxn_broken_id(base):
                       'kegg.reaction': "T1068",
                       'ec-code': "4.1.2..13",
                       'brenda': "4.1.2..13",
+                      'reactome': "R-HSAs-70339I",
                       'rhea': ["1472999", "14730", "14731", "ABCD"],
                       'biocyc': ":ECOLI_F16ALDOLASE-RXN",
                       'bigg.reaction': "/:2x_FBA"}
