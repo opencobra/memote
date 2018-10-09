@@ -117,13 +117,13 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
-@click.option("--test-unchanged", default=False, is_flag=True,
-              show_default=True, help="Run memote on commits where "
+@click.option("--skip-unchanged", default=False, is_flag=True,
+              show_default=True, help="Skip memote run on commits where "
               "the model was not changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment, test_unchanged):
+        skip, solver, experimental, custom_tests, deployment, skip_unchanged):
     """
     Run the test suite on a single model and collect results.
 
@@ -152,7 +152,7 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         pytest_args.append("-vv")
     # Check if the model was changed in this commit. Exit `memote run` if this
     # was not the case.
-    if not test_unchanged and repo is not None:
+    if skip_unchanged and repo is not None:
         commit = repo.head.commit
         staged_files = commit.stats.files
         if not basename(

@@ -63,8 +63,8 @@ def test_run_output_TODO(runner, tmpdir):
     # TODO: Check complete template structure.
 
 
-def test_run_test_unchanged_false(runner, mock_repo):
-    """Expect `memote run` to exit when invoked on a commit with no changes."""
+def test_run_skip_unchanged_false(runner, mock_repo):
+    """Expect `memote run` to run when invoked on a commit with no changes."""
     previous_wd = os.getcwd()
     os.chdir(mock_repo[0])
     repo = mock_repo[1]
@@ -74,20 +74,20 @@ def test_run_test_unchanged_false(runner, mock_repo):
     repo.git.checkout('gh-pages')
     number_of_result_files = len(os.listdir(mock_repo[0]+'/results/'))
     os.chdir(previous_wd)
-    assert number_of_result_files == 3
+    assert number_of_result_files == 4
 
 
-def test_run_test_unchanged_true(runner, mock_repo):
-    """Expect `memote run` to run when invoked on a commit with no changes."""
+def test_run_skip_unchanged_true(runner, mock_repo):
+    """Expect `memote run` to skip when invoked on a commit with no changes."""
     previous_wd = os.getcwd()
     os.chdir(mock_repo[0])
     repo = mock_repo[1]
     repo.git.checkout('eb959dd016aaa71fcef96f00b94ce045d6af8f4c')
     result = runner.invoke(cli, ["run", "--location",
-                                 "results/", "--test-unchanged",
+                                 "results/", "--skip-unchanged",
                                  "test.xml"])
     assert result.exit_code == 0
     repo.git.checkout('gh-pages')
     number_of_result_files = len(os.listdir(mock_repo[0]+'/results/'))
     os.chdir(previous_wd)
-    assert number_of_result_files == 4
+    assert number_of_result_files == 3
