@@ -493,7 +493,9 @@ def test_find_met_in_model_accurate_results(
     pytest.param("find_met_incorrect_xref", "MNXM13", "c",
                  marks=pytest.mark.raises(exception=RuntimeError)),
     pytest.param("find_met_incorrect_xref", "MNXM8", "c",
-                 marks=pytest.mark.raises(exception=RuntimeError))
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+    pytest.param("find_met_incorrect_xref", "MNXM123454", "c",
+                 marks=pytest.mark.raises(exception=ValueError))
 ], indirect=["model"])
 def test_find_met_in_model_exceptions(model, mnx_id, compartment_id):
     """Expect the function to raise the correct exceptions."""

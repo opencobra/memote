@@ -695,7 +695,10 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     """
 
     def compare_annotation(annotation):
-        """Return IDs that are METANETX_SHORTLIST and annotation dictionary."""
+        """
+        Return IDs that are in the intersection of METANETX_SHORTLIST and
+        annotation dictionary.
+        """
         query_values = set(utils.flatten(annotation.values()))
         ref_values = set(utils.flatten(METANETX_SHORTLIST[mnx_id]))
         return query_values & ref_values
@@ -703,7 +706,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     # Make sure that the MNX ID we're looking up exists in the metabolite
     # shortlist.
     if mnx_id not in METANETX_SHORTLIST.columns:
-        raise RuntimeError("{} is not in the MetaNetX Shortlist! Make sure "
+        raise ValueError("{} is not in the MetaNetX Shortlist! Make sure "
                            "you typed the ID correctly, if yes, update the "
                            "shortlist by updating and re-running the script "
                            "generate_mnx_shortlists.py.".format(mnx_id))
@@ -714,7 +717,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     # If the MNX ID itself cannot be found as an ID, we try all other
     # identifiers that are provided by our shortlist of MetaNetX' mapping
     # table.
-    regex = re.compile('^{}(_[a-zA-Z0-9]+?)*?$'.format(mnx_id))
+    regex = re.compile('^{}(_[a-zA-Z0-9]+)?$'.format(mnx_id))
     if model.metabolites.query(regex):
         candidates = model.metabolites.query(regex)
     elif model.metabolites.query(compare_annotation, attribute='annotation'):
@@ -725,7 +728,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
         for value in METANETX_SHORTLIST[mnx_id]:
             if value:
                 for ident in value:
-                    regex = re.compile('^{}(_[a-zA-Z0-9]+?)*?$'.format(ident))
+                    regex = re.compile('^{}(_[a-zA-Z0-9]+)?$'.format(ident))
                     if model.metabolites.query(regex, attribute='id'):
                         candidates.extend(
                             model.metabolites.query(regex, attribute='id'))
