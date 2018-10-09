@@ -26,6 +26,56 @@ from memote.suite.reporting import HistoryReport
 from memote.suite.results.result import MemoteResult
 
 
+MOCK_CONFIG_SCORES = {
+        'cards': {
+            'scored': {
+                'sections': {
+                    'scored_sub_section': {
+                        'cases': [
+                            'test_number',
+                            'test_parametrized'
+                        ],
+                        'title': 'Scored Sub Section',
+                        'weight': 1.0
+                    }
+                },
+                'title': 'Core Tests'
+            }
+        },
+        'weights': {
+            'test_number': 1.0
+        }
+    }
+
+
+MOCK_CONFIG = {
+        'cards': {
+            'scored': {
+                'sections': {
+                    'scored_sub_section': {
+                        'cases': [
+                            'test_parametrized'
+                        ],
+                        'title': 'Scored Sub Section',
+                        'weight': 1.0
+                    }
+                },
+                'title': 'Core Tests'
+            },
+            'test_basic': {
+                'cases': [
+                    'test_number'
+                ],
+                'title': 'Basic Information'
+            }
+        },
+        'weights': {
+            'test_number': 1.0,
+            'test_parametrized': 1.0,
+        }
+    }
+
+
 @pytest.fixture(scope="session")
 def mock_history_manager():
     """Build a mock history manager that already contains results."""
@@ -35,7 +85,7 @@ def mock_history_manager():
             "commit_author": "John Doe",
             "commit_hash": "3f4665356a24d76a9461043f62a2b12dab56c75f",
             "packages": {
-                "SomePackate": "0.1.0"},
+                "SomePackage": "0.1.0"},
             "platform": "Darwin",
             "python": "2.7.10",
             "release": "14.5.0",
@@ -85,7 +135,7 @@ def mock_history_manager():
             "commit_author": "John Doe",
             "commit_hash": "6e30d6236f5d47ebb4be39253eaa6a5dcb487687",
             "packages": {
-                "SomePackate": "0.1.0"},
+                "SomePackage": "0.1.0"},
             "platform": "Darwin",
             "python": "2.7.10",
             "release": "14.5.0",
@@ -108,7 +158,7 @@ def mock_history_manager():
                 },
                 "metric": {
                     "parameter1": 1.0,
-                    "parameter2": 1.0
+                    "parameter2": 0.0
                 },
                 "result": {
                     "parameter1": "failed",
@@ -179,33 +229,7 @@ def mock_history_manager():
 def test_structure(mock_history_manager):
     """Expect this one thing to be true."""
     history = mock_history_manager
-    configuration = {
-        'cards': {
-            'scored': {
-                'sections': {
-                    'scored_sub_section': {
-                        'cases': [
-                            'test_parametrized'
-                        ],
-                        'title': 'Scored Sub Section',
-                        'weight': 1.0
-                    }
-                },
-                'title': 'Core Tests'
-            },
-            'test_basic': {
-                'cases': [
-                    'test_number'
-                ],
-                'title': 'Basic Information'
-            }
-        },
-        'weights': {
-            'test_number': 1.0,
-            'test_parametrized': 1.0,
-        }
-    }
-    results = HistoryReport(history, configuration).result
+    results = HistoryReport(history, MOCK_CONFIG).result
 
     assert set(results.keys()) == set(['cards', 'tests', 'score', 'weights'])
     assert set(results["score"].keys()) == set(['total_score'])
@@ -219,3 +243,19 @@ def test_structure(mock_history_manager):
     ) == set(["commit", "metric", "branch", "data", "result"])
     assert set(results["tests"]["test_number"]["history"][0]) == \
         set(["commit", "metric", "branch", "data", "result"])
+
+
+def test_score_param(mock_history_manager):
+    """Expect all scores to be calculated correctly for parametrized tests."""
+    history = mock_history_manager
+    score_collection = HistoryReport(
+        history, MOCK_CONFIG_SCORES).result['score']
+    for score in score_collection["total_score"]["history"]:
+        # Equation for result 1:
+        # ((((1-0.5)+(1-0.9))/2 + (1-0.2)*1)*1)/(1+1*1)*1
+        if score["commit"] == "3f4665356a24d76a9461043f62a2b12dab56c75f":
+            assert score["metric"] == 0.55
+        # Equation for result 2:
+        # ((((1-0)+(1-1))/2 + (1-0.6)*1)*1)/(1+1*1)*1
+        if score["commit"] == "6e30d6236f5d47ebb4be39253eaa6a5dcb487687":
+            assert score["metric"] == 0.45
