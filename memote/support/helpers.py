@@ -693,11 +693,12 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
         cobra.Metabolite(s) matching the mnx_id.
 
     """
-
     def compare_annotation(annotation):
         """
-        Return IDs that are in the intersection of METANETX_SHORTLIST and
-        annotation dictionary.
+        Return annotation IDs that match to METANETX_SHORTLIST references.
+
+        Compares the set of METANETX_SHORTLIST references for a given mnx_id
+        and the annotation IDs stored in a given annotation dictionary.
         """
         query_values = set(utils.flatten(annotation.values()))
         ref_values = set(utils.flatten(METANETX_SHORTLIST[mnx_id]))
@@ -706,10 +707,12 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     # Make sure that the MNX ID we're looking up exists in the metabolite
     # shortlist.
     if mnx_id not in METANETX_SHORTLIST.columns:
-        raise ValueError("{} is not in the MetaNetX Shortlist! Make sure "
-                           "you typed the ID correctly, if yes, update the "
-                           "shortlist by updating and re-running the script "
-                           "generate_mnx_shortlists.py.".format(mnx_id))
+        raise ValueError(
+            "{} is not in the MetaNetX Shortlist! Make sure "
+            "you typed the ID correctly, if yes, update the "
+            "shortlist by updating and re-running the script "
+            "generate_mnx_shortlists.py.".format(mnx_id)
+        )
     candidates = []
     # The MNX ID used in the model may or may not be tagged with a compartment
     # tag e.g. `MNXM23141_c` vs. `MNXM23141`, which is tested with the
