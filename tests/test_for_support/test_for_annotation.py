@@ -102,6 +102,7 @@ def rxn_each_present(base):
                       'kegg.reaction': "R01068",
                       'ec-code': "4.1.2.13",
                       'brenda': "4.1.2.13",
+                      'reactome': "R-HSA-70339",
                       'rhea': ["14729", "14730", "14731", "14732"],
                       'biocyc': "ECOLI:F16ALDOLASE-RXN",
                       'bigg.reaction': "FBA"}
