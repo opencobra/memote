@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import json
 import logging
 from builtins import dict, str
+from six import string_types
 
 from future.utils import raise_with_traceback
 from numpydoc.docscrape import NumpyDocString
@@ -242,11 +243,11 @@ def flatten(list_of_lists):
     """Flatten a list of lists but maintain strings and ints as entries."""
     flat_list = []
     for sublist in list_of_lists:
-        if isinstance(sublist, str) or isinstance(sublist, int):
+        if isinstance(sublist, string_types) or isinstance(sublist, int):
             flat_list.append(sublist)
         elif sublist is None:
             continue
-        elif len(sublist) == 1:
+        elif not isinstance(sublist, string_types) and len(sublist) == 1:
             flat_list.append(sublist[0])
         else:
             flat_list.append(tuple(sublist))

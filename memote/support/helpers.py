@@ -742,6 +742,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     # an exception if there are more than one possible candidates for a given
     # compartment.
     if compartment_id is None:
+        print("compartment_id = None?")
         return candidates
     else:
         candidates_in_compartment = \
