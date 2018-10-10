@@ -22,7 +22,6 @@ from __future__ import absolute_import
 import json
 import logging
 from builtins import dict, str
-from os.path import basename
 from textwrap import TextWrapper
 
 from future.utils import raise_with_traceback
@@ -281,8 +280,4 @@ def is_modified(path, commit):
         Whether or not the given path is among the modified files.
 
     """
-    path = basename(path)
-    return any(path == basename(f) for f in commit.stats.files)
-    # TODO: Checking the full relative path is faster and specifies file
-    # correctly.
-    # return path in commit.stats.files
+    return path in commit.stats.files
