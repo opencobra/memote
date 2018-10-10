@@ -22,16 +22,18 @@ from __future__ import absolute_import
 import json
 import logging
 from builtins import dict, str
-from six import string_types
+from os.path import basename
+from textwrap import TextWrapper
 
 from future.utils import raise_with_traceback
 from numpydoc.docscrape import NumpyDocString
-from textwrap import TextWrapper
+from six import string_types
 from depinfo import print_dependencies
 
 __all__ = ("register_with", "annotate", "get_ids",
            "get_ids_and_bounds", "truncate", "wrapper",
-           "log_json_incompatible_types", "show_versions", "jsonify")
+           "log_json_incompatible_types", "show_versions", "jsonify",
+           "is_modified")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -260,3 +262,27 @@ def flatten(list_of_lists):
         else:
             flat_list.append(tuple(sublist))
     return flat_list
+
+
+def is_modified(path, commit):
+    """
+    Test whether a given file was modified in a specific commit.
+
+    Parameters
+    ----------
+    path : str
+        The path of a file to be checked.
+    commit : git.Commit
+        A git commit object.
+
+    Returns
+    -------
+    bool
+        Whether or not the given path is among the modified files.
+
+    """
+    path = basename(path)
+    return any(path == basename(f) for f in commit.stats.files)
+    # TODO: Checking the full relative path is faster and specifies file
+    # correctly.
+    # return path in commit.stats.files
