@@ -82,7 +82,8 @@ def confusion_matrix(predicted_essential, expected_essential,
         acc = None
     # Compute Matthews correlation coefficient.
     try:
-        mcc = (tp * tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fn))
+        mcc = (tp * tn - fp * fn) /\
+              sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     except ZeroDivisionError:
         mcc = None
     return {
