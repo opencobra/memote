@@ -117,9 +117,9 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
-@click.option("--skip-unchanged", default=False, is_flag=True,
-              show_default=True, help="Skip memote run on commits where "
-              "the model was not changed.")
+@click.option("--skip-unchanged", is_flag=True, show_default=True,
+              help="Skip memote run on commits where the model was not "
+                   "changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
