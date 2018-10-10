@@ -19,9 +19,9 @@
 
 from __future__ import absolute_import
 
-from builtins import str
-from os.path import exists
 import os
+from builtins import str
+from os.path import exists, join
 
 import pytest
 
@@ -69,17 +69,12 @@ def test_run_skip_unchanged_false(runner, mock_repo):
     os.chdir(mock_repo[0])
     repo = mock_repo[1]
     repo.git.checkout('eb959dd016aaa71fcef96f00b94ce045d6af8f4c')
-    result = runner.invoke(cli, ["run", "--location", "results/", "test.xml"])
+    result = runner.invoke(cli, ["run", "--location", "results", "test.xml"])
     assert result.exit_code == 0
     repo.git.checkout('gh-pages')
-    number_of_result_files = len(os.listdir(mock_repo[0]+'/results/'))
+    number_of_result_files = len(os.listdir(join(mock_repo[0], 'results')))
     # Clean up the one commit made to the gh-pages branch.
-    repo.git.reset("HEAD~")
-    # Remove the results file that has been created by `memote run`.
-    os.remove(
-        mock_repo[0] +
-        "/results/eb959dd016aaa71fcef96f00b94ce045d6af8f4c.json"
-    )
+    repo.git.reset("HEAD~", hard=True)
     os.chdir(previous_wd)
     assert number_of_result_files == 4
 
@@ -91,10 +86,10 @@ def test_run_skip_unchanged_true(runner, mock_repo):
     repo = mock_repo[1]
     repo.git.checkout('eb959dd016aaa71fcef96f00b94ce045d6af8f4c')
     result = runner.invoke(cli, ["run", "--location",
-                                 "results/", "--skip-unchanged",
+                                 "results", "--skip-unchanged",
                                  "test.xml"])
     assert result.exit_code == 0
     repo.git.checkout('gh-pages')
-    number_of_result_files = len(os.listdir(mock_repo[0]+'/results/'))
+    number_of_result_files = len(os.listdir(join(mock_repo[0], 'results')))
     os.chdir(previous_wd)
     assert number_of_result_files == 3
