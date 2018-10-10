@@ -24,6 +24,7 @@ from itertools import combinations
 from pylru import lrudecorator
 
 import memote.support.helpers as helpers
+from memote.utils import filter_none
 
 __all__ = ("check_metabolites_formula_presence",)
 
@@ -135,7 +136,7 @@ def find_ngam(model):
                  'ngam', 'non-growth', 'associated']
 
     refined_candidates = [rxn for rxn in candidates if any(
-        string in rxn.name.lower() for string in buzzwords
+        string in filter_none(rxn.name, '').lower() for string in buzzwords
     )]
 
     if refined_candidates:

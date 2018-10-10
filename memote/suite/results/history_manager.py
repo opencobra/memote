@@ -26,6 +26,7 @@ from six import iteritems, iterkeys
 from sqlalchemy.orm.exc import NoResultFound
 
 from memote.suite.results import MemoteResult
+from memote.utils import is_modified
 
 __all__ = ("HistoryManager",)
 
@@ -75,7 +76,7 @@ class HistoryManager(object):
             history = [latest] + list(latest.iter_parents())
             for commit in history:
                 # Find model in committed files.
-                if model not in commit.stats.files:
+                if not is_modified(model, commit):
                     LOGGER.info(
                         "The model was not modified in commit '{}'. "
                         "Skipping.".format(commit))

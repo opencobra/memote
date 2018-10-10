@@ -50,6 +50,8 @@ from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
+from memote.utils import is_modified
+
 
 LOGGER = logging.getLogger()
 click_log.basic_config(LOGGER)
@@ -89,7 +91,7 @@ def cli():
               "the string as an rfc1738 compatible database URL which will be "
               "used to store the test results. Otherwise write to this "
               "directory using the commit hash as the filename.")
-@click.option("--ignore-git", is_flag=True, show_default=True,
+@click.option("--ignore-git", is_flag=True,
               help="Avoid checking the git repository status.")
 @click.option("--pytest-args", "-a", callback=callbacks.validate_pytest_args,
               help="Any additional arguments you want to pass to pytest. "
@@ -117,10 +119,13 @@ def cli():
 @click.option("--deployment", default="gh-pages", show_default=True,
               help="Results will be read from and committed to the given "
                    "branch.")
+@click.option("--skip-unchanged", is_flag=True,
+              help="Skip memote run on commits where the model was not "
+                   "changed.")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL", callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment):
+        skip, solver, experimental, custom_tests, deployment, skip_unchanged):
     """
     Run the test suite on a single model and collect results.
 
@@ -147,8 +152,18 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         pytest_args = ["--tb", "short"] + pytest_args
     if not any(is_verbose(a) for a in pytest_args):
         pytest_args.append("-vv")
+    # Check if the model was changed in this commit. Exit `memote run` if this
+    # was not the case.
+    if skip_unchanged and repo is not None:
+        commit = repo.head.commit
+        if not is_modified(model, commit):
+            LOGGER.info("The model was not modified in commit '%s'. Skipping.",
+                        commit.hexsha)
+            sys.exit(0)
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
+    # Check if the model can be loaded at all.
+    model = callbacks.validate_model(None, None, model)
     model.solver = solver
     code, result = api.test_model(
         model=model, results=True, pytest_args=pytest_args, skip=skip,
@@ -159,9 +174,19 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             manager.store(result, filename=filename)
         else:
             LOGGER.info("Checking out deployment branch.")
-            previous = repo.active_branch
-            previous_cmt = previous.commit
-            repo.heads[deployment].checkout()
+            # If the repo HEAD is pointing to the most recent branch then
+            # GitPython's `repo.active_branch` works. Yet, if the repo is in
+            # detached HEAD state, i.e., when a user has checked out a specific
+            # commit as opposed to a branch, this won't work and throw a
+            # `TypeError`, which we are circumventing below.
+            try:
+                previous = repo.active_branch
+                previous_cmt = previous.commit
+                is_branch = True
+            except TypeError:
+                previous_cmt = repo.head.commit
+                is_branch = False
+            repo.git.checkout(deployment)
             try:
                 manager = SQLResultManager(repository=repo, location=location)
             except (AttributeError, ArgumentError):
@@ -172,7 +197,10 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             repo.git.add(".")
             repo.index.commit(
                 "chore: add result for {}".format(previous_cmt.hexsha))
-            previous.checkout()
+            if is_branch:
+                previous.checkout()
+            else:
+                repo.commit(previous_cmt)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -322,7 +350,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         cmt = repo.commit(commit)
         # Rewrite to full length hexsha.
         commit = cmt.hexsha
-        if model not in cmt.stats.files:
+        if not is_modified(model, cmt):
             LOGGER.info(
                 "The model was not modified in commit '{}'. "
                 "Skipping.".format(commit))

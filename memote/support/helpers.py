@@ -318,9 +318,8 @@ def find_biomass_reaction(model):
 
     biomass_met = []
     for met in model.metabolites:
-        if met.id.lower().startswith('biomass') or met.name.lower().startswith(
-            'biomass'
-        ):
+        if 'biomass' in met.id.lower() or (
+                met.name is not None and 'biomass' in met.name.lower()):
             biomass_met.append(met)
     if biomass_met == 1:
         biomass_met_matches = set(

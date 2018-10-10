@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from builtins import str
 from os.path import basename
 from shutil import copyfile
+from git import Repo
 
 import pytest
 from click.testing import CliRunner
@@ -36,3 +37,15 @@ def model_file(small_file, tmpdir_factory):
         basename(small_file)))
     copyfile(small_file, filename)
     return filename
+
+
+@pytest.fixture(scope="session")
+def mock_repo(tmpdir_factory):
+    """
+    Clones the mock repo https://github.com/ChristianLieven/memote-mock-repo.
+
+    """
+    path = str(tmpdir_factory.mktemp("mock-repo"))
+    repo = Repo.clone_from(
+        'https://github.com/ChristianLieven/memote-mock-repo.git', path)
+    return path, repo
