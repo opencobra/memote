@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import pandas as pd
 
 
-def read_tabular(filename):
+def read_tabular(filename, dtype_conversion=None):
     """
     Read a tabular data file which can be CSV, TSV, XLS or XLSX.
 
@@ -30,6 +30,8 @@ def read_tabular(filename):
     ----------
     filename : str or pathlib.Path
         The full file path. May be a compressed file.
+    dtype_conversion : dict
+        Column names as keys and corresponding type for loading the data.
 
     Returns
     -------
@@ -37,15 +39,18 @@ def read_tabular(filename):
         The data table.
 
     """
+    if dtype_conversion is None:
+        dtype_conversion = {}
     name, ext = filename.split(".", 1)
     ext = ext.lower()
     # Completely empty columns are interpreted as float by default.
+    dtype_conversion["comment"] = str
     if "csv" in ext:
-        df = pd.read_csv(filename, dtype={"comment": str}, encoding="utf-8")
+        df = pd.read_csv(filename, dtype=dtype_conversion, encoding="utf-8")
     elif "tsv" in ext:
-        df = pd.read_table(filename, dtype={"comment": str}, encoding="utf-8")
+        df = pd.read_table(filename, dtype=dtype_conversion, encoding="utf-8")
     elif "xls" in ext or "xlsx" in ext:
-        df = pd.read_excel(filename, dtype={"comment": str}, encoding="utf-8")
+        df = pd.read_excel(filename, dtype=dtype_conversion, encoding="utf-8")
     # TODO: Add a function to parse ODS data into a pandas data frame.
     else:
         raise ValueError("Unknown file format '{}'.".format(ext))

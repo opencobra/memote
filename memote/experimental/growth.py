@@ -46,6 +46,13 @@ class GrowthExperiment(Experiment):
         """
         super(GrowthExperiment, self).__init__(**kwargs)
 
+    def load(self, dtype_conversion=None):
+        """Load the data table and corresponding validation schema."""
+        if dtype_conversion is None:
+            dtype_conversion = {"growth": str}
+        super(GrowthExperiment, self).load(dtype_conversion=dtype_conversion)
+        self.data["growth"] = self.data["growth"].isin(self.TRUTHY)
+
     def evaluate(self, model, threshold=0.1):
         """Evaluate in silico growth rates."""
         with model:

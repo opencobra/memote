@@ -48,6 +48,14 @@ class EssentialityExperiment(Experiment):
         """
         super(EssentialityExperiment, self).__init__(**kwargs)
 
+    def load(self, dtype_conversion=None):
+        """Load the data table and corresponding validation schema."""
+        if dtype_conversion is None:
+            dtype_conversion = {"essential": str}
+        super(EssentialityExperiment, self).load(
+            dtype_conversion=dtype_conversion)
+        self.data["essential"] = self.data["essential"].isin(self.TRUTHY)
+
     def validate(self, model, checks=[]):
         """Use a defined schema to validate the medium table format."""
         custom = [
