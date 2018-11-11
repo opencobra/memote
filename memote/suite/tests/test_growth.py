@@ -30,7 +30,17 @@ import pytest
 from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
 
-GROWTH_DATA = list(pytest.memote.experimental.growth)
+
+# As a workaround for the auto-documentation where the memote namespace
+# doesn't exist.
+GROWTH_DATA = list(
+    getattr(
+        getattr(
+            getattr(
+                pytest, "memote", None),
+            "experimental", None),
+        "growth", [])
+)
 
 
 @pytest.mark.skipif(len(GROWTH_DATA) == 0,

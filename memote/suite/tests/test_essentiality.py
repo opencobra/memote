@@ -30,7 +30,17 @@ import pytest
 from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
 
-ESSENTIALITY_DATA = list(pytest.memote.experimental.essentiality)
+
+# As a workaround for the auto-documentation where the memote namespace
+# doesn't exist.
+ESSENTIALITY_DATA = list(
+    getattr(
+        getattr(
+            getattr(
+                pytest, "memote", None),
+            "experimental", None),
+        "essentiality", [])
+)
 
 
 @pytest.mark.skipif(len(ESSENTIALITY_DATA) == 0,

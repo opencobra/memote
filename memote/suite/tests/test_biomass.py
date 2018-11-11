@@ -36,7 +36,9 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 
 
 LOGGER = logging.getLogger(__name__)
-BIOMASS_IDS = pytest.memote.biomass_ids
+# As a workaround for the auto-documentation where the memote namespace
+# doesn't exist.
+BIOMASS_IDS = getattr(getattr(pytest, "memote", None), "biomass_ids", [])
 
 
 @annotate(title="Biomass Reactions Identified", format_type="count")
