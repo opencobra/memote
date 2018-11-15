@@ -19,9 +19,9 @@
 
 from __future__ import absolute_import
 
-from equilibrator_api import ComponentContribution, Reaction, ReactionMatcher
+from equilibrator_api import Reaction
 from six import string_types
-from memote.support import helpers
+
 
 def smallest_compound_ID(kegg_ann_list):
     """
@@ -38,9 +38,10 @@ def smallest_compound_ID(kegg_ann_list):
     """
     only_cIDs = [x for x in kegg_ann_list if "C" in x]
     only_cIDs.sort(key=lambda x: int(x.lstrip('C')))
-    return only_cIDs[0]
+    return only_cIDs
 
-def get_equilibrator_rxn_string(rxn):
+
+def get_equilibrator_rxn_string(rxn, compound_matcher):
     """
     Return a reaction string with at least a partial mapping to KEGG IDs.
 
@@ -65,15 +66,93 @@ def get_equilibrator_rxn_string(rxn):
             kegg_rxn = kegg_rxn.replace(met.id, kegg_ann_id)
         elif type(kegg_ann_id) is list and any("C" in s for s in kegg_ann_id):
             kegg_rxn = kegg_rxn.replace(
-                met.id, smallest_compound_ID(kegg_ann_id)
+                met.id, smallest_compound_ID(kegg_ann_id)[0]
             )
         else:
             try:
-                df = cm.match(met.name)
+                df = compound_matcher.match(met.name)
                 kegg_match_id = df['CID'].iloc[0]
                 kegg_rxn = kegg_rxn.replace(met.id, kegg_match_id)
-            except:
+            except Exception as e:
                 pass
     # COBRApy reaction strings seem to use slightly different arrows which
     # are not recognized by the eQuilibrator-API
     return kegg_rxn.replace('-->', '->').replace('<--', '<-')
+
+
+def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
+    """
+    Return reactions whose reversibilities do not agree with thermodynamics.
+
+    This function checks if the reversibility attribute of each reaction
+    in a list of cobrapy reactions agrees with a thermodynamics-based
+    calculation of the reversibility. To determine reversibility we calculate
+    the reversibility index lngamma (see [1]_ section 3.5) of each reaction
+    using the eQuilibrator API [2]_. The default cutoff for lngamma
+    "corresponds to allowing concentrations to span three orders of magnitude
+    around 100 μM (~3 μM—3mM)" at "pH = 7, I = 0.1M and T = 298K" (see [1]_
+    supplement section 3).
+
+    Parameters
+    ----------
+        reactions: list of cobra.Reactions
+            A list of reactions to be checked for agreement with
+            thermodynamics-based calculations of reversibility.
+        lngamma: integer
+            Log-scale, symmetric range of metabolite concentrations around the
+            assumed average of 100µM. A threshold of 3 means that a
+            reaction is considered irreversible if the concentration of an
+            individual metabolite would have to change more than three orders
+            of magnitude i.e. from 3µM to 3mM to reverse the direction of flux.
+
+    Returns
+    -------
+        incorrect_reversibility: list of cobra.Reactions
+            A list of reactions whose reversibility does not agree
+            with thermodynamic calculation.
+        incomplete_mapping: list of cobra.Reactions
+            A list of reactions which contain at least one metabolite that
+            could not be mapped to KEGG on the basis of its annotation or name.
+        problematic_calculation: list of cobra.Reactions
+            A list of reactions for which it is not possible to calculate the
+            standard change in Gibbs potential. Reasons of failure include that
+            participating metabolites cannot be broken down with the group
+            contribution method.
+        unbalanced: list of cobra.Reactions
+            A list of reactions that are not chemically or redox balanced.
+
+
+    References
+    ----------
+    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
+           "Detection of Stoichiometric Inconsistencies in Biomolecular
+           Models."
+           Bioinformatics 24, no. 19 (2008): 2245.
+    .. [2] https://gitlab.com/elad.noor/equilibrator-api/tree/master
+
+    """
+    incomplete_mapping = list()
+    problematic_calculation = list()
+    incorrect_reversibility = list()
+    unbalanced = list()
+
+    for rxn in reactions:
+        try:
+            eq_rxn = Reaction.parse_formula(get_equilibrator_rxn_string(rxn))
+        except Exception:
+            incomplete_mapping.append(rxn)
+            continue
+        if eq_rxn.check_full_reaction_balancing():
+            try:
+                ln_RI = eq_rxn.reversibility_index()
+            except Exception:
+                problematic_calculation.append(rxn)
+                continue
+            if (ln_RI < lngamma) != rxn.reversibility:
+                incorrect_reversibility.append(rxn)
+            else:
+                continue
+        else:
+            unbalanced.append(rxn)
+
+    return incorrect_reversibility, incomplete_mapping, problematic_calculation, unbalanced
