@@ -59,6 +59,7 @@ cards:
     - test_gene_protein_reaction_rule_presence
     - test_find_pure_metabolic_reactions
     - test_find_constrained_pure_metabolic_reactions
+    - test_find_incorrect_thermodynamic_reversibility
     - test_find_duplicate_reactions
     - test_find_transport_reactions
     - test_find_constrained_transport_reactions
