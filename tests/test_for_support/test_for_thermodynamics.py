@@ -90,7 +90,7 @@ def no_annotation_matching():
 @register_with(REACTION_REGISTRY)
 def no_annotation_not_matching():
     """Provide a reaction where one met maps to several KEGG IDs."""
-    c = cobra.Metabolite("whack_c", name="Whack" , compartment="c")
+    c = cobra.Metabolite("whack_c", name="Whack", compartment="c")
     d = cobra.Metabolite("odd_c", name="Odd", compartment="c")
     e = cobra.Metabolite("unknown_c", compartment="c")
     r = cobra.Reaction("Foreign")

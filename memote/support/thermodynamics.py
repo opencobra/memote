@@ -161,4 +161,5 @@ def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
         else:
             unbalanced.append(rxn)
 
-    return incorrect_reversibility, incomplete_mapping, problematic_calculation, unbalanced
+    return(incorrect_reversibility, incomplete_mapping,
+           problematic_calculation, unbalanced)
