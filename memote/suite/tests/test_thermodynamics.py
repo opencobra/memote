@@ -21,8 +21,7 @@ from __future__ import absolute_import, division
 
 import memote.support.thermodynamics as thermo
 import memote.support.basic as basic
-from memote.utils import (
-    annotate, get_ids, get_ids_and_bounds, truncate, wrapper)
+from memote.utils import (annotate, get_ids, truncate)
 
 
 @annotate(title="Thermodynamic Reversibility of Purely Metabolic Reactions",
