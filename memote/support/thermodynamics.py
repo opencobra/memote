@@ -15,12 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Supporting functions for checks requiring the eQuilibrator-API."""
+"""Supporting functions for checks requiring the eQuilibrator API."""
 
 from __future__ import absolute_import
 
-from equilibrator_api import Reaction
+from equilibrator_api import Reaction, CompoundMatcher
 from six import string_types
+
+
+COMPOUND_MATCHER = CompoundMatcher()
 
 
 def smallest_compound_ID(kegg_ann_list):
@@ -41,7 +44,7 @@ def smallest_compound_ID(kegg_ann_list):
     return only_cIDs
 
 
-def get_equilibrator_rxn_string(rxn, compound_matcher):
+def get_equilibrator_rxn_string(rxn):
     """
     Return a reaction string with at least a partial mapping to KEGG IDs.
 
@@ -68,12 +71,14 @@ def get_equilibrator_rxn_string(rxn, compound_matcher):
             kegg_rxn = kegg_rxn.replace(
                 met.id, smallest_compound_ID(kegg_ann_id)[0]
             )
+        elif not getattr(met, "name"):
+            continue
         else:
             try:
-                df = compound_matcher.match(met.name)
+                df = COMPOUND_MATCHER.match(getattr(met, "name", None))
                 kegg_match_id = df['CID'].iloc[0]
                 kegg_rxn = kegg_rxn.replace(met.id, kegg_match_id)
-            except Exception as e:
+            except Exception:
                 pass
     # COBRApy reaction strings seem to use slightly different arrows which
     # are not recognized by the eQuilibrator-API
@@ -124,10 +129,11 @@ def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
 
     References
     ----------
-    .. [1] Gevorgyan, A., M. G Poolman, and D. A Fell.
-           "Detection of Stoichiometric Inconsistencies in Biomolecular
-           Models."
-           Bioinformatics 24, no. 19 (2008): 2245.
+    .. [1] Elad Noor, Arren Bar-Even, Avi Flamholz, Yaniv Lubling, Dan Davidi,
+           Ron Milo; An integrated open framework for thermodynamics of
+           reactions that combines accuracy and coverage, Bioinformatics,
+           Volume 28, Issue 15, 1 August 2012, Pages 2037–2044,
+           https://doi.org/10.1093/bioinformatics/bts317
     .. [2] https://gitlab.com/elad.noor/equilibrator-api/tree/master
 
     """
