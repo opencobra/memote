@@ -19,11 +19,14 @@
 
 from __future__ import absolute_import
 
-from equilibrator_api import Reaction, CompoundMatcher
+from sys import version_info
+
 from six import string_types
 
 
-COMPOUND_MATCHER = CompoundMatcher()
+if version_info[:2] >= (3, 5):
+    from equilibrator_api import Reaction, CompoundMatcher
+    COMPOUND_MATCHER = CompoundMatcher()
 
 
 def smallest_compound_ID(kegg_ann_list):
