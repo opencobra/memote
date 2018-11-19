@@ -32,6 +32,9 @@ def read_tabular(filename, dtype_conversion=None):
         The full file path. May be a compressed file.
     dtype_conversion : dict
         Column names as keys and corresponding type for loading the data.
+        Please take a look at the `pandas documentation
+        <https://pandas.pydata.org/pandas-docs/stable/io.html#specifying-column-data-types>`__
+        for detailed explanations.
 
     Returns
     -------

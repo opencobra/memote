@@ -47,7 +47,18 @@ class GrowthExperiment(Experiment):
         super(GrowthExperiment, self).__init__(**kwargs)
 
     def load(self, dtype_conversion=None):
-        """Load the data table and corresponding validation schema."""
+        """
+        Load the data table and corresponding validation schema.
+
+        Parameters
+        ----------
+        dtype_conversion : dict
+            Column names as keys and corresponding type for loading the data.
+            Please take a look at the `pandas documentation
+            <https://pandas.pydata.org/pandas-docs/stable/io.html#specifying-column-data-types>`__
+            for detailed explanations.
+
+        """
         if dtype_conversion is None:
             dtype_conversion = {"growth": str}
         super(GrowthExperiment, self).load(dtype_conversion=dtype_conversion)

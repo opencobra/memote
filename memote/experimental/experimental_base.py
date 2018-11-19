@@ -70,7 +70,18 @@ class ExperimentalBase(object):
         self.schema = None
 
     def load(self, dtype_conversion=None):
-        """Load the data table and corresponding validation schema."""
+        """
+        Load the data table and corresponding validation schema.
+
+        Parameters
+        ----------
+        dtype_conversion : dict
+            Column names as keys and corresponding type for loading the data.
+            Please take a look at the `pandas documentation
+            <https://pandas.pydata.org/pandas-docs/stable/io.html#specifying-column-data-types>`__
+            for detailed explanations.
+
+        """
         self.data = read_tabular(self.filename, dtype_conversion)
         with open_text(memote.experimental.schemata, self.SCHEMA,
                        encoding="utf-8") as file_handle:
