@@ -29,7 +29,7 @@ if version_info[:2] >= (3, 5):
     COMPOUND_MATCHER = CompoundMatcher()
 
 
-def smallest_compound_ID(kegg_ann_list):
+def smallest_compound_id(kegg_ann_list):
     """
     Return an ascending list filtered to contain only KEGG compound IDs.
 
@@ -42,12 +42,12 @@ def smallest_compound_ID(kegg_ann_list):
         A list of mixed KEGG IDs.
 
     """
-    only_cIDs = [x for x in kegg_ann_list if "C" in x]
-    only_cIDs.sort(key=lambda x: int(x.lstrip('C')))
+    only_compound_ids = [x for x in kegg_ann_list if x.startswith("C")]
+    only_compound_ids.sort(key=lambda x: int(x.lstrip('C')))
     return only_cIDs
 
 
-def get_equilibrator_rxn_string(rxn):
+def get_equilibrator_reaction_string(reaction):
     """
     Return a reaction string with at least a partial mapping to KEGG IDs.
 
@@ -74,7 +74,7 @@ def get_equilibrator_rxn_string(rxn):
             kegg_rxn = kegg_rxn.replace(
                 met.id, smallest_compound_ID(kegg_ann_id)[0]
             )
-        elif not getattr(met, "name"):
+        elif not met.name:
             continue
         else:
             try:
@@ -88,7 +88,7 @@ def get_equilibrator_rxn_string(rxn):
     return kegg_rxn.replace('-->', '->').replace('<--', '<-')
 
 
-def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
+def find_incorrect_thermodynamic_reversibility(reactions, ln_gamma=3):
     u"""
     Return reactions whose reversibilities do not agree with thermodynamics.
 
@@ -98,7 +98,7 @@ def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
     the reversibility index lngamma (see [1]_ section 3.5) of each reaction
     using the eQuilibrator API [2]_. The default cutoff for lngamma
     "corresponds to allowing concentrations to span three orders of magnitude
-    around 100 μM (~3 μM—3mM)" at "pH = 7, I = 0.1M and T = 298K" (see [1]_
+    around 100 μM (~3 μM—3 mM)" at "pH = 7, I = 0.1 M and T = 298 K" (see [1]_
     supplement section 3).
 
     Parameters
