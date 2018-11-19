@@ -44,7 +44,7 @@ def smallest_compound_id(kegg_ann_list):
     """
     only_compound_ids = [x for x in kegg_ann_list if x.startswith("C")]
     only_compound_ids.sort(key=lambda x: int(x.lstrip('C')))
-    return only_cIDs
+    return only_compound_ids
 
 
 def get_equilibrator_reaction_string(reaction):
@@ -65,14 +65,14 @@ def get_equilibrator_reaction_string(reaction):
         The metabolic reaction under investigation.
 
     """
-    kegg_rxn = rxn.reaction
-    for met in rxn.metabolites:
+    kegg_rxn = reaction.reaction
+    for met in reaction.metabolites:
         kegg_ann_id = met.annotation.get("kegg.compound")
         if isinstance(kegg_ann_id, string_types) and "C" in kegg_ann_id:
             kegg_rxn = kegg_rxn.replace(met.id, kegg_ann_id)
         elif type(kegg_ann_id) is list and any("C" in s for s in kegg_ann_id):
             kegg_rxn = kegg_rxn.replace(
-                met.id, smallest_compound_ID(kegg_ann_id)[0]
+                met.id, smallest_compound_id(kegg_ann_id)[0]
             )
         elif not met.name:
             continue
@@ -95,23 +95,29 @@ def find_incorrect_thermodynamic_reversibility(reactions, ln_gamma=3):
     This function checks if the reversibility attribute of each reaction
     in a list of cobrapy reactions agrees with a thermodynamics-based
     calculation of the reversibility. To determine reversibility we calculate
-    the reversibility index lngamma (see [1]_ section 3.5) of each reaction
-    using the eQuilibrator API [2]_. The default cutoff for lngamma
+    the reversibility index ln_gamma (see [1]_ section 3.5) of each reaction
+    using the eQuilibrator API [2]_. The default cutoff for ln_gamma
     "corresponds to allowing concentrations to span three orders of magnitude
     around 100 μM (~3 μM—3 mM)" at "pH = 7, I = 0.1 M and T = 298 K" (see [1]_
-    supplement section 3).
+    supplement section 3). Here pH denotes the negative base 10 logarithm of
+    the activity of the hydrogen ion i.e. a measure of acidity/ basicity of an
+    aqueous solution, I denotes the molar ionic strength which is a measure of
+    the concentration of ions in a solution, lastly, T denotes the
+    thermodynamic temperature also called absolute temperature measured in
+    Kelvin.
 
     Parameters
     ----------
         reactions: list of cobra.Reactions
             A list of reactions to be checked for agreement with
             thermodynamics-based calculations of reversibility.
-        lngamma: integer
+        ln_gamma: integer
             Log-scale, symmetric range of metabolite concentrations around the
-            assumed average of 100µM. A threshold of 3 means that a
+            assumed average of 100 µM. A threshold of 3 means that a
             reaction is considered irreversible if the concentration of an
             individual metabolite would have to change more than three orders
-            of magnitude i.e. from 3µM to 3mM to reverse the direction of flux.
+            of magnitude i.e. from 3 µM to 3 mM to reverse the direction of
+            flux.
 
     Returns
     -------
@@ -147,17 +153,19 @@ def find_incorrect_thermodynamic_reversibility(reactions, ln_gamma=3):
 
     for rxn in reactions:
         try:
-            eq_rxn = Reaction.parse_formula(get_equilibrator_rxn_string(rxn))
+            eq_rxn = Reaction.parse_formula(
+                get_equilibrator_reaction_string(rxn)
+            )
         except Exception:
             incomplete_mapping.append(rxn)
             continue
         if eq_rxn.check_full_reaction_balancing():
             try:
-                ln_RI = eq_rxn.reversibility_index()
+                ln_rev_index = eq_rxn.reversibility_index()
             except Exception:
                 problematic_calculation.append(rxn)
                 continue
-            if (ln_RI < lngamma) != rxn.reversibility:
+            if (ln_rev_index < ln_gamma) != rxn.reversibility:
                 incorrect_reversibility.append(rxn)
             else:
                 continue
