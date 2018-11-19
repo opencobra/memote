@@ -89,7 +89,7 @@ def get_equilibrator_rxn_string(rxn):
 
 
 def find_incorrect_thermodynamic_reversibility(reactions, lngamma=3):
-    """
+    u"""
     Return reactions whose reversibilities do not agree with thermodynamics.
 
     This function checks if the reversibility attribute of each reaction

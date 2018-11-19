@@ -27,15 +27,15 @@ if version_info[:2] < (3, 5):
     pytest.skip("Thermodynamic tests require at least Python version 3.5.",
                 allow_module_level=True)
 
-import memote.support.thermodynamics as thermo
-import memote.support.basic as basic
-from memote.utils import (annotate, get_ids, truncate)
+import memote.support.thermodynamics as thermo # noqa
+import memote.support.basic as basic # noqa
+from memote.utils import (annotate, get_ids, truncate) # noqa
 
 
 @annotate(title="Thermodynamic Reversibility of Purely Metabolic Reactions",
           format_type="percent")
 def test_find_incorrect_thermodynamic_reversibility(read_only_model):
-    """
+    u"""
     Expect reversibility of metabolic reactions to agree with thermodynamics.
 
     If a reaction is neither a transport reaction, a biomass reaction nor a
