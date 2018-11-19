@@ -127,7 +127,7 @@ def problematic_metabolites():
     (["G12322"], [])])
 def test_smallest_compound_ID(input, expected):
     """Expect shortened and sorted list to be returned correctly."""
-    assert thermo.smallest_compound_ID(input) == expected
+    assert thermo.smallest_compound_id(input) == expected
 
 
 @pytest.mark.parametrize("reaction, expected", [
@@ -138,7 +138,7 @@ def test_smallest_compound_ID(input, expected):
     indirect=["reaction"])
 def test_get_equilibrator_rxn_string(reaction, expected):
     """Expect KEGG reaction string to match the expectation."""
-    eq_rxn_string = thermo.get_equilibrator_rxn_string(reaction)
+    eq_rxn_string = thermo.get_equilibrator_reaction_string(reaction)
     assert eq_rxn_string == expected
 
 
