@@ -19,8 +19,14 @@
 
 from __future__ import absolute_import
 
+from sys import version_info
+
 import cobra
 import pytest
+
+if version_info[:2] < (3, 5):
+    pytest.skip("Thermodynamic tests require at least Python version 3.5.",
+                allow_module_level=True)
 
 import memote.support.thermodynamics as thermo
 from memote.utils import register_with
