@@ -47,42 +47,59 @@ def smallest_compound_id(kegg_ann_list):
     return only_compound_ids
 
 
-def get_equilibrator_reaction_string(reaction):
+def get_metabolite_mapping(reactions):
     """
-    Return a reaction string with at least a partial mapping to KEGG IDs.
+    Return dictionary that maps model IDs to KEGG compound IDs if available.
 
     First see if there is an unambiguous mapping to a single KEGG compound ID
     provided with the model. If not, check if there is any KEGG compound ID in
     a list of mappings. KEGG IDs may map to compounds, drugs and glycans. KEGG
     compound IDs are sorted so we keep the lowest that is there. If none of
     this works try mapping to KEGG via the CompoundMatcher by the name of the
-    metabolite. If the metabolite cannot be mapped we simply don't replace it
-    in the original reaction string.
-
-    Parameters
-    ----------
-    rxn: cobra.Reaction
-        The metabolic reaction under investigation.
-
+    metabolite. If the metabolite cannot be mapped at all we simply map it back
+    to its own ID.
     """
-    kegg_rxn = reaction.reaction
-    for met in reaction.metabolites:
+    mets = set([met for rxn in reactions for met in rxn.metabolites])
+    kegg_mapping_dict = {}
+    for met in mets:
         kegg_ann_id = met.annotation.get("kegg.compound")
         if isinstance(kegg_ann_id, string_types) and "C" in kegg_ann_id:
-            kegg_rxn = kegg_rxn.replace(met.id, kegg_ann_id)
+            kegg_mapping_dict[met.id] = kegg_ann_id
         elif type(kegg_ann_id) is list and any("C" in s for s in kegg_ann_id):
-            kegg_rxn = kegg_rxn.replace(
-                met.id, smallest_compound_id(kegg_ann_id)[0]
-            )
+            kegg_mapping_dict[met.id] = smallest_compound_id(kegg_ann_id)[0]
         elif not met.name:
-            continue
+            kegg_mapping_dict[met.id] = met.id
         else:
             try:
                 df = COMPOUND_MATCHER.match(getattr(met, "name", None))
                 kegg_match_id = df['CID'].iloc[0]
-                kegg_rxn = kegg_rxn.replace(met.id, kegg_match_id)
+                kegg_mapping_dict[met.id] = kegg_match_id
             except Exception:
-                pass
+                kegg_mapping_dict[met.id] = met.id
+    return kegg_mapping_dict
+
+
+def get_equilibrator_reaction_string(reaction, mapping_dict):
+    """
+    Return a reaction string with at least a partial mapping to KEGG IDs.
+
+    Parameters
+    ----------
+    reaction: cobra.Reaction
+        The metabolic reaction under investigation.
+    mapping_dict: dict
+        A simple dictionary which provides a 1:1 mapping of metabolite IDs in
+        the model to KEGG compound IDs if available.
+
+    """
+    kegg_rxn_list = reaction.reaction.split(" ")
+
+    for index, met_id in enumerate(kegg_rxn_list):
+        try:
+            kegg_rxn_list[index] = mapping_dict[met_id]
+        except KeyError:
+            pass
+    kegg_rxn = ' '.join(kegg_rxn_list)
     # COBRApy reaction strings seem to use slightly different arrows which
     # are not recognized by the eQuilibrator-API
     return kegg_rxn.replace('-->', '->').replace('<--', '<-')
@@ -150,11 +167,12 @@ def find_incorrect_thermodynamic_reversibility(reactions, ln_gamma=3):
     problematic_calculation = list()
     incorrect_reversibility = list()
     unbalanced = list()
+    mapping_dict = get_metabolite_mapping(reactions)
 
     for rxn in reactions:
         try:
             eq_rxn = Reaction.parse_formula(
-                get_equilibrator_reaction_string(rxn)
+                get_equilibrator_reaction_string(rxn, mapping_dict)
             )
         except Exception:
             incomplete_mapping.append(rxn)

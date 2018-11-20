@@ -138,7 +138,8 @@ def test_smallest_compound_ID(input, expected):
     indirect=["reaction"])
 def test_get_equilibrator_rxn_string(reaction, expected):
     """Expect KEGG reaction string to match the expectation."""
-    eq_rxn_string = thermo.get_equilibrator_reaction_string(reaction)
+    mapping_dict = thermo.get_metabolite_mapping([reaction])
+    eq_rxn_string = thermo.get_equilibrator_reaction_string(reaction, mapping_dict)
     assert eq_rxn_string == expected
 
 
