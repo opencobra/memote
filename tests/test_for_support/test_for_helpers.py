@@ -290,11 +290,11 @@ def find_met_id(base):
     g = cobra.Metabolite("cpd00010", compartment='c')
     # ADP - Cryptic ID - MNX ID in the annotation
     h = cobra.Metabolite("OVER9000_c0", compartment='c')
-    h.annotation = {"metanetx.chemical":"MNXM7"}
+    h.annotation = {"metanetx.chemical": "MNXM7"}
     # Proton - Cryptic ID - Chebi array in the annotation
     i = cobra.Metabolite("x12", compartment='c')
-    i.annotation = {"chebi":["15378", "10744", "13357", "5584",
-                             "24636", "29233", "29234"]}
+    i.annotation = {"chebi": ["15378", "10744", "13357", "5584",
+                              "24636", "29233", "29234"]}
     base.add_metabolites([a, b, c, d, e, f, g, h, i])
     return base
 
@@ -416,6 +416,7 @@ def biomass_metabolite(base):
     base.add_reactions([rxn1, rxn2])
     return base
 
+
 @register_with(REACTION_REGISTRY)
 def transport_reaction_true():
     """Provide a transport reaction identifiable through met annotations"""
@@ -427,6 +428,7 @@ def transport_reaction_true():
     r.add_metabolites({a: -1, b: 1})
     return r
 
+
 @register_with(REACTION_REGISTRY)
 def transport_reaction_missing_annotation():
     """Provide a transport reaction identifiable through met annotations"""
@@ -435,6 +437,7 @@ def transport_reaction_missing_annotation():
     r = cobra.Reaction("Transporter_Missing_Ann")
     r.add_metabolites({a: -1, b: 1})
     return r
+
 
 @register_with(REACTION_REGISTRY)
 def transport_reaction_missing_values():
@@ -446,6 +449,7 @@ def transport_reaction_missing_values():
     r = cobra.Reaction("Transporter_Missing_Values")
     r.add_metabolites({a: -1, b: 1})
     return r
+
 
 @register_with(REACTION_REGISTRY)
 def transport_reaction_false():
@@ -461,6 +465,7 @@ def transport_reaction_false():
     r = cobra.Reaction("ElectronTransfer")
     r.add_metabolites({a: -1, b: 1, c: -1, d: 1})
     return r
+
 
 @pytest.mark.parametrize("model, num", [
     ("uni_anti_symport_formulae", 3),
@@ -600,6 +605,7 @@ def test_find_biomass_reaction(model, expected):
     Expect the biomass reaction to be identified correctly.
     """
     assert len(helpers.find_biomass_reaction(model)) == expected
+
 
 @pytest.mark.parametrize("reaction, boolean", [
     ("transport_reaction_true", True),
