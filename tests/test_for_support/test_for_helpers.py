@@ -219,8 +219,8 @@ def energy_transfer_annotations(base):
 @register_with(MODEL_REGISTRY)
 def labeled_reaction(base):
     """Provide a model with a labeled transport reaction."""
-    a = cobra.Metabolite("a")
-    b = cobra.Metabolite("b")
+    a = cobra.Metabolite("a", compartment="c")
+    b = cobra.Metabolite("b", compartment="p")
     rxn = cobra.Reaction("rxn")
     rxn.annotation["sbo"] = "SBO:0000655"
     rxn.add_metabolites({a: -1, b: 1})
