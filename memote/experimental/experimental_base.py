@@ -37,6 +37,15 @@ class ExperimentalBase(object):
     """Represent a specific medium condition."""
 
     SCHEMA = None
+    TRUTHY = {
+        "true",
+        "True",
+        "TRUE",
+        "1",
+        "yes",
+        "Yes",
+        "YES"
+    }
 
     def __init__(self, identifier, obj, filename, **kwargs):
         """
@@ -60,9 +69,20 @@ class ExperimentalBase(object):
         self.data = None
         self.schema = None
 
-    def load(self):
-        """Load the data table and corresponding validation schema."""
-        self.data = read_tabular(self.filename)
+    def load(self, dtype_conversion=None):
+        """
+        Load the data table and corresponding validation schema.
+
+        Parameters
+        ----------
+        dtype_conversion : dict
+            Column names as keys and corresponding type for loading the data.
+            Please take a look at the `pandas documentation
+            <https://pandas.pydata.org/pandas-docs/stable/io.html#specifying-column-data-types>`__
+            for detailed explanations.
+
+        """
+        self.data = read_tabular(self.filename, dtype_conversion)
         with open_text(memote.experimental.schemata, self.SCHEMA,
                        encoding="utf-8") as file_handle:
             self.schema = json.load(file_handle)

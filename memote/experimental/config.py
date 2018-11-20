@@ -160,6 +160,11 @@ class ExperimentConfiguration(object):
                 filename = join(path, filename)
             growth = GrowthExperiment(
                 identifier=exp_id, obj=exp, filename=filename)
+            if growth.medium is not None:
+                assert growth.medium in self.media, \
+                    "Growth-experiment '{}' has an undefined medium '{}'." \
+                    "".format(exp_id, growth.medium)
+                growth.medium = self.media[growth.medium]
             growth.load()
             growth.validate(model)
             self.growth[exp_id] = growth
