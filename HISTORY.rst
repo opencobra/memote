@@ -24,6 +24,8 @@ Next Release
 * Set ``memote run`` to default to skipping commits where the model was not 
   changed, but implement a flag that enables testing nonetheless. The flag is 
   ``--test-unchanged``.
+* Fix the default value of the overall score to be zero instead of one and
+  make sure that the calculation is ensured with unit tests.
 
 0.8.6 (2018-09-13)
 ------------------

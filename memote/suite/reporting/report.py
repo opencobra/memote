@@ -115,7 +115,7 @@ class Report(object):
         """Calculate the overall test score using the configuration."""
         # LOGGER.info("Begin scoring")
         cases = self.get_configured_tests() | set(self.result.cases)
-        scores = DataFrame({"score": 1.0, "max": 1.0},
+        scores = DataFrame({"score": 0.0, "max": 1.0},
                            index=sorted(cases))
         self.result.setdefault("score", dict())
         self.result["score"]["sections"] = list()
@@ -128,16 +128,17 @@ class Report(object):
                 result["score"] = test_score = dict()
                 total = 0.0
                 for key, value in iteritems(metric):
+                    value = 1.0 - value
                     total += value
-                    test_score[key] = 1.0 - value
+                    test_score[key] = value
                 # For some reason there are parametrized tests without cases.
                 if len(metric) == 0:
-                    metric = 1.0
+                    metric = 0.0
                 else:
                     metric = total / len(metric)
             else:
-                result["score"] = 1.0 - metric
-            scores.at[test, "score"] -= metric
+                metric = 1.0 - metric
+            scores.at[test, "score"] = metric
             scores.loc[test, :] *= self.config["weights"].get(test, 1.0)
         score = 0.0
         maximum = 0.0
