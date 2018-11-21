@@ -13,3 +13,4 @@ pytest-raises
 pytest-cov
 codecov
 travis-encrypt
+equilibrator_api
