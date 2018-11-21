@@ -3,8 +3,9 @@ History
 
 Next Release
 ------------
-* Add a test to check reaction directionality with thermodynamic estimation
-  from eQuilibrator API.
+
+0.8.7 (2018-11-21)
+------------------
 * Add a feature to allow suppling a commit range to ``memote history``.
 * Add a test that checks if reactions are annotated with reactome identifiers.
 * Add a feature that allows identifying specific metabolites by matching
@@ -26,6 +27,9 @@ Next Release
   ``--test-unchanged``.
 * Fix the default value of the overall score to be zero instead of one and
   make sure that the calculation is ensured with unit tests.
+* Fix medium and experiment loading
+* Add a test to check reaction directionality with thermodynamic estimation
+  from eQuilibrator API.
 
 0.8.6 (2018-09-13)
 ------------------
