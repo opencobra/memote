@@ -92,30 +92,11 @@ def figure_2(base):
 
 
 @register_with(MODEL_REGISTRY)
-def free_reactions(base):
-    met_a = cobra.Metabolite("C", compartment= "e")
-    met_b = cobra.Metabolite("A", compartment= "e")
-    met_c = cobra.Metabolite("B", compartment= "e")
-    rxn1 = cobra.Reaction("Gen")
-    rxn1.add_metabolites({met_b: -1, met_a: 1, met_c: 1})
-    rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
-    rxn2.add_metabolites({met_c: -1, met_b: 1})
-    rxn3 = cobra.Reaction("EX_C_e", lower_bound=-1000, upper_bound=1000)
-    rxn3.add_metabolites({met_a: -1})
-    rxn4 = cobra.Reaction("EX_A_e", lower_bound=-1000, upper_bound=1000)
-    rxn4.add_metabolites({met_b: -1})
-    rxn5 = cobra.Reaction("EX_B_e", lower_bound=-1000, upper_bound=1000)
-    rxn5.add_metabolites({met_c: -1})
-    base.add_reactions([rxn1, rxn2, rxn3, rxn4, rxn5])
-    return base
-
-
-@register_with(MODEL_REGISTRY)
 def blocked_reactions(base):
-    met_a = cobra.Metabolite("C", compartment= "e")
-    met_b = cobra.Metabolite("A", compartment= "e")
-    met_c = cobra.Metabolite("B", compartment= "e")
-    met_d = cobra.Metabolite("D", compartment= "e")
+    met_a = cobra.Metabolite("C", compartment="e")
+    met_b = cobra.Metabolite("A", compartment="e")
+    met_c = cobra.Metabolite("B", compartment="e")
+    met_d = cobra.Metabolite("D", compartment="e")
     rxn1 = cobra.Reaction("Gen")
     rxn1.add_metabolites({met_d: -1, met_b: -1, met_a: 1, met_c: 1})
     rxn2 = cobra.Reaction("Recap", lower_bound=-1000, upper_bound=1000)
@@ -409,6 +390,7 @@ def loopy_toy_model(base):
     base.reactions.VB.bounds = 0, 1
     return base
 
+
 @register_with(MODEL_REGISTRY)
 def loopless_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
@@ -661,16 +643,6 @@ def test_find_mass_unbalanced_reactions(model, num):
     internal_rxns = con_helpers.get_internals(model)
     reactions = consistency.find_mass_unbalanced_reactions(internal_rxns)
     assert len(reactions) == num
-
-
-@pytest.mark.parametrize("model, num", [
-    ("free_reactions", 0),
-    ("blocked_reactions", 2),
-], indirect=["model"])
-def test_blocked_reactions(model, num):
-    """Expect all reactions to be able to carry flux."""
-    dict_of_blocked_rxns = consistency.find_universally_blocked_reactions(model)
-    assert len(dict_of_blocked_rxns) == num
 
 
 @pytest.mark.parametrize("model, num", [

@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division
 
 import pytest
+from cobra.flux_analysis import find_blocked_reactions
 
 import memote.support.consistency as consistency
 from memote.utils import annotate, truncate, get_ids, wrapper
@@ -167,9 +168,7 @@ def test_blocked_reactions(read_only_model):
 
     """
     ann = test_blocked_reactions.annotation
-    ann["data"] = get_ids(
-        consistency.find_universally_blocked_reactions(read_only_model)
-    )
+    ann["data"] = find_blocked_reactions(read_only_model, open_exchanges=True)
     ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) blocked reactions in

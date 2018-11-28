@@ -402,30 +402,6 @@ def find_charge_unbalanced_reactions(reactions):
         rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
 
 
-def find_universally_blocked_reactions(model):
-    """
-    Find metabolic reactions that are blocked.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    Notes
-    -----
-    Blocked reactions are those reactions that when optimized for cannot carry
-    any flux while all exchanges are open.
-
-    """
-    with model:
-        helpers.open_boundaries(model)
-        fva_result = flux_variability_analysis(model)
-
-    blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
-                             (fva_result["minimum"] == 0.0)]
-    return [model.reactions.get_by_id(name) for name in blocked.index]
-
-
 def find_stoichiometrically_balanced_cycles(model):
     u"""
     Find metabolic reactions in stoichiometrically balanced cycles (SBCs).
