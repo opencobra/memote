@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Identify blocked reactions using the cobrapy built-in function.
 
 0.8.7 (2018-11-21)
 ------------------
