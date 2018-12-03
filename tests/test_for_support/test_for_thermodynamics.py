@@ -122,22 +122,29 @@ def problematic_metabolites():
     return r
 
 
-@pytest.mark.parametrize("input, expected", [
-    (["C00101", "C00099", "G12322"], ["C00099", "C00101"]),
-    (["G12322"], [])])
-def test_smallest_compound_ID(input, expected):
+@pytest.mark.parametrize("annotation, expected", [
+    (["C00101", "C00099", "G12322"], "C00099"),
+    pytest.param(["G12322"], None,
+                 marks=pytest.mark.raises(exception=ValueError))
+])
+def test_get_smallest_compound_id(annotation, expected):
     """Expect shortened and sorted list to be returned correctly."""
-    assert thermo.smallest_compound_id(input) == expected
+    assert thermo.get_smallest_compound_id(annotation) == expected
+
+
+def test_map_metabolite2kegg():
+    assert False
 
 
 @pytest.mark.parametrize("reaction, expected", [
     ("direct_annotation", "C00668 + C00001 -> C00267 + C00009"),
     ("list_annotation", "2 C00282 + C00007 -> C00001"),
     ("no_annotation_matching", "2 C00282 + C00007 -> C00001"),
-    ("no_annotation_not_matching", "odd_c + 2 unknown_c -> whack_c")],
-    indirect=["reaction"])
-def test_get_equilibrator_rxn_string(reaction, expected):
+    ("no_annotation_not_matching", "odd_c + 2 unknown_c -> whack_c")
+], indirect=["reaction"])
+def test_translate_reaction(reaction, expected):
     """Expect KEGG reaction string to match the expectation."""
+    assert False
     mapping_dict = thermo.get_metabolite_mapping([reaction])
     eq_rxn_string = thermo.get_equilibrator_reaction_string(reaction, mapping_dict)
     assert eq_rxn_string == expected
@@ -149,10 +156,11 @@ def test_get_equilibrator_rxn_string(reaction, expected):
     ("list_annotation", (0, 0, 0, 1)),
     ("no_annotation_matching", (0, 0, 0, 1)),
     ("no_annotation_not_matching", (0, 1, 0, 0)),
-    ("problematic_metabolites", (0, 0, 1, 0))],
-    indirect=["reaction"])
+    ("problematic_metabolites", (0, 0, 1, 0))
+], indirect=["reaction"])
 def test_find_incorrect_thermodynamic_reversibility(reaction, expected):
     """Expect KEGG reaction string to match the expectation."""
+    assert False
     reactions = [reaction]
     rev, map, calc, bal = \
         thermo.find_incorrect_thermodynamic_reversibility(reactions)
