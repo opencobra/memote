@@ -39,7 +39,10 @@ def get_smallest_compound_id(compounds_identifiers):
     Return the smallest KEGG compound identifier from a list.
 
     KEGG identifiers may map to compounds, drugs or glycans prefixed
-    respectively with "C", "D", and "G" followed by at least 5 digits.
+    respectively with "C", "D", and "G" followed by at least 5 digits. We
+    choose the lowest KEGG identifier with the assumption that several
+    identifiers are due to chirality and that the lower one represents the
+    more common form.
 
     Parameters
     ----------
@@ -51,12 +54,17 @@ def get_smallest_compound_id(compounds_identifiers):
     str
         The KEGG compound identifier with the smallest number.
 
+    Raises
+    ------
+    ValueError
+        When compound_identifiers contains no KEGG compound identifiers.
+
     """
     return min((c for c in compounds_identifiers if c.startswith("C")),
                key=lambda c: int(c[1:]))
 
 
-def map_metabolite2kegg(metabolite):
+def map_metabolite2kegg(metabolite, threshold=0.85):
     """
     Return a KEGG compound identifier for the metabolite if it exists.
 
@@ -71,17 +79,35 @@ def map_metabolite2kegg(metabolite):
     Parameters
     ----------
     metabolite : cobra.Metabolite
+    threshold : float, optional
+        Cut off for the name matching score. Can be between 0 and 1 with 1
+        being the stricter side.
 
     Returns
     -------
     str
 
     """
+    logger.debug("Looking for KEGG compound identifier for %s.", metabolite.id)
     kegg_annotation = metabolite.annotation.get("kegg.compound")
     if kegg_annotation is None:
-        logger.warning("No kegg.compound annotation for metabolite %s.",
-                       metabolite.id)
-        return
+        if metabolite.name:
+            # The compound matcher uses regular expression and chokes
+            # with a low level error on `[` in the name, for example.
+            df = compound_matcher.match(metabolite.name)
+            try:
+                return df.loc[df["score"] > threshold, "CID"].iat[0]
+            except (IndexError, AttributeError):
+                logger.warning(
+                    "Could not match the name %r to any kegg.compound "
+                    "annotation for metabolite %s.",
+                    metabolite.name, metabolite.id
+                )
+                return
+        else:
+            logger.warning("No kegg.compound annotation for metabolite %s.",
+                           metabolite.id)
+            return
     if isinstance(kegg_annotation, string_types) and \
             kegg_annotation.startswith("C"):
         return kegg_annotation
@@ -90,24 +116,10 @@ def map_metabolite2kegg(metabolite):
             return get_smallest_compound_id(kegg_annotation)
         except ValueError:
             return
-    elif metabolite.name:
-        try:
-            df = compound_matcher.match(metabolite.name)
-        # TODO: What kind of exception?
-        except Exception:
-            logger.warning(
-                "Could not match the name %r to any kegg.compound "
-                "annotation for metabolite %s.",
-                metabolite.name, metabolite.id
-            )
-        else:
-            # TODO: Table might not exist?
-            return df['CID'].iloc[0]
-    else:
-        logger.warning(
-            "No matching kegg.compound annotation for metabolite %s.",
-            metabolite.id
-        )
+    logger.warning(
+        "No matching kegg.compound annotation for metabolite %s.",
+        metabolite.id
+    )
     return
 
 
@@ -230,5 +242,7 @@ def find_incorrect_thermodynamic_reversibility(reactions, ln_gamma=3):
         else:
             unbalanced.append(rxn)
 
-    return(incorrect_reversibility, incomplete_mapping,
-           problematic_calculation, unbalanced)
+    return (
+        incorrect_reversibility, incomplete_mapping, problematic_calculation,
+        unbalanced
+    )
