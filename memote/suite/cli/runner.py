@@ -83,7 +83,7 @@ def cli():
               help="Whether or not to collect test data needed for "
                    "generating a report.")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
-              default="result.json", show_default=True,
+              default="result.json.gz", show_default=True,
               help="Path for the collected results as JSON. Ignored when "
                    "working with a git repository.")
 @click.option("--location", envvar="MEMOTE_LOCATION",
