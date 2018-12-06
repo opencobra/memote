@@ -91,23 +91,25 @@ def map_metabolite2kegg(metabolite, threshold=0.85):
     logger.debug("Looking for KEGG compound identifier for %s.", metabolite.id)
     kegg_annotation = metabolite.annotation.get("kegg.compound")
     if kegg_annotation is None:
-        if metabolite.name:
-            # The compound matcher uses regular expression and chokes
-            # with a low level error on `[` in the name, for example.
-            df = compound_matcher.match(metabolite.name)
-            try:
-                return df.loc[df["score"] > threshold, "CID"].iat[0]
-            except (IndexError, AttributeError):
-                logger.warning(
-                    "Could not match the name %r to any kegg.compound "
-                    "annotation for metabolite %s.",
-                    metabolite.name, metabolite.id
-                )
-                return
-        else:
-            logger.warning("No kegg.compound annotation for metabolite %s.",
-                           metabolite.id)
-            return
+        # TODO (Moritz Beber): Currently name matching is very slow and
+        #  inaccurate. We disable it until there is a better solution.
+        # if metabolite.name:
+        #     # The compound matcher uses regular expression and chokes
+        #     # with a low level error on `[` in the name, for example.
+        #     df = compound_matcher.match(metabolite.name)
+        #     try:
+        #         return df.loc[df["score"] > threshold, "CID"].iat[0]
+        #     except (IndexError, AttributeError):
+        #         logger.warning(
+        #             "Could not match the name %r to any kegg.compound "
+        #             "annotation for metabolite %s.",
+        #             metabolite.name, metabolite.id
+        #         )
+        #         return
+        # else:
+        logger.warning("No kegg.compound annotation for metabolite %s.",
+                       metabolite.id)
+        return
     if isinstance(kegg_annotation, string_types) and \
             kegg_annotation.startswith("C"):
         return kegg_annotation
