@@ -177,9 +177,14 @@ def test_get_smallest_compound_id(annotation, expected):
     ("h2o_c_list", "C00001"),
     ("o2_c_list", "C00007"),
     ("h2_c_list", "C00282"),
-    ("h2o_c_name", "C00001"),
-    ("o2_c_name", "C00007"),
-    ("h2_c_name", "C00282"),
+    # We currently do not match names because it takes too long.
+    # ("h2o_c_name", "C00001"),
+    # ("o2_c_name", "C00007"),
+    # ("h2_c_name", "C00282"),
+    # Names instead should return nothing.
+    ("h2o_c_name", None),
+    ("o2_c_name", None),
+    ("h2_c_name", None),
     ("whack_c", None),
     ("odd_c", None),
     ("unknown_c", None),
@@ -194,8 +199,11 @@ def test_map_metabolite2kegg(metabolite, kegg_id):
      {"C00668": -1, "C00001": -1, "C00267": 1, "C00009": 1}),
     ("list_annotation",
      {"C00282": -2, "C00007": -1, "C00001": 1}),
-    ("no_annotation_matching",
-     {"C00282": -2, "C00007": -1, "C00001": 1}),
+    # We currently do not match names because it takes too long.
+    # ("no_annotation_matching",
+    #  {"C00282": -2, "C00007": -1, "C00001": 1}),
+    # Names instead should return nothing.
+    ("no_annotation_matching", {}),
     ("no_annotation_not_matching", {})
 ], indirect=["reaction"])
 def test_translate_reaction(reaction, expected):
@@ -206,14 +214,17 @@ def test_translate_reaction(reaction, expected):
 
 @pytest.mark.parametrize("reaction, expected", [
     ("direct_annotation", (1, 0, 0, 0)),
-    ("direct_annotation_correct_rev", (0, 0, 0, 0)),
+    ("direct_annotation_correct_rev", (1, 0, 0, 0)),
     ("list_annotation", (0, 0, 0, 1)),
-    ("no_annotation_matching", (0, 0, 0, 1)),
+    # We currently do not match names because it takes too long.
+    # ("no_annotation_matching", (0, 0, 0, 1)),
+    # Names instead should return nothing.
+    ("no_annotation_matching", (0, 1, 0, 0)),
     ("no_annotation_not_matching", (0, 1, 0, 0)),
     ("problematic_metabolites", (0, 0, 1, 0))
 ], indirect=["reaction"])
 def test_find_incorrect_thermodynamic_reversibility(reaction, expected):
     """Expect the correct reversibility information."""
     result = tuple(map(
-        len, thermo.find_incorrect_thermodynamic_reversibility([reaction])))
+        len, thermo.find_thermodynamic_reversibility_index([reaction])))
     assert result == expected
