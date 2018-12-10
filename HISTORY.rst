@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Adjust tests to the change in the ``add_boundary`` interface.
 * Identify blocked reactions using the cobrapy built-in function.
 
 0.8.7 (2018-11-21)
