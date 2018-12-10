@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Adjust the reversibility index test to not use name matching and increase 
+  the threshold slightly. Also adjust the description of the test.
 * Adjust tests to the change in the ``add_boundary`` interface.
 * Identify blocked reactions using the cobrapy built-in function.
 
