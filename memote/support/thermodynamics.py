@@ -227,6 +227,7 @@ def find_thermodynamic_reversibility_index(reactions):
             reversibility_indexes.append((rxn, ln_rev_index))
         else:
             unbalanced.append(rxn)
+    reversibility_indexes.sort(key=lambda p: abs(p[1]), reverse=True)
     return (
         reversibility_indexes, incomplete_mapping, problematic_calculation,
         unbalanced
