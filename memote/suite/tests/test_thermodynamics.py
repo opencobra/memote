@@ -45,13 +45,12 @@ def test_find_candidate_irreversible_reactions(read_only_model):
     calculation of reversibility. To determine reversibility we calculate
     the reversibility index ln_gamma (natural logarithm of gamma) of each
     reaction
-    using the eQuilibrator API. We use an ln_gamma of 10 as a threshold for
-    irreversibility. That value roughly corresponds to three times the
-    span of three orders of magnitude
-    around 100 μM (~3 μM—3 mM) at pH = 7, I = 0.1 M and T = 298 K. This
-    means that a reaction is considered irreversible if the concentration of
-    an individual metabolite would have to change more than three orders of
-    magnitude i.e. from 3 µM to 3 mM to reverse the direction of flux. For
+    using the eQuilibrator API. We consider reactions, whose reactants'
+    concentrations would need to change by more than three orders of
+    magnitude for the reaction flux to reverse direction, to be likely
+    candidates of irreversible reactions. This assume default concentrations
+    around 100 μM (~3 μM—3 mM) at pH = 7, I = 0.1 M and T = 298 K. The
+    corresponding reversibility index is approximately 7. For
     further information on the thermodynamic and implementation details
     please refer to
     https://doi.org/10.1093/bioinformatics/bts317 and
@@ -75,6 +74,8 @@ def test_find_candidate_irreversible_reactions(read_only_model):
     to the reversibility index, are likely to be irreversible.
 
     """
+    # With gamma = 1000, ln_gamma ~ 6.9. We use 7 as the cut-off.
+    threshold = 7.0
     ann = test_find_candidate_irreversible_reactions.annotation
     met_rxns = basic.find_pure_metabolic_reactions(read_only_model)
     rev_index, incomplete, problematic, unbalanced = \
@@ -85,10 +86,10 @@ def test_find_candidate_irreversible_reactions(read_only_model):
         get_ids(problematic),
         get_ids(unbalanced)
     )
-    num_irrev = sum(1 for r, i in rev_index if abs(i) >= 10)
+    num_irrev = sum(1 for r, i in rev_index if abs(i) >= threshold)
     ann["message"] = wrapper.fill(
         """Out of {} purely metabolic reactions, {} have an absolute
-        reversibility index greater or equal to 10 and are therefore likely
+        reversibility index greater or equal to 7 and are therefore likely
         candidates for being irreversible.
         {} reactions could not be mapped to KEGG completely, {} contained
         'problematic' metabolites, and {} are chemically or redox imbalanced.
