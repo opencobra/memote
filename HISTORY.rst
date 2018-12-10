@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.8.8 (2018-12-10)
+------------------
 * Adjust the reversibility index test to not use name matching and increase 
   the threshold slightly. Also adjust the description of the test.
 * Adjust tests to the change in the ``add_boundary`` interface.
