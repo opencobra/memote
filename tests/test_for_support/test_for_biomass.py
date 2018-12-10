@@ -139,7 +139,7 @@ def precursors_uptake_limited(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    base.add_boundary(met_a1, ub=5)
+    base.add_boundary(met_a1, lb=-5, ub=5)
     base.add_boundary(met_b1)
     base.add_boundary(met_c1)
     base.objective = rxn
@@ -214,8 +214,8 @@ def precursors_not_in_medium(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    base.add_boundary(met_a1, ub=0)
-    base.add_boundary(met_b1, ub=0)
+    base.add_boundary(met_a1, lb=0)
+    base.add_boundary(met_b1, lb=0)
     base.add_boundary(met_c1)
     base.objective = rxn
     return base
@@ -511,7 +511,7 @@ def test_production_biomass_precursors_default(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
 
-    This is without changing the model"s default state.
+    This is without changing the model's default state.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
