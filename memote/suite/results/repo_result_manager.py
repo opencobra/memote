@@ -100,7 +100,7 @@ class RepoResultManager(ResultManager):
             stored.
 
         """
-        return join(self._backend, "{}.json".format(git_info.hexsha))
+        return join(self._backend, "{}.json.gz".format(git_info.hexsha))
 
     @staticmethod
     def add_git(meta, git_info):

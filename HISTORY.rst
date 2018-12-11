@@ -3,6 +3,10 @@ History
 
 Next Release
 ------------
+* Compress JSON and SQLite storage of results using gzip by default. JSON 
+  continues to work either compressed or uncompressed. At the moment we 
+  offer no database migration, please contact us if you need help in 
+  migrating a large existing SQLite database rather than just re-computing it.
 
 0.8.8 (2018-12-10)
 ------------------

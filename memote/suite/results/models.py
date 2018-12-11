@@ -21,13 +21,16 @@ from __future__ import absolute_import
 
 import json
 import logging
+from gzip import GzipFile
+from io import BytesIO
 
 from future.utils import raise_with_traceback
-from sqlalchemy import Column, DateTime, Integer, Unicode, UnicodeText
+from sqlalchemy import (
+    Column, DateTime, Integer, Unicode, UnicodeText, LargeBinary)
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.ext.declarative import declarative_base
 
-from memote.utils import log_json_incompatible_types
+from memote.utils import log_json_incompatible_types, jsonify
 
 __all__ = ("Result",)
 
@@ -50,8 +53,30 @@ class JSON(TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         """Convert the value to a JSON encoded string before storing it."""
+        return jsonify(value, pretty=False)
+
+    def process_result_value(self, value, dialect):
+        """Convert a JSON encoded string to a dictionary structure."""
+        if value is not None:
+            value = json.loads(value)
+        return value
+
+
+class BJSON(TypeDecorator):
+    """Implement a binary compressed JSON column type."""
+
+    impl = LargeBinary
+
+    def process_bind_param(self, value, dialect):
+        """Convert the value to a JSON encoded string before storing it."""
         try:
-            return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+            with BytesIO() as stream:
+                with GzipFile(fileobj=stream, mode="wb") as file_handle:
+                    file_handle.write(
+                        jsonify(value, pretty=False).encode("utf-8")
+                    )
+                output = stream.getvalue()
+            return output
         except TypeError as error:
             log_json_incompatible_types(value)
             raise_with_traceback(error)
@@ -59,7 +84,9 @@ class JSON(TypeDecorator):
     def process_result_value(self, value, dialect):
         """Convert a JSON encoded string to a dictionary structure."""
         if value is not None:
-            value = json.loads(value)
+            with BytesIO(value) as stream:
+                with GzipFile(fileobj=stream, mode="rb") as file_handle:
+                    value = json.loads(file_handle.read().decode("utf-8"))
         return value
 
 
@@ -79,4 +106,4 @@ class Result(Base):
     author = Column(Unicode(255), nullable=True)
     email = Column(Unicode(255), nullable=True)
     authored_on = Column(DateTime(), nullable=True)
-    memote_result = Column(JSON(), nullable=False)
+    memote_result = Column(BJSON(), nullable=False)
