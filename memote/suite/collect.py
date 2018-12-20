@@ -166,4 +166,5 @@ class ResultCollectionPlugin(object):
     @pytest.fixture(scope="function")
     def model(self, read_only_model):
         """Provide a pristine model for a test unit."""
-        return self._model.copy()
+        with self._model as model:
+            yield model
