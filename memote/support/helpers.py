@@ -28,7 +28,6 @@ from operator import itemgetter
 import numpy as np
 import pandas as pd
 from six import iteritems, itervalues
-from sympy import expand
 from importlib_resources import open_text
 from cobra.exceptions import Infeasible
 from cobra.medium.boundary_types import find_boundary_types
@@ -469,29 +468,6 @@ def find_interchange_biomass_reactions(model, biomass=None):
     if biomass is None:
         biomass = set(find_biomass_reaction(model))
     return boundary | transporters | biomass
-
-
-def find_functional_units(gpr_str):
-    """
-    Return an iterator of gene IDs grouped by boolean rules from the gpr_str.
-
-    The gpr_str is first transformed into an algebraic expression, replacing
-    the boolean operators 'or' with '+' and 'and' with '*'. Treating the
-    gene IDs as sympy.symbols this allows a mathematical expansion of the
-    algebraic expression. The expanded form is then split again producing sets
-    of gene IDs that in the gpr_str had an 'and' relationship.
-
-    Parameters
-    ----------
-    gpr_str : string
-        A string consisting of gene ids and the boolean expressions 'and'
-        and 'or'.
-
-    """
-    algebraic_form = re.sub('[Oo]r', '+', re.sub('[Aa]nd', '*', gpr_str))
-    expanded = str(expand(algebraic_form))
-    for unit in expanded.replace('+', ',').split(' , '):
-        yield unit.split('*')
 
 
 def run_fba(model, rxn_id, direction="max", single_value=True):

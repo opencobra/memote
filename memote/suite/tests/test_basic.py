@@ -245,10 +245,10 @@ def test_protein_complex_presence(read_only_model):
     This might also be a relevant metric for other organisms.
     """
     ann = test_protein_complex_presence.annotation
-    ann["data"] = list(basic.find_protein_complexes(read_only_model))
+    ann["data"] = get_ids(basic.find_protein_complexes(read_only_model))
     ann["message"] = wrapper.fill(
-        """A total of {:d} protein complexes are defined through GPR rules in
-        the model.""".format(len(ann["data"])))
+        """A total of {:d} reactions are catalyzed by complexes defined
+        through GPR rules in the model.""".format(len(ann["data"])))
     assert len(ann["data"]) >= 1, ann["message"]
 
 

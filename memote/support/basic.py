@@ -24,6 +24,7 @@ from itertools import combinations
 from pylru import lrudecorator
 
 import memote.support.helpers as helpers
+from memote.support.gpr_helpers import find_top_level_complex
 from memote.utils import filter_none
 
 __all__ = ("check_metabolites_formula_presence",)
@@ -191,7 +192,7 @@ def calculate_metabolic_coverage(model):
 
 def find_protein_complexes(model):
     """
-    Find tuples of gene identifiers that comprise functional enzyme complexes.
+    Find reactions that are catalyzed by at least a heterodimer.
 
     Parameters
     ----------
@@ -200,20 +201,19 @@ def find_protein_complexes(model):
 
     Returns
     -------
-    set
-        A set of tuples of genes that are connected via "AND" in
-        gene-protein-reaction rules (GPR) and thus constitute protein
-        complexes.
+    list
+        Reactions whose gene-protein-reaction association contains at least one
+        logical AND combining different gene products (heterodimer).
 
     """
-    protein_complexes = set()
+    complexes = []
     for rxn in model.reactions:
-        if rxn.gene_reaction_rule:
-            for candidate in helpers.find_functional_units(
-                    rxn.gene_reaction_rule):
-                if len(candidate) >= 2:
-                    protein_complexes.add(tuple(candidate))
-    return protein_complexes
+        if not rxn.gene_reaction_rule:
+            continue
+        size = find_top_level_complex(rxn.gene_reaction_rule)
+        if size >= 2:
+            complexes.append(rxn)
+    return complexes
 
 
 @lrudecorator(size=2)
