@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Refactor the test for enzyme complexes to only return an estimated size.
 
 0.8.9 (2018-12-11)
 ------------------
