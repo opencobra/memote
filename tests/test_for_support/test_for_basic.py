@@ -639,10 +639,10 @@ def test_compartments_presence(model, boolean):
 @pytest.mark.parametrize("model, num", [
     ("gpr_present", 0),
     ("gpr_missing", 0),
-    ("gpr_present_complex", 4)
+    ("gpr_present_complex", 3)
 ], indirect=["model"])
-def test_enzyme_complex_presence(model, num):
-    """Expect amount of enzyme complexes to be identified correctly."""
+def test_find_protein_complexes(model, num):
+    """Expect the number of reactions to be identified correctly."""
     assert len(basic.find_protein_complexes(model)) == num
 
 
