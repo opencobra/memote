@@ -481,16 +481,6 @@ def test_find_transport_reactions(model, num):
     assert len(helpers.find_transport_reactions(model)) == num
 
 
-@pytest.mark.parametrize("gpr_str, expected", [
-    ("gene1 and gene2", [["gene1", "gene2"]]),
-    ("gene1 or gene2", [["gene1"], ["gene2"]]),
-    ("gene1 and (gene2 or gene3)", [["gene1", "gene2"], ["gene1", "gene3"]])
-])
-def test_find_functional_units(gpr_str, expected):
-    """Expect type of enzyme complexes to be identified correctly."""
-    assert list(helpers.find_functional_units(gpr_str)) == expected
-
-
 @pytest.mark.parametrize("model, met_pair, expected", [
     ("converting_reactions", ("MNXM3", "MNXM7"), 2),
     ("converting_reactions", ("MNXM51", "MNXM51"), 1)
