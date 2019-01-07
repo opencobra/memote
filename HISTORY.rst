@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.8.11 (2019-01-07)
+-------------------
+* Temporarily pin pytest to <4.1 in order to avoid a breaking API change on their part.
+
 0.8.10 (2018-12-21)
 -------------------
 * Refactor the test for enzyme complexes to only return an estimated size.
