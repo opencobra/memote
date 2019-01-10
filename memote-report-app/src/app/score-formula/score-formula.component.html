@@ -1,5 +1,24 @@
 <div>
-  <p>
-      This is the end, my only friend, the end.
-  </p>
+    <mat-expansion-panel
+    #expPanel
+    class="mat-elevation-z0">
+       <mat-expansion-panel-header
+       class="mat-expansion-panel-header"
+       collapsedHeight="auto"
+       style="padding:0.05vh">
+       <mat-panel-title fxLayoutAlign='space-between center'>
+          <td class="test-title">
+              {{ scoreType }}
+          </td>
+          <div style="margin-right: 10px">
+          <td *ngFor='let score of modelScore'>
+            <div class="MatButtonEmulation" style="background: white; color:black"> {{ score | percent : '1.0' }} </div>
+          </td>
+          </div>
+         </mat-panel-title>
+       </mat-expansion-panel-header>
+       <div>
+          <p> Formula goes here </p>
+        </div>
+      </mat-expansion-panel>  
 </div>

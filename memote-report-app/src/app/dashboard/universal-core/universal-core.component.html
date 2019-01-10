@@ -30,11 +30,13 @@
             <app-accordion [case]="case"></app-accordion>
           </div>
           <hr>
-          <app-score-formula></app-score-formula>
+          <app-score-formula [position]="section"></app-score-formula>
         </div>
       </div>
       </div>
       <hr>  
+      <hr>
+      <app-score-formula [position]="'Total Score'"></app-score-formula>
       <hr>
       <div
         fxLayout='row'
