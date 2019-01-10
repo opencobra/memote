@@ -29,15 +29,19 @@
                 </mat-expansion-panel>
             <app-accordion [case]="case"></app-accordion>
           </div>
+          <div *ngIf="data.reportType != 'history'">
           <hr>
           <app-score-formula [position]="section"></app-score-formula>
+          </div>
         </div>
       </div>
       </div>
-      <hr>  
-      <hr>
-      <app-score-formula [position]="'Total Score'"></app-score-formula>
-      <hr>
+      <div *ngIf="data.reportType != 'history'">
+          <hr>
+          <hr>
+          <app-score-formula [position]="'Total Score'"></app-score-formula>
+          <hr>
+          </div>
       <div
         fxLayout='row'
         fxLayout.lt-lg='column'
