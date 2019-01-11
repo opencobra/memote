@@ -17,8 +17,8 @@
           </div>
          </mat-panel-title>
        </mat-expansion-panel-header>
-       <div>
-          <p> Formula goes here </p>
+       <div *ngFor='let formula of formulae'>
+          <p> {{ formula }} </p>
         </div>
       </mat-expansion-panel>  
 </div>

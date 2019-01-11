@@ -16,6 +16,7 @@ export class ReportDataService {
   reportType: string;
   allExpandState = false;
   score: any;
+  scorePerSection: Object = {};
 
   constructor(private http: HttpClient) {}
 
@@ -118,6 +119,7 @@ export class ReportDataService {
     this.extractScoring(data);
     this.distributeCardsToSections(data);
     this.determineScoredTests();
+    this.determineScorePerSection();
   }
 
   private convertHistoryResults(data: Object): void {
@@ -176,6 +178,7 @@ private convertDiffResults(data: Object): void {
 this.distributeCardsToSections(data);
 this.determineScoredTests();
 this.extractScoring(data);
+this.determineScorePerSection();
 }
 
   private extractMetadata(data: Object): void {
@@ -223,5 +226,39 @@ this.extractScoring(data);
   }
   return this.getString(reformatted_data);
 
+  }
+
+  public determineScorePerSection() {
+    let total_score: string[] = [];
+    let sections: Object[] = [];
+    if (this.reportType === 'snapshot') {
+      sections = this.score.sections;
+      total_score = [this.score.total_score];
+    } else {
+      sections = this.score.sections.diff;
+      for (const totalScoreObj of this.score.total_score.diff) {
+        total_score.push(totalScoreObj.total_score);
+      }
+    }
+    let weights: string[] = [];
+    let scores: string[] = [];
+    for (const section of sections) {
+      const sectionName = section.section;
+      console.log(this.scorePerSection)
+      console.log(sectionName)
+      if (!(this.scorePerSection.hasOwnProperty(sectionName))) {
+        weights.push(this.scoredCard.sections[sectionName].weight);
+        scores.push(section.score);
+        this.scorePerSection[sectionName] = {
+          'weights': weights,
+          'scores': scores};
+      } else {
+        this.scorePerSection[sectionName]['weights'].push(this.scoredCard.sections[sectionName].weight);
+        this.scorePerSection[sectionName]['scores'].push(section.score);
+      }
+      weights = [];
+      scores = [];
+    }
+    this.scorePerSection['Total Score'] = {'scores': total_score};
   }
 }
