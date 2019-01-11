@@ -74,6 +74,7 @@ export class ScoreFormulaComponent implements OnInit {
     let unweighted_numerator_0 = 0;
     let score = 0;
     for (const test of this.data.scoredCard['sections'][this.position]['cases']) {
+      console.log(test);
       if (test in Object.keys(this.data.testWeights)) {
         const weight = this.data.testWeights[test];
       }

@@ -37,21 +37,6 @@
                     ],
                     "title": "Consistency",
                     "weight": 3.0
-                },
-                "matrix": {
-                    "cases": null,
-                    "title": "Matrix Conditioning",
-                    "weight": 1.0
-                },
-                "sbo": {
-                    "cases": null,
-                    "title": "SBO Terms",
-                    "weight": 2.0
-                },
-                "sequence": {
-                    "cases": null,
-                    "title": "Sequence Cross References",
-                    "weight": 2.0
                 }
             },
             "title": "Core Tests"
@@ -2794,8 +2779,7 @@
     "sections":
         [
             {"section":"annotation", "score": 0.997},
-            {"section":"consistency",  "score":0.64},
-            {"section":"sbo", "score":0.09}
+            {"section":"consistency",  "score":0.64}
         ],
     "total_score": 0.3923105636431504
   }
