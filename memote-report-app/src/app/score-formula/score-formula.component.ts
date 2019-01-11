@@ -37,10 +37,10 @@ export class ScoreFormulaComponent implements OnInit {
         const formula = this.constructTotalFormula(i);
         this.formulae.push(formula);
       } else {
-        continue;
+        const formula = this.constructSubTotalFormula(i);
+        this.formulae.push(formula);
       }
     }
-    console.log(this.formulae);
   }
 
   constructTotalFormula(i: any) {
@@ -51,8 +51,8 @@ export class ScoreFormulaComponent implements OnInit {
   for (const section of Object.keys(this.data.scorePerSection)) {
     if (section !== 'Total Score') {
       const weight = this.data.scorePerSection[section]['weights'][i];
-      const score = this.data.scorePerSection[section]['scores'][i];
-      numerator += addition + '(' + weight + ' * ' + (score.toFixed(4) * 100) + ')';
+      const score = this.data.scorePerSection[section]['scores'][i] * 100;
+      numerator += addition + '(' + weight + ' * ' + (score.toFixed(2)) + ')';
       denominator += addition + '(' + weight + ' * ' + 100 + ')';
     }
     if (first) {
@@ -60,11 +60,57 @@ export class ScoreFormulaComponent implements OnInit {
       first = false;
     }
   }
-  const total_score = this.data.scorePerSection['Total Score']['scores'][i];
-  return '`(' + numerator + ')/(' + denominator + ') = ' + (total_score.toFixed(3) * 100) + '`';
+  const total_score = this.data.scorePerSection['Total Score']['scores'][i] * 100;
+  return '`(' + numerator + ')/(' + denominator + ') = ' + (total_score.toFixed(2)) + '`';
   }
 
-  constructTotalDenominator() {
-
+  constructSubTotalFormula(i: any) {
+    let numerator = '';
+    let denominator = '';
+    let addition = ' + ';
+    let weight = 1;
+    let unweighted_denominator = 0;
+    let unweighted_numerator_100 = 0;
+    let unweighted_numerator_0 = 0;
+    let score = 0;
+    for (const test of this.data.scoredCard['sections'][this.position]['cases']) {
+      if (test in Object.keys(this.data.testWeights)) {
+        const weight = this.data.testWeights[test];
+      }
+      for (const paramtest of this.data.byReg(test)) {
+        if (this.data.reportType === 'snapshot') {
+          score = (1 - this.data.byID(paramtest).metric) * 100;
+        } else {
+          score = (1 - this.data.byID(paramtest).diff[i].metric) * 100;
+        }
+        if (weight === 1) {
+          if (score === 0) {
+            unweighted_denominator += 1;
+            unweighted_numerator_0 += 1;
+            continue;
+          } else if (score === 100) {
+            unweighted_numerator_100 += 1;
+            unweighted_denominator += 1;
+            continue;
+          } else {
+            numerator += (score.toFixed(2)) +  addition;
+            unweighted_denominator += 1;
+          }
+        }
+        if (weight !== 1) {
+          numerator += '(' + weight + ' * ' + (score.toFixed(2)) + ')' + addition;
+          denominator += '(' + weight + ' * ' + 100 + ')' + addition;
+        }
+      }
+    }
+    if (unweighted_numerator_100 > 0) {
+      numerator += '(' + unweighted_numerator_100 + ' * ' + 100 + ')' + addition;
+    }
+    if (unweighted_numerator_0 > 0) {
+      numerator += '(' + unweighted_numerator_0 + ' * ' + 0 + ')';
+    }
+    denominator += '(' + unweighted_denominator + ' * ' + 100 + ')';
+    const section_score = this.data.scorePerSection[this.position]['scores'][i] * 100;
+    return '`(' + numerator + ')/(' + denominator + ') = ' + (section_score.toFixed(2)) + '`';
   }
 }

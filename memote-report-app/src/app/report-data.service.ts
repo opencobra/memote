@@ -17,6 +17,7 @@ export class ReportDataService {
   allExpandState = false;
   score: any;
   scorePerSection: Object = {};
+  testWeights: Object = {};
 
   constructor(private http: HttpClient) {}
 
@@ -117,6 +118,7 @@ export class ReportDataService {
     }
     this.extractMetadata(data);
     this.extractScoring(data);
+    this.extractTestWeights(data);
     this.distributeCardsToSections(data);
     this.determineScoredTests();
     this.determineScorePerSection();
@@ -178,17 +180,23 @@ private convertDiffResults(data: Object): void {
 this.distributeCardsToSections(data);
 this.determineScoredTests();
 this.extractScoring(data);
+this.extractTestWeights(data);
 this.determineScorePerSection();
 }
 
   private extractMetadata(data: Object): void {
-    // Extract metaddata information to be used in the metadata card
+    // Extract metaddata information to be used in the metadata card.
     this.metaData = data['meta'];
   }
 
   private extractScoring(data: Object): void {
-    // Extract score information to be used in the score display and bar chart plot
+    // Extract score information to be used in the score display and bar chart plot.
     this.score = data['score'];
+  }
+
+  private extractTestWeights(data: Object): void {
+    // Extract information for each test weight used in the score-formula component.
+    this.testWeights = data['weights'];
   }
 
   private distributeCardsToSections(data: Object): void {
@@ -244,8 +252,6 @@ this.determineScorePerSection();
     let scores: string[] = [];
     for (const section of sections) {
       const sectionName = section.section;
-      console.log(this.scorePerSection)
-      console.log(sectionName)
       if (!(this.scorePerSection.hasOwnProperty(sectionName))) {
         weights.push(this.scoredCard.sections[sectionName].weight);
         scores.push(section.score);
