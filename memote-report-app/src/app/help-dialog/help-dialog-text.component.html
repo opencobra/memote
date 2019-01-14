@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Help</h2>
+<h2 mat-dialog-title>Readme</h2>
 <mat-dialog-content>
     <mat-card>
     <mat-card-title>What do the colours mean?</mat-card-title>
@@ -61,9 +61,9 @@
           glance. The unscored section provides general statistics and covers specific aspects of a model that are not universally applicable. For instance,
            dedicated quality control of the biomass equation only applies to metabolic models which are used to investigate cell growth.</p>
     <p>The variety of constraints-based modeling approaches and the fundamental differences between various organisms compound the assessment of GEMs. For
-         instance, authors may publish metabolic networks, which are constrained to reflect one experimental condition or publish unconstrained metabolic
-          databases, which need to be initialized before simulation. Both can be encoded in SBML. With having a scored test section, we attempt to normalize
-           each type of model such that they become comparable.</p>
+         instance, authors may publish metabolic networks (referred to as 'models'), which are constrained to reflect one experimental condition or publish unconstrained metabolic
+          databases (referred to as 'reconstructions'), which need to be initialized before simulation. Both can be encoded in SBML. With having a scored test section, we attempt to make both 
+          models and reconstructions comparable.</p>
         </mat-card-content>
     </mat-card>
     <mat-card>
@@ -73,8 +73,7 @@
          results normalized by the maximally achievable score i.e. all individual results at 100%. Individual tests can be weighted, but it is also possible to apply weighting to entire test 
          categories. Hence the final score is calculated:</p>
          <br>
-         <b> FinalScore = Sum( a * Section1Sum( w1 * Test1, w2 * Test2 ), b * Section2Sum( w3 * Test3, w4 * Test4 )) / MaxScore </b>
-    <p> <b>a, b</b> denote section weights, <b>w1, w2, w3, w4</b> denote weights applied to individual tests.</p>
+         <img src="/data/TotalFormula.svg">
     </mat-card-content>
     </mat-card>
 </mat-dialog-content>
