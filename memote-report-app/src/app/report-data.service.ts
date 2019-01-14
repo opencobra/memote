@@ -251,16 +251,16 @@ this.determineScorePerSection();
     let weights: string[] = [];
     let scores: string[] = [];
     for (const section of sections) {
-      const sectionName = section.section;
+      const sectionName = section['section'];
       if (!(this.scorePerSection.hasOwnProperty(sectionName))) {
-        weights.push(this.scoredCard.sections[sectionName].weight);
-        scores.push(section.score);
+        weights.push(this.scoredCard['sections'][sectionName].weight);
+        scores.push(section['score']);
         this.scorePerSection[sectionName] = {
           'weights': weights,
           'scores': scores};
       } else {
-        this.scorePerSection[sectionName]['weights'].push(this.scoredCard.sections[sectionName].weight);
-        this.scorePerSection[sectionName]['scores'].push(section.score);
+        this.scorePerSection[sectionName]['weights'].push(this.scoredCard['sections'][sectionName].weight);
+        this.scorePerSection[sectionName]['scores'].push(section['score']);
       }
       weights = [];
       scores = [];
