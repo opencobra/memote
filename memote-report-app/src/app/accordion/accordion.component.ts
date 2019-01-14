@@ -10,17 +10,21 @@ import {MatBadgeModule} from '@angular/material/badge';
 })
 export class AccordionComponent implements OnInit {
   @Input() case: string;
+  weight = 1;
 
   constructor(private data: ReportDataService) { }
 
   ngOnInit() {}
 
-  getWeight(testId: string) {
-    const weight = this.data.testWeights[testId.split(':')[0]];
-  if ( weight !== 1 && typeof weight !== 'undefined') {
-    return weight;
-  }
-  return ' ';
+  isWeighted(testId: string) {
+    if (testId in this.data.testWeightsExpanded
+      && this.data.testWeightsExpanded[testId] !== 1
+      && this.data.testWeightsExpanded[testId] !== null) {
+      this.weight = this.data.testWeightsExpanded[testId];
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }

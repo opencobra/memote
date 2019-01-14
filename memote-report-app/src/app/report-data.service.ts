@@ -18,6 +18,7 @@ export class ReportDataService {
   score: any;
   scorePerSection: Object = {};
   testWeights: Object = {};
+  testWeightsExpanded: Object = {};
 
   constructor(private http: HttpClient) {}
 
@@ -41,14 +42,14 @@ export class ReportDataService {
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
-        this.http.get('/data/testDiff.json')
-        .subscribe(data => {this.convertDiffResults(data); });
-        this.reportType = 'diff';
-        break;
-        // this.http.get('/data/testData.json')
-        // .subscribe(data => {this.convertResults(data); });
-        // this.reportType = 'snapshot';
+        // this.http.get('/data/testDiff.json')
+        // .subscribe(data => {this.convertDiffResults(data); });
+        // this.reportType = 'diff';
         // break;
+        this.http.get('/data/testData.json')
+        .subscribe(data => {this.convertResults(data); });
+        this.reportType = 'snapshot';
+        break;
         // this.http.get('/data/testHistory.json')
         // .subscribe(data => {this.convertHistoryResults(data); });
         // this.reportType = 'history';
@@ -197,6 +198,13 @@ this.determineScorePerSection();
   private extractTestWeights(data: Object): void {
     // Extract information for each test weight used in the score-formula component.
     this.testWeights = data['weights'];
+
+    for (const testId of Object.keys(this.testWeights)) {
+      const parameterizedTestIds = this.byReg(testId);
+      for (const paramId of parameterizedTestIds) {
+        this.testWeightsExpanded[paramId] = this.testWeights[testId];
+      }
+    }
   }
 
   private distributeCardsToSections(data: Object): void {

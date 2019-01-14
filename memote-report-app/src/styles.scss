@@ -96,8 +96,14 @@ textarea {
   height: auto; 
 }
 
-.weight {
-  width: 5%;
-  text-align: left;
-  padding: 15px;
+.badge {
+  position:relative;
+  text-align:center;
+  background:#ff4081;
+  color:white;
+
+  width:1vmax;
+  height:1vmax;           
+
+  border-radius:50%;
 }

@@ -2763,7 +2763,7 @@
     },
     "weights": {
         "test_find_disconnected": null,
-        "test_metabolite_annotation_overview": null,
+        "test_metabolite_annotation_overview": 5.0,
         "test_metabolite_annotation_presence": null,
         "test_metabolite_annotation_wrong_ids": null,
         "test_metabolite_id_namespace_consistency": null,

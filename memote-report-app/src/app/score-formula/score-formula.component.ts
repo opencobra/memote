@@ -14,6 +14,7 @@ export class ScoreFormulaComponent implements OnInit {
   modelScore: string[] = [];
   formulae: string[] = [];
   sections: Object[] = [];
+  sectionWeight = 1;
 
   constructor(private data: ReportDataService) {
   }
@@ -21,6 +22,17 @@ export class ScoreFormulaComponent implements OnInit {
   ngOnInit() {
     this.getScore();
     this.constructFormulae();
+  }
+
+  getSectionWeight() {
+    if (this.position !== 'Total Score') {
+      const weight = this.data.scorePerSection[this.position]['weights'][0];
+      if ( weight !== 1 && typeof weight !== 'undefined') {
+        this.sectionWeight = weight;
+        return true;
+      }
+      return false;
+      }
   }
 
   getScore() {
@@ -74,7 +86,6 @@ export class ScoreFormulaComponent implements OnInit {
     let unweighted_numerator_0 = 0;
     let score = 0;
     for (const test of this.data.scoredCard['sections'][this.position]['cases']) {
-      console.log(test);
       if (test in Object.keys(this.data.testWeights)) {
         const weight = this.data.testWeights[test];
       }

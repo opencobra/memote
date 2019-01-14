@@ -16,6 +16,12 @@
           </td>
           </div>
          </mat-panel-title>
+         <div *ngIf='getSectionWeight() ; else whiteBadge'> 
+            <div class='badge'> {{ sectionWeight }} </div> 
+          </div>
+          <ng-template #whiteBadge>
+              <div class='badge' style="background-color: white"></div> 
+          </ng-template>
        </mat-expansion-panel-header>
        <div>
          <p>The {{ scoreType}} is the result of the following calculation. For more information please click on "Readme" in the top left of the report.</p>
