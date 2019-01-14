@@ -56,20 +56,26 @@
     <mat-card>
         <mat-card-title>Why are the tests divided into two principal sections?</mat-card-title>
         <mat-card-content>
-    <p>The tests in the left section are independent of the organism, the complexity of a genome-scale metabolic model (GSM) or the types of identifiers
-         that are used to describe its components. Because of this, we calculate a score for these tests which allows for the quick comparison of GSMs. The unscored section on ther right 
+    <p>The tests in the left section are independent of the class of modeled organism, the complexity of a genome-scale metabolic model (GSM) or the types of identifiers
+         that are used to describe its components. Because of this, it is possible to calculate a score for these tests which further allows for the quick comparison of GSMs. The unscored section on ther right 
          provides general statistics and covers specific aspects of a metabolic network that are not universally applicable. For instance,
            dedicated quality control of the biomass equation only applies to GSM which are used to investigate cell growth.</p>
-    <p>The variety of constraints-based modeling approaches and the fundamental differences between various organisms compound the assessment of GSMs. For
-         instance, some authors may publish metabolic networks which are parameterized, ready to run flux balance analysis (FBA), these are referred to simply as 'models'. Alternatively,
-          others may publish unconstrained metabolic databases (referred to as 'reconstructions'), which need to be initialized before simulation. Both can be encoded in SBML. 
-          With having a scored test section, we attempt to make both 'models' and 'reconstructions' comparable.</p>
         </mat-card-content>
     </mat-card>
     <mat-card>
+            <mat-card-title>"Reconstructions" versus "Models"</mat-card-title>
+            <mat-card-content>
+        <p>The variety of constraints-based modeling approaches and the fundamental differences between various organisms compound the assessment of GSMs. For
+                instance, some authors may publish metabolic networks which are parameterized, ready to run flux balance analysis (FBA), these are referred to simply as 'models'. Alternatively,
+                 others may publish unconstrained metabolic databases (referred to as 'reconstructions'), from which several models can be derived by applying differential constraints. Both can be encoded in SBML. 
+                 With having an independent scored test section, we attempt to make both 'models' and 'reconstructions' comparable, although a user should be aware that this difference exists and is subject to <a href="https://github.com/opencobra/memote/issues/228"> some discussion </a>.
+                Please note, that some tests in the specific section may error for a reconstruction as they require initialization.</p>
+            </mat-card-content>
+        </mat-card>
+    <mat-card>
     <mat-card-title>How is the score calculated?</mat-card-title>
     <mat-card-content>
-    <p>Each test provides a relative measure of completeness with regard to the tested property. The final score is the weighted sum of all individual test
+    <p>Each test in the independent section provides a relative measure of completeness with regard to the tested property. The final score is the weighted sum of all individual test
          results normalized by the maximally achievable score i.e. all individual results at 100%. Individual tests can be weighted, but it is also possible to apply weighting to entire test 
          categories. Hence the final score is calculated:</p>
          <br>
@@ -85,7 +91,7 @@
                 <div class='badge'> 3 </div>
             </mat-expansion-panel-header>
           </mat-expansion-panel>
-    <p> No badge means that the weight is either equal 1 or undefined.</p>
+    <p> No badge means that the weight is either equal to 1 or undefined.</p>
     </mat-card-content>
     </mat-card>
 </mat-dialog-content>
