@@ -9,7 +9,7 @@
     style="margin:0.5vmax">
     <mat-toolbar
       class="mat-elevation-z2"
-      color='secondary'> Scored Tests </mat-toolbar>
+      color='secondary'> This section is comparable between GSM </mat-toolbar>
       <mat-card fxFlex *ngIf='data.scoredCard'>
         <app-universal-core [scoreData]="data.scoredCard"></app-universal-core>
       </mat-card>
@@ -23,7 +23,7 @@
     *ngIf='data'>
       <mat-toolbar
       class="mat-elevation-z2"
-      color='secondary'> Unscored Tests </mat-toolbar>
+      color='secondary'> This section is specific to a given GSM </mat-toolbar>
       <div
         *ngFor="let card of data.statisticsCards">
           <app-statistics [currentCard]="card"></app-statistics>

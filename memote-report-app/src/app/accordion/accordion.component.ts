@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ReportDataService } from './../report-data.service';
+import {MatBadgeModule} from '@angular/material/badge';
 
 @Component({
   selector: 'app-accordion',
@@ -12,6 +13,14 @@ export class AccordionComponent implements OnInit {
 
   constructor(private data: ReportDataService) { }
 
-  ngOnInit() { }
+  ngOnInit() {}
+
+  getWeight(testId: string) {
+    const weight = this.data.testWeights[testId.split(':')[0]];
+  if ( weight !== 1 && typeof weight !== 'undefined') {
+    return weight;
+  }
+  return ' ';
+  }
 
 }

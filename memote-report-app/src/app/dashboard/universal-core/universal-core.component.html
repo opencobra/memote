@@ -1,10 +1,10 @@
-<mat-card-title>Universal Core</mat-card-title>
+<mat-card-title></mat-card-title>
     <mat-card-content>
       <div>
       <div fxFlex>
-        <h2>Scored Tests</h2>
+        <!-- <h2>Scored Tests</h2> -->
         <div *ngFor="let section of scoreData.sections | keys">
-          <h3> {{ scoreData.sections[section].title }}</h3>
+          <h2> {{ scoreData.sections[section].title }}</h2>
           <div *ngFor="let case of scoreData.sections[section].cases; let first = first">
               <mat-expansion-panel
               *ngIf="first && data.reportType === 'diff'"

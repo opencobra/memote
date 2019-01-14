@@ -48,6 +48,9 @@
                   <td *ngSwitchCase="'diff'">
                     <app-diff-button [testId]="testId"></app-diff-button>
                   </td>
+              <td class="weight">
+                 {{ getWeight(testId) }}
+              </td>
               </div>
             </mat-panel-title>
             <ng-template #noTitle>
@@ -60,6 +63,9 @@
                 <td *ngSwitchCase="'diff'">
                     <app-diff-button [testId]="testId"></app-diff-button>
                   </td>
+                  <td class="weight">
+                      {{ getWeight(testId) }}
+                   </td>
                 </div>
               </mat-panel-title>
             </ng-template>
