@@ -250,7 +250,6 @@ def find_oxygen_reactions(model):
 
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
-    # TODO: BiGG specific (met_c).
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
 
 
