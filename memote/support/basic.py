@@ -241,7 +241,7 @@ def is_constrained_reaction(model, rxn):
 
 
 def find_oxygen_reactions(model):
-    """Return the directionality of oxygen-producing/-consuming reactions."""
+    """Return list of oxygen-producing/-consuming reactions."""
     o2_in_model = helpers.find_met_in_model(model, "MNXM4")
     return set([rxn for met in model.metabolites for
                 rxn in met.reactions if met.formula == "O2" or
@@ -290,9 +290,9 @@ def find_duplicate_reactions(model):
     Return list of reactions with duplicates.
 
     This function identifies duplicate reactions in each compartment by
-    determining if any two metabolites have identical annotations.
-    For instance, this function would find compounds with IDs ATP1 and ATP2 in
-    the cytosolic compartment, with both having the same InChI annotations.
+    pair-wise comparison of reaction annotation objects. If two reactions have
+    any annotation elements in common they are considered duplicates of each
+    other.
 
     Parameters
     ----------
