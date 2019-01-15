@@ -340,7 +340,7 @@ def test_find_pure_metabolic_reactions(model):
     biomass reactions are removed and the remainder assumed to be pure
     metabolic reactions. Boundary reactions are identified using the attribute
     cobra.Model.boundary. Please read the description of "Transport Reactions"
-    and "Biomass Reactions" to learn how they are identified.
+    and "Biomass Reaction Identified" to learn how they are identified.
 
     """
     ann = test_find_pure_metabolic_reactions.annotation
