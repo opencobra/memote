@@ -1,4 +1,4 @@
-export const specMetric = {
+export const specMetric: any = {
   "$schema": "https://vega.github.io/schema/vega/v3.0.json",
   "width": 350,
   "height": 200,

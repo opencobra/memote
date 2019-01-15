@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ElementRef } from '@angular/core';
-import { parse, View, logLevel, Warn } from 'vega-lib';
+import { parse, View, Warn } from 'vega-lib';
 import { ReportDataService } from '../report-data.service';
 import { specGroupedBarChart } from './vega-grouped-bar-chart.bar-chart-spec';
 
