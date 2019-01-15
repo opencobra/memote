@@ -64,7 +64,7 @@
               </mat-panel-title>
             </ng-template>
           <div *ngIf='isWeighted(testId) ; else whiteBadge'> 
-            <div class='badge'> {{ weight }} </div> 
+            <div class='badge'> <span class="vert-align"> X{{ weight }} </span> </div> 
           </div>
           <ng-template #whiteBadge>
               <div class='badge' style="background-color: white"></div> 
