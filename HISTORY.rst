@@ -10,6 +10,8 @@ Next Release
 * Clearly indicate weights/ multipliers by introducing margenta badges next to each test in the report.
 * In the reports, improve the descriptions of the 'Help' section and rename this section to 'Readme'.
 * Rename the principal sections and include a brief explanation for each.
+* Fix bug that would show a test as 'Errored' although it only failed. Fixed by making condition in errorFailsafe 
+  in test-result.model.ts more specific for cases where data is undefined or null.
 
 0.8.11 (2019-01-07)
 -------------------
