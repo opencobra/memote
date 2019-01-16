@@ -3,6 +3,13 @@ History
 
 Next Release
 ------------
+* Update memote-report-app from Angular 5.1.0 to 7.2.0.
+* Reduce the prominence of the total score in the reports.
+* Provide partial calculations for each section.
+* Show overall formula of how the total score is calculated.
+* Clearly indicate weights/ multipliers by introducing margenta badges next to each test in the report.
+* In the reports, improve the descriptions of the 'Help' section and rename this section to 'Readme'.
+* Rename the principal sections and include a brief explanation for each.
 
 0.8.11 (2019-01-07)
 -------------------
