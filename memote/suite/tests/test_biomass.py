@@ -50,10 +50,20 @@ def test_biomass_presence(model):
     reaction may not be relevant to modeling the metabolism of higher
     organisms, it is essential for single-cell modeling.
 
-    This test checks if at least one biomass reaction is present. Currently,
-    the biomass reaction is identified by looking for the word 'biomass' in
-    the reaction ID. The heuristics of identification will be improved in the
-    future.
+    Implementation:
+    Identifies possible biomass reactions using two principal steps:
+        1. Return reactions that include the SBO annotation "SBO:0000629" for
+        biomass.
+    If no reactions can be identifies this way:
+        1. Look for the ``buzzwords`` "biomass", "growth" and "bof" in reaction
+        IDs.
+        2. Look for metabolite IDs or names that contain the ``buzzword``
+        "biomass" and obtain the set of reactions they are involved in.
+        3. Remove boundary reactions from this set.
+        4. Return the union of reactions that match the buzzwords and of the
+        reactions that metabolites are involved in that match the buzzword.
+    This test checks if at least one biomass reaction is present.
+
     """
     ann = test_biomass_presence.annotation
     ann["data"] = [
@@ -79,6 +89,12 @@ def test_biomass_consistency(model, reaction_id):
     to be able to reliably calculate growth yields, to cross-compare models,
     and to obtain valid predictions when simulating microbial consortia. A
     deviation from 1 - 1E-03 to 1 + 1E-06 is accepted.
+
+    Implementation:
+    Multiplies the coefficient of each metabolite of the biomass reaction with
+    its molecular weight calculated from the formula, then divides the overall
+    sum of all the products by 1000.
+
     """
     ann = test_biomass_consistency.annotation
     reaction = model.reactions.get_by_id(reaction_id)
@@ -97,8 +113,8 @@ def test_biomass_consistency(model, reaction_id):
             """.format(reaction_id, ann["data"][reaction_id])
         )
     ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    # To account for numerical inaccuracies, a range from 1 - 1e0-3 to 1 + 1e-06
-    # is implemented in the assertion check.
+    # To account for numerical inaccuracies, a range from 1-1e0-3 to 1+1e-06
+    # is implemented in the assertion check
     assert (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06), \
         ann["message"][reaction_id]
 
@@ -113,6 +129,11 @@ def test_biomass_default_production(model, reaction_id):
     Using flux balance analysis this test optimizes the model for growth in
     the medium that is set by default. Any non-zero growth rate is accepted to
     pass this test.
+
+    Implementation:
+    Calculate the solution of FBA with the biomass reaction set as objective
+    function and a model's default constraints.
+
     """
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
@@ -135,6 +156,11 @@ def test_biomass_open_production(model, reaction_id):
     Using flux balance analysis this test optimizes the model for growth using
     a complete medium i.e. unconstrained boundary reactions. Any non-zero
     growth rate is accepted to pass this test.
+
+    Implementation:
+    Calculate the solution of FBA with the biomass reaction set as objective
+    function and after removing any constraints from all boundary reactions.
+
     """
     ann = test_biomass_open_production.annotation
     helpers.open_boundaries(model)
@@ -161,6 +187,13 @@ def test_biomass_precursors_default_production(model, reaction_id):
     conditions. This is useful when reconstructing the precursor biosynthesis
     pathways of a metabolic model. To pass this test, the model should be able
     to synthesis all the precursors.
+
+    Implementation:
+    For each biomass precursor (except ATP and H2O) add a temporary demand
+    reaction, then carry out FBA with this reaction as the objective. Collect
+    all metabolites for which this optimization is below or equal to zero or is
+    infeasible.
+
     """
     ann = test_biomass_precursors_default_production.annotation
     reaction = model.reactions.get_by_id(reaction_id)
@@ -195,6 +228,14 @@ def test_biomass_precursors_open_production(model, reaction_id):
     reconstructing the precursor biosynthesis pathways of a metabolic model.
     To pass this test, the model should be able to synthesis all the
     precursors.
+
+    Implementation:
+    First remove any constraints from all boundary reactions, then for each
+    biomass precursor (except ATP and H2O) add a temporary demand
+    reaction, then carry out FBA with this reaction as the objective. Collect
+    all metabolites for which this optimization is below or equal to zero or is
+    infeasible.
+
     """
     ann = test_biomass_precursors_open_production.annotation
     helpers.open_boundaries(model)
@@ -226,6 +267,12 @@ def test_gam_in_biomass(model, reaction_id):
     the form of ATP that is required to synthesize macromolecules such as
     Proteins, DNA and RNA, and other processes during growth. This test checks
     if a biomass reaction contains this term.
+
+    Implementation:
+    Identifies the metabolite IDs of ATP, ADP, H2O, HO4P and H+ based on an
+    internal mapping table. Checks if ATP and H2O are a subset of the reactants
+    and ADP, HO4P and H+ a subset of the products of the biomass equation.
+
     """
     ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
@@ -307,6 +354,15 @@ def test_direct_metabolites_in_biomass(model, reaction_id):
     reaction to account for the impact of their uptake energy costs.
 
     This threshold is subject to change in the future.
+
+    Implementation:
+    Identify biomass precursors (excluding ATP and H+), identify cytosol
+    and extracellular compartment from an internal mapping table. Then,
+    determine which precursors is only involved in transport, boundary and
+    biomass reactions. Using FBA with the biomass function as the objective
+    then determine whether the metabolite is taken up only to be consumed by
+    the biomass reaction.
+
     """
     # TODO: Update the threshold as soon as we have an overview of the average!
     ann = test_direct_metabolites_in_biomass.annotation
@@ -356,6 +412,16 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
 
     These metabolites were selected based on the results presented by
     DOI:10.1016/j.ymben.2016.12.002
+
+    Implementation:
+    Determine whether the model employs a lumped or split biomass reaction.
+    Then, using an internal mapping table, try to identify the above list of
+    essential precursors in list of precursor metabolites of either type of
+    biomass reaction. List IDs in the models namespace if the metabolite
+    exists, else use the MetaNetX namespace if the metabolite does not exist
+    in the model. Identifies the cytosol from an internal mapping
+    table, and assumes that all precursors exist in that compartment.
+
     """
     ann = test_essential_precursors_not_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
