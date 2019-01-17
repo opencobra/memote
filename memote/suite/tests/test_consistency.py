@@ -256,56 +256,62 @@ def test_find_disconnected(read_only_model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Production With Closed Bounds",
-          format_type="count")
-def test_find_metabolites_produced_with_closed_bounds(model):
-    """
-    Expect no metabolites to be produced without substrate consumption.
+# FIXME (Moritz Beber): These metabolites are a subset of the 'unconserved
+#  metabolites' and the test can take a long time. Might be entirely removed in
+#  future.
+# @annotate(title="Metabolite Production With Closed Bounds",
+#           format_type="count")
+# def test_find_metabolites_produced_with_closed_bounds(model):
+#     """
+#     Expect no metabolites to be produced without substrate consumption.
 
-    It should not be possible for the model to produce metabolites without
-    consuming substrate from the medium. This test disables all the boundary
-    reactions and checks if any metabolite can be produced individually
-    using flux balance analysis. To pass this test no metabolite outside of
-    specific boundary reactions should be produced without the consumption of
-    substrate.
+    # It should not be possible for the model to produce metabolites without
+    # consuming substrate from the medium. This test disables all the boundary
+    # reactions and checks if any metabolite can be produced individually
+    # using flux balance analysis. To pass this test no metabolite outside of
+    # specific boundary reactions should be produced without the consumption of
+    # substrate.
 
-    """
-    ann = test_find_metabolites_produced_with_closed_bounds.annotation
-    ann["data"] = get_ids(
-        consistency.find_metabolites_produced_with_closed_bounds(model)
-    )
-    ann["metric"] = len(ann["data"]) / len(model.metabolites)
-    ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites can be produced without the model
-        needing to consume any substrate: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert len(ann["data"]) == 0, ann["message"]
+    # """
+    # ann = test_find_metabolites_produced_with_closed_bounds.annotation
+    # ann["data"] = get_ids(
+    #     consistency.find_metabolites_produced_with_closed_bounds(model)
+    # )
+    # ann["metric"] = len(ann["data"]) / len(model.metabolites)
+    # ann["message"] = wrapper.fill(
+    #     """A total of {} ({:.2%}) metabolites can be produced without the model
+    #     needing to consume any substrate: {}""".format(
+    #         len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    # assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Consumption With Closed Bounds",
-          format_type="count")
-def test_find_metabolites_consumed_with_closed_bounds(model):
-    """
-    Expect no metabolites to be consumed without product removal.
+# FIXME (Moritz Beber): These metabolites are a subset of the 'unconserved
+#  metabolites' and the test can take a long time. Might be entirely removed in
+#  future.
+# @annotate(title="Metabolite Consumption With Closed Bounds",
+#           format_type="count")
+# def test_find_metabolites_consumed_with_closed_bounds(model):
+#     """
+#     Expect no metabolites to be consumed without product removal.
 
-    Just like metabolites should not be produced from nothing, mass should
-    not simply be removed from the model. This test disables all the
-    boundary reactions and checks if any metabolite can be consumed
-    individually using flux balance analysis. To pass this test no
-    metabolite outside of specific boundary reactions should be consumed
-    without product leaving the system.
+    # Just like metabolites should not be produced from nothing, mass should
+    # not simply be removed from the model. This test disables all the
+    # boundary reactions and checks if any metabolite can be consumed
+    # individually using flux balance analysis. To pass this test no
+    # metabolite outside of specific boundary reactions should be consumed
+    # without product leaving the system.
 
-    """
-    ann = test_find_metabolites_consumed_with_closed_bounds.annotation
-    ann["data"] = get_ids(
-        consistency.find_metabolites_consumed_with_closed_bounds(model)
-    )
-    ann["metric"] = len(ann["data"]) / len(model.metabolites)
-    ann["message"] = wrapper.fill(
-        """A total of {} ({:.2%}) metabolites can be consumed without
-        using the system's boundary reactions: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert len(ann["data"]) == 0, ann["message"]
+    # """
+    # ann = test_find_metabolites_consumed_with_closed_bounds.annotation
+    # ann["data"] = get_ids(
+    #     consistency.find_metabolites_consumed_with_closed_bounds(model)
+    # )
+    # ann["metric"] = len(ann["data"]) / len(model.metabolites)
+    # ann["message"] = wrapper.fill(
+    #     """A total of {} ({:.2%}) metabolites can be consumed without
+    #     using the system's boundary reactions: {}""".format(
+    #         len(ann["data"]), ann["metric"], truncate(ann["data"])))
+    # assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Metabolite Production In Complete Medium",
