@@ -47,8 +47,10 @@ class ConfigSectionSchema(object):
         github_username = Param(type=str)
         exclusive = Param(type=str, multiple=True)
         skip = Param(type=str, multiple=True)
-        solver = Param(type=click.Choice(["cplex", "glpk", "gurobi"]),
-                       default="glpk")
+        solver = Param(
+            type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
+            default="glpk"
+        )
         experimental = Param(type=click.Path(exists=False, dir_okay=False),
                              default=None)
 
