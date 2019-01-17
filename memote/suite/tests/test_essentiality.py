@@ -45,6 +45,14 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
     metric but is a little fragile to not having any false negatives or false
     positives in the output.
 
+    Implementation:
+    Read and validate experimental config file and data tables. Constrain the
+    model with the parameters provided by a user's definition of the medium,
+    then compute a confusion matrix based on the predicted essential, expected
+    essential, predicted nonessential and expected nonessential genes.
+    The individual values of the confusion matrix are calculated as described
+    in https://en.wikipedia.org/wiki/Confusion_matrix
+
     """
     ann = test_gene_essentiality_from_data_qualitative.annotation
     exp = pytest.memote.experimental.essentiality[experiment]
