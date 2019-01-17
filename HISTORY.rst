@@ -36,6 +36,8 @@ Next Release
 * Extend the annotations tests by a check for full length InChI strings.
 * Fix a bug in ``Unrealistic Growth Rate In Default Medium`` which reported the
   opposite of what was the case.
+* Extend the description of each test by a description of how it is
+  implemented.
 
 0.8.11 (2019-01-07)
 -------------------
