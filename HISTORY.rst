@@ -1,5 +1,6 @@
 History
 =======
+* Thematically reorganize the test cases in the config.
 
 Next Release
 ------------
