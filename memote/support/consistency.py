@@ -402,7 +402,7 @@ def find_charge_unbalanced_reactions(reactions):
         rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
 
 
-def find_stoichiometrically_balanced_cycles(model):
+def find_stoichiometrically_balanced_cycles(model, threshold=1E-07):
     u"""
     Find metabolic reactions in stoichiometrically balanced cycles (SBCs).
 
@@ -412,6 +412,9 @@ def find_stoichiometrically_balanced_cycles(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    threshold : float
+        A numeric threshold accounting for values instabilities in the
+        optimization solvers.
 
     Notes
     -----
@@ -431,7 +434,9 @@ def find_stoichiometrically_balanced_cycles(model):
     helpers.close_boundaries_sensibly(model)
     fva_result = flux_variability_analysis(model, loopless=False)
     return fva_result.index[
-        (fva_result["minimum"] == -1) | (fva_result["maximum"] == 1)].tolist()
+        (fva_result["minimum"] <= (-1 + threshold)) |
+        (fva_result["maximum"] >= (1 - threshold))
+    ].tolist()
 
 
 def find_orphans(model):
