@@ -250,23 +250,19 @@
     },
     "tests": {
         "test_biomass_consistency": {
-            "data": {
-                "BIOMASS_Ecoli_core_w_GAM": 1.5407661664547
-            },
+            "data": {},
             "duration": {
-                "BIOMASS_Ecoli_core_w_GAM": 0.0010471343994140625
+              "BIOMASS_Ecoli_core_w_GAM": 0.00048470497131347656
             },
-            "message": {
-                "BIOMASS_Ecoli_core_w_GAM": "The component molar mass of the biomass reaction\nBIOMASS_Ecoli_core_w_GAM sums up to 1.54076616645         which is\noutside of the 1e-03 margin from 1 mmol / g[CDW] / h."
-            },
-            "metric": 1.0,
+            "format_type": "number",
+            "message": {},
+            "metric": {},
             "result": {
-                "BIOMASS_Ecoli_core_w_GAM": "failed"
+              "BIOMASS_Ecoli_core_w_GAM": "failed"
             },
-            "summary": "\n    Expect biomass components to sum up to 1 g[CDW].\n\n    The molecular weight of the biomass reaction in metabolic models is\n    defined to be equal to 1 g/mmol. Conforming to this is essential in order\n    to be able to reliably calculate growth yields, to cross-compare models,\n    and to obtain valid predictions when simulating microbial consortia. A\n    deviation by 1e-03 is accepted.\n    ",
-            "title": "Biomass Consistency",
-            "format_type": "number"
-        },
+            "summary": "This test only yields sensible results if all biomass precursor\nmetabolites have chemical formulas assigned to them.\nThe molecular weight of the biomass reaction in metabolic models is\ndefined to be equal to 1 g/mmol. Conforming to this is essential in order\nto be able to reliably calculate growth yields, to cross-compare models,\nand to obtain valid predictions when simulating microbial consortia. A\ndeviation by 1e-03 is accepted.",
+            "title": "Biomass Consistency"
+          },
         "test_biomass_default_production": {
             "data": {
                 "BIOMASS_Ecoli_core_w_GAM": 0.8739215069684279
