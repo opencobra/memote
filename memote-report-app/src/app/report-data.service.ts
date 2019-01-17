@@ -93,7 +93,7 @@ export class ReportDataService {
     // Store each test result as a TestResult object in a central list.
     for (const test of Object.keys(data['tests'])){
       if (data['tests'][test]['message'] instanceof Object) {
-        for (const param of Object.keys(data['tests'][test]['data'])) {
+        for (const param of Object.keys(data['tests'][test]['result'])) {
           const newID = test + ':' + param;
           this.allTests.push(
               new TestResult(
