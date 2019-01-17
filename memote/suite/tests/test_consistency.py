@@ -178,7 +178,7 @@ def test_blocked_reactions(read_only_model):
 
 
 @annotate(title="Stoichiometrically Balanced Cycles", format_type="count")
-def test_find_stoichiometrically_balanced_cycles(read_only_model):
+def test_find_stoichiometrically_balanced_cycles(model):
     """
     Expect no stoichiometrically balanced loops to be present.
 
@@ -188,9 +188,8 @@ def test_find_stoichiometrically_balanced_cycles(read_only_model):
 
     """
     ann = test_find_stoichiometrically_balanced_cycles.annotation
-    ann["data"] = consistency.find_stoichiometrically_balanced_cycles(
-        read_only_model)
-    ann["metric"] = len(ann["data"]) / len(read_only_model.reactions)
+    ann["data"] = consistency.find_stoichiometrically_balanced_cycles(model)
+    ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) reactions
         which participate in SBC in the model: {}""".format(
