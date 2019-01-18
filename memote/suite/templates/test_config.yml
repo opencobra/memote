@@ -19,7 +19,7 @@ cards:
         - test_metabolite_annotation_overview
         - test_metabolite_annotation_wrong_ids
         - test_metabolite_id_namespace_consistency
-       annotation_rxn:
+      annotation_rxn:
         title: "Annotation - Reaction"
         weight: 1.0
         cases:
@@ -27,7 +27,7 @@ cards:
         - test_reaction_annotation_overview
         - test_reaction_annotation_wrong_ids
         - test_reaction_id_namespace_consistency
-       annotation_rxn:
+      annotation_gene:
         title: "Annotation - Gene"
         weight: 1.0
         cases:
