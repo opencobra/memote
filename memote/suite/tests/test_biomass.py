@@ -78,18 +78,27 @@ def test_biomass_consistency(read_only_model, reaction_id):
     defined to be equal to 1 g/mmol. Conforming to this is essential in order
     to be able to reliably calculate growth yields, to cross-compare models,
     and to obtain valid predictions when simulating microbial consortia. A
-    deviation by 1e-03 is accepted.
+    deviation from 1 - 1E-03 to 1 + 1E-06 is accepted.
     """
     ann = test_biomass_consistency.annotation
     reaction = read_only_model.reactions.get_by_id(reaction_id)
-    ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
+    try:
+        ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
+    except TypeError:
+        ann["data"][reaction_id] = float("nan")
+        ann["message"][reaction_id] = wrapper.fill(
+            """One or more of the biomass components do not have a defined
+            formula or contain unspecified chemical groups."""
+        )
+    else:
+        ann["message"][reaction_id] = wrapper.fill(
+            """The component molar mass of the biomass reaction {} sums up to {}
+            which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
+            """.format(reaction_id, ann["data"][reaction_id])
+        )
     ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    ann["message"][reaction_id] = wrapper.fill(
-        """The component molar mass of the biomass reaction {} sums up to {}
-        which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
-        """.format(reaction_id, ann["data"][reaction_id]))
-    # To account for numerical innacuracies, a range from 1-1e0-3 to 1+1e-06
-    # is implemented in the assertion check
+    # To account for numerical inaccuracies, a range from 1 - 1e0-3 to 1 + 1e-06
+    # is implemented in the assertion check.
     assert (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06), \
         ann["message"][reaction_id]
 
