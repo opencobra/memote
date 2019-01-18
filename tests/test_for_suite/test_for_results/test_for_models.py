@@ -101,7 +101,8 @@ class TestResult(object):
 
     @pytest.mark.parametrize("name_a, name_b", [
         ("abcdef", "ghijkl"),
-        pytest.mark.raises(("same", "same"), exception=IntegrityError)
+        pytest.param("same", "same",
+                     marks=pytest.mark.raises(exception=IntegrityError))
     ])
     def test_unique_hexsha(self, session, name_a, name_b):
         timestamp = datetime.now()
