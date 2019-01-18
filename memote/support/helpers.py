@@ -168,7 +168,6 @@ def find_transport_reactions(model):
                        rxn.annotation['sbo'] in TRANSPORT_RXN_SBO_TERMS])
     if len(sbo_matches) > 0:
         transport_reactions += list(sbo_matches)
-        transport_reactions += list(sbo_matches)
     # Find unlabeled transport reactions via formula or annotation checks
     for rxn in transport_rxn_candidates:
         # Check if metabolites have formula field
