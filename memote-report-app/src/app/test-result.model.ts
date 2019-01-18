@@ -10,7 +10,7 @@ export class TestResult {
   public format_type: string;
 
   private errorFailsafe(result: string) {
-    if (this.result !== 'skipped' && !this.data ) {
+    if (this.result !== 'skipped' && (this.data === null || typeof this.data === 'undefined') ) {
       this.result = 'error';
     } else {
       this.result = result;

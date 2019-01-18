@@ -37,21 +37,6 @@
                     ],
                     "title": "Consistency",
                     "weight": 3.0
-                },
-                "matrix": {
-                    "cases": null,
-                    "title": "Matrix Conditioning",
-                    "weight": 1.0
-                },
-                "sbo": {
-                    "cases": null,
-                    "title": "SBO Terms",
-                    "weight": 2.0
-                },
-                "sequence": {
-                    "cases": null,
-                    "title": "Sequence Cross References",
-                    "weight": 2.0
                 }
             },
             "title": "Core Tests"
@@ -265,23 +250,19 @@
     },
     "tests": {
         "test_biomass_consistency": {
-            "data": {
-                "BIOMASS_Ecoli_core_w_GAM": 1.5407661664547
-            },
+            "data": {},
             "duration": {
-                "BIOMASS_Ecoli_core_w_GAM": 0.0010471343994140625
+              "BIOMASS_Ecoli_core_w_GAM": 0.00048470497131347656
             },
-            "message": {
-                "BIOMASS_Ecoli_core_w_GAM": "The component molar mass of the biomass reaction\nBIOMASS_Ecoli_core_w_GAM sums up to 1.54076616645         which is\noutside of the 1e-03 margin from 1 mmol / g[CDW] / h."
-            },
-            "metric": 1.0,
+            "format_type": "number",
+            "message": {},
+            "metric": {},
             "result": {
-                "BIOMASS_Ecoli_core_w_GAM": "failed"
+              "BIOMASS_Ecoli_core_w_GAM": "failed"
             },
-            "summary": "\n    Expect biomass components to sum up to 1 g[CDW].\n\n    The molecular weight of the biomass reaction in metabolic models is\n    defined to be equal to 1 g/mmol. Conforming to this is essential in order\n    to be able to reliably calculate growth yields, to cross-compare models,\n    and to obtain valid predictions when simulating microbial consortia. A\n    deviation by 1e-03 is accepted.\n    ",
-            "title": "Biomass Consistency",
-            "format_type": "number"
-        },
+            "summary": "This test only yields sensible results if all biomass precursor\nmetabolites have chemical formulas assigned to them.\nThe molecular weight of the biomass reaction in metabolic models is\ndefined to be equal to 1 g/mmol. Conforming to this is essential in order\nto be able to reliably calculate growth yields, to cross-compare models,\nand to obtain valid predictions when simulating microbial consortia. A\ndeviation by 1e-03 is accepted.",
+            "title": "Biomass Consistency"
+          },
         "test_biomass_default_production": {
             "data": {
                 "BIOMASS_Ecoli_core_w_GAM": 0.8739215069684279
@@ -2778,7 +2759,7 @@
     },
     "weights": {
         "test_find_disconnected": null,
-        "test_metabolite_annotation_overview": null,
+        "test_metabolite_annotation_overview": 5.0,
         "test_metabolite_annotation_presence": null,
         "test_metabolite_annotation_wrong_ids": null,
         "test_metabolite_id_namespace_consistency": null,
@@ -2794,8 +2775,7 @@
     "sections":
         [
             {"section":"annotation", "score": 0.997},
-            {"section":"consistency",  "score":0.64},
-            {"section":"sbo", "score":0.09}
+            {"section":"consistency",  "score":0.64}
         ],
     "total_score": 0.3923105636431504
   }

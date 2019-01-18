@@ -16,6 +16,9 @@ export class ReportDataService {
   reportType: string;
   allExpandState = false;
   score: any;
+  scorePerSection: Object = {};
+  testWeights: Object = {};
+  testWeightsExpanded: Object = {};
 
   constructor(private http: HttpClient) {}
 
@@ -39,14 +42,14 @@ export class ReportDataService {
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
-        this.http.get('/data/testDiff.json')
-        .subscribe(data => {this.convertDiffResults(data); });
-        this.reportType = 'diff';
-        break;
-        // this.http.get('/data/testData.json')
-        // .subscribe(data => {this.convertResults(data); });
-        // this.reportType = 'snapshot';
+        // this.http.get('/data/testDiff.json')
+        // .subscribe(data => {this.convertDiffResults(data); });
+        // this.reportType = 'diff';
         // break;
+        this.http.get('/data/testData.json')
+        .subscribe(data => {this.convertResults(data); });
+        this.reportType = 'snapshot';
+        break;
         // this.http.get('/data/testHistory.json')
         // .subscribe(data => {this.convertHistoryResults(data); });
         // this.reportType = 'history';
@@ -90,7 +93,7 @@ export class ReportDataService {
     // Store each test result as a TestResult object in a central list.
     for (const test of Object.keys(data['tests'])){
       if (data['tests'][test]['message'] instanceof Object) {
-        for (const param of Object.keys(data['tests'][test]['data'])) {
+        for (const param of Object.keys(data['tests'][test]['result'])) {
           const newID = test + ':' + param;
           this.allTests.push(
               new TestResult(
@@ -116,8 +119,10 @@ export class ReportDataService {
     }
     this.extractMetadata(data);
     this.extractScoring(data);
+    this.extractTestWeights(data);
     this.distributeCardsToSections(data);
     this.determineScoredTests();
+    this.determineScorePerSection();
   }
 
   private convertHistoryResults(data: Object): void {
@@ -176,16 +181,30 @@ private convertDiffResults(data: Object): void {
 this.distributeCardsToSections(data);
 this.determineScoredTests();
 this.extractScoring(data);
+this.extractTestWeights(data);
+this.determineScorePerSection();
 }
 
   private extractMetadata(data: Object): void {
-    // Extract metaddata information to be used in the metadata card
+    // Extract metaddata information to be used in the metadata card.
     this.metaData = data['meta'];
   }
 
   private extractScoring(data: Object): void {
-    // Extract score information to be used in the score display and bar chart plot
+    // Extract score information to be used in the score display and bar chart plot.
     this.score = data['score'];
+  }
+
+  private extractTestWeights(data: Object): void {
+    // Extract information for each test weight used in the score-formula component.
+    this.testWeights = data['weights'];
+
+    for (const testId of Object.keys(this.testWeights)) {
+      const parameterizedTestIds = this.byReg(testId);
+      for (const paramId of parameterizedTestIds) {
+        this.testWeightsExpanded[paramId] = this.testWeights[testId];
+      }
+    }
   }
 
   private distributeCardsToSections(data: Object): void {
@@ -223,5 +242,37 @@ this.extractScoring(data);
   }
   return this.getString(reformatted_data);
 
+  }
+
+  public determineScorePerSection() {
+    let total_score: string[] = [];
+    let sections: Object[] = [];
+    if (this.reportType === 'snapshot') {
+      sections = this.score.sections;
+      total_score = [this.score.total_score];
+    } else {
+      sections = this.score.sections.diff;
+      for (const totalScoreObj of this.score.total_score.diff) {
+        total_score.push(totalScoreObj.total_score);
+      }
+    }
+    let weights: string[] = [];
+    let scores: string[] = [];
+    for (const section of sections) {
+      const sectionName = section['section'];
+      if (!(this.scorePerSection.hasOwnProperty(sectionName))) {
+        weights.push(this.scoredCard['sections'][sectionName].weight);
+        scores.push(section['score']);
+        this.scorePerSection[sectionName] = {
+          'weights': weights,
+          'scores': scores};
+      } else {
+        this.scorePerSection[sectionName]['weights'].push(this.scoredCard['sections'][sectionName].weight);
+        this.scorePerSection[sectionName]['scores'].push(section['score']);
+      }
+      weights = [];
+      scores = [];
+    }
+    this.scorePerSection['Total Score'] = {'scores': total_score};
   }
 }

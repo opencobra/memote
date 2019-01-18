@@ -3,6 +3,17 @@ History
 
 Next Release
 ------------
+* Update memote-report-app from Angular 5.1.0 to 7.2.0.
+* Reduce the prominence of the total score in the reports.
+* Provide partial calculations for each section.
+* Show overall formula of how the total score is calculated.
+* Clearly indicate weights/ multipliers by introducing margenta badges next to each test in the report.
+* In the reports, improve the descriptions of the 'Help' section and rename this section to 'Readme'.
+* Rename the principal sections and include a brief explanation for each.
+* Fix bug that would show a test as 'Errored' although it only failed. Fixed by making condition in errorFailsafe 
+  in test-result.model.ts more specific for cases where data is undefined or null.
+* Fix bug that would make parametrized tests disappear from the report if they had errored or if for some reason their 'data' attribute
+  was undefined.
 * Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
 * Display an alternative message if some biomass components do not contain a 
   formula.

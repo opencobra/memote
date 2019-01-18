@@ -95,3 +95,22 @@ textarea {
   padding: 0.5vw;
   height: auto; 
 }
+
+.badge {
+  position:relative;
+  text-align:center;
+  background:#ff4081;
+  width:1vmax;
+  height:1vmax;
+  line-height:1vmax;        
+
+  border-radius:50%;
+}
+
+.vert-align {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    color:white;
+    font-size:0.6vmax;
+  }

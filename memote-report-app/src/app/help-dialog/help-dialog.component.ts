@@ -14,7 +14,7 @@ export class HelpDialogComponent {
 
   openDialog() {
     const dialogRef = this.dialog.open(HelpDialogTextComponent, {
-      height: '90%', width: '30%'
+      height: '90%', width: '70%'
     });
 
     dialogRef.afterClosed().subscribe(result => {

@@ -6,10 +6,10 @@ export class ResultCard {
   public associatedTests: TestResult[];
 
   constructor(
-    cardID:string,
+    cardID: string,
     {title, cases}: {title: string, cases: TestResult[]}
-  ){
-    this.cardID = cardID
+  ) {
+    this.cardID = cardID;
     this.cardName = title;
     this.associatedTests = cases;
   }

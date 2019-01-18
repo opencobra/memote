@@ -1,4 +1,4 @@
-export const specTotalScoreBarChart = {
+export const specTotalScoreBarChart: any = {
   "$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 300,
   "height": 240,
