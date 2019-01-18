@@ -52,7 +52,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
 
 
 @annotate(title="Independent Conservation Relations",
-          format_type="number")
+          format_type="raw")
 def test_number_independent_conservation_relations(model):
     """
     Show number of independent conservation relations in the model.
@@ -72,7 +72,7 @@ def test_number_independent_conservation_relations(model):
 
 
 @annotate(title="Steady-state Flux Solution Vectors",
-          format_type="number")
+          format_type="raw")
 def test_number_steady_state_flux_solutions(model):
     """
     Show number of independent steady-state flux solution vectors for model.
@@ -91,7 +91,7 @@ def test_number_steady_state_flux_solutions(model):
         """.format(ann["data"]))
 
 
-@annotate(title="Rank", format_type="number")
+@annotate(title="Rank", format_type="raw")
 def test_matrix_rank(model):
     """
     Show rank of the S-Matrix.
@@ -108,7 +108,7 @@ def test_matrix_rank(model):
         """The rank of the S-Matrix is {}.""".format(ann["data"]))
 
 
-@annotate(title="Degrees Of Freedom", format_type="number")
+@annotate(title="Degrees Of Freedom", format_type="raw")
 def test_degrees_of_freedom(model):
     """
     Show degrees of freedom of the S-Matrix.
