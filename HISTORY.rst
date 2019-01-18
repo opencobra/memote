@@ -14,6 +14,9 @@ Next Release
   in test-result.model.ts more specific for cases where data is undefined or null.
 * Fix bug that would make parametrized tests disappear from the report if they had errored or if for some reason their 'data' attribute
   was undefined.
+* Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
+* Display an alternative message if some biomass components do not contain a 
+  formula.
 
 0.8.11 (2019-01-07)
 -------------------

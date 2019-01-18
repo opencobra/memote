@@ -30,12 +30,8 @@ import pytest
 from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
 
-ESSENTIALITY_DATA = list(pytest.memote.experimental.essentiality)
 
-
-@pytest.mark.skipif(len(ESSENTIALITY_DATA) == 0,
-                    reason="No essentiality data found.")
-@pytest.mark.parametrize("experiment", ESSENTIALITY_DATA)
+@pytest.mark.essentiality
 @annotate(title="Gene Essentiality Prediction", format_type="percent",
           data=dict(), message=dict(), metric=dict())
 def test_gene_essentiality_from_data_qualitative(model, experiment,
