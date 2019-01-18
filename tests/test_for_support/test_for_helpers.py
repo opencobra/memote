@@ -240,6 +240,59 @@ def unlabeled_reaction(base):
 
 
 @register_with(MODEL_REGISTRY)
+def ndpk1_annotation(base):
+    """Provide a model with a reportedly false positive."""
+    a = cobra.Metabolite("atp_c", compartment="c")
+    b = cobra.Metabolite("adp_c", compartment="c")
+    c = cobra.Metabolite("gtp_c", compartment="c")
+    d = cobra.Metabolite("gdp_c", compartment="c")
+    b.charge = -3
+    b.formula = "C10H12N5O10P2"
+    b.annotation = {
+        "chebi": "45626",
+        "kegg.compound": "cpd00008",
+        "biocyc": "ADP",
+        "seed.compound": "cpd00008",
+        "pubchem": "6022",
+        "fc_source": "MetaCyc"
+    }
+    a.charge = -4
+    a.formula = "C10H12N5O13P3"
+    a.annotation = {
+        "chebi": "30616",
+        "kegg.compound": "C00002",
+        "biocyc": "ATP",
+        "seed.compound": "cpd00002",
+        "pubchem": "5957",
+        "fc_source": "MetaCyc"
+    }
+    c.charge = -4
+    c.formula = "C10H12N5O14P3"
+    c.annotation = {
+        "chebi": "57600",
+        "kegg.compound": "C00044",
+        "biocyc": "GTP",
+        "seed.compound": "cpd00038",
+        "pubchem": "6830",
+        "fc_source": "MetaCyc"
+    }
+    d.charge = -3
+    d.formula = "C10H12N5O11P2"
+    d.annotation = {
+        "chebi": "58189",
+        "kegg.compound": "C00035",
+        "biocyc": "GDP",
+        "seed.compound": "cpd00031",
+        "pubchem": "8977",
+        "fc_source": "MetaCyc"
+    }
+    rxn = cobra.Reaction("NDPK1")
+    rxn.add_metabolites({a: -1, d: -1, b: 1, c: 1})
+    base.add_reactions([rxn])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def converting_reactions(base):
     """Provide a model with a couple of converting reaction."""
     a = cobra.Metabolite("atp_c", compartment="c")
@@ -479,7 +532,8 @@ def transport_reaction_false():
     ("phosphotransferase_system_formulae", 1),
     ("phosphotransferase_system_annotations", 0),
     ("labeled_reaction", 1),
-    ("unlabeled_reaction", 0)
+    ("unlabeled_reaction", 0),
+    ("ndpk1_annotation", 0)
 ], indirect=["model"])
 def test_find_transport_reactions(model, num):
     """Expect amount of transporters to be identified correctly."""
