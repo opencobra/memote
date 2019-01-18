@@ -30,12 +30,8 @@ import pytest
 from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
 
-GROWTH_DATA = list(pytest.memote.experimental.growth)
 
-
-@pytest.mark.skipif(len(GROWTH_DATA) == 0,
-                    reason="No growth data found.")
-@pytest.mark.parametrize("experiment", GROWTH_DATA)
+@pytest.mark.growth
 @annotate(title="Growth Prediction", format_type="percent",
           data=dict(), message=dict(), metric=dict())
 def test_growth_from_data_qualitative(model, experiment, threshold=0.95):
