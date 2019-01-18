@@ -68,6 +68,7 @@ def met_each_present(base):
                       'kegg.compound': "C00022",
                       'seed.compound': "cpd00020",
                       'inchikey': "LCTONWCANYUPML-UHFFFAOYSA-M",
+                      'inchi': "InChI=1S/C3H4O3/c1-2(4)3(5)6/h1H3,(H,5,6)/p-1",
                       'chebi': ["CHEBI:14987", "CHEBI:15361",
                                 "CHEBI:26462", "CHEBI:26466",
                                 "CHEBI:32816", "CHEBI:45253",
