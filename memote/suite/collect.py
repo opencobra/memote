@@ -72,6 +72,7 @@ class ResultCollectionPlugin(object):
         self._skip = frozenset() if skip is None else frozenset(skip)
 
     def pytest_generate_tests(self, metafunc):
+        """Parametrize marked functions at runtime."""
         if metafunc.definition.get_closest_marker("biomass"):
             metafunc.parametrize("reaction_id", [
                 rxn.id for rxn in find_biomass_reaction(self._model)])
