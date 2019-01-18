@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+* Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
+* Display an alternative message if some biomass components do not contain a 
+  formula.
 
 0.8.11 (2019-01-07)
 -------------------
