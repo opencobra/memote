@@ -130,6 +130,7 @@ def met_broken_id(base):
         'metanetx.chemical': "MNXR23",
         'kegg.compound': "K00022",
         'seed.compound': "cdp00020",
+        'inchi': "InBhI=1/C2H6O/z1-2-3/h3H,2Z2,1Y3",
         'inchikey': "LCT-ONWCANYUPML-UHFFFAOYSA-M",
         'chebi': ["CHEBI:487", "CHEBI:15361", "CHEBI:26462", "CHEBI:26466",
             "CHEBI:32816", "CEBI:O", "CHEBI:86354", "CHEBI:8685"],
