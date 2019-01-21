@@ -17,7 +17,7 @@
 
 """Supporting functions for stoichiometric consistency checks."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import logging
 from operator import attrgetter
@@ -482,62 +482,13 @@ def find_disconnected(model):
     return [met for met in model.metabolites if len(met.reactions) == 0]
 
 
-def find_metabolites_produced_with_closed_bounds(model):
-    """
-    Return metabolites that can be produced when boundary reactions are closed.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    mets_produced = list()
-    helpers.close_boundaries_sensibly(model)
-    for met in model.metabolites:
-        with model:
-            exch = model.add_boundary(
-                met, type='irrex', reaction_id='IRREX', lb=0, ub=1
-            )
-            if helpers.run_fba(model, exch.id) >= TOLERANCE_THRESHOLD:
-                mets_produced.append(met)
-    return mets_produced
-
-
-def find_metabolites_consumed_with_closed_bounds(model):
-    """
-    Return metabolites that can be consumed when boundary reactions are closed.
-
-    Reverse case from 'find_metabolites_produced_with_closed_bounds', just
-    like metabolites should not be produced from nothing, mass should not
-    simply be removed from the model.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    mets_consumed = list()
-    helpers.close_boundaries_sensibly(model)
-    for met in model.metabolites:
-        with model:
-            exch = model.add_boundary(
-                met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
-            )
-            if helpers.run_fba(model, exch.id,
-                               direction='min') <= -TOLERANCE_THRESHOLD:
-                mets_consumed.append(met)
-    return mets_consumed
-
-
 def find_metabolites_not_produced_with_open_bounds(model):
     """
     Return metabolites that cannot be produced with open boundary reactions.
 
     Inverse case from 'find_metabolites_produced_with_closed_bounds', just
     like metabolites should not be produced from nothing, metabolites should
-    all be produced with open exhanges.
+    all be produced with open exchanges.
 
     Parameters
     ----------
@@ -578,7 +529,7 @@ def find_metabolites_not_consumed_with_open_bounds(model):
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
             solution = helpers.run_fba(model, exch.id, direction="min")
-            if solution is np.nan or solution < TOLERANCE_THRESHOLD:
+            if solution is np.nan or abs(solution) < TOLERANCE_THRESHOLD:
                 mets_not_consumed.append(met)
     return mets_not_consumed
 
@@ -594,19 +545,20 @@ def find_reactions_with_unbounded_flux_default_condition(model):
 
     Returns
     -------
-    unlimited_reactions: list
-        A list of reactions that in default modeling conditions are able to
-        carry flux as high/low as the systems maximal and minimal bounds.
-    fraction: float
-        The fraction of the amount of unbounded reactions to the amount of
-        non-blocked reactions.
-    conditionally_blocked_reactions: list
-        A list of reactions that in default modeling conditions are not able
-        to carry flux at all.
+    tuple
+        list
+            A list of reactions that in default modeling conditions are able to
+            carry flux as high/low as the systems maximal and minimal bounds.
+        float
+            The fraction of the amount of unbounded reactions to the amount of
+            non-blocked reactions.
+        list
+            A list of reactions that in default modeling conditions are not able
+            to carry flux at all.
 
     """
     try:
-        fva_result = flux_variability_analysis(model)
+        fva_result = flux_variability_analysis(model, fraction_of_optimum=1.0)
     except Infeasible as err:
         LOGGER.error("Failed to find reactions with unbounded flux "
                      "because '{}'. This may be a bug.".format(err))
@@ -614,20 +566,21 @@ def find_reactions_with_unbounded_flux_default_condition(model):
                          "analysis on the model. Make sure that the model "
                          "can be solved! Check if the constraints are not "
                          "too strict.")
-    conditionally_blocked = fva_result.loc[(fva_result["maximum"] == 0.0) &
-                                           (fva_result["minimum"] == 0.0)]
+    # Per reaction (row) the flux is below threshold (close to zero).
+    conditionally_blocked = fva_result.loc[
+        fva_result.abs().max(axis=1) < TOLERANCE_THRESHOLD
+    ].index.tolist()
     max_bound = max([rxn.upper_bound for rxn in model.reactions])
     min_bound = min([rxn.lower_bound for rxn in model.reactions])
-    unlimited_flux = fva_result.loc[(fva_result["maximum"] == max_bound) |
-                                    (fva_result["minimum"] == min_bound)]
-    conditionally_blocked_reactions = [model.reactions.get_by_id(met_id)
-                                       for met_id in
-                                       conditionally_blocked.index]
-    unlimited_reactions = [model.reactions.get_by_id(met_id) for met_id in
-                           unlimited_flux.index]
+    # Find those reactions whose flux is close to the maximal upper or lower
+    # bound, i.e., appears unconstrained.
+    unlimited_flux = fva_result.loc[
+       np.isclose(fva_result["maximum"], max_bound, atol=TOLERANCE_THRESHOLD) |
+       np.isclose(fva_result["minimum"], min_bound, atol=TOLERANCE_THRESHOLD)
+    ].index.tolist()
     try:
-        fraction = len(unlimited_reactions) / float(
-            (len(model.reactions) - len(conditionally_blocked_reactions)))
+        fraction = len(unlimited_flux) / \
+            (len(model.reactions) - len(conditionally_blocked))
     except ZeroDivisionError:
         LOGGER.error("Division by Zero! Failed to calculate the "
                      "fraction of unbounded reactions. Does this model "
@@ -639,4 +592,4 @@ def find_reactions_with_unbounded_flux_default_condition(model):
                                 "all or that none of the reactions can "
                                 "carry a flux larger than zero!")
 
-    return unlimited_reactions, fraction, conditionally_blocked_reactions
+    return unlimited_flux, fraction, conditionally_blocked

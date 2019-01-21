@@ -324,9 +324,9 @@ def test_find_reactions_unbounded_flux_default_condition(model):
     """
     # TODO: Arbitrary threshold right now! Update after meta study!
     ann = test_find_reactions_unbounded_flux_default_condition.annotation
-    unbounded_rxns, fraction, _ = \
+    unbounded_rxn_ids, fraction, _ = \
         consistency.find_reactions_with_unbounded_flux_default_condition(model)
-    ann["data"] = get_ids(unbounded_rxns)
+    ann["data"] = unbounded_rxn_ids
     ann["metric"] = fraction
     ann["message"] = wrapper.fill(
         """ A fraction of {:.2%} of the non-blocked reactions (in total {}
