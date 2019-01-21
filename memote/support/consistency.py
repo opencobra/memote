@@ -57,6 +57,7 @@ ENERGY_COUPLES = {
     'MNXM558': 'MNXM2178',
     'MNXM21': 'MNXM12',
     'MNXM89557': 'MNXM20'}
+TOLERANCE_THRESHOLD = 1E-07
 
 
 def check_stoichiometric_consistency(model):
@@ -402,7 +403,7 @@ def find_charge_unbalanced_reactions(reactions):
         rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
 
 
-def find_stoichiometrically_balanced_cycles(model, threshold=1E-07):
+def find_stoichiometrically_balanced_cycles(model):
     u"""
     Find metabolic reactions in stoichiometrically balanced cycles (SBCs).
 
@@ -412,9 +413,6 @@ def find_stoichiometrically_balanced_cycles(model, threshold=1E-07):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    threshold : float
-        A numeric threshold accounting for value instabilities in the
-        optimization solvers.
 
     Notes
     -----
@@ -434,8 +432,8 @@ def find_stoichiometrically_balanced_cycles(model, threshold=1E-07):
     helpers.close_boundaries_sensibly(model)
     fva_result = flux_variability_analysis(model, loopless=False)
     return fva_result.index[
-        (fva_result["minimum"] <= (-1 + threshold)) |
-        (fva_result["maximum"] >= (1 - threshold))
+        (fva_result["minimum"] <= (-1 + TOLERANCE_THRESHOLD)) |
+        (fva_result["maximum"] >= (1 - TOLERANCE_THRESHOLD))
     ].tolist()
 
 
@@ -484,7 +482,7 @@ def find_disconnected(model):
     return [met for met in model.metabolites if len(met.reactions) == 0]
 
 
-def find_metabolites_produced_with_closed_bounds(model, threshold=1E-07):
+def find_metabolites_produced_with_closed_bounds(model):
     """
     Return metabolites that can be produced when boundary reactions are closed.
 
@@ -492,9 +490,6 @@ def find_metabolites_produced_with_closed_bounds(model, threshold=1E-07):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    threshold : float
-        A numeric threshold accounting for value instabilities in the
-        optimization solvers.
 
     """
     mets_produced = list()
@@ -504,12 +499,12 @@ def find_metabolites_produced_with_closed_bounds(model, threshold=1E-07):
             exch = model.add_boundary(
                 met, type='irrex', reaction_id='IRREX', lb=0, ub=1
             )
-            if helpers.run_fba(model, exch.id) >= threshold:
+            if helpers.run_fba(model, exch.id) >= TOLERANCE_THRESHOLD:
                 mets_produced.append(met)
     return mets_produced
 
 
-def find_metabolites_consumed_with_closed_bounds(model, threshold=1E-07):
+def find_metabolites_consumed_with_closed_bounds(model):
     """
     Return metabolites that can be consumed when boundary reactions are closed.
 
@@ -521,9 +516,6 @@ def find_metabolites_consumed_with_closed_bounds(model, threshold=1E-07):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    threshold : float
-        A numeric threshold accounting for value instabilities in the
-        optimization solvers.
 
     """
     mets_consumed = list()
@@ -533,12 +525,13 @@ def find_metabolites_consumed_with_closed_bounds(model, threshold=1E-07):
             exch = model.add_boundary(
                 met, type='irrex', reaction_id='IRREX', lb=-1, ub=0
             )
-            if helpers.run_fba(model, exch.id, direction='min') <= -threshold:
+            if helpers.run_fba(model, exch.id,
+                               direction='min') <= -TOLERANCE_THRESHOLD:
                 mets_consumed.append(met)
     return mets_consumed
 
 
-def find_metabolites_not_produced_with_open_bounds(model, threshold=1E-07):
+def find_metabolites_not_produced_with_open_bounds(model):
     """
     Return metabolites that cannot be produced with open boundary reactions.
 
@@ -550,9 +543,6 @@ def find_metabolites_not_produced_with_open_bounds(model, threshold=1E-07):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    threshold : float
-        A numeric threshold accounting for value instabilities in the
-        optimization solvers.
 
     """
     mets_not_produced = list()
@@ -562,12 +552,12 @@ def find_metabolites_not_produced_with_open_bounds(model, threshold=1E-07):
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
             solution = helpers.run_fba(model, exch.id)
-            if solution is np.nan or solution < threshold:
+            if solution is np.nan or solution < TOLERANCE_THRESHOLD:
                 mets_not_produced.append(met)
     return mets_not_produced
 
 
-def find_metabolites_not_consumed_with_open_bounds(model, threshold=1E-07):
+def find_metabolites_not_consumed_with_open_bounds(model):
     """
     Return metabolites that cannot be consumed with open boundary reactions.
 
@@ -579,9 +569,6 @@ def find_metabolites_not_consumed_with_open_bounds(model, threshold=1E-07):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    threshold : float
-        A numeric threshold accounting for value instabilities in the
-        optimization solvers.
 
     """
     mets_not_consumed = list()
@@ -591,7 +578,7 @@ def find_metabolites_not_consumed_with_open_bounds(model, threshold=1E-07):
             exch = model.add_boundary(
                 met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
             solution = helpers.run_fba(model, exch.id, direction="min")
-            if solution is np.nan or solution < threshold:
+            if solution is np.nan or solution < TOLERANCE_THRESHOLD:
                 mets_not_consumed.append(met)
     return mets_not_consumed
 
