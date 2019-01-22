@@ -17,6 +17,7 @@ Next Release
 * Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
 * Display an alternative message if some biomass components do not contain a 
   formula.
+* Extend the annotations tests by a check for full length InChI strings.
 
 0.8.11 (2019-01-07)
 -------------------
