@@ -322,7 +322,6 @@ def test_find_reactions_unbounded_flux_default_condition(model):
     missing cofactors, incorrectly defined transport reactions and more.
 
     """
-    # TODO: Arbitrary threshold right now! Update after meta study!
     ann = test_find_reactions_unbounded_flux_default_condition.annotation
     unbounded_rxn_ids, fraction, _ = \
         consistency.find_reactions_with_unbounded_flux_default_condition(model)
@@ -333,7 +332,8 @@ def test_find_reactions_unbounded_flux_default_condition(model):
         reactions) can carry unbounded flux in the default model
         condition. Unbounded reactions may be involved in
         thermodynamically infeasible cycles: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
+            ann["metric"], len(ann["data"]), truncate(ann["data"])
         )
     )
+    # TODO: Arbitrary threshold right now! Update after meta study!
     assert ann["metric"] <= 0.1, ann["message"]

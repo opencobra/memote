@@ -570,13 +570,14 @@ def find_reactions_with_unbounded_flux_default_condition(model):
     conditionally_blocked = fva_result.loc[
         fva_result.abs().max(axis=1) < TOLERANCE_THRESHOLD
     ].index.tolist()
-    max_bound = max([rxn.upper_bound for rxn in model.reactions])
-    min_bound = min([rxn.lower_bound for rxn in model.reactions])
-    # Find those reactions whose flux is close to the maximal upper or lower
-    # bound, i.e., appears unconstrained.
+    small, large = helpers.find_bounds(model)
+    # Find those reactions whose flux is close to or outside of the median
+    # upper or lower bound, i.e., appears unconstrained.
     unlimited_flux = fva_result.loc[
-       np.isclose(fva_result["maximum"], max_bound, atol=TOLERANCE_THRESHOLD) |
-       np.isclose(fva_result["minimum"], min_bound, atol=TOLERANCE_THRESHOLD)
+        np.isclose(fva_result["maximum"], large, atol=TOLERANCE_THRESHOLD) |
+        (fva_result["maximum"] > large) |
+        np.isclose(fva_result["minimum"], small, atol=TOLERANCE_THRESHOLD) |
+        (fva_result["minimum"] < small)
     ].index.tolist()
     try:
         fraction = len(unlimited_flux) / \
