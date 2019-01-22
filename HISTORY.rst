@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Fix bug which involved find_transport_reactions to ignore compartments.
 * Internal change to use model context rather than copy.
 * Internal changes to JSON structure.
 * Remove tests for metabolite inconsistency with closed bounds. The results 
