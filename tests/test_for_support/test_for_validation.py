@@ -33,7 +33,7 @@ sbml_invalid = "data/validation/tiny_FBC2.xml"
     (sbml_invalid, [1, 0, True])])
 def test_run_cobrapy_validation(filename, expected):
     notifications = {"warnings": [], "errors": []}
-    model = val.run_cobrapy_validation(filename, notifications)
+    model, _ = val.run_cobrapy_validation(filename, notifications)
     assert len(notifications["errors"]) == expected[0]
     assert len(notifications["warnings"]) == expected[1];
     assert (model is None) == expected[2]

@@ -27,10 +27,41 @@ from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.reporting import (
     SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
+from memote.support import validation as val
 
 __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
 LOGGER = logging.getLogger(__name__)
+
+def validate_model(path, results):
+    """
+    Validate a model structurally and optionally store results as JSON.
+
+    Parameters
+    ----------
+    path :
+        Path to model file.
+    results : bool, optional
+        Whether to return the results in addition to the return code.
+
+    Returns
+    -------
+    model_ver : tuple
+        A tuple reporting on the level, version, and FBC use of the SBML file.
+    dict, optional
+        A simple dictionary structure containing a list of errors and warnings.
+
+    """
+    notifications = {"warnings": [], "errors": []}
+    _, model_ver = val.run_cobrapy_validation(path, notifications)
+
+    if len(notifications["errors"]) > 1:
+        val.run_libsbml_validation(notifications)
+
+    if results:
+        return model_ver, notifications
+    else:
+        return model_ver
 
 
 def test_model(model, results=False, pytest_args=None,
