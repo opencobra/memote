@@ -173,3 +173,16 @@ def diff_report(diff_results, config=None, html=True):
         return report.render_html()
     else:
         return report.render_json()
+
+
+def validation_report(notifications):
+    """
+    Generate a validation report from a notification object.
+
+    Parameters
+    ----------
+    notifications : dict
+        A simple dictionary structure containing a list of errors and warnings.
+
+    """
+    pass
