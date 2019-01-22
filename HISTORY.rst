@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Fix bug which involved find_transport_reactions to ignore compartments.
 
 0.8.11 (2019-01-07)
 -------------------
