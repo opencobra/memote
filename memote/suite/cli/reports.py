@@ -50,8 +50,7 @@ def report():
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL",
-                callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
@@ -94,6 +93,9 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
+    model, model_ver, notifications = api.validate_model(model, results=True)
+    if model is None:
+        pass
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
@@ -135,8 +137,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
     """Generate a report over a model's git commit history."""
-    if model is None:
-        raise click.BadParameter("No 'model' path given or configured.")
+    callbacks.validate_path(model)
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     try:
@@ -231,9 +232,13 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     loaded_models = list()
     for model_path in models:
         try:
+            callbacks.validate_path(model_path)
             model_filename = os.path.basename(model_path)
             diff_results.setdefault(model_filename, dict())
-            model = callbacks._load_model(model_path)
+            model, model_ver, notifications = api.validate_model(
+                model_path, results=True)
+            if model is None:
+                continue
             model.solver = solver
             loaded_models.append(model)
         except (IOError, SBMLError):
