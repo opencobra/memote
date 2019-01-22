@@ -32,14 +32,12 @@ def run_libsbml_validation(filename, notifications):
     # latest_level = (str(doc.getLevel()) != "3" or str(
     #     doc.getVersion()) != "1" or doc.getPlugin('fbc') == None)
 
-    warnings = []
-    errors = []
     display_pattern = "Line {}, Column {} - #{}: {} - " \
                       "Category: {}, Severity: {}"
     for i in range(validator.getNumFailures()):
         failure = validator.getFailure(i)
         if failure.isWarning():
-            warnings.append(display_pattern.format(
+            notifications['warnings'].append(display_pattern.format(
                 failure.getLine(),
                 failure.getColumn(),
                 failure.getErrorId(),
@@ -47,25 +45,24 @@ def run_libsbml_validation(filename, notifications):
                 failure.getCategoryAsString(),
                 failure.getSeverity()))
         else:
-            errors.append(display_pattern.format(
+            notifications['errors'].append(display_pattern.format(
                 failure.getLine(),
                 failure.getColumn(),
                 failure.getErrorId(),
                 failure.getMessage(),
                 failure.getCategoryAsString(),
                 failure.getSeverity()))
-        return errors, warnings#, latest_level
 
 
 def run_cobrapy_validation(filename, notifications):
     """Reports errors and warnings from validation with cobrapy."""
     with catch_warnings(record=True) as warnings:
-        simplefilter("always")
+        simplefilter("default")
         model = None
         try:
             model = read_sbml_model(filename)
         except Exception as e:
             notifications['errors'].append(str(e))
-        notifications['warnings'].extend(warnings)
+        notifications['warnings'].extend([str(w.message) for w in warnings])
         return model
 
