@@ -1,5 +1,47 @@
-<mat-card-title>Universal Core</mat-card-title>
+<mat-card-title></mat-card-title>
     <mat-card-content>
+      <div>
+      <div fxFlex>
+        <!-- <h2>Scored Tests</h2> -->
+        <div *ngFor="let section of scoreData.sections | keys">
+          <h2> {{ scoreData.sections[section].title }}</h2>
+          <div *ngFor="let case of scoreData.sections[section].cases; let first = first">
+              <mat-expansion-panel
+              *ngIf="first && data.reportType === 'diff'"
+              disabled
+              #expPanel
+              class="mat-elevation-z0">
+                 <mat-expansion-panel-header
+                 class="mat-expansion-panel-header"
+                 collapsedHeight="auto"
+                 style="padding:0.05vh">
+                 <mat-panel-title fxLayoutAlign='space-between center'>
+                    <td class="test-title">
+                        Compared Models
+                    </td>
+                    <div style="margin-right: 10px">
+                    <td *ngFor="let results of data.byID(case)?.diff">
+                      <div class="MatButtonEmulation" style="background: white; color:black"> {{ results.model }} </div>
+                    </td>
+                    </div>
+                   </mat-panel-title>
+                 </mat-expansion-panel-header>
+                </mat-expansion-panel>
+            <app-accordion [case]="case"></app-accordion>
+          </div>
+          <div *ngIf="data.reportType != 'history'">
+          <hr>
+          <app-score-formula [position]="section"></app-score-formula>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div *ngIf="data.reportType != 'history'">
+          <hr>
+          <hr>
+          <app-score-formula [position]="'Total Score'"></app-score-formula>
+          <hr>
+          </div>
       <div
         fxLayout='row'
         fxLayout.lt-lg='column'
@@ -38,37 +80,4 @@
             <app-vega-plot [testObject]="data.score.total_score"></app-vega-plot>
           </div>
       </ng-template>
-      <hr>
-      <div>
-      <div fxFlex>
-        <h2>Scored Tests</h2>
-        <div *ngFor="let section of scoreData.sections | keys">
-          <h3> {{ scoreData.sections[section].title }}</h3>
-          <div *ngFor="let case of scoreData.sections[section].cases; let first = first">
-              <mat-expansion-panel
-              *ngIf="first && data.reportType === 'diff'"
-              disabled
-              #expPanel
-              class="mat-elevation-z0">
-                 <mat-expansion-panel-header
-                 class="mat-expansion-panel-header"
-                 collapsedHeight="auto"
-                 style="padding:0.05vh">
-                 <mat-panel-title fxLayoutAlign='space-between center'>
-                    <td class="test-title">
-                        Compared Models
-                    </td>
-                    <div style="margin-right: 10px">
-                    <td *ngFor="let results of data.byID(case)?.diff">
-                      <div class="MatButtonEmulation" style="background: white; color:black"> {{ results.model }} </div>
-                    </td>
-                    </div>
-                   </mat-panel-title>
-                 </mat-expansion-panel-header>
-                </mat-expansion-panel>
-            <app-accordion [case]="case"></app-accordion>
-          </div>
-        </div>
-      </div>
-      </div>
 </mat-card-content>

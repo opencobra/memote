@@ -228,8 +228,8 @@ def get_internals(model):
     """
     biomass = set(find_biomass_reaction(model))
     if len(biomass) == 0:
-        LOGGER.warn("No biomass reaction detected. Consistency test results "
-                    "are unreliable if one exists.")
+        LOGGER.warning("No biomass reaction detected. Consistency test results "
+                       "are unreliable if one exists.")
     return set(model.reactions) - (set(model.boundary) | biomass)
 
 

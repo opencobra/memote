@@ -65,7 +65,8 @@ def report():
 @click.option("--skip", type=str, multiple=True, metavar="TEST",
               help="The name of a test or test module to be skipped. This "
                    "option can be used multiple times.")
-@click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
+@click.option("--solver",
+              type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),

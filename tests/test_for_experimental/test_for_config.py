@@ -42,8 +42,10 @@ def test_configuration_schema():
 
 
 @pytest.mark.parametrize("filename", [
-    pytest.mark.raises("empty.yml", exception=ValidationError),
-    pytest.mark.raises("invalid.yml", exception=ValidationError),
+    pytest.param("empty.yml",
+                 marks=pytest.mark.raises(exception=ValidationError)),
+    pytest.param("invalid.yml",
+                 marks=pytest.mark.raises(exception=ValidationError)),
     "valid.yml",
     "medium_only.yml"
 ])

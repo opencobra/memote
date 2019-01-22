@@ -46,7 +46,7 @@
                   <app-result-button [testId]="testId"></app-result-button>
                 </td>
                   <td *ngSwitchCase="'diff'">
-                    <app-diff-button [testId]="testId"></app-diff-button>
+                    <app-diff-button [testId]="testId" ></app-diff-button>
                   </td>
               </div>
             </mat-panel-title>
@@ -63,6 +63,12 @@
                 </div>
               </mat-panel-title>
             </ng-template>
+          <div *ngIf='isWeighted(testId) ; else whiteBadge'> 
+            <div class='badge'> <span class="vert-align"> X{{ weight }} </span> </div> 
+          </div>
+          <ng-template #whiteBadge>
+              <div class='badge' style="background-color: white"></div> 
+          </ng-template>
           </mat-expansion-panel-header>
           <div fxLayout='column' flexLayoutAlign='space-between center'>
             <div *ngIf="data.byReg(case).length === 1; else justMessages">

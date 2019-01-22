@@ -232,14 +232,11 @@ def jsonify(obj, pretty=False):
         default False).
 
     """
-    # TODO: Use compression of JSON in future.
-    #     results=b64encode(compress(
-    #         json.dumps(self.data).encode("UTF-16"), level=9)))
     if pretty:
-        params = dict(sort_keys=True, indent=2,
+        params = dict(sort_keys=True, indent=2, allow_nan=False,
                       separators=(",", ": "), ensure_ascii=False)
     else:
-        params = dict(sort_keys=False, indent=None,
+        params = dict(sort_keys=False, indent=None, allow_nan=False,
                       separators=(",", ":"), ensure_ascii=False)
     try:
         return json.dumps(obj, **params)

@@ -4,6 +4,27 @@ History
 Next Release
 ------------
 * Fix bug which involved find_transport_reactions to ignore compartments.
+* Internal change to use model context rather than copy.
+* Internal changes to JSON structure.
+* Remove tests for metabolite inconsistency with closed bounds. The results 
+  are a subset only of the unconserved metabolites.
+* Make the consistency tests account better for numeric instability.
+* Add the GLPK exact solver as a possible option.
+* Update memote-report-app from Angular 5.1.0 to 7.2.0.
+* Reduce the prominence of the total score in the reports.
+* Provide partial calculations for each section.
+* Show overall formula of how the total score is calculated.
+* Clearly indicate weights/ multipliers by introducing margenta badges next to each test in the report.
+* In the reports, improve the descriptions of the 'Help' section and rename this section to 'Readme'.
+* Rename the principal sections and include a brief explanation for each.
+* Fix bug that would show a test as 'Errored' although it only failed. Fixed by making condition in errorFailsafe 
+  in test-result.model.ts more specific for cases where data is undefined or null.
+* Fix bug that would make parametrized tests disappear from the report if they had errored or if for some reason their 'data' attribute
+  was undefined.
+* Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
+* Display an alternative message if some biomass components do not contain a 
+  formula.
+* Extend the annotations tests by a check for full length InChI strings.
 
 0.8.11 (2019-01-07)
 -------------------

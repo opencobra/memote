@@ -97,6 +97,27 @@ def sum_outside_of_deviation(base):
 
 
 @register_with(MODEL_REGISTRY)
+def sum_missing_formula(base):
+    """Define a biomass reaction whose components lack a formula."""
+    met_a = cobra.Metabolite("lipid_c", "H744")
+    met_b = cobra.Metabolite("protein_c", "H119")
+    met_c = cobra.Metabolite("rna_c")
+    met_d = cobra.Metabolite("dna_c")
+    met_e = cobra.Metabolite("ash_c", None)
+    # Reactions
+    rxn_1 = cobra.Reaction("BIOMASS_TEST")
+    rxn_1.add_metabolites({
+        met_a: -0.2,
+        met_b: -0.2,
+        met_c: -0.2,
+        met_d: -0.2,
+        met_e: -0.2
+    })
+    base.add_reactions([rxn_1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def precursors_producing(base):
     met_a = cobra.Metabolite("lipid_c", compartment='c')
     met_b = cobra.Metabolite("protein_c", compartment='c')
@@ -474,6 +495,7 @@ def essential_not_in_model(base):
 @pytest.mark.parametrize("model, expected", [
     ("sum_within_deviation", True),
     ("sum_outside_of_deviation", False),
+    ("sum_missing_formula", False),
 ], indirect=["model"])
 def test_biomass_weight_production(model, expected):
     """

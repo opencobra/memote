@@ -1,4 +1,5 @@
-export const specBarChart = {
+/* tslint:disable */ 
+export const specBarChart: any = {
   "$schema": "https://vega.github.io/schema/vega/v4.json",
   "width": 300,
   "height": 200,
@@ -78,3 +79,4 @@ export const specBarChart = {
     }
   ]
 };
+/* tslint:enable */

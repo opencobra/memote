@@ -37,6 +37,7 @@ LOGGER = logging.getLogger(__name__)
 # 'Kegg'        ['gen','rxn','met'] 'http://www.kegg.jp/'
 # 'SEED'        ['met']             'http://modelseed.org/'
 #
+# 'InChI'       ['met']     'https://www.ebi.ac.uk/chebi/'
 # 'InChIKey'    ['met']     'http://cactus.nci.nih.gov/chemical/structure'
 # 'ChEBI'       ['met']     'http://bioportal.bioontology.org/ontologies/CHEBI'
 # 'BRENDA'      ['rxn']     'http://www.brenda-enzymes.org/'
@@ -106,6 +107,9 @@ METABOLITE_ANNOTATIONS = OrderedDict([
     ('seed.compound', re.compile(r"^cpd\d+$")),
     ('inchikey', re.compile(
         r"^[A-Z]{14}\-[A-Z]{10}(\-[A-Z])?")),
+    ('inchi', re.compile(
+        r"^InChI\=1S?\/[A-Za-z0-9\.]+(\+[0-9]+)?"
+        r"(\/[cnpqbtmsih][A-Za-z0-9\-\+\(\)\,\/\?\;\.]+)*$")),
     ('chebi', re.compile(r"^CHEBI:\d+$")),
     ('hmdb', re.compile(r"^HMDB\d{5}$")),
     ('reactome', re.compile(

@@ -90,8 +90,8 @@ def test_register_with(func, func_name):
     None
 
     """),
-    pytest.mark.raises((dict(title="Some Title",format_type="wrong_type"),
-                        one, ""), exception=ValueError)
+    pytest.param(dict(title="Some Title",format_type="wrong_type"), one, "",
+                 marks=pytest.mark.raises(exception=ValueError))
 ])
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)

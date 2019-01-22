@@ -7,9 +7,13 @@
     fxFlex="45%"
     fxFlexAlign='stretch'
     style="margin:0.5vmax">
-    <mat-toolbar
+    <mat-card
       class="mat-elevation-z2"
-      color='secondary'> Scored Tests </mat-toolbar>
+      style="background-color:whitesmoke; height: 5vmax"> 
+      <mat-card-title> Independent Section </mat-card-title>
+      <mat-card-subtitle> Contains tests that are independent of the class of modeled organism, a model's complexity or types of identifiers
+          that are used to describe its components. Parameterization or initialization of the network is not required. See readme for more details. </mat-card-subtitle>
+      </mat-card>
       <mat-card fxFlex *ngIf='data.scoredCard'>
         <app-universal-core [scoreData]="data.scoredCard"></app-universal-core>
       </mat-card>
@@ -21,9 +25,12 @@
     fxLayoutAlign='start stretch'
     style="margin:0.5vmax"
     *ngIf='data'>
-      <mat-toolbar
+      <mat-card
       class="mat-elevation-z2"
-      color='secondary'> Unscored Tests </mat-toolbar>
+      style="background-color:whitesmoke; height: 5vmax"> 
+      <mat-card-title> Specific Section </mat-card-title>
+      <mat-card-subtitle> Covers general statistics and specific aspects of a metabolic network that are not universally applicable. See readme for more details. </mat-card-subtitle>
+      </mat-card>
       <div
         *ngFor="let card of data.statisticsCards">
           <app-statistics [currentCard]="card"></app-statistics>
