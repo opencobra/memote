@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SBML Validation</title>
+</head>
+<body>
+    <h1>My Webpage</h1>
+    <div>
+    {% for error in notifications.errors %}
+        <div class="row"> {{ error }} </div>
+    {% endfor %}
+    </div>
+    <div>
+    {% for warning in notifications.warnings %}
+        <div class="row"> {{ warnings }} </div>
+    {% endfor %}
+    </div>
+<a href="https://github.com/opencobra/memote">
+</body>
+<style>
+div.row {
+    margin-top: 1em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+}
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</html>

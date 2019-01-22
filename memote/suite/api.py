@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import logging
 
 import pytest
+from jinja2 import Template
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
@@ -187,4 +188,4 @@ def validation_report(notifications):
         A simple dictionary structure containing a list of errors and warnings.
 
     """
-    pass
+    template = Template(" ")
