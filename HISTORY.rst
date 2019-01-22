@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Instead of min/max bounds consider the median bounds for testing (un-)bounded 
+  fluxes.
 * Use a model context for every test case.
 * Fix bug which involved find_transport_reactions to ignore compartments.
 * Internal change to use model context rather than copy.
