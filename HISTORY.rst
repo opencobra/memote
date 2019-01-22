@@ -3,6 +3,12 @@ History
 
 Next Release
 ------------
+* Internal change to use model context rather than copy.
+* Internal changes to JSON structure.
+* Remove tests for metabolite inconsistency with closed bounds. The results 
+  are a subset only of the unconserved metabolites.
+* Make the consistency tests account better for numeric instability.
+* Add the GLPK exact solver as a possible option.
 * Update memote-report-app from Angular 5.1.0 to 7.2.0.
 * Reduce the prominence of the total score in the reports.
 * Provide partial calculations for each section.
