@@ -85,7 +85,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
     try:
         ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
     except TypeError:
-        ann["data"][reaction_id] = float("nan")
+        ann["data"][reaction_id] = None
         ann["message"][reaction_id] = wrapper.fill(
             """One or more of the biomass components do not have a defined
             formula or contain unspecified chemical groups."""
