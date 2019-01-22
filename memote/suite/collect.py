@@ -154,13 +154,8 @@ class ResultCollectionPlugin(object):
             case["duration"] = report.duration
             case["result"] = report.outcome
 
-    @pytest.fixture(scope="session")
-    def read_only_model(self):
-        """Provide the model for the complete test session."""
-        return self._model
-
     @pytest.fixture(scope="function")
     def model(self):
-        """Provide a pristine model for a test unit."""
+        """Provide each test case with a pristine model."""
         with self._model as model:
             yield model

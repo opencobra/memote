@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 @annotate(title="Biomass Reactions Identified", format_type="count")
-def test_biomass_presence(read_only_model):
+def test_biomass_presence(model):
     """
     Expect the model to contain at least one biomass reaction.
 
@@ -57,7 +57,7 @@ def test_biomass_presence(read_only_model):
     """
     ann = test_biomass_presence.annotation
     ann["data"] = [
-        rxn.id for rxn in helpers.find_biomass_reaction(read_only_model)]
+        rxn.id for rxn in helpers.find_biomass_reaction(model)]
     ann["message"] = wrapper.fill(
         """In this model {} the following biomass reactions were
         identified: {}""".format(
@@ -68,7 +68,7 @@ def test_biomass_presence(read_only_model):
 @pytest.mark.biomass
 @annotate(title="Biomass Consistency", format_type="number", data=dict(),
           message=dict(), metric=dict())
-def test_biomass_consistency(read_only_model, reaction_id):
+def test_biomass_consistency(model, reaction_id):
     """
     Expect biomass components to sum up to 1 g[CDW].
 
@@ -81,7 +81,7 @@ def test_biomass_consistency(read_only_model, reaction_id):
     deviation from 1 - 1E-03 to 1 + 1E-06 is accepted.
     """
     ann = test_biomass_consistency.annotation
-    reaction = read_only_model.reactions.get_by_id(reaction_id)
+    reaction = model.reactions.get_by_id(reaction_id)
     try:
         ann["data"][reaction_id] = biomass.sum_biomass_weight(reaction)
     except TypeError:
@@ -151,7 +151,7 @@ def test_biomass_open_production(model, reaction_id):
 @pytest.mark.biomass
 @annotate(title="Blocked Biomass Precursors In Default Medium",
           format_type="count", data=dict(), metric=dict(), message=dict())
-def test_biomass_precursors_default_production(read_only_model, reaction_id):
+def test_biomass_precursors_default_production(model, reaction_id):
     """
     Expect production of all biomass precursors in default medium.
 
@@ -163,12 +163,12 @@ def test_biomass_precursors_default_production(read_only_model, reaction_id):
     to synthesis all the precursors.
     """
     ann = test_biomass_precursors_default_production.annotation
-    reaction = read_only_model.reactions.get_by_id(reaction_id)
+    reaction = model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = get_ids(
-        biomass.find_blocked_biomass_precursors(reaction, read_only_model)
+        biomass.find_blocked_biomass_precursors(reaction, model)
     )
     ann["metric"][reaction_id] = len(ann["data"][reaction_id]) / \
-        len(biomass.find_biomass_precursors(read_only_model, reaction))
+        len(biomass.find_biomass_precursors(model, reaction))
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} and when the model is simulated on the
         provided default medium a total of {} precursors

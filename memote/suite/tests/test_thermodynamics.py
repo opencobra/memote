@@ -34,7 +34,7 @@ from memote.utils import annotate, get_ids, wrapper  # noqa
 
 @annotate(title="Thermodynamic Reversibility of Purely Metabolic Reactions",
           format_type="percent")
-def test_find_candidate_irreversible_reactions(read_only_model):
+def test_find_candidate_irreversible_reactions(model):
     u"""
     Identify reversible reactions that could be irreversible.
 
@@ -77,7 +77,7 @@ def test_find_candidate_irreversible_reactions(read_only_model):
     # With gamma = 1000, ln_gamma ~ 6.9. We use 7 as the cut-off.
     threshold = 7.0
     ann = test_find_candidate_irreversible_reactions.annotation
-    met_rxns = basic.find_pure_metabolic_reactions(read_only_model)
+    met_rxns = basic.find_pure_metabolic_reactions(model)
     rev_index, incomplete, problematic, unbalanced = \
         thermo.find_thermodynamic_reversibility_index(met_rxns)
     ann["data"] = (
