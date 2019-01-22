@@ -33,7 +33,7 @@ __all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
 
 LOGGER = logging.getLogger(__name__)
 
-def validate_model(path, results):
+def validate_model(path, results=False):
     """
     Validate a model structurally and optionally store results as JSON.
 
@@ -46,22 +46,24 @@ def validate_model(path, results):
 
     Returns
     -------
-    model_ver : tuple
+    model : cobra.Model
+        The metabolic model under investigation.
+    model_ver : tuple, optional
         A tuple reporting on the level, version, and FBC use of the SBML file.
-    dict, optional
+    notifications: dict, optional
         A simple dictionary structure containing a list of errors and warnings.
 
     """
     notifications = {"warnings": [], "errors": []}
-    _, model_ver = val.run_cobrapy_validation(path, notifications)
+    model, model_ver = val.run_cobrapy_validation(path, notifications)
 
     if len(notifications["errors"]) > 1:
         val.run_libsbml_validation(notifications)
 
     if results:
-        return model_ver, notifications
+        return model, model_ver, notifications
     else:
-        return model_ver
+        return model
 
 
 def test_model(model, results=False, pytest_args=None,

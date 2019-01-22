@@ -51,10 +51,10 @@ def _load_model(filename):
         return read_sbml_model(filename)
 
 
-def validate_model(context, param, value):
-    """Load model from path if it exists."""
+def validate_path(context, param, value):
+    """Check if the model path exists."""
     if value is not None:
-        return _load_model(value)
+        pass
     else:
         raise click.BadParameter("No 'model' path given or configured.")
 
