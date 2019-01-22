@@ -28,7 +28,7 @@ import memote.support.consistency_helpers as con_helpers
 
 
 @annotate(title="Stoichiometric Consistency", format_type="count")
-def test_stoichiometric_consistency(read_only_model):
+def test_stoichiometric_consistency(model):
     """
     Expect that the stoichiometry is consistent.
 
@@ -49,10 +49,10 @@ def test_stoichiometric_consistency(read_only_model):
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(
-        read_only_model)
+        model)
     ann["data"] = [] if is_consistent else get_ids(
-        consistency.find_unconserved_metabolites(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+        consistency.find_unconserved_metabolites(model))
+    ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
         metabolites: {}""".format(
@@ -97,7 +97,7 @@ def test_detect_energy_generating_cycles(model, met):
 
 
 @annotate(title="Charge Balance", format_type="count")
-def test_reaction_charge_balance(read_only_model):
+def test_reaction_charge_balance(model):
     """
     Expect all reactions to be charge balanced.
 
@@ -113,7 +113,7 @@ def test_reaction_charge_balance(read_only_model):
 
     """
     ann = test_reaction_charge_balance.annotation
-    internal_rxns = con_helpers.get_internals(read_only_model)
+    internal_rxns = con_helpers.get_internals(model)
     ann["data"] = get_ids(
         consistency.find_charge_unbalanced_reactions(internal_rxns))
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
@@ -126,7 +126,7 @@ def test_reaction_charge_balance(read_only_model):
 
 
 @annotate(title="Mass Balance", format_type="count")
-def test_reaction_mass_balance(read_only_model):
+def test_reaction_mass_balance(model):
     """
     Expect all reactions to be mass balanced.
 
@@ -142,7 +142,7 @@ def test_reaction_mass_balance(read_only_model):
 
     """
     ann = test_reaction_mass_balance.annotation
-    internal_rxns = con_helpers.get_internals(read_only_model)
+    internal_rxns = con_helpers.get_internals(model)
     ann["data"] = get_ids(
         consistency.find_mass_unbalanced_reactions(internal_rxns)
     )
@@ -197,7 +197,7 @@ def test_find_stoichiometrically_balanced_cycles(model):
 
 
 @annotate(title="Orphan Metabolites", format_type="count")
-def test_find_orphans(read_only_model):
+def test_find_orphans(model):
     """
     Expect no orphans to be present.
 
@@ -207,8 +207,8 @@ def test_find_orphans(read_only_model):
 
     """
     ann = test_find_orphans.annotation
-    ann["data"] = get_ids(consistency.find_orphans(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["data"] = get_ids(consistency.find_orphans(model))
+    ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not produced by any reaction
         of the model: {}""".format(
@@ -217,7 +217,7 @@ def test_find_orphans(read_only_model):
 
 
 @annotate(title="Dead-end Metabolites", format_type="count")
-def test_find_deadends(read_only_model):
+def test_find_deadends(model):
     """
     Expect no dead-ends to be present.
 
@@ -227,8 +227,8 @@ def test_find_deadends(read_only_model):
 
     """
     ann = test_find_deadends.annotation
-    ann["data"] = get_ids(consistency.find_deadends(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["data"] = get_ids(consistency.find_deadends(model))
+    ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not consumed by any reaction
         of the model: {}""".format(
@@ -237,7 +237,7 @@ def test_find_deadends(read_only_model):
 
 
 @annotate(title="Metabolite Connectivity", format_type="count")
-def test_find_disconnected(read_only_model):
+def test_find_disconnected(model):
     """
     Expect no disconnected metabolites to be present.
 
@@ -247,8 +247,8 @@ def test_find_disconnected(read_only_model):
 
     """
     ann = test_find_disconnected.annotation
-    ann["data"] = get_ids(consistency.find_disconnected(read_only_model))
-    ann["metric"] = len(ann["data"]) / len(read_only_model.metabolites)
+    ann["data"] = get_ids(consistency.find_disconnected(model))
+    ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not associated with any
         reaction of the model: {}""".format(
