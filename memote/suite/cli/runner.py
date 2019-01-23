@@ -172,7 +172,8 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         sys.exit(1)
     model.solver = solver
     code, result = api.test_model(
-        model=model, results=True, pytest_args=pytest_args, skip=skip,
+        model=model, model_ver=model_ver, results=True,
+        pytest_args=pytest_args, skip=skip,
         exclusive=exclusive, experimental=experimental)
     if collect:
         if repo is None:
@@ -247,12 +248,12 @@ def _model_from_stream(stream, filename):
     return model, model_ver, notifications
 
 
-def _test_history(model, solver, manager, commit, pytest_args, skip,
+def _test_history(model, model_ver, solver, manager, commit, pytest_args, skip,
                   exclusive, experimental):
     model.solver = solver
     _, result = api.test_model(
-        model, results=True, pytest_args=pytest_args, skip=skip,
-        exclusive=exclusive, experimental=experimental)
+        model, model_ver=model_ver, results=True, pytest_args=pytest_args,
+        skip=skip, exclusive=exclusive, experimental=experimental)
     manager.store(result, commit=commit)
 
 
@@ -378,8 +379,8 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
             sys.exit(1)
         proc = Process(
             target=_test_history,
-            args=(model_obj, solver, manager, commit, pytest_args, skip,
-                  exclusive, experimental))
+            args=(model_obj, model_ver, solver, manager, commit,
+                  pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()
     # Copy back all new and modified files and add them to the index.

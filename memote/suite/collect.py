@@ -45,7 +45,7 @@ class ResultCollectionPlugin(object):
     # Seems brittle, can we do better?
     _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
-    def __init__(self, model, model_ver, experimental_config=None,
+    def __init__(self, model, model_ver=None, experimental_config=None,
                  exclusive=None, skip=None, **kwargs):
         """
         Collect and store values during testing.
@@ -54,6 +54,9 @@ class ResultCollectionPlugin(object):
         ----------
         model : cobra.Model
             The metabolic model under investigation.
+        model_ver: tuple, optional
+            A tuple reporting on the level, version, and FBC use of
+            the SBML file.
         experimental_config : memote.ExperimentConfiguration, optional
             A description of experiments.
         exclusive : iterable, optional

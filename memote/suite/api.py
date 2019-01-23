@@ -69,7 +69,7 @@ def validate_model(path, results=False):
         return model
 
 
-def test_model(model, results=False, pytest_args=None,
+def test_model(model, model_ver=None, results=False, pytest_args=None,
                exclusive=None, skip=None, experimental=None):
     """
     Test a model and optionally store results as JSON.
@@ -78,6 +78,8 @@ def test_model(model, results=False, pytest_args=None,
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    model_ver: tuple, optional
+        A tuple reporting on the level, version, and FBC use of the SBML file.
     results : bool, optional
         Whether to return the results in addition to the return code.
     pytest_args : list, optional
@@ -102,7 +104,8 @@ def test_model(model, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip,
+    plugin = ResultCollectionPlugin(model, model_ver=model_ver,
+                                    exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)
     code = pytest.main(pytest_args, plugins=[plugin])
     if results:
