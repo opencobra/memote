@@ -67,4 +67,4 @@ def check_component_for_specific_sbo_term(items, term):
     return [elem for elem in items if
             elem.annotation is None or
             'sbo' not in elem.annotation or
-            elem.annotation['sbo'] not in term]
+            term not in elem.annotation['sbo']]
