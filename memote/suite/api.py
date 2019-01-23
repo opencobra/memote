@@ -21,8 +21,10 @@ from __future__ import absolute_import
 
 import logging
 
+from io import open
 import pytest
-from jinja2 import Template
+from jinja2 import Environment, PackageLoader, select_autoescape
+import os
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
@@ -178,14 +180,23 @@ def diff_report(diff_results, config=None, html=True):
         return report.render_json()
 
 
-def validation_report(notifications):
+def validation_report(path, notifications, filename):
     """
     Generate a validation report from a notification object.
 
     Parameters
     ----------
+    path : string
+        Path to model file.
     notifications : dict
         A simple dictionary structure containing a list of errors and warnings.
 
     """
-    template = Template(" ")
+    env = Environment(
+        loader=PackageLoader('memote.suite', 'templates'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    template = env.get_template('validation_template.html')
+    model = os.path.basename(path)
+    with open(filename, "w") as file_h:
+        file_h.write(template.render(model=model ,notifications=notifications))

@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SBML Validation</title>
+  <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <title>SBML Validation of {{ model }}</title>
 </head>
 <body>
-    <h1>My Webpage</h1>
+    <h1>SBML Validation</h1>
     <div>
     {% for error in notifications.errors %}
-        <div class="row"> {{ error }} </div>
+        <div class="card-panel red lighten-4"> {{ error }} </div>
     {% endfor %}
     </div>
     <div>
     {% for warning in notifications.warnings %}
-        <div class="row"> {{ warnings }} </div>
+        <div class="card-panel yellow lighten-4"> {{ warning }} </div>
     {% endfor %}
     </div>
 <a href="https://github.com/opencobra/memote">
 </body>
-<style>
-div.row {
-    margin-top: 1em;
-    padding: 0.5em;
-    border-radius: 0.5em;
-}
-</style>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </html>
