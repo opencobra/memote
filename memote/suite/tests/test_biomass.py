@@ -265,15 +265,13 @@ def test_fast_growth_default(model, reaction_id):
             the provided default medium the growth rate is higher than that
             of the fastest bacteria.
             This could be due to inconsistencies in the network or missing
-            constraints.""".format(
-            reaction_id))
+            constraints.""".format(reaction_id))
     else:
         ann["message"][reaction_id] = wrapper.fill(
             """Using the biomass reaction {} and when the model is simulated on
             the provided default medium the growth rate is lower than that
             of the fastest bacteria. This is to be expected for
-            a majority of organisms.""".format(
-            reaction_id))
+            a majority of organisms.""".format(reaction_id))
     assert ann["data"][reaction_id] > 10.3972, ann["message"][reaction_id]
 
 
