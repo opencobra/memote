@@ -32,6 +32,7 @@ from sqlalchemy.exc import ArgumentError
 import os
 
 import memote.suite.api as api
+import memote.utils as utils
 import memote.suite.results as managers
 import memote.suite.cli.callbacks as callbacks
 from memote.suite.cli import CONTEXT_SETTINGS
@@ -93,9 +94,13 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
-    model, model_ver, notifications = api.validate_model(model, results=True)
-    if model is None:
-        pass
+    callbacks.validate_path(model)
+    model_obj, model_ver, notifications = api.validate_model(
+        model, results=True)
+    if model_obj is None:
+        api.validation_report(model, notifications, filename)
+        utils.stout_notifications(notifications)
+        sys.exit(1)
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
@@ -104,8 +109,8 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
-    model.solver = solver
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args,
+    model_obj.solver = solver
+    _, results = api.test_model(model_obj, results=True, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
     with open(filename, "w", encoding="utf-8") as file_handle:
@@ -238,6 +243,14 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
             model, model_ver, notifications = api.validate_model(
                 model_path, results=True)
             if model is None:
+                head, tail = os.path.split(filename)
+                report_path = os.path.join(
+                    head, '{}_structural_report.html'.format(model_filename))
+                api.validation_report(
+                    model_path, notifications, report_path)
+                LOGGER.critical(
+                    "The model {} could not be loaded due to SBML errors "
+                    "reported in {}.".format(model_filename, report_path))
                 continue
             model.solver = solver
             loaded_models.append(model)
