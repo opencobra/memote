@@ -70,7 +70,7 @@ GENE_PRODUCT_ANNOTATIONS = OrderedDict([
         r"[0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9]"
         r"[0-9])(\.\d+)?$")),
     ('ecogene', re.compile(r"^EG\d+$")),
-    ('kegg.gene', re.compile(r"^\w+:[\w\d\.-]*$")),
+    ('kegg.genes', re.compile(r"^\w+:[\w\d\.-]*$")),
     ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
     ('ncbigene', re.compile(r"^\d+$")),
     ('ncbiprotein', re.compile(r"^(\w+\d+(\.\d+)?)|(NP_\d+)$")),
