@@ -26,7 +26,8 @@ def test_sbml_level(model_ver):
 
     This test reports if the model file is represented in the latest edition
     (level) of the Systems Biology Markup Language (SBML) which is Level 3,
-    and the latest version, which is Version 1.
+    and the latest version, which is Version 1. Please note that memote will
+    work best with SBML L3V1!
 
     Implementation:
     When parsing the model files collect the 'level' and 'version' attributes
