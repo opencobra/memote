@@ -12,7 +12,7 @@ cards:
         - test_find_disconnected
         - test_find_reactions_unbounded_flux_default_condition
       annotation_met:
-        title: "Annotation - Metabolite"
+        title: "Annotation - Metabolites"
         weight: 1.0
         cases:
         - test_metabolite_annotation_presence
@@ -20,7 +20,7 @@ cards:
         - test_metabolite_annotation_wrong_ids
         - test_metabolite_id_namespace_consistency
       annotation_rxn:
-        title: "Annotation - Reaction"
+        title: "Annotation - Reactions"
         weight: 1.0
         cases:
         - test_reaction_annotation_presence
@@ -28,7 +28,7 @@ cards:
         - test_reaction_annotation_wrong_ids
         - test_reaction_id_namespace_consistency
       annotation_gene:
-        title: "Annotation - Gene"
+        title: "Annotation - Genes"
         weight: 1.0
         cases:
         - test_gene_product_annotation_presence
@@ -59,7 +59,7 @@ cards:
     - test_compartments_presence
     - test_metabolic_coverage
   basic_met:
-    title: "Metabolite Specs"
+    title: "Metabolite Information"
     cases:
     - test_find_unique_metabolites
     - test_find_duplicate_metabolites_in_compartments
@@ -67,7 +67,7 @@ cards:
     - test_metabolites_formula_presence
     - test_find_medium_metabolites
   basic_rxn:
-    title: "Reaction Specs"
+    title: "Reaction Information"
     cases:
     - test_find_pure_metabolic_reactions
     - test_find_constrained_pure_metabolic_reactions
@@ -76,7 +76,7 @@ cards:
     - test_find_candidate_irreversible_reactions
     - test_find_duplicate_reactions
   gpr_calculations:
-    title: "GPR Calculations"
+    title: "Gene-Protein-Reaction (GPR) Associations"
     cases:
     - test_gene_protein_reaction_rule_presence
     - test_transport_reaction_gpr_presence
@@ -93,26 +93,20 @@ cards:
     - test_biomass_precursors_open_production
     - test_direct_metabolites_in_biomass
     - test_essential_precursors_not_in_biomass
-  maintenance_terms:
-    title: "Maintenance Terms"
+  energy_metabolism:
+    title: "Energy Metabolism"
     cases:
     - test_ngam_presence
     - test_gam_in_biomass
-  oxygen_dep:
-    title: "Oxygen Dependency"
-    cases:
     - test_find_reversible_oxygen_reactions
-  cycles:
-    title: "Cycles"
-    cases:
     - test_detect_energy_generating_cycles
-    - test_find_stoichiometrically_balanced_cycles
   gap_finding:
-    title: "Gap Finding"
+    title: "Network Topology"
     cases:
     - test_blocked_reactions
     - test_find_orphans
     - test_find_deadends
+    - test_find_stoichiometrically_balanced_cycles
     - test_find_metabolites_not_produced_with_open_bounds
     - test_find_metabolites_not_consumed_with_open_bounds
   matrix:
