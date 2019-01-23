@@ -248,15 +248,33 @@ def test_fast_growth_default(model, reaction_id):
     fastest growing organism. This is based on lowest doubling time reported
     here:
     http://www.pnnl.gov/science/highlights/highlight.asp?id=879
+
+    Implementation:
+    Calculate the solution of FBA with the biomass reaction set as objective
+    function and a model's default constraints. Then check if the objective
+    flux is above 10.3972.
+
     """
     ann = test_fast_growth_default.annotation
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) <= 10.3972
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) > 10.3972
     ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} and when the model is simulated on
-        the provided default medium the growth rate amounts to {}""".format(
-            reaction_id, ann["data"][reaction_id]))
-    assert ann["data"][reaction_id] <= 10.3972, ann["message"][reaction_id]
+
+    if ann["data"][reaction_id]:
+        ann["message"][reaction_id] = wrapper.fill(
+            """Using the biomass reaction {} and when the model is simulated on
+            the provided default medium the growth rate is higher than that
+            of the fastest bacteria.
+            This could be due to inconsistencies in the network or missing
+            constraints.""".format(
+            reaction_id))
+    else:
+        ann["message"][reaction_id] = wrapper.fill(
+            """Using the biomass reaction {} and when the model is simulated on
+            the provided default medium the growth rate is lower than that
+            of the fastest bacteria. This is to be expected for
+            a majority of organisms.""".format(
+            reaction_id))
+    assert ann["data"][reaction_id] > 10.3972, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
