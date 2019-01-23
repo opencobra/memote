@@ -51,8 +51,9 @@ cards:
         - test_biomass_specific_sbo_presence
   sbml_format:
     title: "SBML"
-      - test_sbml_level
-      - test_fbc_presence
+    cases:
+    - test_sbml_level
+    - test_fbc_presence
   basic_info:
     title: "Basic Information"
     cases:
