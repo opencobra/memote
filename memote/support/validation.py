@@ -71,9 +71,9 @@ def run_cobrapy_validation(path, notifications):
         return model, model_ver
 
 
-def read_sbml_model(path, number=float, **kwargs):
+def read_sbml_model(filename, number=float, **kwargs):
     """ Copy of the function cobrapy.io.sbml3.read_sbml_model. """
-    xmlfile = parse_stream(path)
+    xmlfile = parse_stream(filename)
     xml = xmlfile.getroot()
     # use libsbml if not l3v1 with fbc v2
     model_ver = (
@@ -85,7 +85,7 @@ def read_sbml_model(path, number=float, **kwargs):
                    get_attrib(xml, "fbc:required") is None)
 
     if use_libsbml:
-        if hasattr(path, "read"):
+        if hasattr(filename, "read"):
             with NamedTemporaryFile(suffix=".xml", delete=False) as outfile:
                 xmlfile.write(outfile, encoding="UTF-8", xml_declaration=True)
             filename = outfile.name
