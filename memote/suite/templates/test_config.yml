@@ -11,25 +11,31 @@ cards:
         - test_reaction_charge_balance
         - test_find_disconnected
         - test_find_reactions_unbounded_flux_default_condition
-        - test_find_metabolites_produced_with_closed_bounds
-        - test_find_metabolites_consumed_with_closed_bounds
-      annotation:
-        title: "Annotation"
+      annotation_met:
+        title: "Annotation - Metabolites"
         weight: 1.0
         cases:
         - test_metabolite_annotation_presence
         - test_metabolite_annotation_overview
         - test_metabolite_annotation_wrong_ids
+        - test_metabolite_id_namespace_consistency
+      annotation_rxn:
+        title: "Annotation - Reactions"
+        weight: 1.0
+        cases:
         - test_reaction_annotation_presence
         - test_reaction_annotation_overview
         - test_reaction_annotation_wrong_ids
+        - test_reaction_id_namespace_consistency
+      annotation_gene:
+        title: "Annotation - Genes"
+        weight: 1.0
+        cases:
         - test_gene_product_annotation_presence
         - test_gene_product_annotation_overview
         - test_gene_product_annotation_wrong_ids
-        - test_metabolite_id_namespace_consistency
-        - test_reaction_id_namespace_consistency
-      sbo:
-        title: "SBO Terms"
+      annotation_sbo:
+        title: "Annotation - SBO Terms"
         weight: 2.0
         cases:
         - test_metabolite_sbo_presence
@@ -43,30 +49,37 @@ cards:
         - test_gene_sbo_presence
         - test_gene_specific_sbo_presence
         - test_biomass_specific_sbo_presence
-  test_basic:
+  basic_info:
     title: "Basic Information"
     cases:
     - test_model_id_presence
-    - test_metabolic_coverage
-    - test_compartments_presence
     - test_metabolites_presence
+    - test_reactions_presence
+    - test_genes_presence
+    - test_compartments_presence
+    - test_metabolic_coverage
+  basic_met:
+    title: "Metabolite Information"
+    cases:
     - test_find_unique_metabolites
     - test_find_duplicate_metabolites_in_compartments
     - test_metabolites_charge_presence
     - test_metabolites_formula_presence
     - test_find_medium_metabolites
-    - test_reactions_presence
-    - test_gene_protein_reaction_rule_presence
+  basic_rxn:
+    title: "Reaction Information"
+    cases:
     - test_find_pure_metabolic_reactions
     - test_find_constrained_pure_metabolic_reactions
-    - test_find_candidate_irreversible_reactions
-    - test_find_duplicate_reactions
     - test_find_transport_reactions
     - test_find_constrained_transport_reactions
+    - test_find_candidate_irreversible_reactions
+    - test_find_duplicate_reactions
+  gpr_calculations:
+    title: "Gene-Protein-Reaction (GPR) Associations"
+    cases:
+    - test_gene_protein_reaction_rule_presence
     - test_transport_reaction_gpr_presence
-    - test_find_reversible_oxygen_reactions
-    - test_ngam_presence
-    - test_genes_presence
     - test_protein_complex_presence
   test_biomass:
     title: "Biomass"
@@ -78,17 +91,22 @@ cards:
     - test_biomass_open_production
     - test_biomass_precursors_default_production
     - test_biomass_precursors_open_production
-    - test_gam_in_biomass
     - test_direct_metabolites_in_biomass
     - test_essential_precursors_not_in_biomass
-  test_consistency:
-    title: "Stoichiometry Matrix"
+  energy_metabolism:
+    title: "Energy Metabolism"
     cases:
+    - test_ngam_presence
+    - test_gam_in_biomass
+    - test_find_reversible_oxygen_reactions
     - test_detect_energy_generating_cycles
-    - test_find_stoichiometrically_balanced_cycles
+  gap_finding:
+    title: "Network Topology"
+    cases:
     - test_blocked_reactions
     - test_find_orphans
     - test_find_deadends
+    - test_find_stoichiometrically_balanced_cycles
     - test_find_metabolites_not_produced_with_open_bounds
     - test_find_metabolites_not_consumed_with_open_bounds
   matrix:

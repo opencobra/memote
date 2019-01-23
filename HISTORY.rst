@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Thematically reorganize the test cases in the config.
 * Instead of min/max bounds consider the median bounds for testing (un-)bounded 
   fluxes.
 * Use a model context for every test case.
