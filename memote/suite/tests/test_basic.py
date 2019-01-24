@@ -35,7 +35,7 @@ def test_model_id_presence(model):
     report, which helps to distinguish the output clearly.
 
     Implementation:
-    Check if the cobra.Model object has a non-zero "id"
+    Check if the cobra.Model object has a non-empty "id"
     attribute, this value is parsed from the "id" attribute of the <model> tag
     in the SBML file e.g. <model fbc:strict="true" id="iJO1366">.
 
@@ -58,7 +58,7 @@ def test_genes_presence(model):
     rules. This test requires that there is at least one gene defined.
 
     Implementation:
-    Check if the cobra.Model object has non-zero "genes"
+    Check if the cobra.Model object has non-empty "genes"
     attribute, this list is populated from the list of fbc:listOfGeneProducts
     which should contain at least one fbc:geneProduct.
 
@@ -80,7 +80,7 @@ def test_reactions_presence(model):
     This test simply checks if there are more than zero reactions.
 
     Implementation:
-    Check if the cobra.Model object has non-zero "reactions"
+    Check if the cobra.Model object has non-empty "reactions"
     attribute, this list is populated from the list of sbml:listOfReactions
     which should contain at least one sbml:reaction.
 
@@ -103,7 +103,7 @@ def test_metabolites_presence(model):
     This test simply checks if there are more than zero metabolites.
 
     Implementation:
-    Check if the cobra.Model object has non-zero
+    Check if the cobra.Model object has non-empty
     "metabolites" attribute, this list is populated from the list of
     sbml:listOfSpecies which should contain at least one sbml:species.
 
@@ -128,7 +128,7 @@ def test_metabolites_formula_presence(model):
     when chemical formulas are not defined for each metabolite.
 
     Implementation:
-    Check if each cobra.Metabolite has a non-zero "formula"
+    Check if each cobra.Metabolite has a non-empty "formula"
     attribute. This attribute is set by the parser if there is an
     fbc:chemicalFormula attribute for the corresponding species in the
     SBML.
@@ -157,7 +157,7 @@ def test_metabolites_charge_presence(model):
     when charge information is not defined for each metabolite.
 
     Implementation:
-    Check if each cobra.Metabolite has a non-zero "charge"
+    Check if each cobra.Metabolite has a non-empty "charge"
     attribute. This attribute is set by the parser if there is an
     fbc:charge attribute for the corresponding species in the
     SBML.
@@ -187,7 +187,7 @@ def test_gene_protein_reaction_rule_presence(model):
     likely lack GPR.
 
     Implementation:
-    Check if each cobra.Reaction has a non-zero
+    Check if each cobra.Reaction has a non-empty
     "gene_reaction_rule" attribute, which is set by the parser if there is an
     fbc:geneProductAssociation defined for the corresponding reaction in the
     SBML.
@@ -253,7 +253,7 @@ def test_metabolic_coverage(model):
     gene products and their enzymatic transformations are ‘lumped’.
 
     Implementation:
-    Divides the amount reactions by the amount of genes. Raises a ValueError
+    Divides the amount reactions by the amount of genes. Raises an error
     if the model does not contain either reactions or genes.
 
     """
@@ -280,7 +280,7 @@ def test_compartments_presence(model):
     metabolic model.
 
     Implementation:
-    Check if the cobra.Model object has non-zero "compartments"
+    Check if the cobra.Model object has a non-empty "compartments"
     attribute, this list is populated from the list of sbml:listOfCompartments
     which should contain at least two sbml:compartment elements.
 
@@ -303,7 +303,7 @@ def test_protein_complex_presence(model):
     Based on the gene-protein-reaction (GPR) rules, it is possible to infer
     whether a reaction is catalyzed by a single gene product, isozymes or by a
     heteromeric protein complex. This test checks that at least one
-    such heteromeric protein complex is defined in the GPR of the model. For
+    such heteromeric protein complex is defined in any GPR of the model. For
     S. cerevisiae it could be shown that "essential proteins tend to [cluster]
     together in essential complexes"
     (https://doi.org/10.1074%2Fmcp.M800490-MCP200).
@@ -336,7 +336,7 @@ def test_find_pure_metabolic_reactions(model):
     another.
 
     Implementation:
-    From the list of all reactions those that are boundary, transport and
+    From the list of all reactions, those that are boundary, transport and
     biomass reactions are removed and the remainder assumed to be pure
     metabolic reactions. Boundary reactions are identified using the attribute
     cobra.Model.boundary. Please read the description of "Transport Reactions"
@@ -479,7 +479,7 @@ def test_transport_reaction_gpr_presence(model):
 
     Implementation:
     Check which cobra.Reactions classified as transport reactions have a
-    non-zero "gene_reaction_rule" attribute.
+    non-empty "gene_reaction_rule" attribute.
 
     """
     # TODO: Update threshold with improved insight from meta study.
@@ -539,7 +539,7 @@ def test_find_unique_metabolites(model):
     total number of metabolites.
 
     Implementation:
-    Reduce list of metabolites to unique set by removing the compartment tag.
+    Reduce the list of metabolites to a unique set by removing the compartment tag.
     The cobrapy SBML parser adds compartment tags to each metabolite ID.
 
     """

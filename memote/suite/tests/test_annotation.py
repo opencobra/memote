@@ -40,7 +40,7 @@ def test_metabolite_annotation_presence(model):
 
     Implementation:
     Check if the annotation attribute of each cobra.Metabolite object of the
-    model is None or if the length of it equal to zero.
+    model is unset or empty.
 
     """
     ann = test_metabolite_annotation_presence.annotation
@@ -66,7 +66,7 @@ def test_reaction_annotation_presence(model):
 
     Implementation:
     Check if the annotation attribute of each cobra.Reaction object of the
-    model is None or if the length of it equal to zero.
+    model is unset or empty.
 
     """
     ann = test_reaction_annotation_presence.annotation
@@ -93,7 +93,7 @@ def test_gene_product_annotation_presence(model):
 
     Implementation:
     Check if the annotation attribute of each cobra.Gene object of the
-    model is None or if the length of it equal to zero.
+    model is unset or empty.
 
     """
     ann = test_gene_product_annotation_presence.annotation
@@ -265,7 +265,7 @@ def test_metabolite_annotation_wrong_ids(model, db):
 
     Implementation:
     For those metabolites whose annotation keys match any of the tested
-    databases check if the corresponding values match the identifier pattern
+    databases, check if the corresponding values match the identifier pattern
     of each database.
 
     """
@@ -312,7 +312,7 @@ def test_reaction_annotation_wrong_ids(model, db):
 
     Implementation:
     For those reaction whose annotation keys match any of the tested
-    databases check if the corresponding values match the identifier pattern
+    databases, check if the corresponding values match the identifier pattern
     of each database.
 
     """
@@ -359,7 +359,7 @@ def test_gene_product_annotation_wrong_ids(model, db):
 
     Implementation:
     For those genes whose annotation keys match any of the tested
-    databases check if the corresponding values match the identifier pattern
+    databases, check if the corresponding values match the identifier pattern
     of each database.
 
     """
@@ -402,13 +402,13 @@ def test_metabolite_id_namespace_consistency(model):
     https://identifiers.org/
 
     Implementation:
-    Generate a pandas.DataFrame with each column corresponding to one
-    database from the selection and each row to the metabolite ID. A boolean
-    entry indicates whether the metabolite ID matches the regex pattern
-    of the corresponding database. Since the Biocyc pattern matches quite,
-    assume that any instance of an identifier matching to Biocyc
-    AND any other DB pattern is a false positive match for Biocyc and then set
-    the boolean to ``false``. Sum the positive matches for each database and
+    Generate a table with each column corresponding to one
+    database from the selection and each row to a metabolite identifier. A Boolean
+    entry indicates whether the identifier matches the regular expression
+    of the corresponding database. Since the Biocyc pattern matches broadly,
+    we assume that any instance of an identifier matching to Biocyc
+    AND any other database pattern is a false positive match for Biocyc and thus set
+    it to ``false``. Sum the positive matches for each database and
     assume that the largest set is the 'main' identifier namespace.
 
     """

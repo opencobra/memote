@@ -132,7 +132,7 @@ def test_biomass_default_production(model, reaction_id):
 
     Implementation:
     Calculate the solution of FBA with the biomass reaction set as objective
-    function and a model's default constraints.
+    function and the model's default constraints.
 
     """
     ann = test_biomass_default_production.annotation
@@ -191,7 +191,7 @@ def test_biomass_precursors_default_production(model, reaction_id):
     Implementation:
     For each biomass precursor (except ATP and H2O) add a temporary demand
     reaction, then carry out FBA with this reaction as the objective. Collect
-    all metabolites for which this optimization is below or equal to zero or is
+    all metabolites for which this optimization is equal to zero or
     infeasible.
 
     """
@@ -269,7 +269,7 @@ def test_gam_in_biomass(model, reaction_id):
     if a biomass reaction contains this term.
 
     Implementation:
-    Identifies the metabolite IDs of ATP, ADP, H2O, HO4P and H+ based on an
+    Determines the metabolite identifiers of ATP, ADP, H2O, HO4P and H+ based on an
     internal mapping table. Checks if ATP and H2O are a subset of the reactants
     and ADP, HO4P and H+ a subset of the products of the biomass equation.
 
