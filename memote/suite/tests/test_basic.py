@@ -618,6 +618,40 @@ def test_find_duplicate_reactions_by_annotation(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
+@annotate(title="Duplicate Reactions By Metabolites", format_type="count")
+def test_find_duplicate_reactions_by_metabolites(model):
+    """
+    Expect there to be zero duplicate reactions.
+
+    The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical reactions from different namespaces (hence different IDs).
+    This tests identifies reactions in a pairwise manner that use the same set
+    of metabolites including potentially duplicate metabolites. Moreover, it
+    will take a reaction's directionality and compartment into account.
+
+    Implementation:
+    Compares reactions in a pairwise manner.
+    First, if there are duplicate metabolites in the set of
+    metabolites of each reaction, added them to the set belonging to each
+    reaction respectively. Then, if the sets for each reaction are
+    identical, check the reversibility of each reaction:
+    - If both reactions differ in reversibility they are assumed to be
+    different.
+    - If both are reversible they are assumed to be identical.
+    - If both are irreversible, the upper bound and product metabolites
+     have to be identical for the reactions to be assumed to be identical.
+
+    """
+    ann = test_find_duplicate_reactions.annotation
+    ann["data"] = basic.find_duplicate_reactions_by_annotation(model)
+    ann["message"] = wrapper.fill(
+        """Based on metabolites, directionality and compartment there are a
+        total of {} reactions in the model which have duplicates: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
 @annotate(title="Medium Components", format_type="count")
 def test_find_medium_metabolites(model):
     """
