@@ -64,7 +64,14 @@ def check_component_for_specific_sbo_term(items, term):
         The components without any or that specific SBO term annotation.
 
     """
-    return [elem for elem in items if
-            elem.annotation is None or
-            'sbo' not in elem.annotation or
-            term not in elem.annotation['sbo']]
+    # check for multiple allowable SBO terms
+    if isinstance(term, list):
+        return [elem for elem in items if
+                elem.annotation is None or
+                'sbo' not in elem.annotation or
+                not any(i in elem.annotation['sbo'] for i in term)]
+    else:
+        return [elem for elem in items if
+                elem.annotation is None or
+                'sbo' not in elem.annotation or
+                term not in elem.annotation['sbo']]
