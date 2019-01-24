@@ -34,6 +34,8 @@ Next Release
 * Display an alternative message if some biomass components do not contain a 
   formula.
 * Extend the annotations tests by a check for full length InChI strings.
+* Fix a bug in ``Unrealistic Growth Rate In Default Medium`` which reported the
+  opposite of what was the case.
 
 0.8.11 (2019-01-07)
 -------------------

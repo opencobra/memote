@@ -242,21 +242,41 @@ def test_gam_in_biomass(model, reaction_id):
           format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_fast_growth_default(model, reaction_id):
     """
-    Expect the predicted growth rate for each BOF to be below 10.3972.
+    Expect the predicted growth rate for each BOF to be below 2.81.
 
     The growth rate of a metabolic model should not be faster than that of the
-    fastest growing organism. This is based on lowest doubling time reported
-    here:
-    http://www.pnnl.gov/science/highlights/highlight.asp?id=879
+    fastest growing organism. This is based on a doubling time of Vibrio
+    natriegens which was reported to be 14.8 minutes by: Henry H. Lee, Nili
+    Ostrov, Brandon G. Wong, Michaela A. Gold, Ahmad S. Khalil, George M. Church
+    in https://www.biorxiv.org/content/biorxiv/early/2016/06/12/058487.full.pdf
+
+    The calculation ln(2)/(14.8/60) ~ 2.81 yields the corresponding growth
+    rate.
+
+    Implementation:
+    Calculate the solution of FBA with the biomass reaction set as objective
+    function and a model's default constraints. Then check if the objective
+    value is higher than 2.81.
+
     """
     ann = test_fast_growth_default.annotation
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) <= 10.3972
+    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) > 2.81
     ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    ann["message"][reaction_id] = wrapper.fill(
-        """Using the biomass reaction {} and when the model is simulated on
-        the provided default medium the growth rate amounts to {}""".format(
-            reaction_id, ann["data"][reaction_id]))
-    assert ann["data"][reaction_id] <= 10.3972, ann["message"][reaction_id]
+
+    if ann["data"][reaction_id]:
+        ann["message"][reaction_id] = wrapper.fill(
+            """Using the biomass reaction {} and when the model is simulated on
+            the provided default medium the growth rate is *higher* than that
+            of the fastest bacteria.
+            This could be due to inconsistencies in the network or missing
+            constraints.""".format(reaction_id))
+    else:
+        ann["message"][reaction_id] = wrapper.fill(
+            """Using the biomass reaction {} and when the model is simulated on
+            the provided default medium the growth rate is *lower* than that
+            of the fastest bacteria. This is to be expected for
+            a majority of organisms.""".format(reaction_id))
+    assert ann["data"][reaction_id] > 2.81, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
