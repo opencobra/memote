@@ -318,7 +318,7 @@ def one_exchange(base):
                           compartment='e'): -1}
     )
     rxn.bounds = -1, 5
-    base.add_reaction(rxn)
+    base.add_reactions([rxn])
     return base
 
 

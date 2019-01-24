@@ -633,7 +633,7 @@ def test_ngam_presence(model, num):
 ], indirect=["model"])
 def test_compartments_presence(model, boolean):
     """Expect amount of compartments to be identified correctly."""
-    assert (len(model.get_metabolite_compartments()) >= 3) == boolean
+    assert (len(model.compartments) >= 3) == boolean
 
 
 @pytest.mark.parametrize("model, num", [
