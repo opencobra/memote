@@ -246,7 +246,7 @@ def test_fast_growth_default(model, reaction_id):
 
     The growth rate of a metabolic model should not be faster than that of the
     fastest growing organism. This is based on a doubling time of Vibrio
-    natriegens to be 14.8 minutes as reported by: Henry H. Lee, Nili Ostrov,
+    natriegens which was reported to be 14.8 minutes by: Henry H. Lee, Nili Ostrov,
     Brandon G. Wong, Michaela A. Gold, Ahmad S. Khalil, George M. Church in
     https://www.biorxiv.org/content/biorxiv/early/2016/06/12/058487.full.pdf
 
@@ -256,7 +256,7 @@ def test_fast_growth_default(model, reaction_id):
     Implementation:
     Calculate the solution of FBA with the biomass reaction set as objective
     function and a model's default constraints. Then check if the objective
-    flux is higher than 2.81.
+    value is higher than 2.81.
 
     """
     ann = test_fast_growth_default.annotation
@@ -266,14 +266,14 @@ def test_fast_growth_default(model, reaction_id):
     if ann["data"][reaction_id]:
         ann["message"][reaction_id] = wrapper.fill(
             """Using the biomass reaction {} and when the model is simulated on
-            the provided default medium the growth rate is higher than that
+            the provided default medium the growth rate is *higher* than that
             of the fastest bacteria.
             This could be due to inconsistencies in the network or missing
             constraints.""".format(reaction_id))
     else:
         ann["message"][reaction_id] = wrapper.fill(
             """Using the biomass reaction {} and when the model is simulated on
-            the provided default medium the growth rate is lower than that
+            the provided default medium the growth rate is *lower* than that
             of the fastest bacteria. This is to be expected for
             a majority of organisms.""".format(reaction_id))
     assert ann["data"][reaction_id] > 2.81, ann["message"][reaction_id]
