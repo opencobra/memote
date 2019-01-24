@@ -328,7 +328,7 @@ def find_reactions_with_partially_identical_annotations(model):
             mutual_pair = ann_a & ann_b
             duplicates.setdefault(mutual_pair , set())
             duplicates[mutual_pair].update([rxn_a.id,rxn_b.id])
-    return list(duplicates.items())
+    return list(duplicates.values())
 
 
 def find_duplicate_reactions(model):
