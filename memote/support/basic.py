@@ -284,7 +284,7 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-def find_duplicate_reactions_by_annotation(model):
+def find_duplicate_reactions_by_annotations(model):
     """
     Return list of reactions with duplicates based on identical annotations.
 
@@ -323,8 +323,10 @@ def find_duplicate_reactions_by_annotation(model):
         ann_rxns.append((rxn, frozenset(ann)))
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
-            duplicates.append((rxn_a.id, rxn_b.id))
-    return list(duplicates.values())
+            mutual_pair = ann_a & ann_b
+            duplicates.setdefault(mutual_pair , set())
+            duplicates[mutual_pair].update([rxn_a.id,rxn_b.id])
+    return list(duplicates.items())
 
 
 def find_duplicate_reactions_by_metabolites(model):

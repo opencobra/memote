@@ -582,7 +582,7 @@ def test_find_duplicate_metabolites_in_compartments(model):
 
 
 @annotate(title="Duplicate Reactions By Annotations", format_type="count")
-def test_find_duplicate_reactions_by_annotation(model):
+def test_find_duplicate_reactions_by_annotations(model):
     """
     Expect there to be zero duplicate reactions.
 
