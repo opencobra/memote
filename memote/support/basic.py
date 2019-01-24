@@ -400,9 +400,9 @@ def find_duplicate_reactions_by_metabolites(model):
     return list(duplicates.values())
 
 
-def find_duplicate_reactions_by_genes(model):
+def find_reactions_with_identical_genes(model):
     """
-    Return list of reactions with duplicates based on identical genes.
+    Return list of reaction that have identical genes.
 
     This function identifies duplicate reactions globally by checking if any
     two reactions have the same genes.

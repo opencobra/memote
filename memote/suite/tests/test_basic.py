@@ -652,8 +652,8 @@ def test_find_duplicate_reactions_by_metabolites(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Duplicate Reactions By Genes", format_type="count")
-def test_find_duplicate_reactions_by_genes(model):
+@annotate(title="Reactions With Identical Genes", format_type="count")
+def test_find_reactions_with_identical_genes(model):
     """
     Expect there to be zero duplicate reactions.
 
@@ -669,8 +669,8 @@ def test_find_duplicate_reactions_by_genes(model):
     are identical. Skip reactions with missing genes.
 
     """
-    ann = test_find_duplicate_reactions_by_genes.annotation
-    ann["data"] = basic.find_duplicate_reactions_by_genes(model)
+    ann = test_find_reactions_with_identical_genes.annotation
+    ann["data"] = basic.find_reactions_with_identical_genes(model)
     ann["message"] = wrapper.fill(
         """Based only on genes there are a
         total of {} reactions in the model which have duplicates: {}""".format(

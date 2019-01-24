@@ -843,9 +843,9 @@ def test_find_duplicate_reactions_by_metabolites(model, num):
     ("different_genes", 0),
     ("gpr_missing", 0)
 ], indirect=["model"])
-def test_find_duplicate_reactions_by_genes(model, num):
+def test_find_reactions_with_identical_genes(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(basic.find_duplicate_reactions_by_genes(model)) == num
+    assert len(basic.find_reactions_with_identical_genes(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
