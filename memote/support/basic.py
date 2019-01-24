@@ -253,6 +253,7 @@ def find_unique_metabolites(model):
     return set(met.id.split("_", 1)[0] for met in model.metabolites)
 
 
+@lrudecorator(size=2)
 def find_duplicate_metabolites_in_compartments(model):
     """
     Return list of metabolites with duplicates in the same compartment.
@@ -273,14 +274,15 @@ def find_duplicate_metabolites_in_compartments(model):
         A list of tuples of duplicate metabolites.
 
     """
+    unique_identifiers = ["inchikey", "inchi"]
     duplicates = []
-    for compartment in model.compartments:
-        ann_mets = [(met, met.annotation) for met in model.metabolites
-                    if met.compartment == compartment and
-                    "inchikey" in met.annotation]
-        for a, b in combinations(ann_mets, 2):
-            if a[1]["inchikey"] == b[1]["inchikey"]:
-                duplicates.append((a[0].id, b[0].id))
+    for met_1, met_2 in combinations(model.metabolites, 2):
+        if met_1.compartment == met_2.compartment:
+            for key in unique_identifiers:
+                if key in met_1.annotation and key in met_2.annotation:
+                    if met_1.annotation[key] == met_2.annotation[key]:
+                        duplicates.append((met_1.id, met_2.id))
+                        break
     return duplicates
 
 
