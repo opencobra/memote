@@ -726,9 +726,9 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
     ("dup_rxns_multiple_list_anns_no_match", 0),
     ("gpr_missing", 0)
 ], indirect=["model"])
-def test_find_duplicate_reactions(model, num):
+def test_find_duplicate_reactions_by_annotation(model, num):
     """Expect amount of duplicate metabolites to be identified correctly."""
-    assert len(basic.find_duplicate_reactions(model)) == num
+    assert len(basic.find_duplicate_reactions_by_annotation(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [

@@ -284,14 +284,17 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-def find_duplicate_reactions(model):
+def find_duplicate_reactions_by_annotation(model):
     """
-    Return list of reactions with duplicates.
+    Return list of reactions with duplicates based on identical annotations.
 
-    This function identifies duplicate reactions in each compartment by
-    pair-wise comparison of reaction annotation objects. If two reactions have
-    any annotation elements in common they are considered duplicates of each
-    other.
+    This function identifies duplicate reactions globally by checking if any
+    two reactions have the same entries in their annotation attributes.
+    This can be useful to identify one 'type' of reactions that occurs in
+    several compartments, to curate merged models or to clean-up bulk model
+    modifications. The heuristic looks at annotations with the keys
+    "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
+    "bigg.reaction" only.
 
     Parameters
     ----------
@@ -301,7 +304,7 @@ def find_duplicate_reactions(model):
     Returns
     -------
     list
-        A list of tuples of duplicate reacions.
+        A list of tuples of duplicate reactions.
 
     """
     duplicates = []

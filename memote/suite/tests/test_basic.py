@@ -581,16 +581,26 @@ def test_find_duplicate_metabolites_in_compartments(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Duplicate Reactions", format_type="count")
-def test_find_duplicate_reactions(model):
+@annotate(title="Duplicate Reactions By Annotations", format_type="count")
+def test_find_duplicate_reactions_by_annotation(model):
     """
     Expect there to be zero duplicate reactions.
 
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
     having identical reactions from different namespaces (hence different IDs).
-    This test therefore expects that every reaction has unique identifier
-    values (i.e. unique BRENDA, BiGG, KEGG, etc. values).
+    It could also be useful to identify one 'type' of reactions that
+    occurs in several compartments.
+    This tests identifies reactions in a pairwise manner that are annotated
+    with identical database references, it does not take into account a
+    reaction's directionality or compartment.
+
+    Implementation:
+    Identifies duplicate reactions globally by checking if any
+    two metabolic reactions have the same entries in their annotation
+    attributes. The heuristic looks at annotations with the keys
+    "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
+    "bigg.reaction" only.
 
     Implementation:
     Identifies duplicate reactions in each compartment by
@@ -600,10 +610,11 @@ def test_find_duplicate_reactions(model):
 
     """
     ann = test_find_duplicate_reactions.annotation
-    ann["data"] = basic.find_duplicate_reactions(model)
+    ann["data"] = basic.find_duplicate_reactions_by_annotation(model)
     ann["message"] = wrapper.fill(
-        """There are a total of {} reactions in the model which
-        have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
+        """Based on annotations there are a total of {} reactions in the model
+        which have duplicates: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
 
 
