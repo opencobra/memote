@@ -584,6 +584,36 @@ def dup_rxns_rev(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def identical_genes(base):
+    """Provide a model with reactions with identical genes."""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'gene1 or gene2'
+    rxn_2 = cobra.Reaction("NXR")
+    rxn_2.gene_reaction_rule = 'gene1 or gene2'
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2.add_metabolites({met_1: 1, met_2: -1})
+    base.add_reactions([rxn_1, rxn_2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def different_genes(base):
+    """Provide a model with reactions with different genes."""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'b2912'
+    rxn_2 = cobra.Reaction("NXR")
+    rxn_2.gene_reaction_rule = 'b2551'
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2.add_metabolites({met_1: 1, met_2: -1})
+    base.add_reactions([rxn_1, rxn_2])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -790,7 +820,7 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions_by_annotation(model, num):
-    """Expect amount of duplicate metabolites to be identified correctly."""
+    """Expect amount of duplicate reactions to be identified correctly."""
     assert len(basic.find_duplicate_reactions_by_annotation(model)) == num
 
 
@@ -803,8 +833,19 @@ def test_find_duplicate_reactions_by_annotation(model, num):
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions_by_metabolites(model, num):
-    """Expect amount of duplicate metabolites to be identified correctly."""
+    """Expect amount of duplicate reactions to be identified correctly."""
     assert len(basic.find_duplicate_reactions_by_metabolites(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("identical_genes", 1),
+    ("different_genes", 0),
+    ("gpr_missing", 0)
+], indirect=["model"])
+def test_find_duplicate_reactions_by_genes(model, num):
+    """Expect amount of duplicate reactions to be identified correctly."""
+    assert len(basic.find_duplicate_reactions_by_genes(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [

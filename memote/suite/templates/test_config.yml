@@ -76,6 +76,7 @@ cards:
     - test_find_candidate_irreversible_reactions
     - test_find_duplicate_reactions_by_annotation
     - test_find_duplicate_reactions_by_metabolites
+    - test_find_duplicate_reactions_by_genes
   gpr_calculations:
     title: "Gene-Protein-Reaction (GPR) Associations"
     cases:

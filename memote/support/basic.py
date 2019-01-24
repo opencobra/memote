@@ -396,6 +396,40 @@ def find_duplicate_reactions_by_metabolites(model):
     return duplicates
 
 
+def find_duplicate_reactions_by_genes(model):
+    """
+    Return list of reactions with duplicates based on identical genes.
+
+    This function identifies duplicate reactions globally by checking if any
+    two reactions have the same genes.
+    This can be useful to curate merged models or to clean-up bulk model
+    modifications, but also to identify promiscuous enzymes.
+    The heuristic compares reactions in a pairwise manner and reports on
+    reaction pairs whose genes are identical. Reactions with missing genes are
+    skipped.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns
+    -------
+    list
+        A list of tuples of duplicate reactions based on genes.
+
+    """
+    duplicates = []
+    for rxn_a, rxn_b in combinations(model.reactions, 2):
+        try:
+            symm_difference = getattr(rxn_a, "genes") ^ getattr(rxn_b, "genes")
+            if len(symm_difference) == 0:
+                duplicates.append((rxn_a.id, rxn_b.id))
+        except AttributeError:
+            continue
+    return duplicates
+
+
 def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
     return [rxn for rxn in helpers.find_transport_reactions(model)

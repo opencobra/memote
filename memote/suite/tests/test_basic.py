@@ -643,10 +643,36 @@ def test_find_duplicate_reactions_by_metabolites(model):
      have to be identical for the reactions to be assumed to be identical.
 
     """
-    ann = test_find_duplicate_reactions.annotation
-    ann["data"] = basic.find_duplicate_reactions_by_annotation(model)
+    ann = test_find_duplicate_reactions_by_metabolites.annotation
+    ann["data"] = basic.find_duplicate_reactions_by_metabolites(model)
     ann["message"] = wrapper.fill(
         """Based on metabolites, directionality and compartment there are a
+        total of {} reactions in the model which have duplicates: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
+    assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Duplicate Reactions By Genes", format_type="count")
+def test_find_duplicate_reactions_by_genes(model):
+    """
+    Expect there to be zero duplicate reactions.
+
+    The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical reactions from different namespaces (hence different IDs).
+    This tests identifies reactions in a pairwise manner that use identical
+    sets of genes. It does *not* take a reaction's directionality, compartment,
+    metabolites or annotations into account.
+
+    Implementation:
+    Compares reactions in a pairwise manner and groups reactions whose genes
+    are identical. Skip reactions with missing genes.
+
+    """
+    ann = test_find_duplicate_reactions_by_genes.annotation
+    ann["data"] = basic.find_duplicate_reactions_by_genes(model)
+    ann["message"] = wrapper.fill(
+        """Based only on genes there are a
         total of {} reactions in the model which have duplicates: {}""".format(
             len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
