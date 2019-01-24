@@ -581,8 +581,10 @@ def test_find_duplicate_metabolites_in_compartments(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Duplicate Reactions By Annotations", format_type="count")
-def test_find_duplicate_reactions_by_annotations(model):
+@annotate(
+    title="Reactions With Partially Identical Annotations",
+    format_type="count")
+def test_find_reactions_with_partially_identical_annotations(model):
     """
     Expect there to be zero duplicate reactions.
 
@@ -609,8 +611,8 @@ def test_find_duplicate_reactions_by_annotations(model):
     other.
 
     """
-    ann = test_find_duplicate_reactions.annotation
-    ann["data"] = basic.find_duplicate_reactions_by_annotation(model)
+    ann = test_find_reactions_with_partially_identical_annotations.annotation
+    ann["data"] = basic.find_reactions_with_partially_identical_annotations(model)
     ann["message"] = wrapper.fill(
         """Based on annotations there are a total of {} reactions in the model
         which have duplicates: {}""".format(
@@ -618,8 +620,8 @@ def test_find_duplicate_reactions_by_annotations(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Duplicate Reactions By Metabolites", format_type="count")
-def test_find_duplicate_reactions_by_metabolites(model):
+@annotate(title="Duplicate Reactions", format_type="count")
+def test_find_duplicate_reactions(model):
     """
     Expect there to be zero duplicate reactions.
 
@@ -643,8 +645,8 @@ def test_find_duplicate_reactions_by_metabolites(model):
      have to be identical for the reactions to be assumed to be identical.
 
     """
-    ann = test_find_duplicate_reactions_by_metabolites.annotation
-    ann["data"] = basic.find_duplicate_reactions_by_metabolites(model)
+    ann = test_find_duplicate_reactions.annotation
+    ann["data"] = basic.find_duplicate_reactions(model)
     ann["message"] = wrapper.fill(
         """Based on metabolites, directionality and compartment there are a
         total of {} reactions in the model which have duplicates: {}""".format(

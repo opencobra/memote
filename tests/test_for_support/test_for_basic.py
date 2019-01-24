@@ -819,9 +819,11 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
     ("dup_rxns_irrev", 1),
     ("gpr_missing", 0)
 ], indirect=["model"])
-def test_find_duplicate_reactions_by_annotations(model, num):
+def test_find_reactions_with_partially_identical_annotations(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(basic.find_duplicate_reactions_by_annotations(model)) == num
+    assert len(
+        basic.find_reactions_with_partially_identical_annotations(model)
+    ) == num
 
 
 @pytest.mark.parametrize("model, num", [
@@ -832,9 +834,9 @@ def test_find_duplicate_reactions_by_annotations(model, num):
     ("dup_rxns_compartment", 0),
     ("gpr_missing", 0)
 ], indirect=["model"])
-def test_find_duplicate_reactions_by_metabolites(model, num):
+def test_find_duplicate_reactions(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(basic.find_duplicate_reactions_by_metabolites(model)) == num
+    assert len(basic.find_duplicate_reactions(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [

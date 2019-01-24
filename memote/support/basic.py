@@ -284,7 +284,7 @@ def find_duplicate_metabolites_in_compartments(model):
     return duplicates
 
 
-def find_duplicate_reactions_by_annotations(model):
+def find_reactions_with_partially_identical_annotations(model):
     """
     Return list of reactions with duplicates based on identical annotations.
 
@@ -329,9 +329,9 @@ def find_duplicate_reactions_by_annotations(model):
     return list(duplicates.items())
 
 
-def find_duplicate_reactions_by_metabolites(model):
+def find_duplicate_reactions(model):
     """
-    Return list of reactions with duplicates based on identical metabolites.
+    Return a list with sets of reactions that are functionally identical.
 
     This function identifies duplicate reactions globally by checking if any
     two reactions have the same metabolites, same directionality and are in
