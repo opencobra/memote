@@ -119,16 +119,6 @@ def test_number_independent_conservation_relations(model, num):
 
 
 @pytest.mark.parametrize("model, num", [
-    ("three_components_closed", 0),
-    ("three_components_open", 1),
-    ("x2_cycle_closed", 0),
-    ("x2_cycle_open", 1),
-], indirect=["model"])
-def test_number_steady_state_flux_solutions(model, num):
-    assert matrix.number_steady_state_flux_solutions(model) == num
-
-
-@pytest.mark.parametrize("model, num", [
     ("three_components_closed", 2),
     ("three_components_open", 3),
     ("x2_cycle_closed", 3),
