@@ -53,6 +53,17 @@ def specific_sbo_term(base):
     base.add_reactions([rxn])
     return base
 
+@register_with(MODEL_REGISTRY)
+def multiple_sbo_terms(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    met.annotation = {'sbo': ['SBO:1', 'SBO:2'],
+                    'bigg.metabolite': 'dad_2'}
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1})
+    rxn.annotation = {'bigg.reaction': 'DADNt2pp'}
+    rxn.gene_reaction_rule = '(gene1)'
+    base.add_reactions([rxn])
+    return base
 
 @pytest.mark.parametrize("model, num, components", [
     ("no_annotations", 2, "metabolites"),
@@ -70,6 +81,9 @@ def test_find_components_without_sbo_terms(model, num, components):
     ("specific_sbo_term", 0, "metabolites"),
     ("specific_sbo_term", 1, "reactions"),
     ("specific_sbo_term", 1, "genes")
+    ("multiple_sbo_terms", 0, "metabolites"),
+    ("multiple_sbo_terms", 1, "reactions"),
+    ("multiple_sbo_terms", 1, "genes")
 ], indirect=["model"])
 def test_find_components_without_specific_sbo_term(model, num, components):
     """Expect `num` components to have a specific sbo annotation."""
@@ -77,3 +91,8 @@ def test_find_components_without_specific_sbo_term(model, num, components):
     no_match_to_specific_term = sbo.check_component_for_specific_sbo_term(
         getattr(model, components), term)
     assert len(no_match_to_specific_term) == num
+
+    terms = ['SBO:1','SBO:2','SBO:3']
+    no_match_to_list_of_terms = sbo.check_component_for_specific_sbo_term(
+        getattr(model, components), terms)
+    assert len(no_match_to_list_of_terms) == num
