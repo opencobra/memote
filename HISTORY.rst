@@ -40,6 +40,12 @@ Next Release
   opposite of what was the case.
 * Extend the description of each test by a description of how it is
   implemented.
+* Refactor test that identifies duplicate reactions to take into metabolites,
+  reaction directionality and compartments into account.
+* Add additional tests that identify reactions having identical annotations and
+  identical genes.
+* Refactor test that identifies duplicate metabolites to use for inchi
+  strings in addition to inchikeys.
 
 0.8.11 (2019-01-07)
 -------------------
