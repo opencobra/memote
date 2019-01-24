@@ -307,7 +307,7 @@ def find_duplicate_reactions_by_annotation(model):
         A list of tuples of duplicate reactions based on annotations.
 
     """
-    duplicates = []
+    duplicates = dict()
     rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
                           "rhea", "biocyc", "bigg.reaction"]
 
@@ -324,7 +324,7 @@ def find_duplicate_reactions_by_annotation(model):
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
             duplicates.append((rxn_a.id, rxn_b.id))
-    return duplicates
+    return list(duplicates.values())
 
 
 def find_duplicate_reactions_by_metabolites(model):
@@ -354,7 +354,7 @@ def find_duplicate_reactions_by_metabolites(model):
     Returns
     -------
     list
-        A list of tuples of duplicate reactions based on metabolites.
+        A list of sets of duplicate reactions based on metabolites.
 
     """
 
@@ -368,8 +368,8 @@ def find_duplicate_reactions_by_metabolites(model):
                     expanded_metabolites.append(met)
         return expanded_metabolites
 
-        # Get a list of pure metabolic reactions
-    duplicates = []
+    # Get a list of pure metabolic reactions
+    duplicates = dict()
     # Get a list of duplicate metabolites in each compartment
     duplicate_metabolites = find_duplicate_metabolites_in_compartments(
         model)
@@ -387,13 +387,15 @@ def find_duplicate_reactions_by_metabolites(model):
                 continue
             # ..if not, are they both reversible
             elif all([rxn_a.reversibility, rxn_b.reversibility]):
-                duplicates.append((rxn_a.id, rxn_b.id))
+                duplicates.setdefault(met_set_a, set())
+                duplicates[met_set_a].update([rxn_a.id, rxn_b.id])
             # ..or are they are both irreversible?
             else:
                 if rxn_a.products == rxn_b.products \
                         and rxn_a.upper_bound == rxn_b.upper_bound:
-                    duplicates.append((rxn_a.id, rxn_b.id))
-    return duplicates
+                    duplicates.setdefault(met_set_a, set())
+                    duplicates[met_set_a].update([rxn_a.id, rxn_b.id])
+    return list(duplicates.values())
 
 
 def find_duplicate_reactions_by_genes(model):
@@ -416,18 +418,20 @@ def find_duplicate_reactions_by_genes(model):
     Returns
     -------
     list
-        A list of tuples of duplicate reactions based on genes.
+        A list of sets of duplicate reactions based on genes.
 
     """
-    duplicates = []
+    duplicates = dict()
     for rxn_a, rxn_b in combinations(model.reactions, 2):
         try:
-            symm_difference = getattr(rxn_a, "genes") ^ getattr(rxn_b, "genes")
-            if len(symm_difference) == 0:
-                duplicates.append((rxn_a.id, rxn_b.id))
-        except AttributeError:
+            symm_difference = rxn_a.genes ^ rxn_b.genes
+        except TypeError:
             continue
-    return duplicates
+        else:
+            if len(symm_difference) == 0:
+                duplicates.setdefault(rxn_a.genes, set())
+                duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
+    return list(duplicates.values())
 
 
 def check_transport_reaction_gpr_presence(model):
