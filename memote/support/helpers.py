@@ -541,19 +541,28 @@ def close_boundaries_sensibly(model):
         boundary.bounds = (0, 0)
 
 
-def open_boundaries(model):
+def open_exchanges(model):
     """
-    Return a copy of cobra model with all boundaries opened.
+    Open all exchange reactions.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
-    Returns
+    """
+    for rxn in model.exchanges:
+        rxn.bounds = (-1000, 1000)
+
+
+def open_boundaries(model):
+    """
+    Open all boundary reactions.
+
+    Parameters
     ----------
-    cobra.Model
-        A cobra model with all boundary reactions opened.
+    model : cobra.Model
+        The metabolic model under investigation.
 
     """
     for boundary in model.boundary:
