@@ -62,7 +62,7 @@ def test_stoichiometric_consistency(model):
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])
 @annotate(title="Erroneous Energy-generating Cycles", format_type="count",
-          data=dict(), message=dict())
+          data=dict(), message=dict(), metric=dict())
 def test_detect_energy_generating_cycles(model, met):
     u"""
     Expect that no energy metabolite can be produced out of nothing.
