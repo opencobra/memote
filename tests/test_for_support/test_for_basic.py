@@ -523,6 +523,67 @@ def rxns_with_two_false_substrates(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def dup_rxns_compartment(base):
+    """Provide a model with identical reactions in different compartments."""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    met_c = cobra.Metabolite("a_m", compartment="m")
+    met_d = cobra.Metabolite("b_m", compartment="m")
+    rxn_1 = cobra.Reaction("rxn1")
+    dup_1 = cobra.Reaction("dup1")
+    rxn_1.annotation["kegg.reaction"] = "HEX"
+    dup_1.annotation["kegg.reaction"] = "HEX"
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    dup_1.add_metabolites({met_c: -1, met_d: 1})
+    base.add_reactions([rxn_1, dup_1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_irrev(base):
+    """
+    Provide a model with oppositely directional but irreversible reactions.
+
+    """
+    met_a = cobra.Metabolite("h2o_c", compartment="c")
+    met_b = cobra.Metabolite("methf_c", compartment="c")
+    met_c = cobra.Metabolite("5fthf_c", compartment="c")
+    met_d = cobra.Metabolite("h_c", compartment="c")
+    FOMETRi = cobra.Reaction("FOMETRi")
+    THFAT = cobra.Reaction("THFAT")
+    FOMETRi.annotation["kegg.reaction"] = "R02300"
+    FOMETRi.annotation["brenda"] = "2.1.2.10"
+    THFAT.annotation["kegg.reaction"] = "R02300"
+    THFAT.annotation["brenda"] = "2.1.2.10"
+    FOMETRi.add_metabolites({met_c: 1, met_d: 1, met_a: -1, met_b: -1})
+    THFAT.add_metabolites({met_c: -1, met_d: -1, met_a: 1, met_b: 1})
+    base.add_reactions([FOMETRi, THFAT])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_rev(base):
+    """
+    Provide a model with oppositely directional but reversible reactions.
+
+    """
+    met_a = cobra.Metabolite("h2o_c", compartment="c")
+    met_b = cobra.Metabolite("methf_c", compartment="c")
+    met_c = cobra.Metabolite("5fthf_c", compartment="c")
+    met_d = cobra.Metabolite("h_c", compartment="c")
+    FOMETRi = cobra.Reaction("FOMETRi", upper_bound=1000, lower_bound=-1000)
+    THFAT = cobra.Reaction("THFAT", upper_bound=1000, lower_bound=-1000)
+    FOMETRi.annotation["kegg.reaction"] = "R02300"
+    FOMETRi.annotation["brenda"] = "2.1.2.10"
+    THFAT.annotation["kegg.reaction"] = "R02300"
+    THFAT.annotation["brenda"] = "2.1.2.10"
+    FOMETRi.add_metabolites({met_c: 1, met_d: 1, met_a: -1, met_b: -1})
+    THFAT.add_metabolites({met_c: -1, met_d: -1, met_a: 1, met_b: 1})
+    base.add_reactions([FOMETRi, THFAT])
+    return base
+
+
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("three_missing", 3),
@@ -724,11 +785,26 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
     ("dup_rxns_multiple_list_anns", 1),
     ("dup_rxns_no_matching_multiple_anns", 0),
     ("dup_rxns_multiple_list_anns_no_match", 0),
+    ("dup_rxns_compartment", 1),
+    ("dup_rxns_irrev", 1),
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions_by_annotation(model, num):
     """Expect amount of duplicate metabolites to be identified correctly."""
     assert len(basic.find_duplicate_reactions_by_annotation(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("dup_rxns", 1),
+    ("dup_rxns_rev", 1),
+    ("dup_rxns_irrev", 0),
+    ("dup_rxns_compartment", 0),
+    ("gpr_missing", 0)
+], indirect=["model"])
+def test_find_duplicate_reactions_by_metabolites(model, num):
+    """Expect amount of duplicate metabolites to be identified correctly."""
+    assert len(basic.find_duplicate_reactions_by_metabolites(model)) == num
 
 
 @pytest.mark.parametrize("model, num", [
