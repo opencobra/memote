@@ -304,7 +304,7 @@ def find_duplicate_reactions_by_annotation(model):
     Returns
     -------
     list
-        A list of tuples of duplicate reactions.
+        A list of tuples of duplicate reactions based on annotations.
 
     """
     duplicates = []
@@ -324,6 +324,75 @@ def find_duplicate_reactions_by_annotation(model):
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
             duplicates.append((rxn_a.id, rxn_b.id))
+    return duplicates
+
+
+def find_duplicate_reactions_by_metabolites(model):
+    """
+    Return list of reactions with duplicates based on identical metabolites.
+
+    This function identifies duplicate reactions globally by checking if any
+    two reactions have the same metabolites, same directionality and are in
+    the same compartment.
+    This can be useful to curate merged models or to clean-up bulk model
+    modifications. The heuristic compares reactions in a pairwise manner.
+    First, if there are duplicate metabolites in the set of
+    metabolites of each reaction, they are added to the set of each reaction
+    respectively. Then, if the sets for each reaction are
+    identical the reversibility of each reaction is checked:
+    - If both reactions differ in reversibility they are assumed to be
+    different.
+    - If both are reversible they are assumed to be identical.
+    - If both are irreversible, the upper bound and product metabolites
+     have to be identical for the reactions to be assumed to be identical.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+
+    Returns
+    -------
+    list
+        A list of tuples of duplicate reactions based on metabolites.
+
+    """
+
+    def include_duplicates(rxn, duplicate_metabolites):
+        expanded_metabolites = []
+        for met in rxn.metabolites.keys():
+            for tup in duplicate_metabolites:
+                if met in tup:
+                    expanded_metabolites.extend(tup)
+                else:
+                    expanded_metabolites.append(met)
+        return expanded_metabolites
+
+        # Get a list of pure metabolic reactions
+    duplicates = []
+    # Get a list of duplicate metabolites in each compartment
+    duplicate_metabolites = find_duplicate_metabolites_in_compartments(
+        model)
+    # For each combination of reactions
+    for rxn_a, rxn_b in combinations(model.reactions, 2):
+        # ..generate a set of metabolites including possible
+        # duplicate metabolites.
+        met_set_a = set(include_duplicates(rxn_a, duplicate_metabolites))
+        met_set_b = set(include_duplicates(rxn_b, duplicate_metabolites))
+        symm_difference = met_set_a ^ met_set_b
+        # For the reactions whose sets of metabolites are identical
+        if len(symm_difference) == 0:
+            # ..check if the reversibility is identical
+            if rxn_a.reversibility != rxn_b.reversibility:
+                continue
+            # ..if not, are they both reversible
+            elif all([rxn_a.reversibility, rxn_b.reversibility]):
+                duplicates.append((rxn_a.id, rxn_b.id))
+            # ..or are they are both irreversible?
+            else:
+                if rxn_a.products == rxn_b.products \
+                        and rxn_a.upper_bound == rxn_b.upper_bound:
+                    duplicates.append((rxn_a.id, rxn_b.id))
     return duplicates
 
 
