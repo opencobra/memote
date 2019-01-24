@@ -223,7 +223,7 @@ def test_compartments_presence(model):
     # TODO: Fix the test in a later PR! Should expect 2 compartments instead!
     ann = test_compartments_presence.annotation
     assert hasattr(model, "compartments")
-    ann["data"] = list(model.get_metabolite_compartments())
+    ann["data"] = list(model.compartments)
     ann["message"] = wrapper.fill(
         """A total of {:d} compartments are defined in the model: {}""".format(
             len(ann["data"]), truncate(ann["data"])))

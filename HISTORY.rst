@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+* Fix the discovery or orphan and dead-end metabolites.
+* Improve detection of metabolites that are not consumed or not produced by 
+  only opening exchange reactions not other boundary reactions.
 * Thematically reorganize the test cases in the config.
 * Instead of min/max bounds consider the median bounds for testing (un-)bounded 
   fluxes.
