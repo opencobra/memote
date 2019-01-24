@@ -27,12 +27,12 @@ from memote.utils import annotate, wrapper
           format_type="percent")
 def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     """
-    Show ratio of the absolute largest and smallest non-zero coefficients.
+    Show the ratio of the absolute largest and smallest non-zero coefficients.
 
     This test will return the absolute largest and smallest, non-zero
-    coefficients from the S-Matrix. A large ratio of these values may point to
-    potential numerical issues when trying to solve the underlying system of
-    equations.
+    coefficients of the stoichiometric matrix. A large ratio of these values
+    may point to potential numerical issues when trying to solve different
+    mathematical optimization problems such as flux-balance analysis.
 
     To pass this test the ratio should not exceed 10^9. This threshold has
     been selected based on experience, and is likely to be adapted when more
@@ -55,13 +55,12 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
           format_type="raw")
 def test_number_independent_conservation_relations(model):
     """
-    Show number of independent conservation relations in the model.
+    Show the number of independent conservation relations in the model.
 
-    This test will return the number of conservation relations, i.e.
-    conservation pools through the left null space of the S-Matrix.
-
-    This test is not scored, as the dimension of the left null space
-    depends on the S-Matrix constructed, which is system-specific.
+    This test will return the number of conservation relations, i.e.,
+    conservation pools through the left null space of the stoichiometric
+    matrix. This test is not scored, as the dimension of the left null space
+    is system-specific.
 
     """
     ann = test_number_independent_conservation_relations.annotation
@@ -71,35 +70,13 @@ def test_number_independent_conservation_relations(model):
             ann["data"]))
 
 
-@annotate(title="Steady-state Flux Solution Vectors",
-          format_type="raw")
-def test_number_steady_state_flux_solutions(model):
-    """
-    Show number of independent steady-state flux solution vectors for model.
-
-    This test will return the number of independent steady-state flux solution
-    vector through the null space of the S-Matrix.
-
-    This test is not scored, as the dimension of the null space depends on the
-    S-Matrix constructed, which is system-specific.
-
-    """
-    ann = test_number_steady_state_flux_solutions.annotation
-    ann["data"] = matrix.number_steady_state_flux_solutions(model)
-    ann["message"] = wrapper.fill(
-        """The number of independent steady-state flux solution vectors is {}.
-        """.format(ann["data"]))
-
-
 @annotate(title="Rank", format_type="raw")
 def test_matrix_rank(model):
     """
-    Show rank of the S-Matrix.
+    Show the rank of the stoichiometric matrix.
 
-    This test will return the rank of the S-Matrix of the model.
-
-    This test is not scored, as the rank depends on the S-Matrix constructed,
-    which is system-specific.
+    The rank of the stoichiometric matrix is system specific. It is
+    calculated using singular value decomposition (SVD).
 
     """
     ann = test_matrix_rank.annotation
@@ -111,13 +88,11 @@ def test_matrix_rank(model):
 @annotate(title="Degrees Of Freedom", format_type="raw")
 def test_degrees_of_freedom(model):
     """
-    Show degrees of freedom of the S-Matrix.
+    Show the degrees of freedom of the stoichiometric matrix.
 
-    This test will return the degrees of freedom, i.e. "free variables" of the
-    S-Matrix.
-
-    This test is not scored, as the degrees of freedom depends on S-Matrix
-    constructed, which is system-specific.
+    The degrees of freedom of the stoichiometric matrix, i.e., the number
+    of 'free variables' is system specific and corresponds to the dimension
+    of the right nullspace of the matrix.
 
     """
     ann = test_degrees_of_freedom.annotation

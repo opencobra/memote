@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Remove 'Steady-state flux solution vectors' test case.
+* Improve the descriptions of stoichiometric matrix test cases.
 * Fix the discovery or orphan and dead-end metabolites.
 * Improve detection of metabolites that are not consumed or not produced by 
   only opening exchange reactions not other boundary reactions.

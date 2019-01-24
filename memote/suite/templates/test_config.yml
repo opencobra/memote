@@ -114,7 +114,6 @@ cards:
     cases:
     - test_absolute_extreme_coefficient_ratio
     - test_number_independent_conservation_relations
-    - test_number_steady_state_flux_solutions
     - test_matrix_rank
     - test_degrees_of_freedom
   experimental:

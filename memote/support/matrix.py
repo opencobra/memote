@@ -28,7 +28,7 @@ LOGGER = logging.getLogger(__name__)
 
 def absolute_extreme_coefficient_ratio(model):
     """
-    Return the absolute max and absolute non-zero min coefficients.
+    Return the maximum and minimum absolute, non-zero coefficients.
 
     Parameters
     ----------
@@ -36,21 +36,16 @@ def absolute_extreme_coefficient_ratio(model):
         The metabolic model under investigation.
 
     """
-    # S-Matrix with absolute values:
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    abs_matrix = np.absolute(s_matrix)
-
-    absolute_max_coef = np.amax(abs_matrix)
-    absolute_non_zero_min_coef = abs_matrix[abs_matrix > 0].min()
-
-    return (absolute_max_coef, absolute_non_zero_min_coef)
+    abs_matrix = np.abs(s_matrix)
+    return abs_matrix.max(), abs_matrix[abs_matrix > 0].min()
 
 
 def number_independent_conservation_relations(model):
     """
-    Return the amount of conserved metabolic pools.
+    Return the number of conserved metabolite pools.
 
     Parameters
     ----------
@@ -100,22 +95,22 @@ def matrix_rank(model):
 
 def degrees_of_freedom(model):
     """
-    Return the degrees of freedom, i.e. number of "free variables".
+    Return the degrees of freedom, i.e., number of "free variables".
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
-    Notes:
-    ------
+    Notes
+    -----
     This specifically refers to the dimensionality of the right nullspace
-    of the S matrix, as dim(Null(S)) corresponds directly to the number of
-    free variables in the system [1]_. The forumla used calculates this using
-    the rank-nullity theorem [2]_.
+    of the stoichiometric matrix, as dim(Null(S)) corresponds directly to the
+    number of free variables in the system [1]_. The formula used calculates
+    this using the rank-nullity theorem [2]_.
 
-    References:
-    -----------
+    References
+    ----------
     .. [1] Fukuda, K. & Terlaky, T. Criss-cross methods: A fresh view on
        pivot algorithms. Mathematical Programming 79, 369-395 (1997).
 
