@@ -77,22 +77,16 @@ def test_find_components_without_sbo_terms(model, num, components):
     assert len(without_annotation) == num
 
 
-@pytest.mark.parametrize("model, num, components", [
-    ("specific_sbo_term", 0, "metabolites"),
-    ("specific_sbo_term", 1, "reactions"),
-    ("specific_sbo_term", 1, "genes")
-    ("multiple_sbo_terms", 0, "metabolites"),
-    ("multiple_sbo_terms", 1, "reactions"),
-    ("multiple_sbo_terms", 1, "genes")
+@pytest.mark.parametrize("model, num, components, term", [
+    ("specific_sbo_term", 0, "metabolites", "SBO:1"),
+    ("specific_sbo_term", 1, "reactions", "SBO:1"),
+    ("specific_sbo_term", 1, "genes", "SBO:1"),
+    ("multiple_sbo_terms", 0, "metabolites", ["SBO:1","SBO:2","SBO:3"]),
+    ("multiple_sbo_terms", 1, "reactions", ["SBO:1","SBO:2","SBO:3"]),
+    ("multiple_sbo_terms", 1, "genes", ["SBO:1","SBO:2","SBO:3"])
 ], indirect=["model"])
 def test_find_components_without_specific_sbo_term(model, num, components):
     """Expect `num` components to have a specific sbo annotation."""
-    term = 'SBO:1'
     no_match_to_specific_term = sbo.check_component_for_specific_sbo_term(
         getattr(model, components), term)
     assert len(no_match_to_specific_term) == num
-
-    terms = ['SBO:1','SBO:2','SBO:3']
-    no_match_to_list_of_terms = sbo.check_component_for_specific_sbo_term(
-        getattr(model, components), terms)
-    assert len(no_match_to_list_of_terms) == num
