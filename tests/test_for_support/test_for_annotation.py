@@ -36,6 +36,7 @@ def no_annotations(base):
     met1 = cobra.Metabolite(id='met1_c', name="Met1")
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.add_metabolites({met: -1, met1: 1})
+    rxn.gene_reaction_rule = 'gene1'
     base.add_reactions([rxn])
     return base
 
@@ -59,6 +60,13 @@ def rxn_annotations(base):
     base.add_reactions([rxn])
     return base
 
+@register_with(MODEL_REGISTRY)
+def gene_annotations(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.gene_reaction_rule = 'gene1'
+    base.add_reactions([rxn])
+    base.genes.get_by_id('gene1').annotation = {'kegg.genes': 'syn:ssr3451'}
+    return base
 
 @register_with(MODEL_REGISTRY)
 def met_each_present(base):
@@ -121,6 +129,31 @@ def rxn_each_absent(base):
     base.add_reactions([rxn])
     return base
 
+@register_with(MODEL_REGISTRY)
+def gene_each_present(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.gene_reaction_rule = 'gene1'
+    base.add_reactions([rxn])
+    base.genes[0].annotation = {'refseq': "YP_002410268.1",
+                      'uniprot': "P31663",
+                      'ecogene': "EG10173",
+                      'kegg.genes': "syn:ssr3451",
+                      'ncbigi': "GI:9082283",
+                      'ncbiprotein': "CAA71118.1",
+                      'ccds': "CCDS13573.1",
+                      'hprd': "00001",
+                      'asap': "ABE-0009634"}
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def gene_each_absent(base):
+    rxn.gene_reaction_rule = 'gene1'
+    base.add_reactions([rxn])
+    base.genes[0].annotation = {'old_database': "broken_identifier",
+                      'KEGG': "bad_kegg_gene"}
+    return base
+
 
 @register_with(MODEL_REGISTRY)
 def met_broken_id(base):
@@ -159,6 +192,22 @@ def rxn_broken_id(base):
     base.add_reactions([rxn])
     return base
 
+@register_with(MODEL_REGISTRY)
+def gene_broken_id(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.gene_reaction_rule = 'gene1'
+    base.add_reactions([rxn])
+    base.genes[0].annotation = {'refseq': "YPA_002410268.1",
+                      'uniprot': "PGG31663",
+                      'ecogene': "EG:10173",
+                      'kegg.genes': "syn_ssr3451",
+                      'ncbigi': "GI_9082283",
+                      'ncbiprotein': "CAA71AB118.1",
+                      'ccds': "CCDS:13573.1",
+                      'hprd': "A:00001",
+                      'asap': "ABE-9634"}
+    return base
+
 
 @register_with(MODEL_REGISTRY)
 def consistent_ids(base):
@@ -167,10 +216,13 @@ def consistent_ids(base):
     met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
     rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
     rxn.add_metabolites({met: -1, met1: 1})
+    rxn.gene_reaction_rule = 'eco:b1854'
     rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
     rxn2.add_metabolites({met1: -1, met2: 1})
+    rxn2.gene_reaction_rule = 'eco:b3956'
     rxn3 = cobra.Reaction(id='OAADC', name="Oxaloacetate decarboxylase")
     rxn3.add_metabolites({met2: -1, met: 1})
+    rxn3.gene_reaction_rule = 'eco:b3997'
     base.add_reactions([rxn, rxn2, rxn3])
     return base
 
@@ -181,11 +233,14 @@ def inconsistent_ids(base):
     met1 = cobra.Metabolite(id='pep_c', name="Phosphoenolpyruvate")
     met2 = cobra.Metabolite(id='oaa_c', name="Oxaloacetate")
     rxn = cobra.Reaction(id='PYK', name="Pyruvate kinase")
+    rxn.gene_reaction_rule = 'eco:b1854'
     rxn.add_metabolites({met: -1, met1: 1})
     rxn2 = cobra.Reaction(id='PPC', name="Phosphoenolpyruvate carboxylase")
     rxn2.add_metabolites({met1: -1, met2: 1})
+    rxn2.gene_reaction_rule = 'eco:b3956'
     rxn3 = cobra.Reaction(id='4.1.1.3', name="Oxaloacetate decarboxylase")
     rxn3.add_metabolites({met2: -1, met: 1})
+    rxn3.gene_reaction_rule = 'P31663'
     rxn4 = cobra.Reaction(
         id='KETOGLUCOSE-REDUCTASE-RXN', name="Reaction: 1.1.1.-"
     )
@@ -240,6 +295,22 @@ def test_generate_reaction_annotation_overview(model, num, db):
             model.reactions, db)
     assert len(overview) == num
 
+@pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
+@pytest.mark.parametrize("model, num", [
+    ("gene_each_present", 0),
+    ("gene_each_absent", 1)
+], indirect=["model"])
+def test_generate_gene_annotation_overview(model, num, db):
+    """
+    Expect all reactions to have `num` annotations from common databases.
+
+    The required databases are outlined in `annotation.py`.
+    """
+    overview = \
+        annotation.generate_component_annotation_overview(
+            model.genes, db)
+    assert len(overview) == num
+
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
 @pytest.mark.parametrize("model, num, components", [
@@ -273,12 +344,29 @@ def test_generate_reaction_annotation_miriam_match(model, num, components, db):
         model.reactions, components, db)
     assert len(faulty) == num
 
+@pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
+@pytest.mark.parametrize("model, num, components", [
+    ("gene_each_present", 0, "genes"),
+    ("gene_broken_id", 1, "genes")
+], indirect=["model"])
+def test_generate_gene_annotation_miriam_match(model, num, components, db):
+    """
+    Expect all items to have annotations that match MIRIAM patterns.
+
+    The required databases are outlined in `annotation.py`.
+    """
+    faulty = annotation.generate_component_annotation_miriam_match(
+        model.genes, components, db)
+    assert len(faulty) == num
+
 
 @pytest.mark.parametrize("model, namespace, num, components", [
     ("consistent_ids", "bigg.metabolite", 3, "metabolites"),
     ("inconsistent_ids", "bigg.metabolite", 2, "metabolites"),
     ("consistent_ids", "bigg.reaction", 3, "reactions"),
-    ("inconsistent_ids", "bigg.reaction", 2, "reactions")
+    ("inconsistent_ids", "bigg.reaction", 2, "reactions"),
+    ("consistent_ids", "kegg.genes", 3, "genes"),
+    ("inconsistent_ids", "kegg.genes", 2, "genes")
 ], indirect=["model"])
 def test_generate_component_id_namespace_overview(model, namespace, num,
                                                   components):
