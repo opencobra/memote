@@ -447,8 +447,7 @@ def test_find_constrained_transport_reactions(model):
     Please refer to "Transport Reactions" for details on how memote identifies
     transport reactions.
     From the pool of transport reactions identify reactions which are
-    constrained to values other than the model's minimal or maximal possible
-    bounds.
+    constrained to values other than the model's median lower and upper bounds.
 
     """
     ann = test_find_constrained_transport_reactions.annotation

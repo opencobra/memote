@@ -265,22 +265,60 @@ def test_gam_in_biomass(model, reaction_id):
 
     The growth-associated maintenance (GAM) term accounts for the energy in
     the form of ATP that is required to synthesize macromolecules such as
-    Proteins, DNA and RNA, and other processes during growth. This test checks
-    if a biomass reaction contains this term.
+    Proteins, DNA and RNA, and other processes during growth. A GAM term is
+    therefore a requirement for any well-defined biomass reaction. There are
+    different ways to implement this term depending on
+    what kind of experimental data is available and the preferred
+    way of implementing the biomass reaction:
+    - Chemostat growth experiments yield a single GAM value representing the
+      required energy per gram of biomass (Figure 6 of [1]_). This can be
+      implemented in a lumped biomass reaction or in the final term of a split
+      biomass reaction.
+    - Experimentally delineating or estimating the GAM requirements
+      for each macromolecule separately is possible, yet requires either
+      data from multi-omics experiments [2]_ or detailed resources [1]_ ,
+      respectively. Individual energy requirements can either be implemented
+      in a split biomass equation on the term for each macromolecule, or, on
+      the basis of the biomass composition, they can be summed into a single
+      GAM value for growth and treated as mentioned above.
+
+    This test is only able to detect if a lumped biomass reaction or the final
+    term of a split biomass reaction contains this term. Hence, it will
+    only detect the use of a single GAM value as opposed to individual energy
+    requirements of each macromolecule. Both approaches, however, have
+    its merits.
 
     Implementation:
-    Determines the metabolite identifiers of ATP, ADP, H2O, HO4P and H+ based on an
-    internal mapping table. Checks if ATP and H2O are a subset of the reactants
-    and ADP, HO4P and H+ a subset of the products of the biomass equation.
+    Determines the metabolite identifiers of ATP, ADP, H2O, HO4P and H+ based
+    on an internal mapping table. Checks if ATP and H2O are a subset of the
+    reactants and ADP, HO4P and H+ a subset of the products of the biomass
+    reaction.
+
+    References:
+    .. [1] Thiele, I., & Palsson, B. Ø. (2010, January). A protocol for
+           generating a high-quality genome-scale metabolic reconstruction.
+           Nature protocols. Nature Publishing Group.
+           http://doi.org/10.1038/nprot.2009.203
+    .. [2] Hackett, S. R., Zanotelli, V. R. T., Xu, W., Goya, J., Park, J. O.,
+           Perlman, D. H., Gibney, P. A., Botstein, D., Storey, J. D.,
+           Rabinowitz, J. D.  (2010, January). Systems-level analysis of
+           mechanisms regulating yeast metabolic flux
+           Science
+           http://doi.org/10.1126/science.aaf2786
 
     """
     ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
     ann["data"][reaction_id] = biomass.gam_in_biomass(model, reaction)
     ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    ann["message"][reaction_id] = wrapper.fill(
-        """{} does not contain a term for growth-associated maintenance.
-        """.format(reaction_id))
+    if ann["data"][reaction_id]:
+        ann["message"][reaction_id] = wrapper.fill(
+            """Yes, {} contains a term for growth-associated maintenance.
+            """.format(reaction_id))
+    else:
+        ann["message"][reaction_id] = wrapper.fill(
+            """No, {} does not contain a term for growth-associated
+            maintenance.""".format(reaction_id))
     assert ann["data"][reaction_id], ann["message"][reaction_id]
 
 
