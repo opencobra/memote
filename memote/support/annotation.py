@@ -226,7 +226,8 @@ def generate_component_id_namespace_overview(model, components):
     """
     patterns = {
         "metabolites": METABOLITE_ANNOTATIONS,
-        "reactions": REACTION_ANNOTATIONS
+        "reactions": REACTION_ANNOTATIONS,
+        "genes": GENE_PRODUCT_ANNOTATIONS
     }[components]
     databases = list(patterns)
     data = list()

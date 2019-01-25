@@ -148,6 +148,7 @@ def gene_each_present(base):
 
 @register_with(MODEL_REGISTRY)
 def gene_each_absent(base):
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.gene_reaction_rule = 'gene1'
     base.add_reactions([rxn])
     base.genes[0].annotation = {'old_database': "broken_identifier",
@@ -201,11 +202,11 @@ def gene_broken_id(base):
                       'uniprot': "PGG31663",
                       'ecogene': "EG:10173",
                       'kegg.genes': "syn_ssr3451",
-                      'ncbigi': "GI_9082283",
-                      'ncbiprotein': "CAA71AB118.1",
+                      'ncbigi': "GIX_9082283",
+                      'ncbiprotein': "CAA+xz71AB118.1",
                       'ccds': "CCDS:13573.1",
                       'hprd': "A:00001",
-                      'asap': "ABE-9634"}
+                      'asap': "ABE_9634"}
     return base
 
 
