@@ -19,13 +19,14 @@
 
 from __future__ import absolute_import
 
-import cobra
+import os
 import pytest
 
 import memote.support.validation as val
 
-sbml_valid = "data/validation/tiny_FBC.xml"
-sbml_invalid = "data/validation/tiny_FBC2.xml"
+my_path = os.path.abspath(os.path.dirname(__file__))
+sbml_valid  = os.path.join(my_path, "data/validation/tiny_FBC.xml")
+sbml_invalid = os.path.join(my_path, "data/validation/tiny_FBC2.xml")
 
 
 @pytest.mark.parametrize("filename, expected", [
