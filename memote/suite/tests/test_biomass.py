@@ -260,7 +260,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
 @annotate(title="Growth-associated Maintenance in Biomass Reaction",
           format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_gam_in_biomass(model, reaction_id):
-    """
+    u"""
     Expect the biomass reactions to contain  ATP and ADP.
 
     The growth-associated maintenance (GAM) term accounts for the energy in
