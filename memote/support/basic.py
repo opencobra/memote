@@ -326,9 +326,9 @@ def find_reactions_with_partially_identical_annotations(model):
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         if len(ann_a & ann_b) > 0:
             mutual_pair = ann_a & ann_b
-            duplicates.setdefault(mutual_pair , set())
-            duplicates[mutual_pair].update([rxn_a.id,rxn_b.id])
-    return list(duplicates.values())
+            duplicates.setdefault(mutual_pair, set())
+            duplicates[mutual_pair].update([rxn_a.id, rxn_b.id])
+    return [tuple(value) for value in duplicates.values()]
 
 
 def find_duplicate_reactions(model):
@@ -400,7 +400,7 @@ def find_duplicate_reactions(model):
                         and rxn_a.upper_bound == rxn_b.upper_bound:
                     duplicates.setdefault(key_list, set())
                     duplicates[key_list].update([rxn_a.id, rxn_b.id])
-    return list(duplicates.values())
+    return [tuple(value) for value in duplicates.values()]
 
 
 def find_reactions_with_identical_genes(model):
@@ -436,7 +436,7 @@ def find_reactions_with_identical_genes(model):
             if len(symm_difference) == 0:
                 duplicates.setdefault(rxn_a.genes, set())
                 duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
-    return list(duplicates.values())
+    return [tuple(value) for value in duplicates.values()]
 
 
 def check_transport_reaction_gpr_presence(model):
