@@ -538,8 +538,8 @@ def test_find_unique_metabolites(model):
     total number of metabolites.
 
     Implementation:
-    Reduce the list of metabolites to a unique set by removing the compartment tag.
-    The cobrapy SBML parser adds compartment tags to each metabolite ID.
+    Reduce the list of metabolites to a unique set by removing the compartment
+    tag. The cobrapy SBML parser adds compartment tags to each metabolite ID.
 
     """
     ann = test_find_unique_metabolites.annotation

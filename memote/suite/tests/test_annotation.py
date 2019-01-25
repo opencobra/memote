@@ -403,12 +403,12 @@ def test_metabolite_id_namespace_consistency(model):
 
     Implementation:
     Generate a table with each column corresponding to one
-    database from the selection and each row to a metabolite identifier. A Boolean
-    entry indicates whether the identifier matches the regular expression
-    of the corresponding database. Since the Biocyc pattern matches broadly,
-    we assume that any instance of an identifier matching to Biocyc
-    AND any other database pattern is a false positive match for Biocyc and thus set
-    it to ``false``. Sum the positive matches for each database and
+    database from the selection and each row to a metabolite identifier. A
+    Boolean entry indicates whether the identifier matches the regular
+    expression of the corresponding database. Since the Biocyc pattern matches
+    broadly, we assume that any instance of an identifier matching to Biocyc
+    AND any other database pattern is a false positive match for Biocyc and
+    thus set it to ``false``. Sum the positive matches for each database and
     assume that the largest set is the 'main' identifier namespace.
 
     """
