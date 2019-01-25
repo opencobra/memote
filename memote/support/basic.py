@@ -386,19 +386,20 @@ def find_duplicate_reactions(model):
         symm_difference = met_set_a ^ met_set_b
         # For the reactions whose sets of metabolites are identical
         if len(symm_difference) == 0:
+            key_list = [met.id for met in met_set_a].sort()
             # ..check if the reversibility is identical
             if rxn_a.reversibility != rxn_b.reversibility:
                 continue
             # ..if not, are they both reversible
             elif all([rxn_a.reversibility, rxn_b.reversibility]):
-                duplicates.setdefault(met_set_a, set())
-                duplicates[met_set_a].update([rxn_a.id, rxn_b.id])
+                duplicates.setdefault(key_list, set())
+                duplicates[key_list].update([rxn_a.id, rxn_b.id])
             # ..or are they are both irreversible?
             else:
                 if rxn_a.products == rxn_b.products \
                         and rxn_a.upper_bound == rxn_b.upper_bound:
-                    duplicates.setdefault(met_set_a, set())
-                    duplicates[met_set_a].update([rxn_a.id, rxn_b.id])
+                    duplicates.setdefault(key_list, set())
+                    duplicates[key_list].update([rxn_a.id, rxn_b.id])
     return list(duplicates.values())
 
 

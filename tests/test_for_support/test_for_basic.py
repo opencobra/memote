@@ -585,6 +585,21 @@ def dup_rxns_rev(base):
 
 
 @register_with(MODEL_REGISTRY)
+def dup_rxns_irrev_exchanges(base):
+    """
+    Provide a model with duplicate exchanges.
+
+    """
+    met_a = cobra.Metabolite("A_c", compartment="c")
+    ex1 = cobra.Reaction("ex1", upper_bound=1000, lower_bound=0)
+    ex2 = cobra.Reaction("ex2", upper_bound=1000, lower_bound=0)
+    ex1.add_metabolites({met_a: 1})
+    ex2.add_metabolites({met_a: 1})
+    base.add_reactions([ex1, ex2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
 def identical_genes(base):
     """Provide a model with reactions with identical genes."""
     rxn_1 = cobra.Reaction("RXN1")
@@ -832,6 +847,7 @@ def test_find_reactions_with_partially_identical_annotations(model, num):
     ("dup_rxns_rev", 1),
     ("dup_rxns_irrev", 0),
     ("dup_rxns_compartment", 0),
+    ("dup_rxns_irrev_exchanges", 1),
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions(model, num):
