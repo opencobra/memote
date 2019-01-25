@@ -326,13 +326,14 @@ def test_gam_in_biomass(model, reaction_id):
 @annotate(title="Unrealistic Growth Rate In Default Medium",
           format_type="raw", data=dict(), message=dict(), metric=dict())
 def test_fast_growth_default(model, reaction_id):
-    """
+    u"""
     Expect the predicted growth rate for each BOF to be below 2.81.
 
     The growth rate of a metabolic model should not be faster than that of the
     fastest growing organism. This is based on a doubling time of Vibrio
     natriegens which was reported to be 14.8 minutes by: Henry H. Lee, Nili
-    Ostrov, Brandon G. Wong, Michaela A. Gold, Ahmad S. Khalil, George M. Church
+    Ostrov, Brandon G. Wong, Michaela A. Gold, Ahmad S. Khalil,
+    George M. Church
     in https://www.biorxiv.org/content/biorxiv/early/2016/06/12/058487.full.pdf
 
     The calculation ln(2)/(14.8/60) ~ 2.81 yields the corresponding growth
