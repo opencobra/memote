@@ -37,6 +37,10 @@ def test_metabolite_sbo_presence(model):
     components. The available terms are controlled and relational and can be
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
 
+    Implementation:
+    Check if each cobra.Metabolite has a non-zero "annotation"
+    attribute that contains the key "sbo".
+
     """
     ann = test_metabolite_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
@@ -62,6 +66,10 @@ def test_reaction_sbo_presence(model):
     with terms which indicate the intended function of its individual
     components. The available terms are controlled and relational and can be
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
+
+    Implementation:
+    Check if each cobra.Reaction has a non-zero "annotation"
+    attribute that contains the key "sbo".
 
     """
     ann = test_reaction_sbo_presence.annotation
@@ -89,6 +97,9 @@ def test_gene_sbo_presence(model):
     components. The available terms are controlled and relational and can be
     viewed here http://www.ebi.ac.uk/sbo/main/tree.
 
+    Check if each cobra.Gene has a non-zero "annotation"
+    attribute that contains the key "sbo".
+
     """
     ann = test_gene_sbo_presence.annotation
     ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
@@ -114,6 +125,11 @@ def test_metabolic_reaction_specific_sbo_presence(model):
     reaction that is not a transport or boundary reaction should be annotated
     with this. The results shown are relative to the total amount of pure
     metabolic reactions.
+
+    Implementation:
+    Check if each pure metabolic reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being the SBO term above.
 
     """
     ann = test_metabolic_reaction_specific_sbo_presence.annotation
@@ -146,6 +162,11 @@ def test_transport_reaction_specific_sbo_presence(model):
     be annotated with one of these terms. The results shown are relative to the
     total of all transport reactions.
 
+    Implementation:
+    Check if each transport reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
+
     """
     sbo_transport_terms = helpers.TRANSPORT_RXN_SBO_TERMS
     ann = test_transport_reaction_specific_sbo_presence.annotation
@@ -174,6 +195,11 @@ def test_metabolite_specific_sbo_presence(model):
     SBO:0000247 represents the term 'simple chemical'. Every metabolite should
     be annotated with this.
 
+    Implementation:
+    Check if each cobra.Metabolite has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
+
     """
     ann = test_metabolite_specific_sbo_presence.annotation
     ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
@@ -198,6 +224,11 @@ def test_gene_specific_sbo_presence(model):
 
     SBO:0000243 represents the term 'gene'. Every gene should
     be annotated with this.
+
+    Implementation:
+    Check if each cobra.Gene has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
 
     """
     ann = test_gene_specific_sbo_presence.annotation
@@ -235,6 +266,11 @@ def test_exchange_specific_sbo_presence(model):
     metabolites are removed from or added to the extracellular
     environment only.
 
+    Implementation:
+    Check if each exchange reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
+
     """
     ann = test_exchange_specific_sbo_presence.annotation
     exchanges = helpers.find_exchange_rxns(model)
@@ -270,6 +306,11 @@ def test_demand_specific_sbo_presence(model):
     metabolites are not removed from the extracellular environment, but from
     any of the organism's compartments. Demand reactions differ from sink
     reactions in that they are designated as irreversible.
+
+    Implementation:
+    Check if each demand reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
 
     """
     ann = test_demand_specific_sbo_presence.annotation
@@ -310,6 +351,11 @@ def test_sink_specific_sbo_presence(model):
     are not removed from the extracellular environment, but from any of the
     organism's compartments.
 
+    Implementation:
+    Check if each sink reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
+
     """
     ann = test_sink_specific_sbo_presence.annotation
     sinks = helpers.find_sink_reactions(model)
@@ -349,6 +395,11 @@ def test_biomass_specific_sbo_presence(model):
     growth.'
     Every reaction representing the biomass production should be annotated with
     this.
+
+    Implementation:
+    Check if each biomass reaction has a non-zero "annotation"
+    attribute that contains the key "sbo" with the associated
+    value being one of the SBO terms above.
 
     """
     ann = test_biomass_specific_sbo_presence.annotation

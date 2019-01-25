@@ -274,12 +274,6 @@ def find_elementary_leakage_modes(model, atol=1e-13):
         "Coming soon™ if considered useful.")
 
 
-# TODO: I had to remove the test for an infinite proton gradient i.e testing
-# if the model can somehow cycle h_c and h_p with closed bounds. This test
-# however is very specfic for the existence of a periplasm and since it is
-# not trivial to presuppose agnostically between which two compartments a
-# given model builds the PMF, I've removed this capability from this test.
-# It should be re-added though once we can identify prokaryotes vs eukaryotes.
 def detect_energy_generating_cycles(model, metabolite_id):
     u"""
     Detect erroneous energy-generating cycles for a a single metabolite.

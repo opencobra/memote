@@ -37,6 +37,11 @@ def test_metabolite_annotation_presence(model):
     annotation i.e. specific database  cross-references, ontology terms,
     additional information. For this test to pass the model is expected to
     have metabolites and each of them should have some form of annotation.
+
+    Implementation:
+    Check if the annotation attribute of each cobra.Metabolite object of the
+    model is unset or empty.
+
     """
     ann = test_metabolite_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
@@ -58,6 +63,11 @@ def test_reaction_annotation_presence(model):
     annotation i.e. specific database  cross-references, ontology terms,
     additional information. For this test to pass the model is expected to
     have reactions and each of them should have some form of annotation.
+
+    Implementation:
+    Check if the annotation attribute of each cobra.Reaction object of the
+    model is unset or empty.
+
     """
     ann = test_reaction_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
@@ -80,6 +90,11 @@ def test_gene_product_annotation_presence(model):
     cross-references, ontology terms, additional information. For this test to
     pass the model is expected to have genes and each of them should have some
     form of annotation.
+
+    Implementation:
+    Check if the annotation attribute of each cobra.Gene object of the
+    model is unset or empty.
+
     """
     ann = test_gene_product_annotation_presence.annotation
     ann["data"] = get_ids(annotation.find_components_without_annotation(
@@ -118,6 +133,13 @@ def test_metabolite_annotation_overview(model, db):
     may not be feasible to achieve 100% coverage for each of them. Generally
     it should be possible, however, to obtain cross-references to at least
     one of the databases for all metabolites consistently.
+
+    Implementation:
+    Check if the keys of the annotation attribute of each cobra.Metabolite of
+    the model match with a selection of common biochemical databases. The
+    annotation  attribute of cobrapy components is a dictionary of
+    key:value pairs.
+
     """
     ann = test_metabolite_annotation_overview.annotation
     ann["data"][db] = get_ids(
@@ -157,6 +179,13 @@ def test_reaction_annotation_overview(model, db):
     may not be feasible to achieve 100% coverage for each of them. Generally
     it should be possible, however, to obtain cross-references to at least
     one of the databases for all reactions consistently.
+
+    Implementation:
+    Check if the keys of the annotation attribute of each cobra.Reaction of
+    the model match with a selection of common biochemical databases. The
+    annotation  attribute of cobrapy components is a dictionary of
+    key:value pairs.
+
     """
     ann = test_reaction_annotation_overview.annotation
     ann["data"][db] = get_ids(
@@ -196,6 +225,13 @@ def test_gene_product_annotation_overview(model, db):
     may not be feasible to achieve 100% coverage for each of them. Generally
     it should be possible, however, to obtain cross-references to at least
     one of the databases for all gene products consistently.
+
+    Implementation:
+    Check if the keys of the annotation attribute of each cobra.Gene of
+    the model match with a selection of common genome databases. The
+    annotation  attribute of cobrapy components is a dictionary of
+    key:value pairs.
+
     """
     ann = test_gene_product_annotation_overview.annotation
     ann["data"][db] = get_ids(
@@ -226,6 +262,12 @@ def test_metabolite_annotation_wrong_ids(model, db):
     The required formats, i.e., regex patterns are further outlined in
     `annotation.py`. This test does not carry out a web query for the composed
     URI, it merely controls that the regex patterns match the identifiers.
+
+    Implementation:
+    For those metabolites whose annotation keys match any of the tested
+    databases, check if the corresponding values match the identifier pattern
+    of each database.
+
     """
     ann = test_metabolite_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
@@ -267,6 +309,12 @@ def test_reaction_annotation_wrong_ids(model, db):
     The required formats, i.e., regex patterns are further outlined in
     `annotation.py`. This test does not carry out a web query for the composed
     URI, it merely controls that the regex patterns match the identifiers.
+
+    Implementation:
+    For those reaction whose annotation keys match any of the tested
+    databases, check if the corresponding values match the identifier pattern
+    of each database.
+
     """
     ann = test_reaction_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
@@ -308,6 +356,12 @@ def test_gene_product_annotation_wrong_ids(model, db):
     The required formats, i.e., regex patterns are further outlined in
     `annotation.py`. This test does not carry out a web query for the composed
     URI, it merely controls that the regex patterns match the identifiers.
+
+    Implementation:
+    For those genes whose annotation keys match any of the tested
+    databases, check if the corresponding values match the identifier pattern
+    of each database.
+
     """
     ann = test_gene_product_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
@@ -346,6 +400,17 @@ def test_metabolite_id_namespace_consistency(model):
     Hence, this test checks if the main metabolite identifiers can be
     attributed to one single namespace based on the regex patterns defined at
     https://identifiers.org/
+
+    Implementation:
+    Generate a table with each column corresponding to one
+    database from the selection and each row to a metabolite identifier. A
+    Boolean entry indicates whether the identifier matches the regular
+    expression of the corresponding database. Since the Biocyc pattern matches
+    broadly, we assume that any instance of an identifier matching to Biocyc
+    AND any other database pattern is a false positive match for Biocyc and
+    thus set it to ``false``. Sum the positive matches for each database and
+    assume that the largest set is the 'main' identifier namespace.
+
     """
     ann = test_metabolite_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(
@@ -378,6 +443,17 @@ def test_reaction_id_namespace_consistency(model):
     Hence, this test checks if the main reaction identifiers can be
     attributed to one single namespace based on the regex patterns defined at
     https://identifiers.org/
+
+    Implementation:
+    Generate a pandas.DataFrame with each column corresponding to one
+    database from the selection and each row to the reaction ID. A boolean
+    entry indicates whether the metabolite ID matches the regex pattern
+    of the corresponding database. Since the Biocyc pattern matches quite,
+    assume that any instance of an identifier matching to Biocyc
+    AND any other DB pattern is a false positive match for Biocyc and then set
+    the boolean to ``false``. Sum the positive matches for each database and
+    assume that the largest set is the 'main' identifier namespace.
+
     """
     ann = test_reaction_id_namespace_consistency.annotation
     overview = annotation.generate_component_id_namespace_overview(

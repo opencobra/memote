@@ -34,6 +34,11 @@ def test_model_id_presence(model):
     Further, the ID will be displayed on the memote snapshot
     report, which helps to distinguish the output clearly.
 
+    Implementation:
+    Check if the cobra.Model object has a non-empty "id"
+    attribute, this value is parsed from the "id" attribute of the <model> tag
+    in the SBML file e.g. <model fbc:strict="true" id="iJO1366">.
+
     """
     ann = test_model_id_presence.annotation
     assert hasattr(model, "id")
@@ -52,6 +57,11 @@ def test_genes_presence(model):
     genes and, more importantly, the corresponding gene-protein-reaction
     rules. This test requires that there is at least one gene defined.
 
+    Implementation:
+    Check if the cobra.Model object has non-empty "genes"
+    attribute, this list is populated from the list of fbc:listOfGeneProducts
+    which should contain at least one fbc:geneProduct.
+
     """
     ann = test_genes_presence.annotation
     assert hasattr(model, "genes")
@@ -68,6 +78,12 @@ def test_reactions_presence(model):
 
     To be useful a metabolic model should consist at least of a few reactions.
     This test simply checks if there are more than zero reactions.
+
+    Implementation:
+    Check if the cobra.Model object has non-empty "reactions"
+    attribute, this list is populated from the list of sbml:listOfReactions
+    which should contain at least one sbml:reaction.
+
     """
     ann = test_reactions_presence.annotation
     assert hasattr(model, "reactions")
@@ -85,6 +101,12 @@ def test_metabolites_presence(model):
     To be useful a metabolic model should consist at least of a few
     metabolites that are converted by reactions.
     This test simply checks if there are more than zero metabolites.
+
+    Implementation:
+    Check if the cobra.Model object has non-empty
+    "metabolites" attribute, this list is populated from the list of
+    sbml:listOfSpecies which should contain at least one sbml:species.
+
     """
     ann = test_metabolites_presence.annotation
     assert hasattr(model, "metabolites")
@@ -104,6 +126,12 @@ def test_metabolites_formula_presence(model):
     difficult to obtain formulas for certain metabolites this test serves as a
     mere report. Models can still be stoichiometrically consistent even
     when chemical formulas are not defined for each metabolite.
+
+    Implementation:
+    Check if each cobra.Metabolite has a non-empty "formula"
+    attribute. This attribute is set by the parser if there is an
+    fbc:chemicalFormula attribute for the corresponding species in the
+    SBML.
 
     """
     ann = test_metabolites_formula_presence.annotation
@@ -127,6 +155,13 @@ def test_metabolites_charge_presence(model):
     difficult to obtain charges for certain metabolites this test serves as a
     mere report. Models can still be stoichiometrically consistent even
     when charge information is not defined for each metabolite.
+
+    Implementation:
+    Check if each cobra.Metabolite has a non-empty "charge"
+    attribute. This attribute is set by the parser if there is an
+    fbc:charge attribute for the corresponding species in the
+    SBML.
+
     """
     ann = test_metabolites_charge_presence.annotation
     ann["data"] = get_ids(
@@ -150,6 +185,13 @@ def test_gene_protein_reaction_rule_presence(model):
     deletion studies. However, reactions without GPR may also be valid:
     Spontaneous reactions, or known reactions with yet undiscovered genes
     likely lack GPR.
+
+    Implementation:
+    Check if each cobra.Reaction has a non-empty
+    "gene_reaction_rule" attribute, which is set by the parser if there is an
+    fbc:geneProductAssociation defined for the corresponding reaction in the
+    SBML.
+
     """
     ann = test_gene_protein_reaction_rule_presence.annotation
     missing_gpr_metabolic_rxns = set(
@@ -174,8 +216,20 @@ def test_ngam_presence(model):
     expenses that the cell invests in continuous processes independent of
     the growth rate. Memote tries to infer this reaction from a list of
     buzzwords, and the stoichiometry and components of a simple ATP-hydrolysis
-    reaction. Please see the API documentation for ``basic.find_ngam`` for a
-    more detailed explanation.
+    reaction.
+
+    Implementation:
+    From the list of all reactions that convert ATP to ADP select the reactions
+    that match the irreversible reaction "ATP + H2O -> ADP + HO4P + H+",
+    whose metabolites are situated within the main model compartment.
+    The main model compartment is assumed to be the cytosol, yet, if that
+    cannot be identified, it is assumed to be the compartment with the most
+    metabolites. The resulting list of reactions is then filtered further by
+    attempting to match the reaction name with any of the following buzzwords
+    ('maintenance', 'atpm', 'requirement', 'ngam', 'non-growth', 'associated').
+    If this is possible only the filtered reactions are returned, if not the
+    list is returned as is.
+
     """
     ann = test_ngam_presence.annotation
     ann["data"] = get_ids(basic.find_ngam(model))
@@ -197,6 +251,11 @@ def test_metabolic_coverage(model):
     ratios <1. This difference arises as models with basic or intermediate
     levels of detail are assumed to include many reactions in which several
     gene products and their enzymatic transformations are ‘lumped’.
+
+    Implementation:
+    Divides the amount reactions by the amount of genes. Raises an error
+    if the model does not contain either reactions or genes.
+
     """
     ann = test_metabolic_coverage.annotation
     ann["data"] = (len(model.reactions), len(model.genes))
@@ -219,6 +278,12 @@ def test_compartments_presence(model):
     environment i.e. the medium/ metabolic context in which the modelled cells
     grow. Hence, in total, at least two compartments can be expected from a
     metabolic model.
+
+    Implementation:
+    Check if the cobra.Model object has a non-empty "compartments"
+    attribute, this list is populated from the list of sbml:listOfCompartments
+    which should contain at least two sbml:compartment elements.
+
     """
     # TODO: Fix the test in a later PR! Should expect 2 compartments instead!
     ann = test_compartments_presence.annotation
@@ -238,11 +303,17 @@ def test_protein_complex_presence(model):
     Based on the gene-protein-reaction (GPR) rules, it is possible to infer
     whether a reaction is catalyzed by a single gene product, isozymes or by a
     heteromeric protein complex. This test checks that at least one
-    such protein complex is defined in the GPR of the model. For S. cerevisiae
-    it could be shown that "essential proteins tend to [cluster] together in
-    essential complexes" (https://doi.org/10.1074%2Fmcp.M800490-MCP200).
+    such heteromeric protein complex is defined in any GPR of the model. For
+    S. cerevisiae it could be shown that "essential proteins tend to [cluster]
+    together in essential complexes"
+    (https://doi.org/10.1074%2Fmcp.M800490-MCP200).
 
     This might also be a relevant metric for other organisms.
+
+    Implementation:
+    Identify GPRs which contain at least one logical AND that combines two
+    different gene products.
+
     """
     ann = test_protein_complex_presence.annotation
     ann["data"] = get_ids(basic.find_protein_complexes(model))
@@ -263,6 +334,14 @@ def test_find_pure_metabolic_reactions(model):
     transport reactions. This test is passed when the model contains at least
     one purely metabolic reaction i.e. a conversion of one metabolite into
     another.
+
+    Implementation:
+    From the list of all reactions, those that are boundary, transport and
+    biomass reactions are removed and the remainder assumed to be pure
+    metabolic reactions. Boundary reactions are identified using the attribute
+    cobra.Model.boundary. Please read the description of "Transport Reactions"
+    and "Biomass Reaction Identified" to learn how they are identified.
+
     """
     ann = test_find_pure_metabolic_reactions.annotation
     ann["data"] = get_ids(
@@ -287,6 +366,11 @@ def test_find_constrained_pure_metabolic_reactions(model):
     transport reactions. This test simply reports the number of purely
     metabolic reactions that have fixed constraints and does not have any
     mandatory 'pass' criteria.
+
+    Implementation: From the pool of pure metabolic reactions identify
+    reactions which are constrained to values other than the model's minimal or
+    maximal possible bounds.
+
     """
     ann = test_find_constrained_pure_metabolic_reactions.annotation
     pmr = basic.find_pure_metabolic_reactions(model)
@@ -312,6 +396,7 @@ def test_find_transport_reactions(model):
     to another, are present in the model, as at least one transport reaction
     must be present for cells to take up nutrients and/or excrete waste.
 
+    Implementation:
     A transport reaction is defined as follows:
     1. It contains metabolites from at least 2 compartments and
     2. at least 1 metabolite undergoes no chemical reaction, i.e.,
@@ -358,27 +443,11 @@ def test_find_constrained_transport_reactions(model):
     to another, have fixed constraints. This test does not have any mandatory
     'pass' criteria.
 
-    A transport reaction is defined as follows:
-    1. It contains metabolites from at least 2 compartments and
-    2. at least 1 metabolite undergoes no chemical reaction, i.e.,
-    the formula and/or annotation stays the same on both sides of the equation.
-
-    A notable exception is transport via PTS, which also contains the following
-    restriction:
-    3. The transported metabolite(s) are transported into a compartment through
-    the exchange of a phosphate.
-
-    An example of transport via PTS would be
-    pep(c) + glucose(e) -> glucose-6-phosphate(c) + pyr(c)
-
-    Reactions similar to transport via PTS (referred to as "modified transport
-    reactions") follow a similar pattern:
-    A(x) + B-R(y) -> A-R(y) + B(y)
-
-    Such modified transport reactions can be detected, but only when a formula
-    field exists for all metabolites in a particular reaction. If this is not
-    the case, transport reactions are identified through annotations, which
-    cannot detect modified transport reactions.
+    Implementation:
+    Please refer to "Transport Reactions" for details on how memote identifies
+    transport reactions.
+    From the pool of transport reactions identify reactions which are
+    constrained to values other than the model's median lower and upper bounds.
 
     """
     ann = test_find_constrained_transport_reactions.annotation
@@ -407,6 +476,10 @@ def test_transport_reaction_gpr_presence(model):
     However, transport reactions without GPR may also be valid:
     Diffusion, or known reactions with yet undiscovered genes likely lack GPR.
 
+    Implementation:
+    Check which cobra.Reactions classified as transport reactions have a
+    non-empty "gene_reaction_rule" attribute.
+
     """
     # TODO: Update threshold with improved insight from meta study.
     ann = test_transport_reaction_gpr_presence.annotation
@@ -434,6 +507,12 @@ def test_find_reversible_oxygen_reactions(model):
     This test reports how many of these oxygen-containing reactions are
     reversible. This test does not have any mandatory 'pass' criteria.
 
+    Implementation:
+    First, find the metabolite representing atmospheric oxygen in the model on
+    the basis of an internal mapping table or by specifically looking for the
+    formula "O2". Then, find all reactions that produce or consume oxygen and
+    report those that are reversible.
+
     """
     ann = test_find_reversible_oxygen_reactions.annotation
     o2_rxns = basic.find_oxygen_reactions(model)
@@ -457,6 +536,11 @@ def test_find_unique_metabolites(model):
     metabolites. The test expects that the model is compartimentalized, and
     thus, that the number of unique metabolites is generally lower than the
     total number of metabolites.
+
+    Implementation:
+    Reduce the list of metabolites to a unique set by removing the compartment
+    tag. The cobrapy SBML parser adds compartment tags to each metabolite ID.
+
     """
     ann = test_find_unique_metabolites.annotation
     ann["data"] = list(basic.find_unique_metabolites(model))
@@ -480,6 +564,12 @@ def test_find_duplicate_metabolites_in_compartments(model):
     (hence different IDs). This test therefore expects that every metabolite
     in any particular compartment has unique inchikey values.
 
+    Implementation:
+    Identifies duplicate metabolites in each compartment by
+    determining if any two metabolites have identical InChI-key annotations.
+    For instance, this function would find compounds with IDs ATP1 and ATP2 in
+    the cytosolic compartment, with both having the same InChI annotations.
+
     """
     ann = test_find_duplicate_metabolites_in_compartments.annotation
     ann["data"] = basic.find_duplicate_metabolites_in_compartments(
@@ -502,6 +592,12 @@ def test_find_duplicate_reactions(model):
     This test therefore expects that every reaction has unique identifier
     values (i.e. unique BRENDA, BiGG, KEGG, etc. values).
 
+    Implementation:
+    Identifies duplicate reactions in each compartment by
+    pair-wise comparison of reaction annotation objects. If two reactions have
+    any annotation elements in common they are considered duplicates of each
+    other.
+
     """
     ann = test_find_duplicate_reactions.annotation
     ann["data"] = basic.find_duplicate_reactions(model)
@@ -519,6 +615,12 @@ def test_find_medium_metabolites(model):
     This test checks all boundary reactions in the model that permit flux
     towards creating a metabolite, and reports those metabolites. This test
     does not have any mandatory 'pass' criteria.
+
+    Implementation:
+    Identify the metabolite IDs of each reaction in the method
+    cobra.Model.medium. Model.medium returns exchange reactions whose bounds
+    permit the uptake of metabolites.
+
     """
     ann = test_find_medium_metabolites.annotation
     ann["data"] = basic.find_medium_metabolites(model)
