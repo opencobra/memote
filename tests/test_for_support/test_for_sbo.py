@@ -85,7 +85,8 @@ def test_find_components_without_sbo_terms(model, num, components):
     ("multiple_sbo_terms", 1, "reactions", ["SBO:1","SBO:2","SBO:3"]),
     ("multiple_sbo_terms", 1, "genes", ["SBO:1","SBO:2","SBO:3"])
 ], indirect=["model"])
-def test_find_components_without_specific_sbo_term(model, num, components):
+def test_find_components_without_specific_sbo_term(model, num, components,
+                                                   term):
     """Expect `num` components to have a specific sbo annotation."""
     no_match_to_specific_term = sbo.check_component_for_specific_sbo_term(
         getattr(model, components), term)
