@@ -274,12 +274,6 @@ def find_elementary_leakage_modes(model, atol=1e-13):
         "Coming soon™ if considered useful.")
 
 
-# TODO: I had to remove the test for an infinite proton gradient i.e testing
-# if the model can somehow cycle h_c and h_p with closed bounds. This test
-# however is very specfic for the existence of a periplasm and since it is
-# not trivial to presuppose agnostically between which two compartments a
-# given model builds the PMF, I've removed this capability from this test.
-# It should be re-added though once we can identify prokaryotes vs eukaryotes.
 def detect_energy_generating_cycles(model, metabolite_id):
     u"""
     Detect erroneous energy-generating cycles for a a single metabolite.
@@ -441,32 +435,46 @@ def find_orphans(model):
     """
     Return metabolites that are only consumed in reactions.
 
+    Metabolites that are involved in an exchange reaction are never
+    considered to be orphaned.
+
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
     """
-    return [met for met in model.metabolites
-            if (len(met.reactions) > 0) and all(
-                (not rxn.reversibility) and (rxn.metabolites[met] < 0)
-                for rxn in met.reactions)]
+    exchange = frozenset(model.exchanges)
+    return [
+        met for met in model.metabolites
+        if (len(met.reactions) > 0) and all(
+            (not rxn.reversibility) and (rxn not in exchange) and
+            (rxn.metabolites[met] < 0) for rxn in met.reactions
+        )
+    ]
 
 
 def find_deadends(model):
     """
     Return metabolites that are only produced in reactions.
 
+    Metabolites that are involved in an exchange reaction are never
+    considered to be dead ends.
+
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
     """
-    return [met for met in model.metabolites
-            if (len(met.reactions) > 0) and all(
-                (not rxn.reversibility) and
-                (rxn.metabolites[met] > 0) for rxn in met.reactions)]
+    exchange = frozenset(model.exchanges)
+    return [
+        met for met in model.metabolites
+        if (len(met.reactions) > 0) and all(
+            (not rxn.reversibility) and (rxn not in exchange) and
+            (rxn.metabolites[met] > 0) for rxn in met.reactions
+        )
+    ]
 
 
 def find_disconnected(model):
@@ -484,26 +492,30 @@ def find_disconnected(model):
 
 def find_metabolites_not_produced_with_open_bounds(model):
     """
-    Return metabolites that cannot be produced with open boundary reactions.
+    Return metabolites that cannot be produced with open exchange reactions.
 
-    Inverse case from 'find_metabolites_produced_with_closed_bounds', just
-    like metabolites should not be produced from nothing, metabolites should
-    all be produced with open exchanges.
+    A perfect model should be able to produce each and every metabolite when
+    all medium components are available.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
+    Returns
+    -------
+    list
+        Those metabolites that could not be produced.
+
     """
     mets_not_produced = list()
-    helpers.open_boundaries(model)
+    helpers.open_exchanges(model)
     for met in model.metabolites:
         with model:
             exch = model.add_boundary(
-                met, type="irrex", reaction_id="IRREX", lb=0, ub=1)
+                met, type="irrex", reaction_id="IRREX", lb=0, ub=1000)
             solution = helpers.run_fba(model, exch.id)
-            if solution is np.nan or solution < TOLERANCE_THRESHOLD:
+            if np.isnan(solution) or solution < TOLERANCE_THRESHOLD:
                 mets_not_produced.append(met)
     return mets_not_produced
 
@@ -512,24 +524,28 @@ def find_metabolites_not_consumed_with_open_bounds(model):
     """
     Return metabolites that cannot be consumed with open boundary reactions.
 
-    Reverse case from 'find_metabolites_not_produced_with_open_bounds', just
-    like metabolites should all be produced with open exchanges, they should
-    also all be consumed with open exchanges.
+    When all metabolites can be secreted, it should be possible for each and
+    every metabolite to be consumed in some form.
 
     Parameters
     ----------
     model : cobra.Model
         The metabolic model under investigation.
 
+    Returns
+    -------
+    list
+        Those metabolites that could not be consumed.
+
     """
     mets_not_consumed = list()
-    helpers.open_boundaries(model)
+    helpers.open_exchanges(model)
     for met in model.metabolites:
         with model:
             exch = model.add_boundary(
-                met, type="irrex", reaction_id="IRREX", lb=-1, ub=0)
+                met, type="irrex", reaction_id="IRREX", lb=-1000, ub=0)
             solution = helpers.run_fba(model, exch.id, direction="min")
-            if solution is np.nan or abs(solution) < TOLERANCE_THRESHOLD:
+            if np.isnan(solution) or abs(solution) < TOLERANCE_THRESHOLD:
                 mets_not_consumed.append(met)
     return mets_not_consumed
 

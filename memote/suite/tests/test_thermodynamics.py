@@ -42,7 +42,10 @@ def test_find_candidate_irreversible_reactions(model):
     boundary reaction, it is counted as a purely metabolic reaction.
     This test checks if the reversibility attribute of each reaction
     agrees with a thermodynamics-based
-    calculation of reversibility. To determine reversibility we calculate
+    calculation of reversibility.
+
+    Implementation:
+    To determine reversibility we calculate
     the reversibility index ln_gamma (natural logarithm of gamma) of each
     reaction
     using the eQuilibrator API. We consider reactions, whose reactants'

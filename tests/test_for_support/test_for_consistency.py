@@ -494,10 +494,10 @@ def consuming_toy_model(base):
 
 @register_with(MODEL_REGISTRY)
 def gap_model(base):
-    a_c = cobra.Metabolite("a_c")
-    a_e = cobra.Metabolite("a_e")
-    b_c = cobra.Metabolite("b_c")
-    c_c = cobra.Metabolite("c_c")
+    a_c = cobra.Metabolite("a_c", compartment="c")
+    a_e = cobra.Metabolite("a_e", compartment="e")
+    b_c = cobra.Metabolite("b_c", compartment="c")
+    c_c = cobra.Metabolite("c_c", compartment="c")
     base.add_metabolites([a_e])
     rxn1 = cobra.Reaction("R1")
     rxn1.add_metabolites({a_c: -1, b_c: 1})
@@ -509,24 +509,29 @@ def gap_model(base):
 
 @register_with(MODEL_REGISTRY)
 def gap_model_2(base):
-    base.add_metabolites([cobra.Metabolite(i) for i in "abcd"])
+    a_c = cobra.Metabolite("a_c", compartment="c")
+    b_c = cobra.Metabolite("b_c", compartment="c")
+    c_c = cobra.Metabolite("c_c", compartment="c")
+    d_c = cobra.Metabolite("d_c", compartment="c")
     base.add_reactions([cobra.Reaction(i)
                         for i in ["EX_A", "A2B", "C2D", "EX_D"]])
-    base.reactions.EX_A.add_metabolites({"a": 1})
-    base.reactions.EX_D.add_metabolites({"d": -1})
-    base.reactions.A2B.add_metabolites({"a": -1, "b": 1})
-    base.reactions.C2D.add_metabolites({"c": -1, "d": 1})
+    base.reactions.EX_A.add_metabolites({a_c: -1})
+    base.reactions.EX_D.add_metabolites({d_c: -1})
+    base.reactions.A2B.add_metabolites({a_c: -1, b_c: 1})
+    base.reactions.C2D.add_metabolites({c_c: -1, d_c: 1})
+    base.reactions.EX_A.bounds = -1000, 1000
     base.reactions.A2B.bounds = 0, 1000
     base.reactions.C2D.bounds = 0, 1000
+    base.reactions.EX_D.bounds = -1000, 1000
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def gapfilled_model(base):
-    a_c = cobra.Metabolite("a_c")
-    a_e = cobra.Metabolite("a_e")
-    b_c = cobra.Metabolite("b_c")
-    c_c = cobra.Metabolite("c_c")
+    a_c = cobra.Metabolite("a_c", compartment="c")
+    a_e = cobra.Metabolite("a_e", compartment="e")
+    b_c = cobra.Metabolite("b_c", compartment="c")
+    c_c = cobra.Metabolite("c_c", compartment="c")
     rxn1 = cobra.Reaction("R1")
     rxn1.add_metabolites({a_c: -1, b_c: 1})
     rxn2 = cobra.Reaction("R2")
@@ -545,9 +550,9 @@ def gapfilled_model(base):
 
 @register_with(MODEL_REGISTRY)
 def reversible_gap(base):
-    a_c = cobra.Metabolite("a_c")
-    b_c = cobra.Metabolite("b_c")
-    c_c = cobra.Metabolite("c_c")
+    a_c = cobra.Metabolite("a_c", compartment="c")
+    b_c = cobra.Metabolite("b_c", compartment="c")
+    c_c = cobra.Metabolite("c_c", compartment="c")
     rxn1 = cobra.Reaction("R1", lower_bound=-1000)
     rxn1.add_metabolites({a_c: -1, b_c: 1})
     rxn2 = cobra.Reaction("R2")

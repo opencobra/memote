@@ -40,11 +40,15 @@ def test_stoichiometric_consistency(model):
     Similar to insufficient constraints, this may give rise to cycles which
     either produce mass from nothing or consume mass from the model.
 
-    This test uses an implementation of the algorithm presented by
-    Gevorgyan, A., M. G Poolman, and D. A Fell.
+    Implementation:
+    This test first uses an implementation of the algorithm presented in
+    section 3.1 by Gevorgyan, A., M. G Poolman, and D. A Fell.
     "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
     Bioinformatics 24, no. 19 (2008): 2245.
     doi: 10.1093/bioinformatics/btn425
+    Should the model be inconsistent, then the list of unconserved metabolites
+    is computed using the algorithm described in section 3.2 of the same
+    publication.
 
     """
     ann = test_stoichiometric_consistency.annotation
@@ -62,7 +66,7 @@ def test_stoichiometric_consistency(model):
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])
 @annotate(title="Erroneous Energy-generating Cycles", format_type="count",
-          data=dict(), message=dict())
+          data=dict(), message=dict(), metric=dict())
 def test_detect_energy_generating_cycles(model, met):
     u"""
     Expect that no energy metabolite can be produced out of nothing.
@@ -75,11 +79,18 @@ def test_detect_energy_generating_cycles(model, met):
     which makes studies involving the growth rates predicted from such models
     unreliable.
 
+    Implementation:
     This test uses an implementation of the algorithm presented by:
     Fritzemeier, C. J., Hartleb, D., Szappanos, B., Papp, B., & Lercher,
     M. J. (2017). Erroneous energy-generating cycles in published genome scale
     metabolic networks: Identification and removal. PLoS Computational
     Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
+
+    First attempt to identify the main compartment (cytosol), then attempt to
+    identify each metabolite of the referenced list of energy couples via an
+    internal mapping table. Construct a dissipation reaction for each couple.
+    Carry out FBA with each dissipation reaction as the objective and report
+    those reactions that non-zero carry flux.
 
     """
     ann = test_detect_energy_generating_cycles.annotation
@@ -111,6 +122,11 @@ def test_reaction_charge_balance(model):
     charge are not considered to be balanced, even though the remaining
     metabolites participating in the reaction might be.
 
+    Implementation:
+    For each reaction that isn't a boundary or biomass reaction check if each
+    metabolite has a non-zero charge attribute and if so calculate if the
+    overall sum of charges of reactants and products is equal to zero.
+
     """
     ann = test_reaction_charge_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
@@ -140,6 +156,11 @@ def test_reaction_mass_balance(model):
     formula are not considered to be balanced, even though the remaining
     metabolites participating in the reaction might be.
 
+    Implementation:
+    For each reaction that isn't a boundary or biomass reaction check if each
+    metabolite has a non-zero elements attribute and if so calculate if the
+    overall element balance of reactants and products is equal to zero.
+
     """
     ann = test_reaction_mass_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
@@ -165,6 +186,14 @@ def test_blocked_reactions(model):
     Generally blocked reactions are caused by network gaps, which can be
     attributed to scope or knowledge gaps.
 
+    Implementation:
+    Use flux variability analysis (FVA) implemented in
+    cobra.flux_analysis.find_blocked_reactions with open_exchanges=True.
+    Please refer to the cobrapy documentation for more information:
+    https://cobrapy.readthedocs.io/en/stable/autoapi/cobra/flux_analysis/
+    variability/index.html#cobra.flux_analysis.variability.
+    find_blocked_reactions
+
     """
     ann = test_blocked_reactions.annotation
     ann["data"] = find_blocked_reactions(model, open_exchanges=True)
@@ -184,6 +213,10 @@ def test_find_stoichiometrically_balanced_cycles(model):
     Stoichiometrically Balanced Cycles are artifacts of insufficiently
     constrained networks resulting in reactions that can carry flux when
     all the boundaries have been closed.
+
+    Implementation:
+    Close all model boundary reactions and then use flux variability analysis
+    (FVA) to identify reactions that carry flux.
 
     """
     ann = test_find_stoichiometrically_balanced_cycles.annotation
@@ -205,6 +238,11 @@ def test_find_orphans(model):
     reactions in the model. They may indicate the presence of network and
     knowledge gaps.
 
+    Implementation:
+    Find orphan metabolites structurally by considering only reaction
+    equations and reversibility. FBA is not carried out.
+
+
     """
     ann = test_find_orphans.annotation
     ann["data"] = get_ids(consistency.find_orphans(model))
@@ -225,6 +263,10 @@ def test_find_deadends(model):
     reactions in the model. They may indicate the presence of network and
     knowledge gaps.
 
+    Implementation:
+    Find dead-end metabolites structurally by considering only reaction
+    equations and reversibility. FBA is not carried out.
+
     """
     ann = test_find_deadends.annotation
     ann["data"] = get_ids(consistency.find_deadends(model))
@@ -244,6 +286,10 @@ def test_find_disconnected(model):
     Disconnected metabolites are not part of any reaction in the model. They
     are most likely left-over from the reconstruction process, but may also
     point to network and knowledge gaps.
+
+    Implementation:
+    Check for any metabolites of the cobra.Model object with emtpy reaction
+    attribute.
 
     """
     ann = test_find_disconnected.annotation
@@ -266,9 +312,13 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
     metabolite. This test opens all the boundary reactions i.e. simulates a
     complete medium and checks if any metabolite cannot be produced
     individually using flux balance analysis. Metabolites that cannot be
-    produced this way are likely orphan metabolites or downstream of reactions
-    with fixed constraints. To pass this test all metabolites should be
-    producible.
+    produced this way are likely orphan metabolites, downstream of reactions
+    with fixed constraints, or blocked by a cofactor imbalance. To pass this
+    test all metabolites should be producible.
+
+    Implementation:
+    Open all model boundary reactions, then for each metabolite in the model
+    add a boundary reaction and maximize it with FBA.
 
     """
     ann = test_find_metabolites_not_produced_with_open_bounds.annotation
@@ -297,6 +347,10 @@ def test_find_metabolites_not_consumed_with_open_bounds(model):
     with fixed constraints. To pass this test all metabolites should be
     consumable.
 
+    Implementation:
+    Open all model boundary reactions, then for each metabolite in the model
+    add a boundary reaction and minimize it with FBA.
+
     """
     ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
     ann["data"] = get_ids(
@@ -320,6 +374,11 @@ def test_find_reactions_unbounded_flux_default_condition(model):
     A large fraction of model reactions able to carry unlimited flux under
     default conditions indicates problems with reaction directionality,
     missing cofactors, incorrectly defined transport reactions and more.
+
+    Implementation:
+    Without changing the default constraints run flux variability analysis.
+    From the FVA results identify those reactions that carry flux equal to the
+    model's maximal or minimal flux.
 
     """
     ann = test_find_reactions_unbounded_flux_default_condition.annotation

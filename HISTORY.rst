@@ -3,6 +3,11 @@ History
 
 Next Release
 ------------
+* Remove 'Steady-state flux solution vectors' test case.
+* Improve the descriptions of stoichiometric matrix test cases.
+* Fix the discovery or orphan and dead-end metabolites.
+* Improve detection of metabolites that are not consumed or not produced by 
+  only opening exchange reactions not other boundary reactions.
 * Thematically reorganize the test cases in the config.
 * Instead of min/max bounds consider the median bounds for testing (un-)bounded 
   fluxes.
@@ -29,6 +34,10 @@ Next Release
 * Display an alternative message if some biomass components do not contain a 
   formula.
 * Extend the annotations tests by a check for full length InChI strings.
+* Fix a bug in ``Unrealistic Growth Rate In Default Medium`` which reported the
+  opposite of what was the case.
+* Extend the description of each test by a description of how it is
+  implemented.
 
 0.8.11 (2019-01-07)
 -------------------
