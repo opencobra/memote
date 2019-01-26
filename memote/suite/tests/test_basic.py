@@ -612,7 +612,8 @@ def test_find_reactions_with_partially_identical_annotations(model):
 
     """
     ann = test_find_reactions_with_partially_identical_annotations.annotation
-    ann["data"] = basic.find_reactions_with_partially_identical_annotations(model)
+    ann["data"] = \
+        basic.find_reactions_with_partially_identical_annotations(model)
     ann["message"] = wrapper.fill(
         """Based on annotations there are a total of {} reactions in the model
         which have duplicates: {}""".format(

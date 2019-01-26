@@ -361,7 +361,6 @@ def find_duplicate_reactions(model):
         A list of sets of duplicate reactions based on metabolites.
 
     """
-
     def include_duplicates(rxn, duplicate_metabolites):
         expanded_metabolites = []
         for met in rxn.metabolites.keys():
