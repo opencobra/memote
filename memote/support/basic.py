@@ -288,11 +288,11 @@ def find_duplicate_metabolites_in_compartments(model):
 
 def find_reactions_with_partially_identical_annotations(model):
     """
-    Return list of reactions with duplicates based on identical annotations.
+    Return duplicate reactions based on identical annotation.
 
-    This function identifies duplicate reactions globally by checking if any
-    two reactions have the same entries in their annotation attributes.
-    This can be useful to identify one 'type' of reactions that occurs in
+    Identify duplicate reactions globally by checking if any
+    two metabolic reactions have the same entries in their annotation
+    attributes. This can be useful to identify one 'type' of reactions that occurs in
     several compartments, to curate merged models or to clean-up bulk model
     modifications. The heuristic looks at annotations with the keys
     "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
@@ -324,8 +324,8 @@ def find_reactions_with_partially_identical_annotations(model):
                     ann.append((key, rxn.annotation[key]))
         ann_rxns.append((rxn, frozenset(ann)))
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
-        if len(ann_a & ann_b) > 0:
-            mutual_pair = ann_a & ann_b
+        mutual_pair = ann_a & ann_b
+        if len(mutual_pair) > 0:
             duplicates.setdefault(mutual_pair, set())
             duplicates[mutual_pair].update([rxn_a.id, rxn_b.id])
     return [tuple(value) for value in duplicates.values()]
@@ -335,9 +335,10 @@ def find_duplicate_reactions(model):
     """
     Return a list with sets of reactions that are functionally identical.
 
-    This function identifies duplicate reactions globally by checking if any
+    Identify duplicate reactions globally by checking if any
     two reactions have the same metabolites, same directionality and are in
     the same compartment.
+
     This can be useful to curate merged models or to clean-up bulk model
     modifications. The heuristic compares reactions in a pairwise manner.
     First, if there are duplicate metabolites in the set of
@@ -363,7 +364,7 @@ def find_duplicate_reactions(model):
     """
     def include_duplicates(rxn, duplicate_metabolites):
         expanded_metabolites = []
-        for met in rxn.metabolites.keys():
+        for met in rxn.metabolites:
             for tup in duplicate_metabolites:
                 if met in tup:
                     expanded_metabolites.extend(tup)
@@ -406,7 +407,7 @@ def find_reactions_with_identical_genes(model):
     """
     Return list of reaction that have identical genes.
 
-    This function identifies duplicate reactions globally by checking if any
+    Identify duplicate reactions globally by checking if any
     two reactions have the same genes.
     This can be useful to curate merged models or to clean-up bulk model
     modifications, but also to identify promiscuous enzymes.
@@ -427,14 +428,11 @@ def find_reactions_with_identical_genes(model):
     """
     duplicates = dict()
     for rxn_a, rxn_b in combinations(model.reactions, 2):
-        try:
-            symm_difference = rxn_a.genes ^ rxn_b.genes
-        except TypeError:
+        if rxn_a.genes is None or rxn_b.genes:
             continue
-        else:
-            if len(symm_difference) == 0:
-                duplicates.setdefault(rxn_a.genes, set())
-                duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
+        if rxn_a.genes == rxn_b.genes:
+            duplicates.setdefault(rxn_a.genes, set())
+            duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
     return [tuple(value) for value in duplicates.values()]
 
 

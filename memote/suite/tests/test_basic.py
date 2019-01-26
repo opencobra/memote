@@ -590,25 +590,21 @@ def test_find_reactions_with_partially_identical_annotations(model):
 
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
-    having identical reactions from different namespaces (hence different IDs).
-    It could also be useful to identify one 'type' of reactions that
+    having identical reactions with identifiers from different namespaces.
+    It could also be useful to identify a 'type' of reaction that
     occurs in several compartments.
-    This tests identifies reactions in a pairwise manner that are annotated
+
+    This test identifies reactions in a pairwise manner that are annotated
     with identical database references, it does not take into account a
     reaction's directionality or compartment.
 
     Implementation:
-    Identifies duplicate reactions globally by checking if any
+
+    Identify duplicate reactions globally by checking if any
     two metabolic reactions have the same entries in their annotation
     attributes. The heuristic looks at annotations with the keys
     "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
     "bigg.reaction" only.
-
-    Implementation:
-    Identifies duplicate reactions in each compartment by
-    pair-wise comparison of reaction annotation objects. If two reactions have
-    any annotation elements in common they are considered duplicates of each
-    other.
 
     """
     ann = test_find_reactions_with_partially_identical_annotations.annotation
@@ -628,22 +624,24 @@ def test_find_duplicate_reactions(model):
 
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
-    having identical reactions from different namespaces (hence different IDs).
-    This tests identifies reactions in a pairwise manner that use the same set
+    having identical reactions with identifiers from different namespaces.
+
+    This test identifies reactions in a pairwise manner that use the same set
     of metabolites including potentially duplicate metabolites. Moreover, it
     will take a reaction's directionality and compartment into account.
 
     Implementation:
-    Compares reactions in a pairwise manner.
+
+    Compare reactions in a pairwise manner.
     First, if there are duplicate metabolites in the set of
-    metabolites of each reaction, added them to the set belonging to each
+    metabolites of each reaction, add them to the set belonging to each
     reaction respectively. Then, if the sets for each reaction are
     identical, check the reversibility of each reaction:
     - If both reactions differ in reversibility they are assumed to be
-    different.
+      different.
     - If both are reversible they are assumed to be identical.
     - If both are irreversible, the upper bound and product metabolites
-     have to be identical for the reactions to be assumed to be identical.
+      have to be identical for the reactions to be assumed to be identical.
 
     """
     ann = test_find_duplicate_reactions.annotation
@@ -662,13 +660,14 @@ def test_find_reactions_with_identical_genes(model):
 
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
-    having identical reactions from different namespaces (hence different IDs).
+    having identical reactions with identifiers from different namespaces.
+
     This tests identifies reactions in a pairwise manner that use identical
     sets of genes. It does *not* take a reaction's directionality, compartment,
     metabolites or annotations into account.
 
     Implementation:
-    Compares reactions in a pairwise manner and groups reactions whose genes
+    Compare reactions in a pairwise manner and groups reactions whose genes
     are identical. Skip reactions with missing genes.
 
     """
