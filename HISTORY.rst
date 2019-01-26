@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Change SBO annotation tests to check for multiple terms until we can properly 
+  handle the ontology.
 * Remove 'Steady-state flux solution vectors' test case.
 * Improve the descriptions of stoichiometric matrix test cases.
 * Fix the discovery or orphan and dead-end metabolites.
