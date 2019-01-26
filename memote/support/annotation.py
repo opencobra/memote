@@ -198,7 +198,8 @@ def generate_component_annotation_miriam_match(elements, component, db):
 
     pattern = {
         "metabolites": METABOLITE_ANNOTATIONS,
-        "reactions": REACTION_ANNOTATIONS
+        "reactions": REACTION_ANNOTATIONS,
+        "genes": GENE_PRODUCT_ANNOTATIONS
     }[component][db]
     return [elem for elem in elements
             if is_faulty(elem.annotation, db, pattern)]
@@ -225,7 +226,8 @@ def generate_component_id_namespace_overview(model, components):
     """
     patterns = {
         "metabolites": METABOLITE_ANNOTATIONS,
-        "reactions": REACTION_ANNOTATIONS
+        "reactions": REACTION_ANNOTATIONS,
+        "genes": GENE_PRODUCT_ANNOTATIONS
     }[components]
     databases = list(patterns)
     data = list()
