@@ -623,13 +623,13 @@ def test_find_duplicate_reactions(model):
     """
     Expect there to be zero duplicate reactions.
 
+    Identify reactions in a pairwise manner that use the same set
+    of metabolites including potentially duplicate metabolites. Moreover, it
+    will take a reaction's directionality and compartment into account.
+
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
     having identical reactions with identifiers from different namespaces.
-
-    This test identifies reactions in a pairwise manner that use the same set
-    of metabolites including potentially duplicate metabolites. Moreover, it
-    will take a reaction's directionality and compartment into account.
 
     Implementation:
 

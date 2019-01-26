@@ -371,45 +371,70 @@ def find_duplicate_reactions(model):
         A list of sets of duplicate reactions based on metabolites.
 
     """
-    def include_duplicates(rxn, duplicate_metabolites):
-        expanded_metabolites = []
-        for met in rxn.metabolites:
-            for tup in duplicate_metabolites:
-                if met in tup:
-                    expanded_metabolites.extend(tup)
-                else:
-                    expanded_metabolites.append(met)
-        return expanded_metabolites
+    # Build a mapping from metabolites to their InChI and InChI key space.
+    # Metabolites who lack this annotation are ignored.
+    # TODO: Consider SMILES?
+    unique_identifiers = ["inchikey", "inchi"]
+    met2mol = {}
+    mols = []
+    for met in model.metabolites:
+        ann = []
+        for key in unique_identifiers:
+            mol = met.annotation.get(key)
+            if mol is not None:
+                ann.append(mol)
+        # Ignore metabolites without the required information.
+        if len(ann) == 0:
+            continue
+        ann = set(ann)
+        for i, mol_group in enumerate(mols):
+            if len(ann & mol_group) > 0:
+                mol_group.update(ann)
+                # We map to the index of the group because it is hashable and
+                # cheaper to compare later.
+                met2mol[met] = i
+                break
+        if met not in met2mol:
+            # The length of the list corresponds to the 0-index after appending.
+            met2mol[met] = len(mols)
+            mols.append(ann)
 
-    # Get a list of pure metabolic reactions
-    duplicates = dict()
-    # Get a list of duplicate metabolites in each compartment
-    duplicate_metabolites = find_duplicate_metabolites_in_compartments(
-        model)
-    # For each combination of reactions
-    for rxn_a, rxn_b in combinations(model.reactions, 2):
-        # ..generate a set of metabolites including possible
-        # duplicate metabolites.
-        met_set_a = set(include_duplicates(rxn_a, duplicate_metabolites))
-        met_set_b = set(include_duplicates(rxn_b, duplicate_metabolites))
-        symm_difference = met_set_a ^ met_set_b
-        # For the reactions whose sets of metabolites are identical
-        if len(symm_difference) == 0:
-            key_list = [met.id for met in met_set_a].sort()
-            # ..check if the reversibility is identical
-            if rxn_a.reversibility != rxn_b.reversibility:
-                continue
-            # ..if not, are they both reversible
-            elif all([rxn_a.reversibility, rxn_b.reversibility]):
-                duplicates.setdefault(key_list, set())
-                duplicates[key_list].update([rxn_a.id, rxn_b.id])
-            # ..or are they are both irreversible?
-            else:
-                if rxn_a.products == rxn_b.products \
-                        and rxn_a.upper_bound == rxn_b.upper_bound:
-                    duplicates.setdefault(key_list, set())
-                    duplicates[key_list].update([rxn_a.id, rxn_b.id])
-    return [tuple(value) for value in duplicates.values()]
+    # Build a list associating reactions with their stoichiometry in InChI and
+    # InChI key space. Reactions that have metabolites without such
+    # information are ignored.
+    augmented = []
+    for rxn in (set(model.reactions) - set(model.boundary)):
+        if not all(met in met2mol for met in rxn.metabolites):
+            continue
+        # We map metabolites from the identifier namespace to the InChI space.
+        # We consider substrates and products separately since, for example,
+        # the InChI for H2O and OH is the same.
+        substrates = {
+            met2mol[met]: rxn.get_coefficient(met) for met in rxn.reactants
+        }
+        products = {
+            met2mol[met]: rxn.get_coefficient(met) for met in rxn.products
+        }
+        augmented.append((rxn, substrates, products))
+
+    # Now compare reactions in this augmented list.
+    # TODO: Consider compartments.
+    duplicates = []
+    for (rxn_a, sub_a, prod_a), (rxn_b, sub_b, prod_b) in combinations(
+            augmented, 2):
+        # Compare the substrates in InChI space.
+        if sub_a != sub_b:
+            continue
+        # Compare the products in InChI space.
+        if prod_a != prod_b:
+            continue
+        # Compare whether they are both (ir-)reversible.
+        if rxn_a.reversibility != rxn_b.reversibility:
+            continue
+        # TODO: We could compare bounds here but it might be worth knowing
+        #  about the reactions even if the bounds differ?
+        duplicates.append((rxn_a.id, rxn_b.id))
+    return duplicates
 
 
 def find_reactions_with_identical_genes(model):
