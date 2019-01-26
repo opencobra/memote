@@ -588,15 +588,15 @@ def test_find_reactions_with_partially_identical_annotations(model):
     """
     Expect there to be zero duplicate reactions.
 
+    Identify reactions in a pairwise manner that are annotated
+    with identical database references. This does not take into account a
+    reaction's directionality or compartment.
+
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
     having identical reactions with identifiers from different namespaces.
     It could also be useful to identify a 'type' of reaction that
     occurs in several compartments.
-
-    This test identifies reactions in a pairwise manner that are annotated
-    with identical database references, it does not take into account a
-    reaction's directionality or compartment.
 
     Implementation:
 
@@ -608,13 +608,14 @@ def test_find_reactions_with_partially_identical_annotations(model):
 
     """
     ann = test_find_reactions_with_partially_identical_annotations.annotation
-    ann["data"] = \
+    duplicates, total = \
         basic.find_reactions_with_partially_identical_annotations(model)
+    ann["data"] = duplicates
     ann["message"] = wrapper.fill(
-        """Based on annotations there are a total of {} reactions in the model
-        which have duplicates: {}""".format(
-            len(ann["data"]), truncate(ann["data"])))
-    assert len(ann["data"]) == 0, ann["message"]
+        """Based on annotations there are {} different groups of overlapping 
+        annotation which corresponds to a total of {} duplicated reactions in 
+        the model.""".format(len(duplicates), total))
+    assert total == 0, ann["message"]
 
 
 @annotate(title="Duplicate Reactions", format_type="count")

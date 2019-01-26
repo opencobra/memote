@@ -305,30 +305,39 @@ def find_reactions_with_partially_identical_annotations(model):
 
     Returns
     -------
-    list
-        A list of tuples of duplicate reactions based on annotations.
+    dict
+        A mapping from sets of annotations to groups of reactions with those
+        annotations.
+    int
+        The total number of unique reactions that are duplicated.
 
     """
-    duplicates = dict()
+    duplicates = {}
     rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
                           "rhea", "biocyc", "bigg.reaction"]
-
+    # Build a list that associates a reaction with a set of its annotations.
     ann_rxns = []
     for rxn in model.reactions:
         ann = []
         for key in rxn_db_identifiers:
             if key in rxn.annotation:
-                if type(rxn.annotation[key]) is list:
+                if isinstance(rxn.annotation[key], list):
                     ann.extend([(key, elem) for elem in rxn.annotation[key]])
                 else:
                     ann.append((key, rxn.annotation[key]))
         ann_rxns.append((rxn, frozenset(ann)))
+    # Compute the intersection between annotations and record the matching
+    # reaction identifiers.
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         mutual_pair = ann_a & ann_b
         if len(mutual_pair) > 0:
             duplicates.setdefault(mutual_pair, set())
             duplicates[mutual_pair].update([rxn_a.id, rxn_b.id])
-    return [tuple(value) for value in duplicates.values()]
+    # Find the cardinality of the set of reaction identifiers.
+    num_duplicated = len({
+        rxn_id for group in duplicates.values() for rxn_id in group
+    })
+    return duplicates, num_duplicated
 
 
 def find_duplicate_reactions(model):
