@@ -414,7 +414,7 @@ def find_duplicate_reactions(model):
 
 def find_reactions_with_identical_genes(model):
     """
-    Return list of reaction that have identical genes.
+    Return reactions that have identical genes.
 
     Identify duplicate reactions globally by checking if any
     two reactions have the same genes.
@@ -431,18 +431,25 @@ def find_reactions_with_identical_genes(model):
 
     Returns
     -------
-    list
-        A list of sets of duplicate reactions based on genes.
+    dict
+        A mapping from sets of genes to all the reactions containing those
+        genes.
+    int
+        The total number of unique reactions that appear duplicates based on
+        their gene-protein-reaction associations.
 
     """
     duplicates = dict()
     for rxn_a, rxn_b in combinations(model.reactions, 2):
-        if rxn_a.genes is None or rxn_b.genes:
+        if rxn_a.genes is None or rxn_b.genes is None:
             continue
         if rxn_a.genes == rxn_b.genes:
             duplicates.setdefault(rxn_a.genes, set())
             duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
-    return [tuple(value) for value in duplicates.values()]
+    num_duplicates = len({
+        rxn_id for group in duplicates.values() for rxn_id in group
+    })
+    return duplicates, num_duplicates
 
 
 def check_transport_reaction_gpr_presence(model):

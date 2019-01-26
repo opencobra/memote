@@ -659,26 +659,28 @@ def test_find_reactions_with_identical_genes(model):
     """
     Expect there to be zero duplicate reactions.
 
+    Identify reactions in a pairwise manner that use identical
+    sets of genes. It does *not* take into account a reaction's directionality,
+    compartment, metabolites or annotations.
+
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
     having identical reactions with identifiers from different namespaces.
 
-    This tests identifies reactions in a pairwise manner that use identical
-    sets of genes. It does *not* take a reaction's directionality, compartment,
-    metabolites or annotations into account.
-
     Implementation:
-    Compare reactions in a pairwise manner and groups reactions whose genes
+
+    Compare reactions in a pairwise manner and group reactions whose genes
     are identical. Skip reactions with missing genes.
 
     """
     ann = test_find_reactions_with_identical_genes.annotation
-    ann["data"] = basic.find_reactions_with_identical_genes(model)
+    duplicates, total = basic.find_reactions_with_identical_genes(model)
+    ann["data"] = duplicates
     ann["message"] = wrapper.fill(
-        """Based only on genes there are a
-        total of {} reactions in the model which have duplicates: {}""".format(
-            len(ann["data"]), truncate(ann["data"])))
-    assert len(ann["data"]) == 0, ann["message"]
+        """Based only on equal genes there are {} different groups of 
+        identical reactions which corresponds to a total of {} 
+        duplicated reactions in the model.""".format(len(duplicates), total))
+    assert total == 0, ann["message"]
 
 
 @annotate(title="Medium Components", format_type="count")
