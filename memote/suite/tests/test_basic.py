@@ -612,8 +612,8 @@ def test_find_reactions_with_partially_identical_annotations(model):
         basic.find_reactions_with_partially_identical_annotations(model)
     ann["data"] = duplicates
     ann["message"] = wrapper.fill(
-        """Based on annotations there are {} different groups of overlapping 
-        annotation which corresponds to a total of {} duplicated reactions in 
+        """Based on annotations there are {} different groups of overlapping
+        annotation which corresponds to a total of {} duplicated reactions in
         the model.""".format(len(duplicates), total))
     assert total == 0, ann["message"]
 
@@ -677,8 +677,8 @@ def test_find_reactions_with_identical_genes(model):
     duplicates, total = basic.find_reactions_with_identical_genes(model)
     ann["data"] = duplicates
     ann["message"] = wrapper.fill(
-        """Based only on equal genes there are {} different groups of 
-        identical reactions which corresponds to a total of {} 
+        """Based only on equal genes there are {} different groups of
+        identical reactions which corresponds to a total of {}
         duplicated reactions in the model.""".format(len(duplicates), total))
     assert total == 0, ann["message"]
 

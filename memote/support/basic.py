@@ -290,10 +290,10 @@ def find_reactions_with_partially_identical_annotations(model):
     """
     Return duplicate reactions based on identical annotation.
 
-    Identify duplicate reactions globally by checking if any
-    two metabolic reactions have the same entries in their annotation
-    attributes. This can be useful to identify one 'type' of reactions that occurs in
-    several compartments, to curate merged models or to clean-up bulk model
+    Identify duplicate reactions globally by checking if any two metabolic
+    reactions have the same entries in their annotation attributes. This can be
+    useful to identify one 'type' of reactions that occurs in several
+    compartments, to curate merged models or to clean-up bulk model
     modifications. The heuristic looks at annotations with the keys
     "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
     "bigg.reaction" only.
@@ -340,6 +340,56 @@ def find_reactions_with_partially_identical_annotations(model):
     return duplicates, num_duplicated
 
 
+def map_metabolites_to_structures(metabolites, compartments):
+    """
+    Map metabolites from the identifier namespace to structural space.
+
+    Metabolites who lack structural annotation (InChI or InChIKey) are ignored.
+
+    Parameters
+    ----------
+    metabolites : iterable
+        The cobra.Metabolites to map.
+    compartments : iterable
+        The different compartments to consider. Structures are treated
+        separately for each compartment.
+
+    Returns
+    -------
+    dict
+        A mapping from a cobra.Metabolite to its compartment specific
+        structure index.
+
+    """
+    # TODO: Consider SMILES?
+    unique_identifiers = ["inchikey", "inchi"]
+    met2mol = {}
+    molecules = {c: [] for c in compartments}
+    for met in metabolites:
+        ann = []
+        for key in unique_identifiers:
+            mol = met.annotation.get(key)
+            if mol is not None:
+                ann.append(mol)
+        # Ignore metabolites without the required information.
+        if len(ann) == 0:
+            continue
+        ann = set(ann)
+        # Compare with other structures in the same compartment.
+        mols = molecules[met.compartment]
+        for i, mol_group in enumerate(mols):
+            if len(ann & mol_group) > 0:
+                mol_group.update(ann)
+                # We map to the index of the group because it is hashable and
+                # cheaper to compare later.
+                met2mol[met] = "{}-{}".format(met.compartment, i)
+                break
+        if met not in met2mol:
+            # The length of the list corresponds to the 0-index after appending.
+            met2mol[met] = "{}-{}".format(met.compartment, len(mols))
+            mols.append(ann)
+
+
 def find_duplicate_reactions(model):
     """
     Return a list with sets of reactions that are functionally identical.
@@ -371,42 +421,15 @@ def find_duplicate_reactions(model):
         A list of sets of duplicate reactions based on metabolites.
 
     """
-    # Build a mapping from metabolites to their InChI and InChI key space.
-    # Metabolites who lack this annotation are ignored.
-    # TODO: Consider SMILES?
-    unique_identifiers = ["inchikey", "inchi"]
-    met2mol = {}
-    mols = []
-    for met in model.metabolites:
-        ann = []
-        for key in unique_identifiers:
-            mol = met.annotation.get(key)
-            if mol is not None:
-                ann.append(mol)
-        # Ignore metabolites without the required information.
-        if len(ann) == 0:
-            continue
-        ann = set(ann)
-        for i, mol_group in enumerate(mols):
-            if len(ann & mol_group) > 0:
-                mol_group.update(ann)
-                # We map to the index of the group because it is hashable and
-                # cheaper to compare later.
-                met2mol[met] = i
-                break
-        if met not in met2mol:
-            # The length of the list corresponds to the 0-index after appending.
-            met2mol[met] = len(mols)
-            mols.append(ann)
-
-    # Build a list associating reactions with their stoichiometry in InChI and
-    # InChI key space. Reactions that have metabolites without such
-    # information are ignored.
-    augmented = []
-    for rxn in (set(model.reactions) - set(model.boundary)):
+    met2mol = map_metabolites_to_structures(model.metabolites,
+                                            model.compartments)
+    # Build a list associating reactions with their stoichiometry in molecular
+    # structure space.
+    structural = []
+    for rxn in model.reactions:
+        # Ignore reactions that have metabolites without structures.
         if not all(met in met2mol for met in rxn.metabolites):
             continue
-        # We map metabolites from the identifier namespace to the InChI space.
         # We consider substrates and products separately since, for example,
         # the InChI for H2O and OH is the same.
         substrates = {
@@ -415,24 +438,22 @@ def find_duplicate_reactions(model):
         products = {
             met2mol[met]: rxn.get_coefficient(met) for met in rxn.products
         }
-        augmented.append((rxn, substrates, products))
-
-    # Now compare reactions in this augmented list.
-    # TODO: Consider compartments.
+        structural.append((rxn, substrates, products))
+    # Compare reactions using their structure-based stoichiometries.
     duplicates = []
     for (rxn_a, sub_a, prod_a), (rxn_b, sub_b, prod_b) in combinations(
-            augmented, 2):
-        # Compare the substrates in InChI space.
+            structural, 2):
+        # Compare the substrates.
         if sub_a != sub_b:
             continue
-        # Compare the products in InChI space.
+        # Compare the products.
         if prod_a != prod_b:
             continue
         # Compare whether they are both (ir-)reversible.
         if rxn_a.reversibility != rxn_b.reversibility:
             continue
         # TODO: We could compare bounds here but it might be worth knowing
-        #  about the reactions even if the bounds differ?
+        #  about the reactions even if their bounds differ?
         duplicates.append((rxn_a.id, rxn_b.id))
     return duplicates
 
