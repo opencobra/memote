@@ -388,6 +388,7 @@ def map_metabolites_to_structures(metabolites, compartments):
             # The length of the list corresponds to the 0-index after appending.
             met2mol[met] = "{}-{}".format(met.compartment, len(mols))
             mols.append(ann)
+    return met2mol
 
 
 def find_duplicate_reactions(model):

@@ -374,6 +374,8 @@ def dup_rxns(base):
     """Provide a model with duplicate reactions"""
     met_a = cobra.Metabolite("a_c", compartment="c")
     met_b = cobra.Metabolite("b_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
     rxn_1 = cobra.Reaction("rxn1")
     dup_1 = cobra.Reaction("dup1")
     rxn_1.annotation["kegg.reaction"] = "HEX"
@@ -530,6 +532,10 @@ def dup_rxns_compartment(base):
     met_b = cobra.Metabolite("b_c", compartment="c")
     met_c = cobra.Metabolite("a_m", compartment="m")
     met_d = cobra.Metabolite("b_m", compartment="m")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "123"
+    met_d.annotation["inchikey"] = "456"
     rxn_1 = cobra.Reaction("rxn1")
     dup_1 = cobra.Reaction("dup1")
     rxn_1.annotation["kegg.reaction"] = "HEX"
@@ -550,6 +556,10 @@ def dup_rxns_irrev(base):
     met_b = cobra.Metabolite("methf_c", compartment="c")
     met_c = cobra.Metabolite("5fthf_c", compartment="c")
     met_d = cobra.Metabolite("h_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "789"
+    met_d.annotation["inchikey"] = "111"
     FOMETRi = cobra.Reaction("FOMETRi")
     THFAT = cobra.Reaction("THFAT")
     FOMETRi.annotation["kegg.reaction"] = "R02300"
@@ -572,6 +582,10 @@ def dup_rxns_rev(base):
     met_b = cobra.Metabolite("methf_c", compartment="c")
     met_c = cobra.Metabolite("5fthf_c", compartment="c")
     met_d = cobra.Metabolite("h_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "789"
+    met_d.annotation["inchikey"] = "111"
     FOMETRi = cobra.Reaction("FOMETRi", upper_bound=1000, lower_bound=-1000)
     THFAT = cobra.Reaction("THFAT", upper_bound=1000, lower_bound=-1000)
     FOMETRi.annotation["kegg.reaction"] = "R02300"
@@ -591,6 +605,7 @@ def dup_rxns_irrev_exchanges(base):
 
     """
     met_a = cobra.Metabolite("A_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
     ex1 = cobra.Reaction("ex1", upper_bound=1000, lower_bound=0)
     ex2 = cobra.Reaction("ex2", upper_bound=1000, lower_bound=0)
     ex1.add_metabolites({met_a: 1})
@@ -823,32 +838,30 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("dup_rxns", 1),
-    ("dup_rxns_multiple_anns", 1),
-    ("dup_rxns_partial_matching_multiple_anns", 1),
-    ("dup_rxns_list_anns", 1),
-    ("dup_rxns_multiple_list_anns", 1),
+    ("dup_rxns", 2),
+    ("dup_rxns_multiple_anns", 2),
+    ("dup_rxns_partial_matching_multiple_anns", 2),
+    ("dup_rxns_list_anns", 2),
+    ("dup_rxns_multiple_list_anns", 2),
     ("dup_rxns_no_matching_multiple_anns", 0),
     ("dup_rxns_multiple_list_anns_no_match", 0),
-    ("dup_rxns_compartment", 1),
-    ("dup_rxns_irrev", 1),
+    ("dup_rxns_compartment", 2),
+    ("dup_rxns_irrev", 2),
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_reactions_with_partially_identical_annotations(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(
-        basic.find_reactions_with_partially_identical_annotations(model)
-    ) == num
+    _, total = basic.find_reactions_with_partially_identical_annotations(model)
+    assert total == num
 
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
     ("dup_rxns", 1),
-    ("dup_rxns_rev", 1),
+    ("dup_rxns_rev", 0),
     ("dup_rxns_irrev", 0),
     ("dup_rxns_compartment", 0),
     ("dup_rxns_irrev_exchanges", 1),
-    ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_duplicate_reactions(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
@@ -857,13 +870,14 @@ def test_find_duplicate_reactions(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("identical_genes", 1),
+    ("identical_genes", 2),
     ("different_genes", 0),
     ("gpr_missing", 0)
 ], indirect=["model"])
 def test_find_reactions_with_identical_genes(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(basic.find_reactions_with_identical_genes(model)) == num
+    _, total = basic.find_reactions_with_identical_genes(model)
+    assert total == num
 
 
 @pytest.mark.parametrize("model, num", [
