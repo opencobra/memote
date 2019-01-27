@@ -581,30 +581,109 @@ def test_find_duplicate_metabolites_in_compartments(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
+@annotate(
+    title="Reactions With Partially Identical Annotations",
+    format_type="percent"
+)
+def test_find_reactions_with_partially_identical_annotations(model):
+    """
+    Expect there to be zero duplicate reactions.
+
+    Identify reactions in a pairwise manner that are annotated
+    with identical database references. This does not take into account a
+    reaction's directionality or compartment.
+
+    The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical reactions with identifiers from different namespaces.
+    It could also be useful to identify a 'type' of reaction that
+    occurs in several compartments.
+
+    Implementation:
+
+    Identify duplicate reactions globally by checking if any
+    two metabolic reactions have the same entries in their annotation
+    attributes. The heuristic looks at annotations with the keys
+    "metanetx.reaction", "kegg.reaction", "brenda", "rhea", "biocyc",
+    "bigg.reaction" only.
+
+    """
+    ann = test_find_reactions_with_partially_identical_annotations.annotation
+    duplicates, total = \
+        basic.find_reactions_with_partially_identical_annotations(model)
+    ann["data"] = duplicates
+    ann["metric"] = total / len(model.reactions)
+    ann["message"] = wrapper.fill(
+        """Based on annotations there are {} different groups of overlapping
+        annotation which corresponds to a total of {} duplicated reactions in
+        the model.""".format(len(duplicates), total))
+    assert total == 0, ann["message"]
+
+
 @annotate(title="Duplicate Reactions", format_type="count")
 def test_find_duplicate_reactions(model):
     """
     Expect there to be zero duplicate reactions.
 
+    Identify reactions in a pairwise manner that use the same set
+    of metabolites including potentially duplicate metabolites. Moreover, it
+    will take a reaction's directionality and compartment into account.
+
     The main reason for having this test is to help cleaning up merged models
     or models from automated reconstruction pipelines as these are prone to
-    having identical reactions from different namespaces (hence different IDs).
-    This test therefore expects that every reaction has unique identifier
-    values (i.e. unique BRENDA, BiGG, KEGG, etc. values).
+    having identical reactions with identifiers from different namespaces.
 
     Implementation:
-    Identifies duplicate reactions in each compartment by
-    pair-wise comparison of reaction annotation objects. If two reactions have
-    any annotation elements in common they are considered duplicates of each
-    other.
+
+    Compare reactions in a pairwise manner.
+    First, if there are duplicate metabolites in the set of
+    metabolites of each reaction, add them to the set belonging to each
+    reaction respectively. Then, if the sets for each reaction are
+    identical, check the reversibility of each reaction:
+    - If both reactions differ in reversibility they are assumed to be
+      different.
+    - If both are reversible they are assumed to be identical.
+    - If both are irreversible, the upper bound and product metabolites
+      have to be identical for the reactions to be assumed to be identical.
 
     """
     ann = test_find_duplicate_reactions.annotation
     ann["data"] = basic.find_duplicate_reactions(model)
     ann["message"] = wrapper.fill(
-        """There are a total of {} reactions in the model which
-        have duplicates: {}""".format(len(ann["data"]), truncate(ann["data"])))
+        """Based on metabolites, directionality and compartment there are a
+        total of {} reactions in the model which have duplicates: {}""".format(
+            len(ann["data"]), truncate(ann["data"])))
     assert len(ann["data"]) == 0, ann["message"]
+
+
+@annotate(title="Reactions With Identical Genes", format_type="percent")
+def test_find_reactions_with_identical_genes(model):
+    """
+    Expect there to be zero duplicate reactions.
+
+    Identify reactions in a pairwise manner that use identical
+    sets of genes. It does *not* take into account a reaction's directionality,
+    compartment, metabolites or annotations.
+
+    The main reason for having this test is to help cleaning up merged models
+    or models from automated reconstruction pipelines as these are prone to
+    having identical reactions with identifiers from different namespaces.
+
+    Implementation:
+
+    Compare reactions in a pairwise manner and group reactions whose genes
+    are identical. Skip reactions with missing genes.
+
+    """
+    ann = test_find_reactions_with_identical_genes.annotation
+    duplicates, total = basic.find_reactions_with_identical_genes(model)
+    ann["data"] = duplicates
+    ann["metric"] = total / len(model.reactions)
+    ann["message"] = wrapper.fill(
+        """Based only on equal genes there are {} different groups of
+        identical reactions which corresponds to a total of {}
+        duplicated reactions in the model.""".format(len(duplicates), total))
+    assert total == 0, ann["message"]
 
 
 @annotate(title="Medium Components", format_type="count")

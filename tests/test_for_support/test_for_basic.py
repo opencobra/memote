@@ -374,6 +374,8 @@ def dup_rxns(base):
     """Provide a model with duplicate reactions"""
     met_a = cobra.Metabolite("a_c", compartment="c")
     met_b = cobra.Metabolite("b_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
     rxn_1 = cobra.Reaction("rxn1")
     dup_1 = cobra.Reaction("dup1")
     rxn_1.annotation["kegg.reaction"] = "HEX"
@@ -520,6 +522,125 @@ def rxns_with_two_false_substrates(base):
     base.add_reactions([rxn_1])
     base.add_boundary(met_c, type="custom", reaction_id="EX_c", lb=1, ub=1000)
     base.add_boundary(met_d, type="custom", reaction_id="EX_d", lb=1, ub=1000)
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_compartment(base):
+    """Provide a model with identical reactions in different compartments."""
+    met_a = cobra.Metabolite("a_c", compartment="c")
+    met_b = cobra.Metabolite("b_c", compartment="c")
+    met_c = cobra.Metabolite("a_m", compartment="m")
+    met_d = cobra.Metabolite("b_m", compartment="m")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "123"
+    met_d.annotation["inchikey"] = "456"
+    rxn_1 = cobra.Reaction("rxn1")
+    dup_1 = cobra.Reaction("dup1")
+    rxn_1.annotation["kegg.reaction"] = "HEX"
+    dup_1.annotation["kegg.reaction"] = "HEX"
+    rxn_1.add_metabolites({met_a: -1, met_b: 1})
+    dup_1.add_metabolites({met_c: -1, met_d: 1})
+    base.add_reactions([rxn_1, dup_1])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_irrev(base):
+    """
+    Provide a model with oppositely directional but irreversible reactions.
+
+    """
+    met_a = cobra.Metabolite("h2o_c", compartment="c")
+    met_b = cobra.Metabolite("methf_c", compartment="c")
+    met_c = cobra.Metabolite("5fthf_c", compartment="c")
+    met_d = cobra.Metabolite("h_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "789"
+    met_d.annotation["inchikey"] = "111"
+    FOMETRi = cobra.Reaction("FOMETRi")
+    THFAT = cobra.Reaction("THFAT")
+    FOMETRi.annotation["kegg.reaction"] = "R02300"
+    FOMETRi.annotation["brenda"] = "2.1.2.10"
+    THFAT.annotation["kegg.reaction"] = "R02300"
+    THFAT.annotation["brenda"] = "2.1.2.10"
+    FOMETRi.add_metabolites({met_c: 1, met_d: 1, met_a: -1, met_b: -1})
+    THFAT.add_metabolites({met_c: -1, met_d: -1, met_a: 1, met_b: 1})
+    base.add_reactions([FOMETRi, THFAT])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_rev(base):
+    """
+    Provide a model with oppositely directional but reversible reactions.
+
+    """
+    met_a = cobra.Metabolite("h2o_c", compartment="c")
+    met_b = cobra.Metabolite("methf_c", compartment="c")
+    met_c = cobra.Metabolite("5fthf_c", compartment="c")
+    met_d = cobra.Metabolite("h_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    met_b.annotation["inchikey"] = "456"
+    met_c.annotation["inchikey"] = "789"
+    met_d.annotation["inchikey"] = "111"
+    FOMETRi = cobra.Reaction("FOMETRi", upper_bound=1000, lower_bound=-1000)
+    THFAT = cobra.Reaction("THFAT", upper_bound=1000, lower_bound=-1000)
+    FOMETRi.annotation["kegg.reaction"] = "R02300"
+    FOMETRi.annotation["brenda"] = "2.1.2.10"
+    THFAT.annotation["kegg.reaction"] = "R02300"
+    THFAT.annotation["brenda"] = "2.1.2.10"
+    FOMETRi.add_metabolites({met_c: 1, met_d: 1, met_a: -1, met_b: -1})
+    THFAT.add_metabolites({met_c: -1, met_d: -1, met_a: 1, met_b: 1})
+    base.add_reactions([FOMETRi, THFAT])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def dup_rxns_irrev_exchanges(base):
+    """
+    Provide a model with duplicate exchanges.
+
+    """
+    met_a = cobra.Metabolite("A_c", compartment="c")
+    met_a.annotation["inchikey"] = "123"
+    ex1 = cobra.Reaction("ex1", upper_bound=1000, lower_bound=0)
+    ex2 = cobra.Reaction("ex2", upper_bound=1000, lower_bound=0)
+    ex1.add_metabolites({met_a: 1})
+    ex2.add_metabolites({met_a: 1})
+    base.add_reactions([ex1, ex2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def identical_genes(base):
+    """Provide a model with reactions with identical genes."""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'gene1 or gene2'
+    rxn_2 = cobra.Reaction("NXR")
+    rxn_2.gene_reaction_rule = 'gene1 or gene2'
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2.add_metabolites({met_1: 1, met_2: -1})
+    base.add_reactions([rxn_1, rxn_2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def different_genes(base):
+    """Provide a model with reactions with different genes."""
+    rxn_1 = cobra.Reaction("RXN1")
+    rxn_1.gene_reaction_rule = 'b2912'
+    rxn_2 = cobra.Reaction("NXR")
+    rxn_2.gene_reaction_rule = 'b2551'
+    met_1 = cobra.Metabolite("met1")
+    met_2 = cobra.Metabolite("met2")
+    rxn_1.add_metabolites({met_1: 1, met_2: -1})
+    rxn_2.add_metabolites({met_1: 1, met_2: -1})
+    base.add_reactions([rxn_1, rxn_2])
     return base
 
 
@@ -717,18 +838,46 @@ def test_find_duplicate_metabolites_in_compartments(model, num):
 
 @pytest.mark.parametrize("model, num", [
     ("empty", 0),
-    ("dup_rxns", 1),
-    ("dup_rxns_multiple_anns", 1),
-    ("dup_rxns_partial_matching_multiple_anns", 1),
-    ("dup_rxns_list_anns", 1),
-    ("dup_rxns_multiple_list_anns", 1),
+    ("dup_rxns", 2),
+    ("dup_rxns_multiple_anns", 2),
+    ("dup_rxns_partial_matching_multiple_anns", 2),
+    ("dup_rxns_list_anns", 2),
+    ("dup_rxns_multiple_list_anns", 2),
     ("dup_rxns_no_matching_multiple_anns", 0),
     ("dup_rxns_multiple_list_anns_no_match", 0),
+    ("dup_rxns_compartment", 2),
+    ("dup_rxns_irrev", 2),
     ("gpr_missing", 0)
 ], indirect=["model"])
+def test_find_reactions_with_partially_identical_annotations(model, num):
+    """Expect amount of duplicate reactions to be identified correctly."""
+    _, total = basic.find_reactions_with_partially_identical_annotations(model)
+    assert total == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("dup_rxns", 1),
+    ("dup_rxns_rev", 0),
+    ("dup_rxns_irrev", 0),
+    ("dup_rxns_compartment", 0),
+    ("dup_rxns_irrev_exchanges", 1),
+], indirect=["model"])
 def test_find_duplicate_reactions(model, num):
-    """Expect amount of duplicate metabolites to be identified correctly."""
+    """Expect amount of duplicate reactions to be identified correctly."""
     assert len(basic.find_duplicate_reactions(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("empty", 0),
+    ("identical_genes", 2),
+    ("different_genes", 0),
+    ("gpr_missing", 0)
+], indirect=["model"])
+def test_find_reactions_with_identical_genes(model, num):
+    """Expect amount of duplicate reactions to be identified correctly."""
+    _, total = basic.find_reactions_with_identical_genes(model)
+    assert total == num
 
 
 @pytest.mark.parametrize("model, num", [

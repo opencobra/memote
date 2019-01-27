@@ -74,7 +74,9 @@ cards:
     - test_find_transport_reactions
     - test_find_constrained_transport_reactions
     - test_find_candidate_irreversible_reactions
+    - test_find_reactions_with_partially_identical_annotations
     - test_find_duplicate_reactions
+    - test_find_reactions_with_identical_genes
   gpr_calculations:
     title: "Gene-Protein-Reaction (GPR) Associations"
     cases:
