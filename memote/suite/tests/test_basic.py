@@ -583,7 +583,8 @@ def test_find_duplicate_metabolites_in_compartments(model):
 
 @annotate(
     title="Reactions With Partially Identical Annotations",
-    format_type="count")
+    format_type="percent"
+)
 def test_find_reactions_with_partially_identical_annotations(model):
     """
     Expect there to be zero duplicate reactions.
@@ -611,6 +612,7 @@ def test_find_reactions_with_partially_identical_annotations(model):
     duplicates, total = \
         basic.find_reactions_with_partially_identical_annotations(model)
     ann["data"] = duplicates
+    ann["metric"] = total / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based on annotations there are {} different groups of overlapping
         annotation which corresponds to a total of {} duplicated reactions in
@@ -654,7 +656,7 @@ def test_find_duplicate_reactions(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Reactions With Identical Genes", format_type="count")
+@annotate(title="Reactions With Identical Genes", format_type="percent")
 def test_find_reactions_with_identical_genes(model):
     """
     Expect there to be zero duplicate reactions.
@@ -676,6 +678,7 @@ def test_find_reactions_with_identical_genes(model):
     ann = test_find_reactions_with_identical_genes.annotation
     duplicates, total = basic.find_reactions_with_identical_genes(model)
     ann["data"] = duplicates
+    ann["metric"] = total / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based only on equal genes there are {} different groups of
         identical reactions which corresponds to a total of {}

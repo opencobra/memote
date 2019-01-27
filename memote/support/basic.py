@@ -329,15 +329,19 @@ def find_reactions_with_partially_identical_annotations(model):
     # Compute the intersection between annotations and record the matching
     # reaction identifiers.
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
-        mutual_pair = ann_a & ann_b
+        mutual_pair = tuple(ann_a & ann_b)
         if len(mutual_pair) > 0:
             duplicates.setdefault(mutual_pair, set())
             duplicates[mutual_pair].update([rxn_a.id, rxn_b.id])
-    # Find the cardinality of the set of reaction identifiers.
-    num_duplicated = len({
-        rxn_id for group in duplicates.values() for rxn_id in group
-    })
-    return duplicates, num_duplicated
+    # Transform the object for JSON compatibility
+    num_duplicated = set()
+    duplicated = {}
+    for key in duplicates:
+        # Object keys must be strings in JSON.
+        new_key = ",".join(sorted("{}:{}".format(ns, term) for ns, term in key))
+        duplicated[new_key] = rxns = list(duplicates[key])
+        num_duplicated.update(rxns)
+    return duplicated, len(num_duplicated)
 
 
 def map_metabolites_to_structures(metabolites, compartments):
@@ -491,12 +495,18 @@ def find_reactions_with_identical_genes(model):
         if rxn_a.genes is None or rxn_b.genes is None:
             continue
         if rxn_a.genes == rxn_b.genes:
-            duplicates.setdefault(rxn_a.genes, set())
-            duplicates[rxn_a.genes].update([rxn_a.id, rxn_b.id])
-    num_duplicates = len({
-        rxn_id for group in duplicates.values() for rxn_id in group
-    })
-    return duplicates, num_duplicates
+            identifiers = rxn_a.genes
+            duplicates.setdefault(identifiers, set())
+            duplicates[identifiers].update([rxn_a.id, rxn_b.id])
+    # Transform the object for JSON compatibility
+    num_duplicated = set()
+    duplicated = {}
+    for key in duplicates:
+        # Object keys must be strings in JSON.
+        new_key = ",".join(sorted(g.id for g in key))
+        duplicated[new_key] = rxns = list(duplicates[key])
+        num_duplicated.update(rxns)
+    return duplicated, len(num_duplicated)
 
 
 def check_transport_reaction_gpr_presence(model):
