@@ -20,20 +20,51 @@
 from __future__ import absolute_import
 
 import logging
+import os
+from io import open
 
 import pytest
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.reporting import (
     SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
+from memote.support import validation as val
 
-__all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
+__all__ = ("validate_model", "test_model", "snapshot_report", "diff_report",
+           "history_report")
 
 LOGGER = logging.getLogger(__name__)
 
 
-def test_model(model, results=False, pytest_args=None,
+def validate_model(path):
+    """
+    Validate a model structurally and optionally store results as JSON.
+
+    Parameters
+    ----------
+    path :
+        Path to model file.
+
+    Returns
+    -------
+    tuple
+        cobra.Model
+            The metabolic model under investigation.
+        tuple
+            A tuple reporting on the SBML level, version, and FBC package
+            version used (if any) in the SBML document.
+        dict
+            A simple dictionary containing a list of errors and warnings.
+
+    """
+    notifications = {"warnings": [], "errors": []}
+    model, sbml_ver = val.load_cobra_model(path, notifications)
+    return model, sbml_ver, notifications
+
+
+def test_model(model, sbml_version=None, results=False, pytest_args=None,
                exclusive=None, skip=None, experimental=None):
     """
     Test a model and optionally store results as JSON.
@@ -42,6 +73,8 @@ def test_model(model, results=False, pytest_args=None,
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    sbml_version: tuple, optional
+        A tuple reporting on the level, version, and FBC use of the SBML file.
     results : bool, optional
         Whether to return the results in addition to the return code.
     pytest_args : list, optional
@@ -66,7 +99,8 @@ def test_model(model, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    plugin = ResultCollectionPlugin(model, exclusive=exclusive, skip=skip,
+    plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
+                                    exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)
     code = pytest.main(pytest_args, plugins=[plugin])
     if results:
@@ -127,7 +161,7 @@ def diff_report(diff_results, config=None, html=True):
 
     Parameters
     ----------
-    result : memote.MemoteResult
+    diff_results : iterable of memote.MemoteResult
         Nested dictionary structure as returned from the test suite.
     config : dict, optional
         The final test report configuration (default None).
@@ -142,3 +176,25 @@ def diff_report(diff_results, config=None, html=True):
         return report.render_html()
     else:
         return report.render_json()
+
+
+def validation_report(path, notifications, filename):
+    """
+    Generate a validation report from a notification object.
+
+    Parameters
+    ----------
+    path : string
+        Path to model file.
+    notifications : dict
+        A simple dictionary structure containing a list of errors and warnings.
+
+    """
+    env = Environment(
+        loader=PackageLoader('memote.suite', 'templates'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    template = env.get_template('validation_template.html')
+    model = os.path.basename(path)
+    with open(filename, "w") as file_h:
+        file_h.write(template.render(model=model, notifications=notifications))

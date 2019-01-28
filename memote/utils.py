@@ -32,7 +32,7 @@ from depinfo import print_dependencies
 __all__ = ("register_with", "annotate", "get_ids",
            "get_ids_and_bounds", "truncate", "wrapper",
            "log_json_incompatible_types", "show_versions", "jsonify",
-           "is_modified")
+           "is_modified", "stdout_notifications")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -278,3 +278,19 @@ def is_modified(path, commit):
 
     """
     return path in commit.stats.files
+
+
+def stdout_notifications(notifications):
+    """
+    Print each entry of errors and warnings to stdout.
+
+    Parameters
+    ----------
+    notifications: dict
+        A simple dictionary structure containing a list of errors and warnings.
+
+    """
+    for error in notifications["errors"]:
+        LOGGER.error(error)
+    for warn in notifications["warnings"]:
+        LOGGER.warning(warn)

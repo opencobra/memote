@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core"
+      groups:required="false"
+      level="3"
+      sboTerm="SBO:0000624"
+      version="1"
+      xmlns:groups="http://www.sbml.org/sbml/level3/version1/groups/version1">
+  <model fbc:strict="true" id="tiny_invalid"
+         metaid="tiny_invalid" name="This is a tiny invalid test model">
+  </model>
+</sbml>

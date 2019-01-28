@@ -32,6 +32,7 @@ from sqlalchemy.exc import ArgumentError
 import os
 
 import memote.suite.api as api
+import memote.utils as utils
 import memote.suite.results as managers
 import memote.suite.cli.callbacks as callbacks
 from memote.suite.cli import CONTEXT_SETTINGS
@@ -50,8 +51,7 @@ def report():
 @report.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
-                envvar="MEMOTE_MODEL",
-                callback=callbacks.validate_model)
+                envvar="MEMOTE_MODEL")
 @click.option("--filename", type=click.Path(exists=False, writable=True),
               default="index.html", show_default=True,
               help="Path for the HTML report output.")
@@ -94,6 +94,14 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
+    model_obj, sbml_ver, notifications = api.validate_model(
+        model)
+    if model_obj is None:
+        LOGGER.critical(
+            "The model could not be loaded due to the following SBML errors.")
+        utils.stdout_notifications(notifications)
+        api.validation_report(model, notifications, filename)
+        sys.exit(1)
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
@@ -102,10 +110,10 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
-    model.solver = solver
-    _, results = api.test_model(model, results=True, pytest_args=pytest_args,
-                                skip=skip, exclusive=exclusive,
-                                experimental=experimental)
+    model_obj.solver = solver
+    _, results = api.test_model(model_obj, sbml_version=sbml_ver, results=True,
+                                pytest_args=pytest_args, skip=skip,
+                                exclusive=exclusive, experimental=experimental)
     with open(filename, "w", encoding="utf-8") as file_handle:
         LOGGER.info("Writing snapshot report to '%s'.", filename)
         file_handle.write(api.snapshot_report(results, config))
@@ -135,8 +143,6 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
     """Generate a report over a model's git commit history."""
-    if model is None:
-        raise click.BadParameter("No 'model' path given or configured.")
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     try:
@@ -165,9 +171,11 @@ def history(location, model, filename, deployment, custom_config):
         file_handle.write(report)
 
 
-def _test_diff(model, pytest_args, skip, exclusive, experimental):
+def _test_diff(model_and_model_ver_tuple, pytest_args, skip,
+               exclusive, experimental):
+    model, sbml_ver = model_and_model_ver_tuple
     _, diff_results = api.test_model(
-        model, results=True, pytest_args=pytest_args,
+        model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
         skip=skip, exclusive=exclusive, experimental=experimental)
     return diff_results
 
@@ -228,33 +236,43 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
         config.merge(ReportConfiguration.load(custom))
     # Build the diff report specific data structure
     diff_results = dict()
-    loaded_models = list()
+    model_and_model_ver_tuple = list()
     for model_path in models:
         try:
             model_filename = os.path.basename(model_path)
             diff_results.setdefault(model_filename, dict())
-            model = callbacks._load_model(model_path)
+            model, model_ver, notifications = api.validate_model(model_path)
+            if model is None:
+                head, tail = os.path.split(filename)
+                report_path = os.path.join(
+                    head, '{}_structural_report.html'.format(model_filename))
+                api.validation_report(
+                    model_path, notifications, report_path)
+                LOGGER.critical(
+                    "The model {} could not be loaded due to SBML errors "
+                    "reported in {}.".format(model_filename, report_path))
+                continue
             model.solver = solver
-            loaded_models.append(model)
+            model_and_model_ver_tuple.append((model, model_ver))
         except (IOError, SBMLError):
             LOGGER.debug(exc_info=True)
             LOGGER.warning("An error occurred while loading the model '%s'. "
                            "Skipping.", model_filename)
     # Abort the diff report unless at least two models can be loaded
     # successfully.
-    if len(loaded_models) < 2:
+    if len(model_and_model_ver_tuple) < 2:
         LOGGER.critical(
             "Out of the %d provided models only %d could be loaded. Please, "
             "check if the models that could not be loaded are valid SBML. "
             "Aborting.",
-            len(models), len(loaded_models))
+            len(models), len(model_and_model_ver_tuple))
         sys.exit(1)
     # Running pytest in individual processes to avoid interference
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
     pool = Pool(min(len(models), os.cpu_count()))
-    results = pool.map(partial_test_diff, loaded_models)
+    results = pool.map(partial_test_diff, model_and_model_ver_tuple)
 
     for model_path, result in zip(models, results):
         model_filename = os.path.basename(model_path)

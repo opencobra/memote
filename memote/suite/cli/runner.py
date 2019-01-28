@@ -34,7 +34,6 @@ import click
 import click_log
 import git
 import travis.encrypt as te
-from cobra.io import read_sbml_model
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
@@ -50,7 +49,7 @@ from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
-from memote.utils import is_modified
+from memote.utils import is_modified, stdout_notifications
 
 
 LOGGER = logging.getLogger()
@@ -126,7 +125,8 @@ def cli():
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment, skip_unchanged):
+        skip, solver, experimental, custom_tests, deployment,
+        skip_unchanged):
     """
     Run the test suite on a single model and collect results.
 
@@ -164,10 +164,16 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     # Check if the model can be loaded at all.
-    model = callbacks.validate_model(None, None, model)
+    model, sbml_ver, notifications = api.validate_model(model)
+    if model is None:
+        LOGGER.critical(
+            "The model could not be loaded due to the following SBML errors.")
+        stdout_notifications(notifications)
+        sys.exit(1)
     model.solver = solver
     code, result = api.test_model(
-        model=model, results=True, pytest_args=pytest_args, skip=skip,
+        model=model, sbml_version=sbml_ver, results=True,
+        pytest_args=pytest_args, skip=skip,
         exclusive=exclusive, experimental=experimental)
     if collect:
         if repo is None:
@@ -234,18 +240,18 @@ def new(directory, replay):
 def _model_from_stream(stream, filename):
     if filename.endswith(".gz"):
         with GzipFile(fileobj=stream) as file_handle:
-            model = read_sbml_model(file_handle)
+            model, sbml_ver, notifications = api.validate_model(file_handle)
     else:
-        model = read_sbml_model(stream)
-    return model
+        model, sbml_ver, notifications = api.validate_model(stream)
+    return model, sbml_ver, notifications
 
 
-def _test_history(model, solver, manager, commit, pytest_args, skip,
+def _test_history(model, sbml_ver, solver, manager, commit, pytest_args, skip,
                   exclusive, experimental):
     model.solver = solver
     _, result = api.test_model(
-        model, results=True, pytest_args=pytest_args, skip=skip,
-        exclusive=exclusive, experimental=experimental)
+        model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
+        skip=skip, exclusive=exclusive, experimental=experimental)
     manager.store(result, commit=commit)
 
 
@@ -300,8 +306,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
        for those only. This can also be achieved by supplying a commit range.
 
     """
-    if model is None:
-        raise click.BadParameter("No 'model' path given or configured.")
+    callbacks.validate_path(model)
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     if "--tb" not in pytest_args:
@@ -364,11 +369,18 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit))
         blob = cmt.tree[model]
-        model_obj = _model_from_stream(blob.data_stream, blob.name)
+        model_obj, sbml_ver, notifications = _model_from_stream(
+            blob.data_stream, blob.name
+        )
+        if model_obj is None:
+            LOGGER.critical("The model could not be loaded due to the "
+                            "following SBML errors.")
+            stdout_notifications(notifications)
+            continue
         proc = Process(
             target=_test_history,
-            args=(model_obj, solver, manager, commit, pytest_args, skip,
-                  exclusive, experimental))
+            args=(model_obj, sbml_ver, solver, manager, commit,
+                  pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()
     # Copy back all new and modified files and add them to the index.
