@@ -418,4 +418,4 @@ def test_biomass_specific_sbo_presence(model):
         'biomass production': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         ))
-    assert len(ann["data"]) == len(biomass), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
