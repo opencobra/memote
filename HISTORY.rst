@@ -46,6 +46,7 @@ Next Release
   identical genes.
 * Refactor test that identifies duplicate metabolites to use for inchi
   strings in addition to inchikeys.
+* Round score to and display a single decimal value.
 
 0.8.11 (2019-01-07)
 -------------------
