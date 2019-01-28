@@ -47,6 +47,7 @@ Next Release
 * Refactor test that identifies duplicate metabolites to use for inchi
   strings in addition to inchikeys.
 * Round score to and display a single decimal value.
+* Fix bug that would show a test as errored whenever it was marked as skipped.
 * Read SBML files with modified parser that can collect the level, version and
   whether the FBC package is used.
 * Validate the SBML structure with the libSBML python API if the parser errors
