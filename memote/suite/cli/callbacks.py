@@ -22,41 +22,14 @@ from __future__ import absolute_import
 import shlex
 import sys
 import logging
-import warnings
 
 import click
 import git
-from cobra.io import read_sbml_model
 
 from memote.experimental import ExperimentConfiguration
 
+
 LOGGER = logging.getLogger(__name__)
-
-
-def _load_model(filename):
-    """
-    Load the model defined in SBMLFBCv2.
-
-    Loading the model uses Cobrapy which has native support for reading and
-    writing SBML with FBCv2.
-
-    Parameters
-    ----------
-    filename: click.Path
-
-    """
-    # TODO: Record the SBML warnings and add them to the report.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        return read_sbml_model(filename)
-
-
-def validate_path(value):
-    """Check if the model path exists."""
-    if value is not None:
-        pass
-    else:
-        raise click.BadParameter("No 'model' path given or configured.")
 
 
 def validate_collect(context, param, value):

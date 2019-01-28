@@ -34,7 +34,6 @@ import click
 import click_log
 import git
 import travis.encrypt as te
-from cobra.io import read_sbml_model
 from cookiecutter.main import cookiecutter, get_user_config
 from github import (
     Github, BadCredentialsException, UnknownObjectException, GithubException)
@@ -50,7 +49,7 @@ from memote.suite.cli import CONTEXT_SETTINGS
 from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
-from memote.utils import is_modified, stout_notifications
+from memote.utils import is_modified, stdout_notifications
 
 
 LOGGER = logging.getLogger()
@@ -165,14 +164,15 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
     # Check if the model can be loaded at all.
-    callbacks.validate_path(model)
-    model, model_ver, notifications = api.validate_model(model, results=True)
+    model, sbml_ver, notifications = api.validate_model(model)
     if model is None:
-        stout_notifications(notifications)
+        LOGGER.critical(
+            "The model could not be loaded due to the following SBML errors.")
+        stdout_notifications(notifications)
         sys.exit(1)
     model.solver = solver
     code, result = api.test_model(
-        model=model, model_ver=model_ver, results=True,
+        model=model, sbml_version=sbml_ver, results=True,
         pytest_args=pytest_args, skip=skip,
         exclusive=exclusive, experimental=experimental)
     if collect:
@@ -240,19 +240,17 @@ def new(directory, replay):
 def _model_from_stream(stream, filename):
     if filename.endswith(".gz"):
         with GzipFile(fileobj=stream) as file_handle:
-            model, model_ver, notifications = api.validate_model(
-                file_handle, results=True)
+            model, sbml_ver, notifications = api.validate_model(file_handle)
     else:
-        model, model_ver, notifications = api.validate_model(
-            stream, results=True)
-    return model, model_ver, notifications
+        model, sbml_ver, notifications = api.validate_model(stream)
+    return model, sbml_ver, notifications
 
 
-def _test_history(model, model_ver, solver, manager, commit, pytest_args, skip,
+def _test_history(model, sbml_ver, solver, manager, commit, pytest_args, skip,
                   exclusive, experimental):
     model.solver = solver
     _, result = api.test_model(
-        model, model_ver=model_ver, results=True, pytest_args=pytest_args,
+        model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
         skip=skip, exclusive=exclusive, experimental=experimental)
     manager.store(result, commit=commit)
 
@@ -371,15 +369,17 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         LOGGER.info(
             "Running the test suite for commit '{}'.".format(commit))
         blob = cmt.tree[model]
-        model_obj, model_ver, notifications = _model_from_stream(
+        model_obj, sbml_ver, notifications = _model_from_stream(
             blob.data_stream, blob.name
         )
         if model_obj is None:
-            stout_notifications(notifications)
-            sys.exit(1)
+            LOGGER.critical("The model could not be loaded due to the "
+                            "following SBML errors.")
+            stdout_notifications(notifications)
+            continue
         proc = Process(
             target=_test_history,
-            args=(model_obj, model_ver, solver, manager, commit,
+            args=(model_obj, sbml_ver, solver, manager, commit,
                   pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()

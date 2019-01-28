@@ -94,12 +94,13 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
-    callbacks.validate_path(model)
-    model_obj, model_ver, notifications = api.validate_model(
-        model, results=True)
+    model_obj, sbml_ver, notifications = api.validate_model(
+        model)
     if model_obj is None:
+        LOGGER.critical(
+            "The model could not be loaded due to the following SBML errors.")
+        utils.stdout_notifications(notifications)
         api.validation_report(model, notifications, filename)
-        utils.stout_notifications(notifications)
         sys.exit(1)
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args
@@ -110,7 +111,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
     model_obj.solver = solver
-    _, results = api.test_model(model_obj, model_ver=model_ver, results=True,
+    _, results = api.test_model(model_obj, sbml_version=sbml_ver, results=True,
                                 pytest_args=pytest_args, skip=skip,
                                 exclusive=exclusive, experimental=experimental)
     with open(filename, "w", encoding="utf-8") as file_handle:
@@ -142,7 +143,6 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
     """Generate a report over a model's git commit history."""
-    callbacks.validate_path(model)
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     try:
@@ -173,10 +173,9 @@ def history(location, model, filename, deployment, custom_config):
 
 def _test_diff(model_and_model_ver_tuple, pytest_args, skip,
                exclusive, experimental):
-    model = model_and_model_ver_tuple[0]
-    model_ver = model_and_model_ver_tuple[1]
+    model, sbml_ver = model_and_model_ver_tuple
     _, diff_results = api.test_model(
-        model, model_ver=model_ver, results=True, pytest_args=pytest_args,
+        model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
         skip=skip, exclusive=exclusive, experimental=experimental)
     return diff_results
 
@@ -240,11 +239,9 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     model_and_model_ver_tuple = list()
     for model_path in models:
         try:
-            callbacks.validate_path(model_path)
             model_filename = os.path.basename(model_path)
             diff_results.setdefault(model_filename, dict())
-            model, model_ver, notifications = api.validate_model(
-                model_path, results=True)
+            model, model_ver, notifications = api.validate_model(model_path)
             if model is None:
                 head, tail = os.path.split(filename)
                 report_path = os.path.join(
