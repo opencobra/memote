@@ -45,7 +45,7 @@ class ResultCollectionPlugin(object):
     # Seems brittle, can we do better?
     _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
-    def __init__(self, model, experimental_config=None,
+    def __init__(self, model, sbml_version=None, experimental_config=None,
                  exclusive=None, skip=None, **kwargs):
         """
         Collect and store values during testing.
@@ -54,6 +54,9 @@ class ResultCollectionPlugin(object):
         ----------
         model : cobra.Model
             The metabolic model under investigation.
+        sbml_version: tuple, optional
+            A tuple reporting on the level, version, and FBC use of
+            the SBML file.
         experimental_config : memote.ExperimentConfiguration, optional
             A description of experiments.
         exclusive : iterable, optional
@@ -65,6 +68,7 @@ class ResultCollectionPlugin(object):
         """
         super(ResultCollectionPlugin, self).__init__(**kwargs)
         self._model = model
+        self._sbml_ver = sbml_version
         self._exp_config = experimental_config
         self.results = MemoteResult()
         self.results.add_environment_information(self.results.meta)
@@ -159,3 +163,8 @@ class ResultCollectionPlugin(object):
         """Provide each test case with a pristine model."""
         with self._model as model:
             yield model
+
+    @pytest.fixture(scope="session")
+    def sbml_version(self):
+        """Provide SBML level, version, and FBC use."""
+        return self._sbml_ver
