@@ -20,11 +20,11 @@
 from __future__ import absolute_import
 
 import logging
-
+import os
 from io import open
+
 import pytest
 from jinja2 import Environment, PackageLoader, select_autoescape
-import os
 
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
@@ -32,11 +32,13 @@ from memote.suite.reporting import (
     SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
 from memote.support import validation as val
 
-__all__ = ("test_model", "snapshot_report", "diff_report", "history_report")
+__all__ = ("validate_model", "test_model", "snapshot_report", "diff_report",
+           "history_report")
 
 LOGGER = logging.getLogger(__name__)
 
-def validate_model(path, results=False):
+
+def validate_model(path):
     """
     Validate a model structurally and optionally store results as JSON.
 
@@ -44,32 +46,25 @@ def validate_model(path, results=False):
     ----------
     path :
         Path to model file.
-    results : bool, optional
-        Whether to return the results in addition to the return code.
 
     Returns
     -------
-    model : cobra.Model
-        The metabolic model under investigation.
-    model_ver : tuple, optional
-        A tuple reporting on the level, version, and FBC use of the SBML file.
-    notifications: dict, optional
-        A simple dictionary structure containing a list of errors and warnings.
+    tuple
+        cobra.Model
+            The metabolic model under investigation.
+        tuple
+            A tuple reporting on the SBML level, version, and FBC package
+            version used (if any) in the SBML document.
+        dict
+            A simple dictionary containing a list of errors and warnings.
 
     """
     notifications = {"warnings": [], "errors": []}
-    model, model_ver = val.run_cobrapy_validation(path, notifications)
-
-    if len(notifications["errors"]) > 1:
-        val.run_libsbml_validation(notifications)
-
-    if results:
-        return model, model_ver, notifications
-    else:
-        return model
+    model, sbml_ver = val.load_cobra_model(path, notifications)
+    return model, sbml_ver, notifications
 
 
-def test_model(model, model_ver=None, results=False, pytest_args=None,
+def test_model(model, sbml_version=None, results=False, pytest_args=None,
                exclusive=None, skip=None, experimental=None):
     """
     Test a model and optionally store results as JSON.
@@ -78,7 +73,7 @@ def test_model(model, model_ver=None, results=False, pytest_args=None,
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    model_ver: tuple, optional
+    sbml_version: tuple, optional
         A tuple reporting on the level, version, and FBC use of the SBML file.
     results : bool, optional
         Whether to return the results in addition to the return code.
@@ -104,7 +99,7 @@ def test_model(model, model_ver=None, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
-    plugin = ResultCollectionPlugin(model, model_ver=model_ver,
+    plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
                                     exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)
     code = pytest.main(pytest_args, plugins=[plugin])
@@ -166,7 +161,7 @@ def diff_report(diff_results, config=None, html=True):
 
     Parameters
     ----------
-    result : memote.MemoteResult
+    diff_results : iterable of memote.MemoteResult
         Nested dictionary structure as returned from the test suite.
     config : dict, optional
         The final test report configuration (default None).
@@ -202,4 +197,4 @@ def validation_report(path, notifications, filename):
     template = env.get_template('validation_template.html')
     model = os.path.basename(path)
     with open(filename, "w") as file_h:
-        file_h.write(template.render(model=model ,notifications=notifications))
+        file_h.write(template.render(model=model, notifications=notifications))
