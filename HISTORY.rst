@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Add seed.reaction namespace to the reaction annotation databases.
 * Change SBO annotation tests to check for multiple terms until we can properly 
   handle the ontology.
 * Remove 'Steady-state flux solution vectors' test case.
