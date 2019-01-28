@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.9.0 (2019-01-28)
+------------
 * Change SBO annotation tests to check for multiple terms until we can properly 
   handle the ontology.
 * Remove 'Steady-state flux solution vectors' test case.
