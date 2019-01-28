@@ -47,6 +47,7 @@ Next Release
 * Refactor test that identifies duplicate metabolites to use for inchi
   strings in addition to inchikeys.
 * Round score to and display a single decimal value.
+* Fix bug that would show a test as errored whenever it was marked as skipped.
 
 0.8.11 (2019-01-07)
 -------------------
