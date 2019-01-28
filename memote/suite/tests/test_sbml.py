@@ -17,32 +17,35 @@
 
 """Tests the level, version and FBC usage of the loaded SBML file."""
 
+from __future__ import absolute_import
+
 from memote.utils import annotate, wrapper
 
+
 @annotate(title="SBML Level and Version", format_type="raw")
-def test_sbml_level(model_ver):
+def test_sbml_level(sbml_version):
     """
-    Expect the SBML to be provided as level 3 version 1.
+    Expect the SBML to be at least level 3 version 2.
 
     This test reports if the model file is represented in the latest edition
     (level) of the Systems Biology Markup Language (SBML) which is Level 3,
-    and the latest version, which is Version 1. Please note that memote will
-    work best with SBML L3V1!
+    and at least version 1.
 
     Implementation:
-    When parsing the model files collect the 'level' and 'version' attributes
-    and expose them to this test as a fixture.
+    The level and version are parsed directly from the SBML document.
 
     """
-    version_tag = '{}.{}'.format(model_ver[0], model_ver[1])
+    version_tag = 'SBML Level {} Version {}'.format(
+        sbml_version[0], sbml_version[1])
     ann = test_sbml_level.annotation
     ann["data"] = version_tag
     ann["message"] = wrapper.fill(
-        """The SBML file uses Level.Version: {}""".format(ann["data"]))
-    assert ann["data"] == '3.1', ann["message"]
+        """The SBML file uses: {}""".format(ann["data"]))
+    assert sbml_version[:2] >= (3, 1), ann["message"]
+
 
 @annotate(title="FBC enabled", format_type="raw")
-def test_fbc_presence(model_ver):
+def test_fbc_presence(sbml_version):
     """
     Expect the FBC plugin to be present.
 
@@ -55,13 +58,14 @@ def test_fbc_presence(model_ver):
     and update it based on user input.
 
     Implementation:
-    When parsing the model files collect the 'fbc:required' attribute
-    and expose it to this test as a fixture.
+    Parse the state of the FBC plugin from the SBML document.
 
     """
-    fbc_present = model_ver[2] is not None
-    ann = test_sbml_level.annotation
+    fbc_present = sbml_version[2] is not None
+    ann = test_fbc_presence.annotation
     ann["data"] = fbc_present
-    ann["message"] = wrapper.fill(
-        """The FBC package is present: {}""".format(ann["data"]))
+    if fbc_present:
+        ann["message"] = wrapper.fill("The FBC package *is* used.")
+    else:
+        ann["message"] = wrapper.fill("The FBC package is *not* used.")
     assert fbc_present, ann["message"]
