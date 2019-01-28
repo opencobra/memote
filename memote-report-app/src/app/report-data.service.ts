@@ -95,6 +95,7 @@ export class ReportDataService {
       if (data['tests'][test]['message'] instanceof Object) {
         for (const param of Object.keys(data['tests'][test]['result'])) {
           const newID = test + ':' + param;
+          console.log(data['tests'][test]['result'][param]);
           this.allTests.push(
               new TestResult(
                 newID,
