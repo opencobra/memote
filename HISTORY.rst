@@ -3,25 +3,28 @@ History
 
 Next Release
 ------------
+
+0.9.1 (2019-01-28)
+------------------
 * Add ``seed.reaction`` namespace to the reaction annotation databases.
 
 0.9.0 (2019-01-28)
-------------
-* Change SBO annotation tests to check for multiple terms until we can properly 
+------------------
+* Change SBO annotation tests to check for multiple terms until we can properly
   handle the ontology.
 * Remove 'Steady-state flux solution vectors' test case.
 * Improve the descriptions of stoichiometric matrix test cases.
 * Fix the discovery or orphan and dead-end metabolites.
-* Improve detection of metabolites that are not consumed or not produced by 
+* Improve detection of metabolites that are not consumed or not produced by
   only opening exchange reactions not other boundary reactions.
 * Thematically reorganize the test cases in the config.
-* Instead of min/max bounds consider the median bounds for testing (un-)bounded 
+* Instead of min/max bounds consider the median bounds for testing (un-)bounded
   fluxes.
 * Use a model context for every test case.
 * Fix bug which involved find_transport_reactions to ignore compartments.
 * Internal change to use model context rather than copy.
 * Internal changes to JSON structure.
-* Remove tests for metabolite inconsistency with closed bounds. The results 
+* Remove tests for metabolite inconsistency with closed bounds. The results
   are a subset only of the unconserved metabolites.
 * Make the consistency tests account better for numeric instability.
 * Add the GLPK exact solver as a possible option.
@@ -32,12 +35,12 @@ Next Release
 * Clearly indicate weights/ multipliers by introducing margenta badges next to each test in the report.
 * In the reports, improve the descriptions of the 'Help' section and rename this section to 'Readme'.
 * Rename the principal sections and include a brief explanation for each.
-* Fix bug that would show a test as 'Errored' although it only failed. Fixed by making condition in errorFailsafe 
+* Fix bug that would show a test as 'Errored' although it only failed. Fixed by making condition in errorFailsafe
   in test-result.model.ts more specific for cases where data is undefined or null.
 * Fix bug that would make parametrized tests disappear from the report if they had errored or if for some reason their 'data' attribute
   was undefined.
 * Unpin pytest (require >= 4.0) and adjust some internal mechanics accordingly.
-* Display an alternative message if some biomass components do not contain a 
+* Display an alternative message if some biomass components do not contain a
   formula.
 * Extend the annotations tests by a check for full length InChI strings.
 * Fix a bug in ``Unrealistic Growth Rate In Default Medium`` which reported the
