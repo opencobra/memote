@@ -19,24 +19,25 @@
 
 from __future__ import absolute_import
 
-import os
+from os.path import join, dirname
+
+import libsbml
 import pytest
 
 import memote.support.validation as val
 
-my_path = os.path.abspath(os.path.dirname(__file__))
-sbml_valid  = os.path.join(my_path, "data/validation/tiny_FBC.xml")
-sbml_invalid = os.path.join(my_path, "data/validation/tiny_FBC2.xml")
+sbml_valid = join(dirname(__file__), "data", "validation", "tiny_FBC.xml")
+sbml_invalid = join(dirname(__file__), "data", "validation", "tiny_FBC2.xml")
 
 
 @pytest.mark.parametrize("filename, expected", [
     (sbml_valid, [0, 1, False]),
-    (sbml_invalid, [1, 0, True])])
-def test_run_cobrapy_validation(filename, expected):
+    (sbml_invalid, [2, 0, True])])
+def test_load_cobra_model(filename, expected):
     notifications = {"warnings": [], "errors": []}
-    model, _ = val.run_cobrapy_validation(filename, notifications)
+    model, _ = val.load_cobra_model(filename, notifications)
     assert len(notifications["errors"]) == expected[0]
-    assert len(notifications["warnings"]) == expected[1];
+    assert len(notifications["warnings"]) == expected[1]
     assert (model is None) == expected[2]
 
 
@@ -45,6 +46,7 @@ def test_run_cobrapy_validation(filename, expected):
     (sbml_invalid, [1, 0])])
 def test_run_libsbml_validation(filename, expected):
     notifications = {"warnings": [], "errors": []}
-    val.run_libsbml_validation(filename, notifications)
+    document = libsbml.readSBML(filename)
+    val.run_sbml_validation(document, notifications)
     assert len(notifications["errors"]) == expected[0]
-    assert len(notifications["warnings"]) == expected[1];
+    assert len(notifications["warnings"]) == expected[1]

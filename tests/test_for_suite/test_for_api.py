@@ -102,7 +102,7 @@ def test_diff_report_file():
 
 def test_validate_model(model_file):
     """Expect a valid returned model."""
-    model = api.validate_model(model_file, results=False)
+    model, _, _ = api.validate_model(model_file)
     assert model.id == "e_coli_core"
     assert len(model.metabolites) == 72
     assert len(model.reactions) == 95
