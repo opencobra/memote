@@ -53,6 +53,7 @@ def specific_sbo_term(base):
     base.add_reactions([rxn])
     return base
 
+
 @register_with(MODEL_REGISTRY)
 def multiple_sbo_terms(base):
     met = cobra.Metabolite(id='met_c', name="Met")
@@ -64,6 +65,17 @@ def multiple_sbo_terms(base):
     rxn.gene_reaction_rule = '(gene1)'
     base.add_reactions([rxn])
     return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_sbo_term(base):
+    met = cobra.Metabolite(id='met_c', name="Met")
+    rxn = cobra.Reaction(id='RXN', name="Rxn")
+    rxn.add_metabolites({met: -1})
+    rxn.annotation = {'sbo': 'SBO:0000629'}
+    base.add_reactions([rxn])
+    return base
+
 
 @pytest.mark.parametrize("model, num, components", [
     ("no_annotations", 2, "metabolites"),
@@ -81,6 +93,7 @@ def test_find_components_without_sbo_terms(model, num, components):
     ("specific_sbo_term", 0, "metabolites", "SBO:1"),
     ("specific_sbo_term", 1, "reactions", "SBO:1"),
     ("specific_sbo_term", 1, "genes", "SBO:1"),
+    ("biomass_sbo_term", 0, "reactions", "SBO:0000629"),
     ("multiple_sbo_terms", 0, "metabolites", ["SBO:1","SBO:2","SBO:3"]),
     ("multiple_sbo_terms", 1, "reactions", ["SBO:1","SBO:2","SBO:3"]),
     ("multiple_sbo_terms", 1, "genes", ["SBO:1","SBO:2","SBO:3"])

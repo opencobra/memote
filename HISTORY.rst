@@ -7,6 +7,7 @@ Next Release
 0.9.1 (2019-01-28)
 ------------------
 * Add ``seed.reaction`` namespace to the reaction annotation databases.
+* Fix bug that would lead to biomass SBO annotations not being reported.
 
 0.9.0 (2019-01-28)
 ------------------
