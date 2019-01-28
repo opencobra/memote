@@ -109,6 +109,7 @@ def rxn_each_present(base):
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.annotation = {'metanetx.reaction': "MNXR13125",
                       'kegg.reaction': "R01068",
+                      'seed.reaction': "rxn01068",
                       'ec-code': "4.1.2.13",
                       'brenda': "4.1.2.13",
                       'reactome': "R-HSA-70339",
@@ -185,6 +186,7 @@ def rxn_broken_id(base):
     rxn = cobra.Reaction(id='RXN', name="Rxn")
     rxn.annotation = {'metanetx.reaction': "MNXM13125",
                       'kegg.reaction': "T1068",
+                      'seed.reaction': "rxn_123AB",
                       'ec-code': "4.1.2..13",
                       'brenda': "4.1.2..13",
                       'reactome': "R-HSAs-70339I",

@@ -83,6 +83,7 @@ GENE_PRODUCT_ANNOTATIONS = OrderedDict([
 REACTION_ANNOTATIONS = OrderedDict([
     ('rhea', re.compile(r"^\d{5}$")),
     ('kegg.reaction', re.compile(r"^R\d+$")),
+    ('seed.reaction', re.compile(r"^rxn\d+$")),
     ('metanetx.reaction', re.compile(r"^MNXR\d+$")),
     ('bigg.reaction', re.compile(r"^[a-z_A-Z0-9]+$")),
     ('reactome', re.compile(

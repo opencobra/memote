@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Add ``seed.reaction`` namespace to the reaction annotation databases.
 
 0.9.0 (2019-01-28)
 ------------
