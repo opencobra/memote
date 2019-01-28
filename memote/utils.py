@@ -32,7 +32,7 @@ from depinfo import print_dependencies
 __all__ = ("register_with", "annotate", "get_ids",
            "get_ids_and_bounds", "truncate", "wrapper",
            "log_json_incompatible_types", "show_versions", "jsonify",
-           "is_modified")
+           "is_modified", "stdout_notifications")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -279,7 +279,8 @@ def is_modified(path, commit):
     """
     return path in commit.stats.files
 
-def stout_notifications(notifications):
+
+def stdout_notifications(notifications):
     """
     Print each entry of errors and warnings to stdout.
 
@@ -289,8 +290,6 @@ def stout_notifications(notifications):
         A simple dictionary structure containing a list of errors and warnings.
 
     """
-    LOGGER.critical(
-        "The model could not be loaded due to the following SBML errors.")
     for error in notifications["errors"]:
         LOGGER.error(error)
     for warn in notifications["warnings"]:
