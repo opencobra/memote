@@ -250,7 +250,17 @@ def find_oxygen_reactions(model):
 
 def find_unique_metabolites(model):
     """Return set of metabolite IDs without duplicates from compartments."""
-    return set(met.id.split("_", 1)[0] for met in model.metabolites)
+    unique = set()
+    for met in model.metabolites:
+        is_missing = True
+        for comp in model.compartments:
+            if met.id.endswith("_{}".format(comp)):
+                unique.add(met.id[:-(len(comp) + 1)])
+                is_missing = False
+                break
+        if is_missing:
+            unique.add(met.id)
+    return unique
 
 
 @lrudecorator(size=2)

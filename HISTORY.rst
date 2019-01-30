@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Enhance the function for finding unique metabolites and make it more robust.
 * Improve logging output when there is a problem with serializing a result to
   JSON.
 * Fix some test cases that got broken by cobrapy's new boundary identification.
