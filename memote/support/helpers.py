@@ -229,12 +229,12 @@ def is_transport_reaction_annotations(rxn):
     """
     reactants = set([(k, tuple(v)) for met in rxn.reactants
                      for k, v in iteritems(met.annotation)
-                     if met.id is not "H"
-                     and k is not None and k is not 'sbo' and v is not None])
+                     if met.id != "H"
+                     and k is not None and k != 'sbo' and v is not None])
     products = set([(k, tuple(v)) for met in rxn.products
                     for k, v in iteritems(met.annotation)
-                    if met.id is not "H"
-                    and k is not None and k is not 'sbo' and v is not None])
+                    if met.id != "H"
+                    and k is not None and k != 'sbo' and v is not None])
     # Find intersection between reactant annotations and
     # product annotations to find common metabolites between them,
     # satisfying the requirements for a transport reaction. Reactions such
