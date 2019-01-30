@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.9.3 (2019-01-30)
+------------------
 * Enhance the function for finding unique metabolites and make it more robust.
 * Improve logging output when there is a problem with serializing a result to
   JSON.
