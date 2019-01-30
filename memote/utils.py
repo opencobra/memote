@@ -25,6 +25,7 @@ from builtins import dict, str
 from textwrap import TextWrapper
 
 from future.utils import raise_with_traceback
+from numpy import isfinite
 from numpydoc.docscrape import NumpyDocString
 from six import string_types
 from depinfo import print_dependencies
@@ -186,13 +187,15 @@ def log_json_incompatible_types(obj):
     while len(keys_to_explore) > 0:
         key = keys_to_explore.pop()
         if not isinstance(key, str):
-            LOGGER.debug(type(key))
+            LOGGER.info(type(key))
         value = obj[key]
         if isinstance(value, dict):
-            LOGGER.debug("%s:", key)
+            LOGGER.info("%s:", key)
             log_json_incompatible_types(value)
         elif not isinstance(value, JSON_TYPES):
-            LOGGER.debug("%s: %s", key, type(value))
+            LOGGER.info("%s: %s", key, type(value))
+        elif isinstance(value, (int, float)) and not isfinite(value):
+            LOGGER.info("%s: %f", key, value)
 
 
 def extended_summary(func):
@@ -240,7 +243,10 @@ def jsonify(obj, pretty=False):
                       separators=(",", ":"), ensure_ascii=False)
     try:
         return json.dumps(obj, **params)
-    except TypeError as error:
+    except (TypeError, ValueError) as error:
+        LOGGER.critical(
+            "The memote result structure is incompatible with the JSON "
+            "standard.")
         log_json_incompatible_types(obj)
         raise_with_traceback(error)
 

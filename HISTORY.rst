@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Improve logging output when there is a problem with serializing a result to
+  JSON.
 * Fix some test cases that got broken by cobrapy's new boundary identification.
 
 0.9.2 (2019-01-28)
