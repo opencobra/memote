@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Enhance the function for finding unique metabolites and make it more robust.
 
 0.9.2 (2019-01-28)
 ------------------
