@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Improve logging output when there is a problem with serializing a result to
+  JSON.
 
 0.9.2 (2019-01-28)
 ------------------
