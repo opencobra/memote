@@ -84,7 +84,9 @@ def test_find_candidate_irreversible_reactions(model):
     rev_index, incomplete, problematic, unbalanced = \
         thermo.find_thermodynamic_reversibility_index(met_rxns)
     ann["data"] = (
-        [(r.id, i) for r, i in rev_index],
+        # The reversibility index can be infinite so we convert it to a JSON
+        # compatible string.
+        [(r.id, str(i)) for r, i in rev_index],
         get_ids(incomplete),
         get_ids(problematic),
         get_ids(unbalanced)
