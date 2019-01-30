@@ -160,9 +160,13 @@ def precursors_uptake_limited(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    base.add_boundary(met_a1, lb=-5, ub=5)
-    base.add_boundary(met_b1)
-    base.add_boundary(met_c1)
+    ex1 = cobra.Reaction("EX_lipid_e", lower_bound=-5, upper_bound=5)
+    ex2 = cobra.Reaction("EX_protein_e", lower_bound=-1000, upper_bound=1000)
+    ex3 = cobra.Reaction("EX_rna_e", lower_bound=-1000, upper_bound=1000)
+    ex1.add_metabolites({met_a1: -1})
+    ex2.add_metabolites({met_b1: -1})
+    ex3.add_metabolites({met_c1: -1})
+    base.add_reactions([ex1, ex2, ex3])
     base.objective = rxn
     return base
 
@@ -185,9 +189,13 @@ def precursors_uptake_limited_in_alien_species(base):
     rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=1000)
     rxn3.add_metabolites({met_c: 1, met_c1: -1})
     base.add_reactions([rxn, rxn1, rxn2, rxn3])
-    base.add_boundary(met_a1, ub=5)
-    base.add_boundary(met_b1)
-    base.add_boundary(met_c1)
+    ex1 = cobra.Reaction("EX_lipid_e", lower_bound=-5, upper_bound=5)
+    ex2 = cobra.Reaction("EX_protein_e", lower_bound=-1000, upper_bound=1000)
+    ex3 = cobra.Reaction("EX_rna_e", lower_bound=-1000, upper_bound=1000)
+    ex1.add_metabolites({met_a1: -1})
+    ex2.add_metabolites({met_b1: -1})
+    ex3.add_metabolites({met_c1: -1})
+    base.add_reactions([ex1, ex2, ex3])
     base.objective = rxn
     return base
 
