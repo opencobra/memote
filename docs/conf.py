@@ -24,7 +24,7 @@ import sphinx_bootstrap_theme
 # directory, add these directories to sys.path here. If the directory is
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, dirname(dirname(__file__)))
 
 # Get the project root dir, which is the parent dir of this
 PROJECT_ROOT = dirname(dirname(__file__))
@@ -43,7 +43,12 @@ sys.path.insert(1, join(PROJECT_ROOT, "memote", "suite", "tests"))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc',
-              'sphinx.ext.autosummary']
+              'sphinx.ext.autosummary', 'autoapi.extension']
+
+# Document Python Code
+autoapi_type = 'python'
+autoapi_dirs = ['../memote']
+autoapi_ignore = ['.tox', '.pytest_cache', 'scripts', 'benchmarks']
 
 numpydoc_show_class_members = False
 
@@ -281,17 +286,3 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
-
-# -- sphinx-apidoc calling ---------------------------------------------
-
-
-# def run_apidoc(_):
-#     from sphinx.apidoc import main
-
-    # mod_path = join(PROJECT_ROOT, 'memote')
-    # auto_path = join(dirname(__file__), '_autogen')
-    # main([None, '-f', '-d', '2', '-e', '-o', auto_path, mod_path])
-
-
-# def setup(app):
-#     app.connect('builder-inited', run_apidoc)
