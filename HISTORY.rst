@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Repair auto generation of API docs and update section on test suite.
 
 0.9.3 (2019-01-30)
 ------------------

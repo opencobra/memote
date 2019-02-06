@@ -6,3 +6,4 @@ Test Suite
    :maxdepth: 2
 
    core
+   experimental

@@ -1,4 +1,5 @@
-Sphinx
+sphinx==1.8.4
+sphinx-autoapi
 numpydoc
 sphinx-bootstrap-theme
 pytest

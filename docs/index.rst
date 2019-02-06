@@ -27,7 +27,6 @@ Contents
    experimental_data
    custom_tests
    test_suite
-   api
    contributing
    authors
    history
