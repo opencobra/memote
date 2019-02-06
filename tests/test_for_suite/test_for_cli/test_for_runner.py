@@ -44,7 +44,7 @@ def test_run_simple(runner, model_file):
 
 
 def test_run_output(runner, model_file):
-    """Expect a simple run to function."""
+    """Expect a memote run to collect the results as json."""
     output = model_file.split(".", 1)[0] + ".json"
     result = runner.invoke(cli, [
         "run", "--filename", output, "--ignore-git", model_file])
