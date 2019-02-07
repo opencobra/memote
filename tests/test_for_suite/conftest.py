@@ -40,6 +40,14 @@ def model_file(small_file, tmpdir_factory):
 
 
 @pytest.fixture(scope="session")
+def invalid_file(invalid_model, tmpdir_factory):
+    filename = str(tmpdir_factory.mktemp("invalid_models").join(
+        basename(invalid_model)))
+    copyfile(invalid_model, filename)
+    return filename
+
+
+@pytest.fixture(scope="session")
 def mock_repo(tmpdir_factory):
     """
     Clones the mock repo https://github.com/ChristianLieven/memote-mock-repo.

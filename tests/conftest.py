@@ -45,6 +45,16 @@ def small_file(request):
         return join(dirname(__file__), "data", "EcoliCore.xml.gz")
 
 
+@pytest.fixture(scope="session", params=["invalid"])
+def invalid_model(request):
+    if request.param == "invalid":
+        return join(
+            dirname(__file__),
+            "test_for_support/data/validation",
+            "tiny_FBC2.xml"
+        )
+
+
 @pytest.fixture(scope="function")
 def model(request, solver):
     if request.param == "empty":

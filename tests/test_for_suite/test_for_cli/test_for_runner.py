@@ -52,6 +52,56 @@ def test_run_output(runner, model_file):
     assert exists(output)
 
 
+def test_run_no_location(runner, mock_repo):
+    """
+    Expect memote run to error when in repo but without specified location.
+
+    """
+    previous_wd = os.getcwd()
+    os.chdir(mock_repo[0])
+    repo = mock_repo[1]
+    repo.git.checkout('eb959dd016aaa71fcef96f00b94ce045d6af8f4c')
+    result = runner.invoke(cli, ["run", "--location", None, "test.xml"])
+    os.chdir(previous_wd)
+    assert result.exit_code == 1
+
+
+def test_run_no_repo_ignore_git_false(runner, model_file):
+    """
+    Expect memote run to warn user if it was not invoked inside a git repo.
+
+    """
+    result = runner.invoke(cli, ["-v", "WARN", "run", model_file])
+    assert "warning: We highly recommend" in result.output
+
+
+def test_run_dirty_repo_ignore_git_false(runner, mock_repo):
+    """
+    Expect memote run to error if it was invoked inside a dirty git repo.
+
+    """
+    previous_wd = os.getcwd()
+    os.chdir(mock_repo[0])
+    repo = mock_repo[1]
+    repo.git.checkout('eb959dd016aaa71fcef96f00b94ce045d6af8f4c')
+    new_file = mock_repo[0] + "/new_file.txt"
+    open(new_file, 'a').close()
+    repo.git.add(new_file)
+    result = runner.invoke(cli, ["run", "test.xml"])
+    os.chdir(previous_wd)
+    assert result.exit_code == 1
+    assert "Please git commit or git stash all changes" in result.output
+
+
+def test_run_no_repo_ignore_git_false(runner, invalid_file):
+    """
+    Expect memote run to error when a provided model fails SBML validation.
+
+    """
+    result = runner.invoke(cli, ["run", invalid_file])
+    assert result.exit_code == 1
+
+
 @pytest.mark.skip(reason="TODO: Need to provide input somehow.")
 def test_run_output_TODO(runner, tmpdir):
     """Expect a simple run to function."""
