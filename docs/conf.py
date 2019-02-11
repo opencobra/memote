@@ -25,6 +25,7 @@ import sphinx_bootstrap_theme
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 sys.path.insert(0, dirname(dirname(__file__)))
+autodoc_mock_imports = ["pylru", "equilibrator_api", "libsbml"]
 
 # Get the project root dir, which is the parent dir of this
 PROJECT_ROOT = dirname(dirname(__file__))
