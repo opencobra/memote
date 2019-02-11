@@ -20,5 +20,3 @@ travispy
 travis-encrypt
 importlib_resources
 goodtables
-pylru
-equilibrator_api
