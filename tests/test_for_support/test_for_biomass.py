@@ -589,8 +589,7 @@ def test_production_biomass_precursors_exchange(model, num):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        for exchange in model.exchanges:
-            exchange.bounds = (-1000, 1000)
+        helpers.open_boundaries(model)
         blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
         assert len(blocked_mets) == num
 
