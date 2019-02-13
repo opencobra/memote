@@ -25,7 +25,7 @@ import re
 import numpy as np
 from six import iteritems
 from future.utils import raise_with_traceback
-from cobra.exceptions import Infeasible, OptimizationError
+from cobra.exceptions import OptimizationError
 
 import memote.support.helpers as helpers
 
@@ -135,7 +135,7 @@ def find_blocked_biomass_precursors(reaction, model):
             dm_rxn = model.add_boundary(
                 precursor,
                 type="safe-demand",
-                reaction_id= "safe_demand",
+                reaction_id="safe_demand",
                 lb=0,
                 ub=ub
             )
