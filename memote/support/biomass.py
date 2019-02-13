@@ -133,7 +133,6 @@ def find_blocked_biomass_precursors(reaction, model):
         with model:
             try:
                 dm_rxn = model.add_boundary(precursor, type="demand")
-                model.objective = dm_rxn
             except ValueError:
                 _, ub = helpers.find_bounds(model)
                 reaction_id = "SDM_" + precursor.id
@@ -144,7 +143,7 @@ def find_blocked_biomass_precursors(reaction, model):
                     lb=0,
                     ub=ub
                 )
-                model.objective = dm_rxn
+            model.objective = dm_rxn
             try:
                 solution = model.optimize()
                 LOGGER.debug(
