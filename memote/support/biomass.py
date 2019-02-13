@@ -129,9 +129,9 @@ def find_blocked_biomass_precursors(reaction, model):
     LOGGER.debug("Finding blocked biomass precursors")
     precursors = find_biomass_precursors(model, reaction)
     blocked_precursors = list()
+    _, ub = helpers.find_bounds(model)
     for precursor in precursors:
         with model:
-            _, ub = helpers.find_bounds(model)
             dm_rxn = model.add_boundary(
                 precursor,
                 type="safe-demand",
