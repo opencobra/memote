@@ -500,6 +500,32 @@ def essential_not_in_model(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def precursor_demand_exists(base):
+    met_a = cobra.Metabolite("lipid_c", compartment='c')
+    met_b = cobra.Metabolite("protein_c", compartment='c')
+    met_c = cobra.Metabolite("rna_c", compartment='c')
+    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
+    met_b1 = cobra.Metabolite("protein_e", compartment='e')
+    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    # Reactions
+    rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
+    rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
+    rxn1 = cobra.Reaction("MET_Atec", lower_bound=-1000, upper_bound=1000)
+    rxn1.add_metabolites({met_a: 1, met_a1: -1})
+    rxn2 = cobra.Reaction("MET_Btec", lower_bound=-1000, upper_bound=1000)
+    rxn2.add_metabolites({met_b: 1, met_b1: -1})
+    rxn3 = cobra.Reaction("MET_Ctec", lower_bound=-1000, upper_bound=0)
+    rxn3.add_metabolites({met_c: 1, met_c1: -1})
+    base.add_reactions([rxn, rxn1, rxn2, rxn3])
+    base.add_boundary(met_a, type="demand")
+    base.add_boundary(met_a1)
+    base.add_boundary(met_b1)
+    base.add_boundary(met_c1)
+    base.objective = rxn
+    return base
+
+
 @pytest.mark.parametrize("model, expected", [
     ("sum_within_deviation", True),
     ("sum_outside_of_deviation", False),
@@ -535,7 +561,8 @@ def test_biomass_production(model, expected):
 @pytest.mark.parametrize("model, num", [
     ("precursors_producing", 0),
     ("precursors_not_in_medium", 2),
-    ("precursors_blocked", 1)
+    ("precursors_blocked", 1),
+    ("precursor_demand_exists", 1)
 ], indirect=["model"])
 def test_production_biomass_precursors_default(model, num):
     """
@@ -562,8 +589,7 @@ def test_production_biomass_precursors_exchange(model, num):
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        for exchange in model.exchanges:
-            exchange.bounds = (-1000, 1000)
+        helpers.open_boundaries(model)
         blocked_mets = biomass.find_blocked_biomass_precursors(rxn, model)
         assert len(blocked_mets) == num
 

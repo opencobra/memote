@@ -25,7 +25,7 @@ import re
 import numpy as np
 from six import iteritems
 from future.utils import raise_with_traceback
-from cobra.exceptions import Infeasible, OptimizationError
+from cobra.exceptions import OptimizationError
 
 import memote.support.helpers as helpers
 
@@ -129,18 +129,18 @@ def find_blocked_biomass_precursors(reaction, model):
     LOGGER.debug("Finding blocked biomass precursors")
     precursors = find_biomass_precursors(model, reaction)
     blocked_precursors = list()
+    _, ub = helpers.find_bounds(model)
     for precursor in precursors:
         with model:
-            dm_rxn = model.add_boundary(precursor, type="demand")
-            model.objective = dm_rxn
-            try:
-                solution = model.optimize()
-                LOGGER.debug(
-                    "%s: demand flux is '%g' and solver status is '%s'",
-                    str(precursor), solution.objective_value, solution.status)
-                if solution.objective_value <= 0.0:
-                    blocked_precursors.append(precursor)
-            except Infeasible:
+            dm_rxn = model.add_boundary(
+                precursor,
+                type="safe-demand",
+                reaction_id="safe_demand",
+                lb=0,
+                ub=ub
+            )
+            flux = helpers.run_fba(model, dm_rxn.id, direction='max')
+            if np.isnan(flux) or abs(flux) < 1E-08:
                 blocked_precursors.append(precursor)
     return blocked_precursors
 
