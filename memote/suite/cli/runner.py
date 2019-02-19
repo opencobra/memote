@@ -50,6 +50,7 @@ from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
 from memote.utils import is_modified, stdout_notifications
+import requests
 
 
 LOGGER = logging.getLogger()
@@ -398,6 +399,75 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
     LOGGER.info("Done.")
 
 
+def _setup_gh_repo(github_repository, github_username, note):
+    password = getpass("GitHub Password: ")
+    gh = Github(github_username, password)
+    user = gh.get_user()
+    try:
+        when = user.created_at.isoformat(sep=" ")
+        LOGGER.info(
+            "Logged in to user '{}' created on '{}'.".format(user.login, when))
+    except BadCredentialsException:
+        LOGGER.critical("Incorrect username or password!")
+        sys.exit(1)
+    try:
+        gh_repo = user.get_repo(github_repository)
+        LOGGER.warning(
+            "Using existing repository '{}'. This may override previous "
+            "settings.".format(github_repository))
+    except UnknownObjectException:
+        gh_repo = user.create_repo(github_repository)
+        LOGGER.info(
+            "'{}' did not exist on GitHub yet."
+            " Creating it for you now!".format(github_repository))
+    try:
+        LOGGER.info("Creating token.")
+        auth = user.create_authorization(scopes=["repo"], note=note)
+    except GithubException:
+        LOGGER.critical(
+            "A personal access token with the note '{}' already exists. "
+            "Either delete it or choose another note using the option "
+            "'--note'.".format(note))
+        sys.exit(1)
+    return gh_repo.full_name, auth.token
+
+
+def _setup_travis_ci(gh_repo_name, auth_token):
+    try:
+        LOGGER.info("Authorizing with TravisCI.")
+        travis = TravisPy.github_auth(auth_token)
+        t_user = travis.user()
+    except TravisError:
+        LOGGER.critical(
+            "Something is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'!")
+        sys.exit(1)
+    LOGGER.info("Synchronizing repositories.")
+    while not t_user.sync():
+        sleep(0.1)
+    try:
+        LOGGER.info("This is the user id {}".format(t_user.login))
+        LOGGER.info("This is the gh_repo_slug {}".format(gh_repo_name))
+        t_repo = travis.repo("{}/{}".format(t_user.login, gh_repo_name))
+    except TravisError:
+        LOGGER.critical(
+            "Repository could not be found. Is it on GitHub already and "
+            "spelled correctly?")
+        sys.exit(1)
+    if t_repo.enable():
+        LOGGER.info(
+            "Your repository is now on GitHub and automatic testing has "
+            "been enabled on Travis CI. Congrats!")
+    else:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+        sys.exit(1)
+    LOGGER.info(
+        "Encrypting GitHub token for repo '{}'.".format(gh_repo_name))
+    key = te.retrieve_public_key(gh_repo_name)
+    secret = te.encrypt_key(key, "GITHUB_TOKEN={}".format(auth_token).encode())
+    return secret
+
+
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.help_option("--help", "-h")
 @click.option("--note", default="memote-ci access", show_default=True,
@@ -417,64 +487,22 @@ def online(note, github_repository, github_username):
             "'memote online' requires a git repository in order to follow "
             "the current branch's commit history.")
         sys.exit(1)
-    password = getpass("GitHub Password: ")
-    gh = Github(github_username, password)
-    user = gh.get_user()
-    try:
-        when = user.created_at.isoformat(sep=" ")
-        LOGGER.info(
-            "Logged in to user '{}' created on '{}'.".format(user.login, when))
-    except BadCredentialsException:
-        LOGGER.critical("Incorrect username or password!")
-        sys.exit(1)
-    try:
-        gh_repo = user.get_repo(github_repository)
-        LOGGER.warning(
-            "Using existing repository '{}'. This may override previous "
-            "settings.".format(github_repository))
-    except UnknownObjectException:
-        gh_repo = user.create_repo(github_repository)
     if note == "memote-ci access":
         note = "{} to {}".format(note, github_repository)
-    try:
-        LOGGER.info("Creating token.")
-        auth = user.create_authorization(scopes=["repo"], note=note)
-    except GithubException:
-        LOGGER.critical(
-            "A personal access token with the note '{}' already exists. "
-            "Either delete it or choose another note using the option "
-            "'--note'.".format(note))
-        sys.exit(1)
-    try:
-        LOGGER.info("Authorizing with TravisCI.")
-        travis = TravisPy.github_auth(auth.token)
-        t_user = travis.user()
-    except TravisError:
-        LOGGER.critical(
-            "Something is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!")
-        sys.exit(1)
-    LOGGER.info("Synchronizing repositories.")
-    while not t_user.sync():
-        sleep(0.1)
-    try:
-        t_repo = travis.repo(gh_repo.full_name)
-    except TravisError:
-        LOGGER.critical(
-            "Repository could not be found. Is it on GitHub already and "
-            "spelled correctly?")
-        sys.exit(1)
-    if t_repo.enable():
-        LOGGER.info(
-            "Your repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!")
-    else:
-        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
-        sys.exit(1)
-    LOGGER.info(
-        "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
-    key = te.retrieve_public_key(gh_repo.full_name)
-    secret = te.encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
+
+    # Github API calls
+    # Set up the git repository on GitHub via API v3.
+    gh_repo_name, auth_token = _setup_gh_repo(
+        github_repository,
+        github_username,
+        note
+    )
+
+    # Travis API calls
+    # Configure Travis CI to use Github auth token then return encrypted token.
+    secret = _setup_travis_ci(gh_repo_name, auth_token)
+
+    # Save the encrypted token in the travis config then commit and push
     LOGGER.info("Storing GitHub token in '.travis.yml'.")
     config = te.load_travis_configuration(".travis.yml")
     global_env = config.setdefault("env", {}).get("global")
