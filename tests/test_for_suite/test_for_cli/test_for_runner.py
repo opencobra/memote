@@ -27,7 +27,8 @@ import json
 import pytest
 
 from memote.suite.cli.runner import cli
-
+import memote.suite.cli.runner
+from memote.suite.cli import CONTEXT_SETTINGS
 
 def test_cli(runner):
     """Expect a simple memote invocation to be successful."""
@@ -171,3 +172,34 @@ def test_new(runner, tmpdir):
     result = runner.invoke(cli, [
         "new", "--directory", target_dir, "--replay"], input='Yes')
     assert result.exit_code == 0
+
+
+def test_online(runner, mock_repo, monkeypatch):
+    # Build-up
+    def mock_setup_gh_repo(github_repository, github_username, note):
+        return "mock_repo_name", "mock_auth_token"
+    def mock_setup_travis_ci(gh_repo_name, auth_token):
+        return "mock_secret"
+
+    monkeypatch.setattr(
+        memote.suite.cli.runner, "_setup_gh_repo", mock_setup_gh_repo)
+    monkeypatch.setattr(
+        memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci)
+    previous_wd = os.getcwd()
+    os.chdir(mock_repo[0])
+    repo = mock_repo[1]
+
+    # Tested function
+    # result_output = check_call(['memote', "online"])
+    # print(result_output)
+    print(os.listdir("."))
+    print(CONTEXT_SETTINGS)
+    result = runner.invoke(cli, ["online"], **CONTEXT_SETTINGS)
+    print(result.output)
+    assert result.exit_code == 0
+
+    # Teardown
+    repo.git.reset('HEAD~')
+    repo.git.push('-f','origin', 'HEAD^:master')
+    os.chdir(previous_wd)
+
