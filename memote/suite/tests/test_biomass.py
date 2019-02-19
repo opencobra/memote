@@ -452,6 +452,13 @@ def test_essential_precursors_not_in_biomass(model, reaction_id):
     These metabolites were selected based on the results presented by
     DOI:10.1016/j.ymben.2016.12.002
 
+    Please note, that the authors also suggest to count C1 carriers
+    (derivatives of tetrahydrofolate(B9) or tetrahydromethanopterin) as
+    universal cofactors. We have omitted these from this check because there
+    are many individual compounds that classify as C1 carriers, and it is not
+    clear a priori which one should be preferred. In a future update, we may
+    consider identifying these using a chemical ontology.
+
     Implementation:
     Determine whether the model employs a lumped or split biomass reaction.
     Then, using an internal mapping table, try to identify the above list of

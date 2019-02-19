@@ -36,16 +36,34 @@ __all__ = (
 LOGGER = logging.getLogger(__name__)
 
 # 20 Amino Acids, 4 Deoxyribonucleotides, 4 Ribonucleotides,
-# 8 Cofactors, and H2O
+# 8 Universal Cofactors, and H2O
 ESSENTIAL_PRECURSOR_IDS = \
     ['MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61',
      'MNXM97', 'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142',
      'MNXM37', 'MNXM89557', 'MNXM231', 'MNXM70', 'MNXM78',
      'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29', 'MNXM147',
+     # Deoxyribonucleotides
      'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
+     # Ribonucleotides
      'MNXM3', 'MNXM51', 'MNXM63', 'MNXM121',
-     'MNXM8', 'MNXM5', 'MNXM16', 'MNXM33', 'MNXM161',
-     'MNXM12', 'MNXM256', 'MNXM119', 'MNXM2']
+     # NAD
+     'MNXM8',
+     # NADP
+     'MNXM5',
+     # S-adenosyl-L-methionine
+     'MNXM16',
+     # FAD
+     'MNXM33',
+     # Pyridoxal 5'-phosphate
+     'MNXM161',
+     # CoA
+     'MNXM12',
+     # Thiamine Diphosphate
+     'MNXM256',
+     # FMN
+     'MNXM119',
+     # H2O
+     'MNXM2']
 
 
 def sum_biomass_weight(reaction):
@@ -425,6 +443,13 @@ def essential_precursors_not_in_biomass(model, reaction):
     and NADH), only one form could be included for the sake of simplicity.
     When a class of cofactors includes active and non-active interconvertible
     forms, the active forms should be preferred. [1]_."
+
+    Please note, that [1]_ also suggest to count C1 carriers
+    (derivatives of tetrahydrofolate(B9) or tetrahydromethanopterin) as
+    universal cofactors. We have omitted these from this check because there
+    are many individual compounds that classify as C1 carriers, and it is not
+    clear a priori which one should be preferred. In a future update, we may
+    consider identifying these using a chemical ontology.
 
     References
     ----------
