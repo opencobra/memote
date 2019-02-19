@@ -68,6 +68,7 @@ def test_biomass_presence(model):
     ann = test_biomass_presence.annotation
     ann["data"] = [
         rxn.id for rxn in helpers.find_biomass_reaction(model)]
+    ann["metric"] = 1.0 - float(len(ann["data"]) > 0)
     ann["message"] = wrapper.fill(
         """In this model {} the following biomass reactions were
         identified: {}""".format(
@@ -112,11 +113,11 @@ def test_biomass_consistency(model, reaction_id):
             which is outside of the 1e-03 margin from 1 mmol / g[CDW] / h.
             """.format(reaction_id, ann["data"][reaction_id])
         )
-    ann["metric"][reaction_id] = 1.0  # Placeholder value.
+    test_outcome = (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06)
+    ann["metric"] = 1.0 - float(test_outcome)
     # To account for numerical inaccuracies, a range from 1-1e0-3 to 1+1e-06
     # is implemented in the assertion check
-    assert (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06), \
-        ann["message"][reaction_id]
+    assert test_outcome, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
@@ -137,13 +138,14 @@ def test_biomass_default_production(model, reaction_id):
     """
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
-    ann["metric"][reaction_id] = 1.0  # Placeholder value.
+    test_outcome = ann["data"][reaction_id] > 1E-07
+    ann["metric"] = 1.0 - float(test_outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate (1/h) that
         can be achieved when the model is simulated on the provided
         default medium: {}
         """.format(reaction_id, ann["data"][reaction_id]))
-    assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
+    assert test_outcome, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
@@ -165,13 +167,14 @@ def test_biomass_open_production(model, reaction_id):
     ann = test_biomass_open_production.annotation
     helpers.open_boundaries(model)
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
-    ann["metric"][reaction_id] = 1.0  # Placeholder value.
+    test_outcome = ann["data"][reaction_id] > 1E-07
+    ann["metric"] = 1.0 - float(test_outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate that can be
         achieved when the model is simulated on a complete medium i.e.
         with all the boundary reactions unconstrained: {}
         """.format(reaction_id, ann["data"][reaction_id]))
-    assert ann["data"][reaction_id] > 0.0, ann["message"][reaction_id]
+    assert test_outcome, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
@@ -309,9 +312,11 @@ def test_gam_in_biomass(model, reaction_id):
     """
     ann = test_gam_in_biomass.annotation
     reaction = model.reactions.get_by_id(reaction_id)
-    ann["data"][reaction_id] = biomass.gam_in_biomass(model, reaction)
-    ann["metric"][reaction_id] = 1.0  # Placeholder value.
-    if ann["data"][reaction_id]:
+    test_outcome = biomass.gam_in_biomass(model, reaction)
+    ann["data"][reaction_id] = test_outcome
+    test_outcome = ann["data"][reaction_id]
+    ann["metric"] = 1.0 - float(test_outcome)
+    if test_outcome:
         ann["message"][reaction_id] = wrapper.fill(
             """Yes, {} contains a term for growth-associated maintenance.
             """.format(reaction_id))
@@ -319,7 +324,7 @@ def test_gam_in_biomass(model, reaction_id):
         ann["message"][reaction_id] = wrapper.fill(
             """No, {} does not contain a term for growth-associated
             maintenance.""".format(reaction_id))
-    assert ann["data"][reaction_id], ann["message"][reaction_id]
+    assert test_outcome, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass
@@ -346,8 +351,9 @@ def test_fast_growth_default(model, reaction_id):
 
     """
     ann = test_fast_growth_default.annotation
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id) > 2.81
-    ann["metric"][reaction_id] = 1.0  # Placeholder value.
+    test_outcome = helpers.run_fba(model, reaction_id) > 2.81
+    ann["data"][reaction_id] = test_outcome
+    ann["metric"] = 1.0 - float(test_outcome)
 
     if ann["data"][reaction_id]:
         ann["message"][reaction_id] = wrapper.fill(
@@ -362,7 +368,7 @@ def test_fast_growth_default(model, reaction_id):
             the provided default medium the growth rate is *lower* than that
             of the fastest bacteria. This is to be expected for
             a majority of organisms.""".format(reaction_id))
-    assert ann["data"][reaction_id] > 2.81, ann["message"][reaction_id]
+    assert test_outcome, ann["message"][reaction_id]
 
 
 @pytest.mark.biomass

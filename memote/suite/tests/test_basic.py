@@ -43,6 +43,7 @@ def test_model_id_presence(model):
     ann = test_model_id_presence.annotation
     assert hasattr(model, "id")
     ann["data"] = model.id
+    ann["metric"] = 1.0 - float(bool(ann["data"]))
     ann["message"] = "The model ID is {}".format(ann["data"])
     assert bool(model.id)
 
@@ -233,6 +234,7 @@ def test_ngam_presence(model):
     """
     ann = test_ngam_presence.annotation
     ann["data"] = get_ids(basic.find_ngam(model))
+    ann["metric"] = 1.0 - float(len(ann["data"]) == 1)
     ann["message"] = wrapper.fill(
         """A total of {} NGAM reactions could be identified:
         {}""".format(len(ann["data"]), truncate(ann["data"])))
@@ -268,7 +270,7 @@ def test_metabolic_coverage(model):
 @annotate(title="Total Compartments", format_type="count")
 def test_compartments_presence(model):
     """
-    Expect that more than two compartments are defined in the model.
+    Expect that two or more compartments are defined in the model.
 
     While simplified metabolic models may be perfectly viable, generally
     across the tree of life organisms contain at least one distinct
@@ -285,14 +287,14 @@ def test_compartments_presence(model):
     which should contain at least two sbml:compartment elements.
 
     """
-    # TODO: Fix the test in a later PR! Should expect 2 compartments instead!
     ann = test_compartments_presence.annotation
     assert hasattr(model, "compartments")
     ann["data"] = list(model.compartments)
+    ann["metric"] = 1.0 - float(len(ann["data"]) >= 2)
     ann["message"] = wrapper.fill(
         """A total of {:d} compartments are defined in the model: {}""".format(
             len(ann["data"]), truncate(ann["data"])))
-    assert len(ann["data"]) >= 3, ann["message"]
+    assert len(ann["data"]) >= 2, ann["message"]
 
 
 @annotate(title="Enzyme Complexes", format_type="count")
@@ -317,6 +319,7 @@ def test_protein_complex_presence(model):
     """
     ann = test_protein_complex_presence.annotation
     ann["data"] = get_ids(basic.find_protein_complexes(model))
+    ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {:d} reactions are catalyzed by complexes defined
         through GPR rules in the model.""".format(len(ann["data"])))
@@ -574,6 +577,7 @@ def test_find_duplicate_metabolites_in_compartments(model):
     ann = test_find_duplicate_metabolites_in_compartments.annotation
     ann["data"] = basic.find_duplicate_metabolites_in_compartments(
         model)
+    ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """There are a total of {} metabolites in the model which
         have duplicates in the same compartment: {}""".format(
@@ -620,7 +624,7 @@ def test_find_reactions_with_partially_identical_annotations(model):
     assert total == 0, ann["message"]
 
 
-@annotate(title="Duplicate Reactions", format_type="count")
+@annotate(title="Duplicate Reactions", format_type="percent")
 def test_find_duplicate_reactions(model):
     """
     Expect there to be zero duplicate reactions.
@@ -649,6 +653,7 @@ def test_find_duplicate_reactions(model):
     """
     ann = test_find_duplicate_reactions.annotation
     ann["data"] = basic.find_duplicate_reactions(model)
+    ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based on metabolites, directionality and compartment there are a
         total of {} reactions in the model which have duplicates: {}""".format(
@@ -676,14 +681,15 @@ def test_find_reactions_with_identical_genes(model):
 
     """
     ann = test_find_reactions_with_identical_genes.annotation
-    duplicates, total = basic.find_reactions_with_identical_genes(model)
-    ann["data"] = duplicates
-    ann["metric"] = total / len(model.reactions)
+    rxn_groups, num_dup = basic.find_reactions_with_identical_genes(model)
+    ann["data"] = rxn_groups
+    ann["metric"] = num_dup / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based only on equal genes there are {} different groups of
         identical reactions which corresponds to a total of {}
-        duplicated reactions in the model.""".format(len(duplicates), total))
-    assert total == 0, ann["message"]
+        duplicated reactions in the model.""".format(
+            len(rxn_groups), num_dup))
+    assert num_dup == 0, ann["message"]
 
 
 @annotate(title="Medium Components", format_type="count")
@@ -703,6 +709,10 @@ def test_find_medium_metabolites(model):
     """
     ann = test_find_medium_metabolites.annotation
     ann["data"] = basic.find_medium_metabolites(model)
+    num_ex = basic.find_external_metabolites(model)
+    ann["metric"] = len(ann["data"]) / num_ex
     ann["message"] = wrapper.fill(
         """There are a total of {} metabolites in the currently set medium
-        in the model: {}""".format(len(ann["data"]), truncate(ann["data"])))
+        (out of {} defined extra-cellular metabolites)
+        in the model: {}""".format(len(ann["data"]), num_ex,
+                                   truncate(ann["data"])))

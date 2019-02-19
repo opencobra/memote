@@ -144,9 +144,9 @@ def rank(matrix, atol=1e-13, rtol=0):
     return int((sigma >= tol).sum())
 
 
-def nullspace(matrix, atol=1e-13, rtol=0.0):
+def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
     """
-    Compute an approximate basis for the nullspace of a matrix.
+    Compute an approximate basis for the null space (kernel) of a matrix.
 
     The algorithm used by this function is based on the singular value
     decomposition of the given matrix.

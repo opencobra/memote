@@ -896,3 +896,14 @@ def test_check_transport_reaction_gpr_presence(model, num):
 def test_find_medium_metabolites(model, num):
     """Expect amount of medium metabolites be identified."""
     assert len(basic.find_medium_metabolites(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("non_metabolic_reactions", 1),
+    ("transport_gpr", 2),
+    pytest.param("gpr_missing", 2,
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+], indirect=["model"])
+def test_find_external_metabolites(model, num):
+    """Expect a specific number of external metabolites to be found."""
+    assert len(basic.find_external_metabolites(model)) == num
