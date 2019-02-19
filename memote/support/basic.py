@@ -23,6 +23,8 @@ import logging
 from itertools import combinations
 from pylru import lrudecorator
 
+from cobra.medium import find_external_compartment
+
 import memote.support.helpers as helpers
 from memote.support.gpr_helpers import find_top_level_complex
 from memote.utils import filter_none
@@ -529,3 +531,9 @@ def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
     return [met.id for rxn in model.medium
             for met in model.reactions.get_by_id(rxn).metabolites]
+
+
+def find_external_metabolites(model):
+    """Return all metabolites in the external compartment."""
+    ex_comp = find_external_compartment(model)
+    return [met for met in model.metabolites if met.compartment == ex_comp]

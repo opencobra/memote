@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Add metrics, i.e., model-size independent test outcomes to almost all test 
+  cases.
 * Repair auto generation of API docs and update section on test suite.
 
 0.9.3 (2019-01-30)
