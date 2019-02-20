@@ -414,9 +414,9 @@ def _setup_gh_repo(github_repository, github_username, note):
             'https://api.github.com/user', auth=auth, headers=headers
         )
         user = response.json()
-        when = user.created_at.isoformat(sep=" ")
+        when = user[u"created_at"]
         LOGGER.info(
-            "Logged in to user '{}' created on '{}'.".format(user.login, when))
+            "Logged in to user '{}' created on '{}'.".format(user[u"login"], when))
         response.raise_for_status()
     except HTTPError:
         LOGGER.critical("Incorrect username or password!")
@@ -425,7 +425,7 @@ def _setup_gh_repo(github_repository, github_username, note):
     # GitHub.
     try:
         endpoint = 'https://api.github.com/repos/{}/{}'.format(
-            user.login, github_repository
+            user["login"], github_repository
         )
         response = requests.get(endpoint, auth=auth, headers=headers)
         gh_repo = response.json()
@@ -434,12 +434,11 @@ def _setup_gh_repo(github_repository, github_username, note):
             "settings.".format(github_repository))
         response.raise_for_status()
     except HTTPError:
-        payload = {"name": github_repository}
         response = requests.post(
             'https://api.github.com/user/repo',
             auth=auth,
             headers=headers,
-            payload=payload
+            data={"name": github_repository}
         )
         gh_repo = response.json()
         LOGGER.info(
@@ -448,30 +447,57 @@ def _setup_gh_repo(github_repository, github_username, note):
     # Create a personal access token on GitHub.
     try:
         LOGGER.info("Creating token.")
-        payload = {"scopes":["repo"], "note": note}
         response = requests.post(
-            'https://api.github.com/user/repo',
+            'https://api.github.com/authorizations',
             auth=auth,
             headers=headers,
-            payload=payload
+            json={"scopes":["public_repo"], "note": note}
         )
-        auth = response.json()
+        auth_response = response.json()
     except HTTPError:
         LOGGER.critical(
             "A personal access token with the note '{}' already exists. "
             "Either delete it or choose another note using the option "
             "'--note'.".format(note))
         sys.exit(1)
-    return gh_repo.full_name, auth.token
+    return gh_repo["full_name"], auth_response["token"]
 
 
 def _setup_travis_ci(gh_repo_name, auth_token):
     # travis-ci.org is the open source endpoint only! We will need to hit
     # travis-ci.com for private projects!
+
+    # Headers for API v2. This is only necessary because generating a Travis
+    # API token from a GitHub Token isn't possible in the API v3 yet. This way
+    # is recommended as per:
+    # https://github.com/travis-ci/travis-ci/issues/9273
+    headers = {
+        'Accept': 'application/vnd.travis-ci.2+json',
+        'User-Agent': 'Memote Query'
+    }
+
+    # Generate Travis API token:
+    try:
+        LOGGER.info("Generating Travis API token.")
+        response = requests.get(
+            "https://api.travis-ci.org/auth/github",
+            headers=headers,
+            json={'github_token': auth_token}
+        )
+        print (auth_token)
+        print (response.json())
+        response.raise_for_status()
+        access_token = response.json()["access_token"]
+    except HTTPError:
+        LOGGER.critical(
+            "Something is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'!")
+        sys.exit(1)
+
     # Headers for API v3!
     headers = {
         'Travis-API-Version': '3',
-        'Authorization': 'token {}'.format(auth_token),
+        'Authorization': 'token {}'.format(access_token),
         'User-Agent': 'Memote Query'
     }
     try:
