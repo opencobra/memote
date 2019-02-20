@@ -403,29 +403,60 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
 
 def _setup_gh_repo(github_repository, github_username, note):
     password = getpass("GitHub Password: ")
-    gh = Github(github_username, password)
-    user = gh.get_user()
+
+    headers = {"Accept": "application/vnd.github.v3+json",
+               "User-Agent": "Memote Query"}
+    auth = (github_username, password)
+
+    # Authenticate user on GitHub
     try:
+        response = requests.get(
+            'https://api.github.com/user', auth=auth, headers=headers
+        )
+        user = response.json()
         when = user.created_at.isoformat(sep=" ")
         LOGGER.info(
             "Logged in to user '{}' created on '{}'.".format(user.login, when))
-    except BadCredentialsException:
+        response.raise_for_status()
+    except HTTPError:
         LOGGER.critical("Incorrect username or password!")
         sys.exit(1)
+    # Get a user's repository or create the repository if it doesn't exist on
+    # GitHub.
     try:
-        gh_repo = user.get_repo(github_repository)
+        endpoint = 'https://api.github.com/repos/{}/{}'.format(
+            user.login, github_repository
+        )
+        response = requests.get(endpoint, auth=auth, headers=headers)
+        gh_repo = response.json()
         LOGGER.warning(
             "Using existing repository '{}'. This may override previous "
             "settings.".format(github_repository))
-    except UnknownObjectException:
-        gh_repo = user.create_repo(github_repository)
+        response.raise_for_status()
+    except HTTPError:
+        payload = {"name": github_repository}
+        response = requests.post(
+            'https://api.github.com/user/repo',
+            auth=auth,
+            headers=headers,
+            payload=payload
+        )
+        gh_repo = response.json()
         LOGGER.info(
             "'{}' did not exist on GitHub yet."
             " Creating it for you now!".format(github_repository))
+    # Create a personal access token on GitHub.
     try:
         LOGGER.info("Creating token.")
-        auth = user.create_authorization(scopes=["repo"], note=note)
-    except GithubException:
+        payload = {"scopes":["repo"], "note": note}
+        response = requests.post(
+            'https://api.github.com/user/repo',
+            auth=auth,
+            headers=headers,
+            payload=payload
+        )
+        auth = response.json()
+    except HTTPError:
         LOGGER.critical(
             "A personal access token with the note '{}' already exists. "
             "Either delete it or choose another note using the option "
