@@ -50,7 +50,9 @@ from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
 from memote.utils import is_modified, stdout_notifications
+
 import requests
+from requests.exceptions import  HTTPError
 
 
 LOGGER = logging.getLogger()
@@ -433,23 +435,48 @@ def _setup_gh_repo(github_repository, github_username, note):
 
 
 def _setup_travis_ci(gh_repo_name, auth_token):
+    # travis-ci.org is the open source endpoint only! We will need to hit
+    # travis-ci.com for private projects!
+    # Headers for API v3!
+    headers = {
+        'Travis-API-Version': '3',
+        'Authorization': 'token {}'.format(auth_token),
+        'User-Agent': 'Memote Query'
+    }
     try:
         LOGGER.info("Authorizing with TravisCI.")
-        travis = TravisPy.github_auth(auth_token)
-        t_user = travis.user()
-    except TravisError:
+        # Authenticate the User on Travis
+        response = requests.get(
+            "https://api.travis-ci.org/user", headers=headers
+        )
+        response.raise_for_status()
+        t_user = response.json()
+    except HTTPError:
         LOGGER.critical(
             "Something is wrong with the generated token or you did not "
             "link your GitHub account on 'https://travis-ci.org/'!")
         sys.exit(1)
+    # Synchronize a User's projects between GitHub and Travis
     LOGGER.info("Synchronizing repositories.")
-    while not t_user.sync():
-        sleep(0.1)
+    synced = False
+    while not synced:
+        response = requests.post(
+            "https://api.travis-ci.org/user/{}/sync".format(t_user.id),
+            headers=headers
+        )
+        if response.status_code == 200:
+            synced = True
+        else:
+            sleep(0.1)
+    #
     try:
-        LOGGER.info("This is the user id {}".format(t_user.login))
-        LOGGER.info("This is the gh_repo_slug {}".format(gh_repo_name))
-        t_repo = travis.repo("{}/{}".format(t_user.login, gh_repo_name))
-    except TravisError:
+        repo_slug = "{}%2F{}".format(t_user.login, gh_repo_name)
+        response = requests.get(
+            "https://api.travis-ci.org/repo/{}".format(repo_slug),
+            headers=headers
+        )
+        response.raise_for_status()
+    except HTTPError:
         LOGGER.critical(
             "Repository could not be found. Is it on GitHub already and "
             "spelled correctly?")
