@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Add missing parametrized metric on ``test_biomass_open_production``.
 
 0.9.4 (2019-02-20)
 ------------------
