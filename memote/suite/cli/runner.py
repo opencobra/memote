@@ -426,6 +426,7 @@ def _setup_gh_repo(github_repository, github_username, note):
             "Logged in to user '{}' created on '{}'.".format(
                 user[u"login"], when)
         )
+
     # Get a user's repository or create the repository if it doesn't exist on
     # GitHub.
     try:
@@ -434,72 +435,59 @@ def _setup_gh_repo(github_repository, github_username, note):
             user["login"], github_repository
         )
         response = requests.get(endpoint, auth=credentials, headers=headers)
+        response.raise_for_status()
         LOGGER.warning(
             "Using existing repository '{}'. This may override previous "
             "settings.".format(github_repository))
-        response.raise_for_status()
-    except HTTPError:
-        LOGGER.info(
-            "'{}' did not exist on GitHub yet."
-            " Creating it for you now!".format(github_repository))
-        response = requests.post(
-            'https://api.github.com/user/repo',
-            auth=credentials,
-            headers=headers,
-            data={"name": github_repository}
-        )
-    finally:
         gh_repo = response.json()
+    except HTTPError:
+        try:
+            LOGGER.info(
+                "'{}' did not exist on GitHub yet."
+                " Creating it for you now!".format(github_repository))
+            response = requests.post(
+                'https://api.github.com/user/repos',
+                auth=credentials,
+                headers=headers,
+                json={"name": github_repository}
+            )
+            response.raise_for_status()
+        except HTTPError:
+            LOGGER.critical(
+                "The repository cannot be created on GitHub. "
+                "Are the servers up?"
+            )
+            sys.exit(1)
+        else:
+            gh_repo = response.json()
+
     # Create a personal access token on GitHub which is only used to generate
     # the Travis APIv3 access token.
-    auth_note = "Travis APIv3 Auth"
+    auth_note = "Travis APIv3 Auth for {}".format(github_repository)
     payload = {
         "scopes":["read:org", "user:email",
                   "repo_deployment", "repo:status",
                   "write:repo_hook"],
         "note": auth_note
     }
-    # Check for an existing authentication token first:
     try:
-        LOGGER.info("Checking for an existing authentication token.")
-        response = requests.get(
-        'https://api.github.com/authorizations',
-        auth=credentials,
-        headers=headers
+        LOGGER.info("Creating Travis APIv3 authentication token for you now!")
+        response = requests.post(
+            'https://api.github.com/authorizations',
+            auth=credentials,
+            headers=headers,
+            json=payload
         )
         response.raise_for_status()
     except HTTPError:
         LOGGER.info(
-            "Could not check for existing authentication.")
+            "An authentication token with the note '{}' already "
+            "exists. Please delete it and try again.'.".format(auth_note))
         sys.exit(1)
     else:
-        all_authorizations = response.json()
+        auth_response = response.json()
         LOGGER.info("Success!")
-        auth_response = {}
-        for authorization in all_authorizations:
-            if authorization["note"] == auth_note:
-                LOGGER.info("Using existing authentication token!")
-                auth_response = authorization
-        if not auth_response:
-            try:
-                LOGGER.info("No authentication token existed yet. "
-                            "Creating it for you now!")
-                response = requests.post(
-                    'https://api.github.com/authorizations',
-                    auth=credentials,
-                    headers=headers,
-                    json=payload
-                )
-                response.raise_for_status()
-            except HTTPError:
-                LOGGER.info(
-                    "A personal access token with the note '{}' already "
-                    "exists. Either delete it or choose another note using "
-                    "the option '--note'.".format(note))
-                sys.exit(1)
-            else:
-                auth_response = response.json()
-                LOGGER.info("Success!")
+
     # Create a personal access token that allows Travis to push to a repo.
     payload = {
         "scopes":["repo"],
@@ -535,7 +523,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
     # API token from a GitHub Token isn't possible in the API v3 yet. This way
     # is recommended as per:
     # https://github.com/travis-ci/travis-ci/issues/9273
-    headers = {
+    headers_v2_only = {
         'User-Agent': 'Memote',
         'Accept': 'application/vnd.travis-ci.2+json',
     }
@@ -545,14 +533,15 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         LOGGER.info("Generating Travis API token.")
         response = requests.post(
             "https://api.travis-ci.org/auth/github",
-            headers=headers,
-            data={'github_token': "76cc758ad153654f7ac68461349bb880dd9e6cdd"}
+            headers=headers_v2_only,
+            data={'github_token': auth_token}
         )
         response.raise_for_status()
     except HTTPError:
         LOGGER.critical(
-            "Something is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!")
+            "Something is wrong with the generated APIv3 authentication token "
+            "or you did not link your GitHub account on "
+            "'https://travis-ci.org/'!")
         sys.exit(1)
     else:
         LOGGER.info("Success!")
@@ -564,9 +553,10 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         'Authorization': 'token {}'.format(travis_api_token),
         'User-Agent': 'Memote Query'
     }
+
+    # Authenticate the User on Travis
     try:
         LOGGER.info("Authorizing with TravisCI.")
-        # Authenticate the User on Travis
         response = requests.get(
             "https://api.travis-ci.org/user", headers=headers
         )
@@ -579,6 +569,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
     else:
         LOGGER.info("Success!")
         t_user = response.json()
+
     # Synchronize a User's projects between GitHub and Travis
     LOGGER.info("Synchronizing user projects between GitHub and Travis.")
     synced = False
@@ -592,10 +583,11 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             LOGGER.info("Success!")
         else:
             sleep(0.1)
-    # Enable Travis CI for the user provided repository.
+
+    # Retrieve repo ID on Travis CI.#
     url_safe_repo_name = quote_plus(gh_repo_name)
     try:
-        LOGGER.info("Enabling continuous integration for Travis CI")
+        LOGGER.info("Find repository {} on Travis CI".format(gh_repo_name))
         response = requests.get(
             "https://api.travis-ci.org/repo/{}".format(url_safe_repo_name),
             headers=headers
@@ -607,31 +599,34 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             "spelled correctly?")
         sys.exit(1)
     else:
+        LOGGER.info("Success!")
         t_repo = response.json()
+
+    # Use repo ID to activate Travis CI for this repo
+    try:
+        LOGGER.info(
+            "Activating automatic testing for you "
+            "on Travis CI.")
+        endpoint = "https://api.travis-ci.org/repo/{}/activate".format(
+            url_safe_repo_name
+        )
+        response = requests.post(
+            endpoint,
+            headers=headers
+        )
+        response.raise_for_status()
+    except:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+        sys.exit(1)
+
+    # Check if activation was successful
     if t_repo["active"]:
         LOGGER.info(
             "Your repository is now on GitHub and automatic testing has "
             "been enabled on Travis CI. Congrats!")
     else:
-        try:
-            LOGGER.info(
-                "Activating automatic testing for you"
-                "on Travis CI.")
-            endpoint = "https://api.travis-ci.org/{}/activate".format(
-                url_safe_repo_name
-            )
-            response = requests.get(
-                endpoint,
-                headers=headers
-            )
-            response.raise_for_status()
-        except:
-            LOGGER.critical("Unable to enable automatic testing on Travis CI!")
-            sys.exit(1)
-        else:
-            LOGGER.info(
-                "Your repository is now on GitHub and automatic testing has "
-                "been enabled on Travis CI. Congrats!")
+        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+        sys.exit(1)
     LOGGER.info(
         "Encrypting GitHub token for repo '{}'.".format(gh_repo_name))
     key = te.retrieve_public_key(gh_repo_name)
