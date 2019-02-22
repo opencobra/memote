@@ -584,7 +584,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         else:
             sleep(0.1)
 
-    # Retrieve repo ID on Travis CI.#
+    # Make sure GitHub repo can be found on Travis CI.#
     url_safe_repo_name = quote_plus(gh_repo_name)
     try:
         LOGGER.info("Find repository {} on Travis CI".format(gh_repo_name))
