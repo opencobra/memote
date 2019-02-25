@@ -28,7 +28,7 @@ import pytest
 
 from memote.suite.cli.runner import cli
 import memote.suite.cli.runner
-from memote.suite.cli import CONTEXT_SETTINGS
+from memote.suite.cli.config import ConfigFileProcessor
 
 def test_cli(runner):
     """Expect a simple memote invocation to be successful."""
@@ -177,8 +177,8 @@ def test_new(runner, tmpdir):
 def test_online(runner, mock_repo, monkeypatch):
     # Build-up
     def mock_setup_gh_repo(github_repository, github_username, note):
-        return "mock_repo_name", "mock_auth_token"
-    def mock_setup_travis_ci(gh_repo_name, auth_token):
+        return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
+    def mock_setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         return "mock_secret"
 
     monkeypatch.setattr(
@@ -189,17 +189,19 @@ def test_online(runner, mock_repo, monkeypatch):
     os.chdir(mock_repo[0])
     repo = mock_repo[1]
 
-    # Tested function
-    # result_output = check_call(['memote', "online"])
-    # print(result_output)
-    print(os.listdir("."))
-    print(CONTEXT_SETTINGS)
-    result = runner.invoke(cli, ["online"], **CONTEXT_SETTINGS)
-    print(result.output)
+    # Build context_settings
+    context_settings = ConfigFileProcessor.read_config()
+    github_repository = context_settings["github_repository"]
+    github_username = context_settings["github_username"]
+    print(github_username)
+
+    result = runner.invoke(
+        cli,
+        ["online", "--github_repository", github_repository,
+         "--github_username", github_username])
     assert result.exit_code == 0
 
     # Teardown
-    repo.git.reset('HEAD~')
-    repo.git.push('-f','origin', 'HEAD^:master')
+    repo.git.reset("--hard", 'HEAD~')
+    repo.git.push('--force','origin', 'master')
     os.chdir(previous_wd)
-
