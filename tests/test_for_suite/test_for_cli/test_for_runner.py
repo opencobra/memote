@@ -226,5 +226,4 @@ def test_history(runner, mock_repo):
 
     # Teardown
     os.chdir(previous_wd)
-    print(result.output)
     assert result.exit_code == 0

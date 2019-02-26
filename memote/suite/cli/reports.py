@@ -143,6 +143,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
     """Generate a report over a model's git commit history."""
+    LOGGER.info("Initialising history report generation.")
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     try:
@@ -153,7 +154,9 @@ def history(location, model, filename, deployment, custom_config):
             "the model's commit history.")
         sys.exit(1)
     previous = repo.active_branch
-    repo.heads[deployment].checkout()
+    LOGGER.info("Obtaining history of results from "
+                "the deployment branch {}.".format(deployment))
+    repo.git.checkout(deployment)
     try:
         manager = managers.SQLResultManager(repository=repo, location=location)
     except (AttributeError, ArgumentError):
@@ -163,8 +166,10 @@ def history(location, model, filename, deployment, custom_config):
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
+    LOGGER.info("Tracing the commit history.")
     history = managers.HistoryManager(repository=repo, manager=manager)
     history.load_history(model, skip={deployment})
+    LOGGER.info("Composing the history report.")
     report = api.history_report(history, config=config)
     previous.checkout()
     with open(filename, "w", encoding="utf-8") as file_handle:

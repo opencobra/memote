@@ -20,8 +20,10 @@
 from __future__ import absolute_import
 
 from os.path import exists
+import os
 
 from memote.suite.cli.reports import report
+from memote.suite.cli.config import ConfigFileProcessor
 
 
 def test_report(runner):
@@ -39,3 +41,34 @@ def test_snapshot(runner, model_file):
         "snapshot", "--filename", output, model_file])
     assert result.exit_code == 0
     assert exists(output)
+
+
+def test_diff(runner, model_file):
+    """Expect the diff report to function."""
+    output = model_file.split(".", 1)[0] + ".html"
+    result = runner.invoke(report, [
+        "diff", "--filename", output, model_file, model_file])
+    assert result.exit_code == 0
+    assert exists(output)
+
+
+def test_history(runner, mock_repo):
+    """Expect the history report to function."""
+    # Initialize mock repo
+    previous_wd = os.getcwd()
+    os.chdir(mock_repo[0])
+
+    # Build context_settings
+    context_settings = ConfigFileProcessor.read_config()
+    model = context_settings["model"]
+    location = context_settings["location"]
+    output = model.split(".", 1)[0] + ".html"
+
+    result = runner.invoke(report, ["history", "--model", model,
+                                    "--location", location]
+    )
+    print(result.output)
+
+    # Teardown
+    os.chdir(previous_wd)
+    assert result.exit_code == 0
