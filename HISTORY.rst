@@ -4,6 +4,13 @@ History
 Next Release
 ------------
 * Repair auto generation of API docs and update section on test suite.
+* Remove our dependecy on PyGithub and TravisPy by reimplementing all the
+  necessary steps with `requests`
+* Add unit and integration tests for `runner.py` and `reports.py`, except
+  for `memote online`.
+* Debug `memote online` - could only be tested manually, CI is impossible
+  without a secure way of storing github credentials.
+* Add logging statements to all CLI functions to facilitate future debugging.
 
 0.9.3 (2019-01-30)
 ------------------
