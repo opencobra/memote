@@ -62,13 +62,8 @@ def test_history(runner, mock_repo):
     context_settings = ConfigFileProcessor.read_config()
     model = context_settings["model"]
     location = context_settings["location"]
-    output = model.split(".", 1)[0] + ".html"
-
     result = runner.invoke(report, ["history", "--model", model,
-                                    "--location", location]
-    )
-    print(result.output)
-
+                                    "--location", location])
     # Teardown
     os.chdir(previous_wd)
     assert result.exit_code == 0

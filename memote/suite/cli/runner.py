@@ -48,7 +48,7 @@ from memote.suite.results import (
 from memote.utils import is_modified, stdout_notifications
 
 import requests
-from requests.exceptions import  HTTPError
+from requests.exceptions import HTTPError
 from urllib.parse import quote_plus
 import tempfile
 
@@ -476,9 +476,10 @@ def _setup_gh_repo(github_repository, github_username, note):
     # the Travis APIv3 access token.
     auth_note = "Travis APIv3 Auth for {}".format(github_repository)
     payload = {
-        "scopes":["read:org", "user:email",
-                  "repo_deployment", "repo:status",
-                  "write:repo_hook"],
+        "scopes": [
+            "read:org", "user:email", "repo_deployment",
+            "repo:status", "write:repo_hook"
+        ],
         "note": auth_note
     }
     try:
@@ -501,7 +502,7 @@ def _setup_gh_repo(github_repository, github_username, note):
 
     # Create a personal access token that allows Travis to push to a repo.
     payload = {
-        "scopes":["repo"],
+        "scopes": ["repo"],
         "note": note
     }
     try:
@@ -523,7 +524,7 @@ def _setup_gh_repo(github_repository, github_username, note):
         repo_access_response = response.json()
         LOGGER.info("Success!")
     return gh_repo["full_name"], auth_response["token"], \
-           repo_access_response["token"]
+        repo_access_response["token"]
 
 
 def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
@@ -626,7 +627,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             headers=headers
         )
         response.raise_for_status()
-    except:
+    except HTTPError:
         LOGGER.critical("Unable to enable automatic testing on Travis CI!")
         sys.exit(1)
 

@@ -30,6 +30,7 @@ from memote.suite.cli.runner import cli
 import memote.suite.cli.runner
 from memote.suite.cli.config import ConfigFileProcessor
 
+
 def test_cli(runner):
     """Expect a simple memote invocation to be successful."""
     result = runner.invoke(cli)
@@ -95,7 +96,7 @@ def test_run_dirty_repo_ignore_git_false(runner, mock_repo):
     assert "Please git commit or git stash all changes" in result.output
 
 
-def test_run_no_repo_ignore_git_false(runner, invalid_file):
+def test_run_error_when_invalid(runner, invalid_file):
     """
     Expect memote run to error when a provided model fails SBML validation.
 
@@ -160,11 +161,11 @@ def test_new(runner, tmpdir):
     }
     home = expanduser("~")
     cookiecutter_replay = join(
-        home,'.cookiecutter_replay/cookiecutter-memote.json'
+        home, '.cookiecutter_replay/cookiecutter-memote.json'
     )
     try:
         os.makedirs('~/.cookiecutter_replay')
-    except:
+    except Exception:
         pass
     with open(cookiecutter_replay, 'w') as outfile:
         json.dump(recorded_user_input, outfile)
@@ -182,6 +183,7 @@ def test_online(runner, mock_repo, monkeypatch):
     # Build-up
     def mock_setup_gh_repo(github_repository, github_username, note):
         return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
+
     def mock_setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         return "mock_secret"
 
@@ -207,7 +209,7 @@ def test_online(runner, mock_repo, monkeypatch):
 
     # Teardown
     repo.git.reset("--hard", 'HEAD~')
-    repo.git.push('--force','origin', 'master')
+    repo.git.push('--force', 'origin', 'master')
     os.chdir(previous_wd)
 
 
@@ -223,7 +225,6 @@ def test_history(runner, mock_repo):
 
     result = runner.invoke(cli, ["history", model, "Mock Commit Message",
                                  "--location", location])
-
     # Teardown
     os.chdir(previous_wd)
     assert result.exit_code == 0
