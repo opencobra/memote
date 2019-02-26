@@ -54,6 +54,7 @@ from memote.utils import is_modified, stdout_notifications
 import requests
 from requests.exceptions import  HTTPError
 from urllib.parse import quote_plus
+import tempfile
 
 
 LOGGER = logging.getLogger()
@@ -242,11 +243,17 @@ def new(directory, replay):
 
 
 def _model_from_stream(stream, filename):
+    fd, path = tempfile.mkstemp(suffix=".xml", text=True)
+    LOGGER.debug("Creating temporary model file at {}.".format(path))
     if filename.endswith(".gz"):
         with GzipFile(fileobj=stream) as file_handle:
-            model, sbml_ver, notifications = api.validate_model(file_handle)
+            os.write(fd, file_handle.read())
     else:
-        model, sbml_ver, notifications = api.validate_model(stream)
+        os.write(fd, stream.read())
+    os.close(fd)
+    model, sbml_ver, notifications = api.validate_model(path)
+    LOGGER.debug("Cleaning up temporary file.")
+    os.remove(path)
     return model, sbml_ver, notifications
 
 
@@ -310,22 +317,26 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
        for those only. This can also be achieved by supplying a commit range.
 
     """
-    callbacks.validate_path(model)
+    # callbacks.validate_path(model)
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     if "--tb" not in pytest_args:
         pytest_args = ["--tb", "no"] + pytest_args
     try:
+        LOGGER.info("Identifying git repository!")
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
             "The history requires a git repository in order to follow "
             "the model's commit history.")
         sys.exit(1)
-    previous = repo.active_branch
+    else:
+        LOGGER.info("Success!")
+        previous = repo.active_branch
+        LOGGER.info("Checking out deployment branch {}.".format(deployment))
+        repo.git.checkout(deployment)
     # Temporarily move the results to a new location so that they are
     # available while checking out the various commits.
-    repo.heads[deployment].checkout()
     engine = None
     tmp_location = mkdtemp()
     try:
@@ -350,6 +361,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         move(location, tmp_location)
         new_location = join(tmp_location, location)
         manager = RepoResultManager(repository=repo, location=new_location)
+    LOGGER.info("Recomputing result history!")
     history = HistoryManager(repository=repo, manager=manager)
     history.load_history(model, skip={deployment})
     if len(commits) == 0:
@@ -387,8 +399,10 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
                   pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()
+    LOGGER.info("Finished recomputing!")
     # Copy back all new and modified files and add them to the index.
-    repo.heads[deployment].checkout()
+    LOGGER.info("Committing recomputed results!")
+    repo.git.checkout(deployment)
     if engine is not None:
         manager.session.close()
         if location.startswith("sqlite"):
@@ -397,6 +411,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         move(new_location, os.getcwd())
     repo.git.add(".")
     repo.index.commit(message)
+    LOGGER.info("Success!")
     # Checkout the original branch.
     previous.checkout()
     LOGGER.info("Done.")

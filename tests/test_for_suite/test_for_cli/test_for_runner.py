@@ -209,3 +209,22 @@ def test_online(runner, mock_repo, monkeypatch):
     repo.git.reset("--hard", 'HEAD~')
     repo.git.push('--force','origin', 'master')
     os.chdir(previous_wd)
+
+
+def test_history(runner, mock_repo):
+    # Initialize mock repo
+    previous_wd = os.getcwd()
+    os.chdir(mock_repo[0])
+
+    # Build context_settings
+    context_settings = ConfigFileProcessor.read_config()
+    model = context_settings["model"]
+    location = context_settings["location"]
+
+    result = runner.invoke(cli, ["history", model, "Mock Commit Message",
+                                 "--location", location])
+
+    # Teardown
+    os.chdir(previous_wd)
+    print(result.output)
+    assert result.exit_code == 0
