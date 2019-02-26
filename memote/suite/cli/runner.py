@@ -35,12 +35,8 @@ import click_log
 import git
 import travis.encrypt as te
 from cookiecutter.main import cookiecutter, get_user_config
-from github import (
-    Github, BadCredentialsException, UnknownObjectException, GithubException)
 from sqlalchemy import create_engine
 from sqlalchemy.exc import ArgumentError
-from travispy import TravisPy
-from travispy.errors import TravisError
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
