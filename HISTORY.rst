@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* The number of duplicated reactions is now reported uniquely rather than all
+  duplicate pairs.
 
 0.9.5 (2019-02-21)
 ------------------
