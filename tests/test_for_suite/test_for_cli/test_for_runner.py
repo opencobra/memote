@@ -140,38 +140,11 @@ def test_run_skip_unchanged_true(runner, mock_repo):
 def test_new(runner, tmpdir):
     """Expect memote new to create a cookiecutter repo."""
     target_dir = str(tmpdir)
-    # Create the user config for cookiecutter to replay
-    recorded_user_input = {
-        "cookiecutter": {
-            "full_name": "John Doe",
-            "email": "john@doe.com",
-            "github_username": "JohnnyD",
-            "project_name": "mock-repo",
-            "project_slug": "mock-repo",
-            "project_short_description": "Mock repo for unit testing memote",
-            "release_date": "2019-02-07",
-            "year": "2019",
-            "version": "0.1.0",
-            "model": "default",
-            "model_path": "default",
-            "deployment": "gh-pages",
-            "yaml": "default",
-            "_extensions": ["memote.MemoteExtension"],
-            "_template": "gh:opencobra/cookiecutter-memote"}
-    }
-    home = expanduser("~")
-    cookiecutter_replay = join(
-        home, '.cookiecutter_replay/cookiecutter-memote.json'
-    )
-    try:
-        os.makedirs('~/.cookiecutter_replay')
-    except Exception:
-        pass
-    with open(cookiecutter_replay, 'w') as outfile:
-        json.dump(recorded_user_input, outfile)
-    # Invoke memote new reading the cookiecutter user configuration
+    user_responses = "John\nj@d.com\nJD\nmock-repo\nmock-repo\n" \
+                     "description\n2019-02-07\n2019\n0.1.0\n" \
+                     "default\ndefault\ngh-pages"
     result = runner.invoke(cli, [
-        "new", "--directory", target_dir, "--replay"], input='Yes')
+        "new", "--directory", target_dir], input=user_responses)
     assert result.exit_code == 0
 
 

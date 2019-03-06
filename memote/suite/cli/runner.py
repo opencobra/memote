@@ -49,8 +49,12 @@ from memote.utils import is_modified, stdout_notifications
 
 import requests
 from requests.exceptions import HTTPError
-from urllib.parse import quote_plus
 import tempfile
+
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    from urllib import quote_plus
 
 
 LOGGER = logging.getLogger()
