@@ -652,13 +652,14 @@ def test_find_duplicate_reactions(model):
 
     """
     ann = test_find_duplicate_reactions.annotation
-    ann["data"] = basic.find_duplicate_reactions(model)
-    ann["metric"] = len(ann["data"]) / len(model.reactions)
+    duplicates, num = basic.find_duplicate_reactions(model)
+    ann["data"] = duplicates
+    ann["metric"] = num / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based on metabolites, directionality and compartment there are a
-        total of {} reactions in the model which have duplicates: {}""".format(
-            len(ann["data"]), truncate(ann["data"])))
-    assert len(ann["data"]) == 0, ann["message"]
+        total of {} reactions in the model which have duplicates:
+        {}""".format(num, truncate(duplicates)))
+    assert num == 0, ann["message"]
 
 
 @annotate(title="Reactions With Identical Genes", format_type="percent")
