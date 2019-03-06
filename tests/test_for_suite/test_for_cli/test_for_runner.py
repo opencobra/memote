@@ -69,12 +69,14 @@ def test_run_no_location(runner, mock_repo):
     assert result.exit_code == 1
 
 
-def test_run_no_repo_ignore_git_false(runner, model_file):
+def test_run_no_repo_ignore_git_false(runner, model_file, tmpdir):
     """
     Expect memote run to warn user if it was not invoked inside a git repo.
 
     """
+    previous_wd = tmpdir.chdir()
     result = runner.invoke(cli, ["-v", "WARN", "run", model_file])
+    previous_wd.chdir()
     assert "warning: We highly recommend" in result.output
 
 
