@@ -855,17 +855,18 @@ def test_find_reactions_with_partially_identical_annotations(model, num):
     assert total == num
 
 
-@pytest.mark.parametrize("model, num", [
+@pytest.mark.parametrize("model, expected", [
     ("empty", 0),
-    ("dup_rxns", 1),
+    ("dup_rxns", 2),
     ("dup_rxns_rev", 0),
     ("dup_rxns_irrev", 0),
     ("dup_rxns_compartment", 0),
-    ("dup_rxns_irrev_exchanges", 1),
+    ("dup_rxns_irrev_exchanges", 2),
 ], indirect=["model"])
-def test_find_duplicate_reactions(model, num):
+def test_find_duplicate_reactions(model, expected):
     """Expect amount of duplicate reactions to be identified correctly."""
-    assert len(basic.find_duplicate_reactions(model)) == num
+    _, num = basic.find_duplicate_reactions(model)
+    assert num == expected
 
 
 @pytest.mark.parametrize("model, num", [
@@ -896,3 +897,14 @@ def test_check_transport_reaction_gpr_presence(model, num):
 def test_find_medium_metabolites(model, num):
     """Expect amount of medium metabolites be identified."""
     assert len(basic.find_medium_metabolites(model)) == num
+
+
+@pytest.mark.parametrize("model, num", [
+    ("non_metabolic_reactions", 1),
+    ("transport_gpr", 2),
+    pytest.param("gpr_missing", 2,
+                 marks=pytest.mark.raises(exception=RuntimeError)),
+], indirect=["model"])
+def test_find_external_metabolites(model, num):
+    """Expect a specific number of external metabolites to be found."""
+    assert len(basic.find_external_metabolites(model)) == num

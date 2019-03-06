@@ -25,7 +25,7 @@ import re
 import numpy as np
 from six import iteritems
 from future.utils import raise_with_traceback
-from cobra.exceptions import Infeasible, OptimizationError
+from cobra.exceptions import OptimizationError
 
 import memote.support.helpers as helpers
 
@@ -36,16 +36,34 @@ __all__ = (
 LOGGER = logging.getLogger(__name__)
 
 # 20 Amino Acids, 4 Deoxyribonucleotides, 4 Ribonucleotides,
-# 8 Cofactors, and H2O
+# 8 Universal Cofactors, and H2O
 ESSENTIAL_PRECURSOR_IDS = \
     ['MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61',
      'MNXM97', 'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142',
      'MNXM37', 'MNXM89557', 'MNXM231', 'MNXM70', 'MNXM78',
      'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29', 'MNXM147',
+     # Deoxyribonucleotides
      'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
+     # Ribonucleotides
      'MNXM3', 'MNXM51', 'MNXM63', 'MNXM121',
-     'MNXM8', 'MNXM5', 'MNXM16', 'MNXM33', 'MNXM161',
-     'MNXM12', 'MNXM256', 'MNXM119', 'MNXM2']
+     # NAD
+     'MNXM8',
+     # NADP
+     'MNXM5',
+     # S-adenosyl-L-methionine
+     'MNXM16',
+     # FAD
+     'MNXM33',
+     # Pyridoxal 5'-phosphate
+     'MNXM161',
+     # CoA
+     'MNXM12',
+     # Thiamine Diphosphate
+     'MNXM256',
+     # FMN
+     'MNXM119',
+     # H2O
+     'MNXM2']
 
 
 def sum_biomass_weight(reaction):
@@ -129,18 +147,18 @@ def find_blocked_biomass_precursors(reaction, model):
     LOGGER.debug("Finding blocked biomass precursors")
     precursors = find_biomass_precursors(model, reaction)
     blocked_precursors = list()
+    _, ub = helpers.find_bounds(model)
     for precursor in precursors:
         with model:
-            dm_rxn = model.add_boundary(precursor, type="demand")
-            model.objective = dm_rxn
-            try:
-                solution = model.optimize()
-                LOGGER.debug(
-                    "%s: demand flux is '%g' and solver status is '%s'",
-                    str(precursor), solution.objective_value, solution.status)
-                if solution.objective_value <= 0.0:
-                    blocked_precursors.append(precursor)
-            except Infeasible:
+            dm_rxn = model.add_boundary(
+                precursor,
+                type="safe-demand",
+                reaction_id="safe_demand",
+                lb=0,
+                ub=ub
+            )
+            flux = helpers.run_fba(model, dm_rxn.id, direction='max')
+            if np.isnan(flux) or abs(flux) < 1E-08:
                 blocked_precursors.append(precursor)
     return blocked_precursors
 
@@ -425,6 +443,13 @@ def essential_precursors_not_in_biomass(model, reaction):
     and NADH), only one form could be included for the sake of simplicity.
     When a class of cofactors includes active and non-active interconvertible
     forms, the active forms should be preferred. [1]_."
+
+    Please note, that [1]_ also suggest to count C1 carriers
+    (derivatives of tetrahydrofolate(B9) or tetrahydromethanopterin) as
+    universal cofactors. We have omitted these from this check because there
+    are many individual compounds that classify as C1 carriers, and it is not
+    clear a priori which one should be preferred. In a future update, we may
+    consider identifying these using a chemical ontology.
 
     References
     ----------

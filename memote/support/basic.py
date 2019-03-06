@@ -17,11 +17,13 @@
 
 """Supporting functions for basic checks performed on the model object."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import logging
 from itertools import combinations
 from pylru import lrudecorator
+
+from cobra.medium import find_external_compartment
 
 import memote.support.helpers as helpers
 from memote.support.gpr_helpers import find_top_level_complex
@@ -375,7 +377,7 @@ def map_metabolites_to_structures(metabolites, compartments):
         structure index.
 
     """
-    # TODO: Consider SMILES?
+    # TODO (Moritz Beber): Consider SMILES?
     unique_identifiers = ["inchikey", "inchi"]
     met2mol = {}
     molecules = {c: [] for c in compartments}
@@ -407,7 +409,7 @@ def map_metabolites_to_structures(metabolites, compartments):
 
 def find_duplicate_reactions(model):
     """
-    Return a list with sets of reactions that are functionally identical.
+    Return a list with pairs of reactions that are functionally identical.
 
     Identify duplicate reactions globally by checking if any
     two reactions have the same metabolites, same directionality and are in
@@ -433,7 +435,9 @@ def find_duplicate_reactions(model):
     Returns
     -------
     list
-        A list of sets of duplicate reactions based on metabolites.
+        A list of pairs of duplicate reactions based on metabolites.
+    int
+        The number of unique reactions that have a duplicates
 
     """
     met2mol = map_metabolites_to_structures(model.metabolites,
@@ -455,6 +459,7 @@ def find_duplicate_reactions(model):
         }
         structural.append((rxn, substrates, products))
     # Compare reactions using their structure-based stoichiometries.
+    num_duplicated = set()
     duplicates = []
     for (rxn_a, sub_a, prod_a), (rxn_b, sub_b, prod_b) in combinations(
             structural, 2):
@@ -467,10 +472,12 @@ def find_duplicate_reactions(model):
         # Compare whether they are both (ir-)reversible.
         if rxn_a.reversibility != rxn_b.reversibility:
             continue
-        # TODO: We could compare bounds here but it might be worth knowing
-        #  about the reactions even if their bounds differ?
+        # TODO (Moritz Beber): We could compare bounds here but it might be
+        #  worth knowing about the reactions even if their bounds differ?
         duplicates.append((rxn_a.id, rxn_b.id))
-    return duplicates
+        num_duplicated.add(rxn_a.id)
+        num_duplicated.add(rxn_b.id)
+    return duplicates, len(num_duplicated)
 
 
 def find_reactions_with_identical_genes(model):
@@ -529,3 +536,9 @@ def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
     return [met.id for rxn in model.medium
             for met in model.reactions.get_by_id(rxn).metabolites]
+
+
+def find_external_metabolites(model):
+    """Return all metabolites in the external compartment."""
+    ex_comp = find_external_compartment(model)
+    return [met for met in model.metabolites if met.compartment == ex_comp]

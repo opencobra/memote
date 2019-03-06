@@ -47,6 +47,8 @@ def number_independent_conservation_relations(model):
     """
     Return the number of conserved metabolite pools.
 
+    This number is given by the left null space of the stoichiometric matrix.
+
     Parameters
     ----------
     model : cobra.Model
@@ -58,23 +60,6 @@ def number_independent_conservation_relations(model):
     )
     ln_matrix = con_helpers.nullspace(s_matrix.T)
     return ln_matrix.shape[1]
-
-
-def number_steady_state_flux_solutions(model):
-    """
-    Return the amount of steady-state flux solutions of this model.
-
-    Parameters
-    ----------
-    model : cobra.Model
-        The metabolic model under investigation.
-
-    """
-    s_matrix, _, _ = con_helpers.stoichiometry_matrix(
-        model.metabolites, model.reactions
-    )
-    n_matrix = con_helpers.nullspace(s_matrix)
-    return n_matrix.shape[1]
 
 
 def matrix_rank(model):
@@ -104,7 +89,7 @@ def degrees_of_freedom(model):
 
     Notes
     -----
-    This specifically refers to the dimensionality of the right nullspace
+    This specifically refers to the dimensionality of the (right) null space
     of the stoichiometric matrix, as dim(Null(S)) corresponds directly to the
     number of free variables in the system [1]_. The formula used calculates
     this using the rank-nullity theorem [2]_.

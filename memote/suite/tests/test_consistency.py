@@ -98,6 +98,8 @@ def test_detect_energy_generating_cycles(model, met):
         pytest.skip("This test has been skipped since metabolite {} could "
                     "not be found in the model.".format(met))
     ann["data"][met] = consistency.detect_energy_generating_cycles(model, met)
+    # Report the number of cycles scaled by the number of reactions.
+    ann["metric"][met] = len(ann["data"][met]) / len(model.reactions)
     ann["message"][met] = wrapper.fill(
         """The model can produce '{}' without requiring resources. This is
         caused by improperly constrained reactions leading to erroneous

@@ -39,8 +39,9 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     data on solver performance becomes available.
 
     Implementation:
-    Compose the S-Matrix, then calculate absolute coefficients and lastly use
-    the maximal value and minimal non-zero value to calculate the ratio
+    Compose the stoichiometric matrix, then calculate absolute coefficients and
+    lastly use the maximal value and minimal non-zero value to calculate the
+    ratio.
 
     """
     ann = test_absolute_extreme_coefficient_ratio.annotation
@@ -55,8 +56,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     assert ann["data"] < threshold, ann["message"]
 
 
-@annotate(title="Independent Conservation Relations",
-          format_type="raw")
+@annotate(title="Independent Conservation Relations", format_type="raw")
 def test_number_independent_conservation_relations(model):
     """
     Show the number of independent conservation relations in the model.
@@ -67,14 +67,17 @@ def test_number_independent_conservation_relations(model):
     is system-specific.
 
     Implementation:
-    Compose and transpose the S-Matrix, then calculate the left nullspace
-    using an algorithm based on the singular value decomposition adapted from
+    Calculate the left null space, i.e., the null space of the transposed
+    stoichiometric matrix, using an algorithm based on the singular value
+    decomposition adapted from
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-    Then, return the estimated dimension of the left nullspace.
+    Then, return the estimated dimension of that null space.
 
     """
     ann = test_number_independent_conservation_relations.annotation
     ann["data"] = matrix.number_independent_conservation_relations(model)
+    # Report the number of ICR scaled by the number of metabolites.
+    ann["metric"] = ann["data"] / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """The number of independent conservation relations is {}.""".format(
             ann["data"]))
@@ -89,13 +92,15 @@ def test_matrix_rank(model):
     calculated using singular value decomposition (SVD).
 
     Implementation:
-    Compose the S-Matrix, then estimate the rank, i.e. the dimension of the
-    column space, of a matrix. The algorithm used by this function is based on
-    the singular value decomposition of the S-Matrix.
+    Compose the stoichiometric matrix, then estimate the rank, i.e. the
+    dimension of the column space, of a matrix. The algorithm used by this
+    function is based on the singular value decomposition of the matrix.
 
     """
     ann = test_matrix_rank.annotation
     ann["data"] = matrix.matrix_rank(model)
+    # Report the rank scaled by the number of reactions.
+    ann["metric"] = ann["data"] / len(model.reactions)
     ann["message"] = wrapper.fill(
         """The rank of the S-Matrix is {}.""".format(ann["data"]))
 
@@ -107,16 +112,18 @@ def test_degrees_of_freedom(model):
 
     The degrees of freedom of the stoichiometric matrix, i.e., the number
     of 'free variables' is system specific and corresponds to the dimension
-    of the right nullspace of the matrix.
+    of the (right) null space of the matrix.
 
     Implementation:
-    Compose the S-Matrix, then calculate the dimensionality of the right
-    nullspace using the rank-nullity theorem outlined by
+    Compose the stoichiometric matrix, then calculate the dimensionality of the
+    null space using the rank-nullity theorem outlined by
     Alama, J. The Rank+Nullity Theorem. Formalized Mathematics 15, (2007).
 
     """
     ann = test_degrees_of_freedom.annotation
     ann["data"] = matrix.degrees_of_freedom(model)
+    # Report the degrees of freedom scaled by the number of reactions.
+    ann["metric"] = ann["data"] / len(model.reactions)
     ann["message"] = wrapper.fill(
         """The degrees of freedom of the S-Matrix are {}.""".format(
             ann["data"]))

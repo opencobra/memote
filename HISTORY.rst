@@ -3,6 +3,20 @@ History
 
 Next Release
 ------------
+
+0.9.6 (2019-03-06)
+------------------
+* The number of duplicated reactions is now reported uniquely rather than all
+  duplicate pairs.
+
+0.9.5 (2019-02-21)
+------------------
+* Add missing parametrized metric on ``test_biomass_open_production``.
+
+0.9.4 (2019-02-20)
+------------------
+* Add metrics, i.e., model-size independent test outcomes to almost all test
+  cases.
 * Repair auto generation of API docs and update section on test suite.
 * Remove our dependecy on PyGithub and TravisPy by reimplementing all the
   necessary steps with `requests`
