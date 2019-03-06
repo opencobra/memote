@@ -69,7 +69,7 @@ def test_biomass_presence(model):
     ann["data"] = [
         rxn.id for rxn in helpers.find_biomass_reaction(model)]
     outcome = len(ann["data"]) > 0
-    ann["metric"] = 1.0 - float(outcome)
+    ann["metric"] = float(outcome)
     ann["message"] = wrapper.fill(
         """In this model {} the following biomass reactions were
         identified: {}""".format(
@@ -115,7 +115,7 @@ def test_biomass_consistency(model, reaction_id):
             """.format(reaction_id, ann["data"][reaction_id])
         )
     outcome = (1 - 1e-03) < ann["data"][reaction_id] < (1 + 1e-06)
-    ann["metric"][reaction_id] = 1.0 - float(outcome)
+    ann["metric"][reaction_id] = float(outcome)
     # To account for numerical inaccuracies, a range from 1-1e0-3 to 1+1e-06
     # is implemented in the assertion check
     assert outcome, ann["message"][reaction_id]
@@ -140,7 +140,7 @@ def test_biomass_default_production(model, reaction_id):
     ann = test_biomass_default_production.annotation
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     outcome = ann["data"][reaction_id] > 1E-07
-    ann["metric"][reaction_id] = 1.0 - float(outcome)
+    ann["metric"][reaction_id] = float(outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate (1/h) that
         can be achieved when the model is simulated on the provided
@@ -169,7 +169,7 @@ def test_biomass_open_production(model, reaction_id):
     helpers.open_boundaries(model)
     ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
     outcome = ann["data"][reaction_id] > 1E-07
-    ann["metric"][reaction_id] = 1.0 - float(outcome)
+    ann["metric"][reaction_id] = float(outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate that can be
         achieved when the model is simulated on a complete medium i.e.
@@ -315,7 +315,7 @@ def test_gam_in_biomass(model, reaction_id):
     reaction = model.reactions.get_by_id(reaction_id)
     outcome = biomass.gam_in_biomass(model, reaction)
     ann["data"][reaction_id] = outcome
-    ann["metric"][reaction_id] = 1.0 - float(outcome)
+    ann["metric"][reaction_id] = float(outcome)
     if outcome:
         ann["message"][reaction_id] = wrapper.fill(
             """Yes, {} contains a term for growth-associated maintenance.
@@ -353,7 +353,7 @@ def test_fast_growth_default(model, reaction_id):
     ann = test_fast_growth_default.annotation
     outcome = helpers.run_fba(model, reaction_id) > 2.81
     ann["data"][reaction_id] = outcome
-    ann["metric"][reaction_id] = 1.0 - float(outcome)
+    ann["metric"][reaction_id] = float(outcome)
     if ann["data"][reaction_id]:
         ann["message"][reaction_id] = wrapper.fill(
             """Using the biomass reaction {} and when the model is simulated on

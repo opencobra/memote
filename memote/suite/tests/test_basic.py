@@ -43,7 +43,7 @@ def test_model_id_presence(model):
     ann = test_model_id_presence.annotation
     assert hasattr(model, "id")
     ann["data"] = model.id
-    ann["metric"] = 1.0 - float(bool(ann["data"]))
+    ann["metric"] = float(bool(ann["data"]))
     ann["message"] = "The model ID is {}".format(ann["data"])
     assert bool(model.id)
 
@@ -234,7 +234,7 @@ def test_ngam_presence(model):
     """
     ann = test_ngam_presence.annotation
     ann["data"] = get_ids(basic.find_ngam(model))
-    ann["metric"] = 1.0 - float(len(ann["data"]) == 1)
+    ann["metric"] = float(len(ann["data"]) == 1)
     ann["message"] = wrapper.fill(
         """A total of {} NGAM reactions could be identified:
         {}""".format(len(ann["data"]), truncate(ann["data"])))
@@ -290,7 +290,7 @@ def test_compartments_presence(model):
     ann = test_compartments_presence.annotation
     assert hasattr(model, "compartments")
     ann["data"] = list(model.compartments)
-    ann["metric"] = 1.0 - float(len(ann["data"]) >= 2)
+    ann["metric"] = float(len(ann["data"]) >= 2)
     ann["message"] = wrapper.fill(
         """A total of {:d} compartments are defined in the model: {}""".format(
             len(ann["data"]), truncate(ann["data"])))

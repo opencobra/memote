@@ -48,7 +48,7 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     high, low = matrix.absolute_extreme_coefficient_ratio(model)
     ann["data"] = high / low
     # Inverse the Boolean: 0.0 = good; 1.0 = bad.
-    ann["metric"] = 1.0 - float(ann["data"] < threshold)
+    ann["metric"] = float(ann["data"] < threshold)
     ann["message"] = wrapper.fill(
         """The ratio of the absolute values of the largest coefficient {} and
         the lowest, non-zero coefficient {} is: {:.3G}.""".format(

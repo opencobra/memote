@@ -40,7 +40,7 @@ def test_sbml_level(sbml_version):
     ann = test_sbml_level.annotation
     ann["data"] = version_tag
     outcome = sbml_version[:2] >= (3, 1)
-    ann["metric"] = 1.0 - float(outcome)
+    ann["metric"] = float(outcome)
     ann["message"] = wrapper.fill(
         """The SBML file uses: {}""".format(ann["data"]))
     assert sbml_version[:2] >= (3, 1), ann["message"]
@@ -66,7 +66,7 @@ def test_fbc_presence(sbml_version):
     fbc_present = sbml_version[2] is not None
     ann = test_fbc_presence.annotation
     ann["data"] = fbc_present
-    ann["metric"] = 1.0 - float(fbc_present)
+    ann["metric"] = float(fbc_present)
     if fbc_present:
         ann["message"] = wrapper.fill("The FBC package *is* used.")
     else:
