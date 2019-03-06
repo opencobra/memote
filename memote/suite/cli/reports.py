@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import logging
 import sys
 from builtins import open
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 from functools import partial
 
 from libsbml import SBMLError
@@ -276,7 +276,7 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
                                 experimental=experimental)
-    pool = Pool(min(len(models), os.cpu_count()))
+    pool = Pool(min(len(models), cpu_count()))
     results = pool.map(partial_test_diff, model_and_model_ver_tuple)
 
     for model_path, result in zip(models, results):
