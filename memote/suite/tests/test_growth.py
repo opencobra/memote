@@ -54,20 +54,20 @@ def test_growth_from_data_qualitative(model, experiment, threshold=0.95):
 
     """
     ann = test_growth_from_data_qualitative.annotation
-    exp = pytest.memote.experimental.growth[experiment]
+    name, exp = experiment
     expected = exp.data
     test = exp.evaluate(model)
     # Growth data sets need not use unique exchange reactions thus we use the
     # numeric index here to compute the confusion matrix.
-    ann["data"][experiment] = confusion_matrix(
+    ann["data"][name] = result = confusion_matrix(
         set(test.loc[test["growth"], "exchange"].index),
         set(expected.loc[expected["growth"], "exchange"].index),
         set(test.loc[~test["growth"], "exchange"].index),
         set(expected.loc[~expected["growth"], "exchange"].index)
     )
-    ann["metric"][experiment] = ann["data"][experiment]["ACC"]
-    ann["message"][experiment] = wrapper.fill(
+    ann["metric"][name] = result["ACC"]
+    ann["message"][name] = wrapper.fill(
         """Ideally, every model would show a perfect accuracy of 1. In
-        experiment '{}' the model has  {:.2}.""".format(
-            experiment, ann["data"][experiment]["MCC"]))
-    assert ann["data"][experiment]["ACC"] > threshold
+        name '{}' the model has  {:.2}.""".format(
+            name, result["MCC"]))
+    assert result["ACC"] > threshold
