@@ -418,9 +418,10 @@ def find_duplicate_reactions(model):
     This can be useful to curate merged models or to clean-up bulk model
     modifications. The heuristic compares reactions in a pairwise manner.
     For each reaction, the metabolite annotations are checked for a description
-    of the structure (via Inchi and Inchikey).Then substrates and products of
-    any reaction pair are compared. Only reactions where the substrates,
-    products and reversibility are identical are considered to be duplicates.
+    of the structure (via Inchi and Inchikey).If they exist, substrates and
+    products as well as the stoichiometries of any reaction pair are compared.
+    Only reactions where the substrates, products, stoichiometry and
+    reversibility are identical are considered to be duplicates.
     This test will not be able to identify duplicate reactions if there are no
     structure annotations. Further, it will report reactions with
     differing bounds as equal if they otherwise match the above conditions.
