@@ -81,19 +81,19 @@ class ResultCollectionPlugin(object):
             metafunc.parametrize("reaction_id", [
                 rxn.id for rxn in find_biomass_reaction(self._model)])
             return
-        if metafunc.definition.get_closest_marker("essentiality"):
-            if self._exp_config is None:
+        # Parametrize experimental test cases.
+        for kind in ["essentiality", "growth"]:
+            # Find a corresponding pytest marker on the test case.
+            if not metafunc.definition.get_closest_marker(kind):
+                continue
+            exp = getattr(self._exp_config, kind, None)
+            if exp is None:
                 metafunc.parametrize("experiment", [])
             else:
-                metafunc.parametrize("experiment",
-                                     self._exp_config.get("essentiality", []))
-            return
-        if metafunc.definition.get_closest_marker("growth"):
-            if self._exp_config is None:
-                metafunc.parametrize("experiment", [])
-            else:
-                metafunc.parametrize("experiment",
-                                     self._exp_config.get("growth", []))
+                metafunc.parametrize(
+                    "experiment", list(exp.items()))
+            # We only expect one kind of experimental marker per test case
+            # and thus end execution here.
             return
 
     @pytest.hookimpl(tryfirst=True)
