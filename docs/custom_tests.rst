@@ -215,3 +215,44 @@ module directories:
 .. code-block:: console
 
     $ memote run -a "--durations=10 path/to/dir1/ path/to/dir2/" --filename "report.html" path/to/model.xml
+
+
+Guidelines
+==========
+
+Please consider the following guidelines which reflect some of the considerations
+behind the core tests in memote. Adhering to these guidelines will allow other
+researchers to easily adopt your custom tests and ensure that they are applicable
+to a wide array of modeling practises.
+
+1. **Be namespace agnostic**. Use the ``METANETX_SHORTLIST`` and
+``COMPARTMENT_SHORTLIST`` mapping tables from memote or consider creating your
+own if your custom test needs to identify a specific metabolite in a specific
+compartment. You can generate a custom metablite shortlist by adapting
+``shortlist.tsv`` and then executing the script ``annotate_mnx_shortlists.py``
+found in ``memote/scripts``.
+
+2. **Be paradigm agnostic**. Use the functions provided in
+``memote/support`` for routine operations i.e. identifying a model's biomass
+reaction(s) or finding all purely metabolic reactions. We have been intent on making
+memote as robust as possible with regards to the range of modeling
+paradigms we have encountered so far. In addition, support functions are rigidly
+unit tested.
+
+3. **Be organism agnostic**. Unless you target a specific class of organism,
+consider how your test performs on a model of a different organism. Will the
+results be biased by that in anyway? If so, consider emphasizing that bias in the
+docstring.
+
+4. **Be reproducible**. Provide a ``requirements.txt`` or ``setup.cfg`` with your
+custom test module if you rely on packages or specific version that differ from
+those memote relies on.
+
+5. **Write readable code**. Lint your code with respect to PEP8_, annotate it
+consistently and make use of logging.
+
+6. **Share the love**. Let us know about your custom tests! We are considering
+to build a registry and knowing that people use this feature is the first step
+towards that.
+
+.. _PEP8: https://www.python.org/dev/peps/pep-0008/
