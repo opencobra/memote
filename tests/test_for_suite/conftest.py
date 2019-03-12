@@ -70,7 +70,7 @@ def mock_repo(tmpdir_factory):
     mock_repo_tarfile.extractall(base_path)
     mock_repo_tarfile.close()
     # Obtain the repository as a gitpython Repo object
-    path = join(base_path,"memote-mock-repo")
+    path = join(base_path, "memote-mock-repo")
     chdir(path)
     try:
         repo = Repo()

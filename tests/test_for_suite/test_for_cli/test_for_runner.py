@@ -21,8 +21,7 @@ from __future__ import absolute_import
 
 import os
 from builtins import str
-from os.path import exists, join, expanduser
-import json
+from os.path import exists, join
 
 import pytest
 
