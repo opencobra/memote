@@ -17,13 +17,18 @@
 
 from __future__ import absolute_import
 
+import logging
+from os import chdir, getcwd
 from builtins import str
-from os.path import basename
+from os.path import basename, dirname, pardir, join
 from shutil import copyfile
-from git import Repo
+from git import Repo, InvalidGitRepositoryError
+from tarfile import open
 
 import pytest
 from click.testing import CliRunner
+
+LOGGER = logging.getLogger()
 
 
 @pytest.fixture(scope="session")
@@ -50,10 +55,27 @@ def invalid_file(invalid_model, tmpdir_factory):
 @pytest.fixture(scope="function")
 def mock_repo(tmpdir_factory):
     """
-    Clones the mock repo https://github.com/ChristianLieven/memote-mock-repo.
+    Unzips the mock repo providing the path to it and a repo instance.
 
     """
-    path = str(tmpdir_factory.mktemp("mock-repo"))
-    repo = Repo.clone_from(
-        'https://github.com/ChristianLieven/memote-mock-repo.git', path)
+    cwd = getcwd()
+    # Define the path to the temporary folder
+    base_path = str(tmpdir_factory.mktemp("mock-repo"))
+    # and the tarball that we will decompress there
+    tar_file = join(
+        dirname(__file__), pardir, "data", "memote-mock-repo.tar.gz"
+    )
+    # Extract the gzipped tarball
+    mock_repo_tarfile = open(tar_file)
+    mock_repo_tarfile.extractall(base_path)
+    mock_repo_tarfile.close()
+    # Obtain the repository as a gitpython Repo object
+    path = join(base_path,"memote-mock-repo")
+    chdir(path)
+    try:
+        repo = Repo()
+    except InvalidGitRepositoryError:
+        LOGGER.warning(
+            "Could not find memote-mock-repository. Is the path correct?")
+    chdir(cwd)
     return path, repo
