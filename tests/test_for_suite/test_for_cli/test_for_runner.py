@@ -21,9 +21,7 @@ from __future__ import absolute_import
 
 import os
 from builtins import str
-from os.path import exists, join
-
-import pytest
+from os.path import exists, join, pardir
 
 from memote.suite.cli.runner import cli
 import memote.suite.cli.runner
@@ -149,10 +147,6 @@ def test_new(runner, tmpdir):
     assert result.exit_code == 0
 
 
-@pytest.mark.skip(reason="Currently fails with: fatal: could not read "
-                         "Username for 'https://github.com': Device not "
-                         "configured. In addition, incorporating github "
-                         "credentials is a bit of an issue.")
 def test_online(runner, mock_repo, monkeypatch):
     # Build-up
     def mock_setup_gh_repo(github_repository, github_username, note):
@@ -166,8 +160,14 @@ def test_online(runner, mock_repo, monkeypatch):
     monkeypatch.setattr(
         memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci)
     previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-    repo = mock_repo[1]
+
+    path2origin = mock_repo[0]
+    originrepo = mock_repo[1]
+
+    path2local = join(path2origin, pardir, 'cloned_repo')
+    os.mkdir(path2local)
+    localrepo = originrepo.clone(path2local)
+    os.chdir(path2local)
 
     # Build context_settings
     context_settings = ConfigFileProcessor.read_config()
@@ -182,8 +182,8 @@ def test_online(runner, mock_repo, monkeypatch):
     assert result.exit_code == 0
 
     # Teardown
-    repo.git.reset("--hard", 'HEAD~')
-    repo.git.push('--force', 'origin', 'master')
+    localrepo.git.reset("--hard", 'HEAD~')
+    localrepo.git.push('--force', 'origin', 'master')
     os.chdir(previous_wd)
 
 
