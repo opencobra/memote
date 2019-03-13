@@ -229,7 +229,7 @@ to a wide array of modeling practises.
 ``COMPARTMENT_SHORTLIST`` (both in ``memote/support/helpers.py``) mapping
 tables from memote or consider creating your own if your custom test needs to
 identify a specific metabolite in a specific
-compartment. You can generate a custom metablite shortlist by adapting
+compartment. You can generate a custom metabolite shortlist by adapting
 ``shortlist.tsv`` and then executing the script ``annotate_mnx_shortlists.py``
 found in ``memote/scripts``.
 
