@@ -226,8 +226,9 @@ researchers to easily adopt your custom tests and ensure that they are applicabl
 to a wide array of modeling practises.
 
 1. **Be namespace agnostic**. Use the ``METANETX_SHORTLIST`` and
-``COMPARTMENT_SHORTLIST`` mapping tables from memote or consider creating your
-own if your custom test needs to identify a specific metabolite in a specific
+``COMPARTMENT_SHORTLIST`` (both in ``memote/support/helpers.py``) mapping
+tables from memote or consider creating your own if your custom test needs to
+identify a specific metabolite in a specific
 compartment. You can generate a custom metablite shortlist by adapting
 ``shortlist.tsv`` and then executing the script ``annotate_mnx_shortlists.py``
 found in ``memote/scripts``.
