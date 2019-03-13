@@ -161,9 +161,13 @@ def test_online(runner, mock_repo, monkeypatch):
         memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci)
     previous_wd = os.getcwd()
 
+    # Use the Repository from the mock_repo fixture as the origin to clone from
     path2origin = mock_repo[0]
     originrepo = mock_repo[1]
 
+    # Create a directory at a temporary path to clone the mock_repo into.
+    # Cloning configures the mock_repo as the origin of the "local" repo which
+    # allows us to push from one local directory to another.
     path2local = join(path2origin, pardir, 'cloned_repo')
     os.mkdir(path2local)
     localrepo = originrepo.clone(path2local)
