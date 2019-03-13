@@ -228,7 +228,7 @@ to a wide array of modeling practises.
 1. **Be namespace agnostic**. Use the ``METANETX_SHORTLIST`` and
 ``COMPARTMENT_SHORTLIST`` mapping tables from memote or consider creating your
 own if your custom test needs to identify a specific metabolite in a specific
-compartment. You can generate a custom metablite shortlist by adapting
+compartment. You can generate a custom metabolite shortlist by adapting
 ``shortlist.tsv`` and then executing the script ``annotate_mnx_shortlists.py``
 found in ``memote/scripts``.
 
