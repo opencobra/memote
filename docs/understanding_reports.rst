@@ -77,6 +77,11 @@ Some tests carry out one operation on several parameters and therefore deviate
 slightly from the descriptions above. Expanding the title row reveals only the
 description, while rows of the individual parameters reveal the text fields.
 
+In the history report, instead of text fields scatterplots show how the
+respective metrics developed over the commit history for each branch of a
+repository. By clicking an entry in the legend, it is possible to toggle
+its visibility in the plot.
+
 Interpretation
 ==============
 
