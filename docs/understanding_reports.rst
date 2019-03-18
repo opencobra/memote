@@ -8,12 +8,12 @@ Understanding the reports
 
 Memote will return one of four possible outputs.
 If your preferred workflow is to benchmark one or several genome-scale
-metabolic models (GSM) memote generates a either a snapshot or diff report,
+metabolic models (GSM) memote generates either a snapshot or a diff report,
 respectively. For the reconstruction workflow the primary output is a history
-report. This will only work if the provided input model are formatted
+report. This will only work if the provided input models are formatted
 correctly in the systems biology markup language (SBML_). However, if a
-provided model is not a valid SBML file, memote composes an error report
-enumerating structural errors and warnings from the SBML validator in the
+provided model is not a valid SBML file, memote composes a report
+enumerating errors and warnings from the SBML validator in
 order of appearance. To better understand the output of the error report we
 refer the reader to this section of the `SBML documentation`_. In this section
 we will focus on how to understand the snapshot, diff and history reports.
@@ -52,7 +52,7 @@ of the page summarises the results to further simplify comparison.
 The specific section on the right provides model specific statistics
 and covers aspects of a metabolic network that can not be normalized
 without introducing bias. For instance, dedicated quality control of the biomass
-equation only applies to GSMs which are used to investigate cell growth i.e.
+equation only applies to GSMs which are used to investigate cell growth, i.e.,
 those for which a biomass equation has been generated. Some tests in this
 section are also influenced by whether the tested GSM represents a prokaryote or
 a eukaryote. Therefore the results cannot be generalized and direct comparisons
@@ -127,7 +127,7 @@ the sample maxium. Result sets where the sample minimum and the sample
 maximum are identical will be coloured in the main blue colour of the
 memote colour scheme. Result sets where the sample minimum is very small
 relative to the sample maximum will appear red . This ratio is calculated
-with as **1 - (Min / Max)) * 100**.
+using :math:`1 - (Min / Max)) * 100`.
 
 This is then mapped to the following gradient:
 
@@ -158,7 +158,7 @@ Score
 Each test in the independent section provides a relative measure of
 completeness with regard to the tested property. The final score is the
 weighted sum of all individual test results normalized by the maximally
-achievable score i.e. all individual results at 100%. Individual tests can
+achievable score, i.e., all individual results at 100%. Individual tests can
 be weighted, but it is also possible to apply weighting to entire test
 categories. Hence the final score is calculated:
 
@@ -354,8 +354,7 @@ categories. Hence the final score is calculated:
 
 
 Weights for sections and individual tests are indicated by a white number
-inside a magenta badge. No badge means that the weight is either equal to 1
-or undefined.
+inside a magenta badge. No badge means that the weight defaults to 1.
 
 
 
