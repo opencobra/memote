@@ -22,6 +22,18 @@ input.form-control{
     text-color: #FFF;
 }
 
+.red{
+    color: rgb(161, 18, 18);
+}
+
+.green{
+    color: rgb(18, 161, 46);
+}
+
+.blue{
+    color: rgb(42, 123, 184);
+}
+
 .form-control::-webkit-input-placeholder {
     color: #ACD7E6;
 }  /* WebKit, Blink, Edge */
