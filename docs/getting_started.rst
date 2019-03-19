@@ -21,6 +21,11 @@ Users that have already followed these steps once may want to refer to the
 comprehensive insight into all optional parameters of the CLI please refer to
 the :doc:`corresponding API reference <_autogen/memote.suite.cli>`.
 
+If you only want to benchmark a model, using the `memote
+webservice hosted at memote.io`_ instead may be more convenient.
+
+.. _memote webservice hosted at memote.io: https://memote.io/
+
 Benchmark
 =========
 

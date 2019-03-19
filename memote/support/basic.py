@@ -417,15 +417,14 @@ def find_duplicate_reactions(model):
 
     This can be useful to curate merged models or to clean-up bulk model
     modifications. The heuristic compares reactions in a pairwise manner.
-    First, if there are duplicate metabolites in the set of
-    metabolites of each reaction, they are added to the set of each reaction
-    respectively. Then, if the sets for each reaction are
-    identical the reversibility of each reaction is checked:
-    - If both reactions differ in reversibility they are assumed to be
-    different.
-    - If both are reversible they are assumed to be identical.
-    - If both are irreversible, the upper bound and product metabolites
-     have to be identical for the reactions to be assumed to be identical.
+    For each reaction, the metabolite annotations are checked for a description
+    of the structure (via InChI and InChIKey).If they exist, substrates and
+    products as well as the stoichiometries of any reaction pair are compared.
+    Only reactions where the substrates, products, stoichiometry and
+    reversibility are identical are considered to be duplicates.
+    This test will not be able to identify duplicate reactions if there are no
+    structure annotations. Further, it will report reactions with
+    differing bounds as equal if they otherwise match the above conditions.
 
     Parameters
     ----------
