@@ -601,8 +601,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
     # Synchronize a User's projects between GitHub and Travis
     LOGGER.info("Synchronizing user projects between GitHub and Travis.")
     synced = False
-    count = 0
-    while not synced:
+    for _ in range(60):
         response = requests.post(
             "https://api.travis-ci.org/user/{}/sync".format(t_user["id"]),
             headers=headers
@@ -610,15 +609,15 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         if response.status_code == 200:
             synced = True
             LOGGER.info("Success!")
-        elif count > 600:
-            LOGGER.critical(
-                "Synchronizing user projects failed because the operation "
-                "exceeded the execution time! "
-                "Is either Github or Travis down?")
-            sys.exit(1)
+            break
         else:
-            sleep(0.1)
-            count += 1
+            LOGGER.info("Still synchronizing...")
+            sleep(0.5)
+    if not synced:
+        LOGGER.critical(
+            "Could not synchronize your projects between GitHub and Travis!"
+            "The latest response code is {}".format(response.status_code))
+        sys.exit(1)
 
     # Make sure GitHub repo can be found on Travis CI.#
     url_safe_repo_name = quote_plus(gh_repo_name)
