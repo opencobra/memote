@@ -431,9 +431,16 @@ def _setup_gh_repo(github_repository, github_username, note):
             'https://api.github.com/user', auth=credentials, headers=headers
         )
         response.raise_for_status()
-    except HTTPError:
-        LOGGER.critical("Incorrect username or password!")
-        sys.exit(1)
+    except HTTPError as error:
+        if error.response.status_code == 401:
+            LOGGER.critical("Authentication failed! "
+                            "Incorrect username or password?")
+            sys.exit(1)
+        else:
+            LOGGER.critical(
+                "Your account could not be authenticated. "
+                "{}".format(str(error)))
+            sys.exit(1)
     else:
         user = response.json()
         when = user[u"created_at"]
@@ -455,26 +462,31 @@ def _setup_gh_repo(github_repository, github_username, note):
             "Using existing repository '{}'. This may override previous "
             "settings.".format(github_repository))
         gh_repo = response.json()
-    except HTTPError:
-        try:
-            LOGGER.info(
-                "'{}' did not exist on GitHub yet."
-                " Creating it for you now!".format(github_repository))
-            response = requests.post(
-                'https://api.github.com/user/repos',
-                auth=credentials,
-                headers=headers,
-                json={"name": github_repository}
-            )
-            response.raise_for_status()
-        except HTTPError:
-            LOGGER.critical(
-                "The repository cannot be created on GitHub. "
-                "Are the servers up?"
-            )
-            sys.exit(1)
+    except HTTPError as error:
+        if error.response.status_code == 404:
+            try:
+                LOGGER.info(
+                    "'{}' did not exist on GitHub yet."
+                    " Creating it for you now!".format(github_repository))
+                response = requests.post(
+                    'https://api.github.com/user/repos',
+                    auth=credentials,
+                    headers=headers,
+                    json={"name": github_repository}
+                )
+                response.raise_for_status()
+            except HTTPError as error:
+                LOGGER.critical(
+                    "The repository cannot be created on GitHub. "
+                    "{}".format(str(error)))
+                sys.exit(1)
+            else:
+                gh_repo = response.json()
         else:
-            gh_repo = response.json()
+            LOGGER.critical(
+                "The repository cannot be found on GitHub. "
+                "{}".format(str(error)))
+            sys.exit(1)
 
     # Create a personal access token on GitHub which is only used to generate
     # the Travis APIv3 access token.

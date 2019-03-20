@@ -149,10 +149,10 @@ def test_new(runner, tmpdir):
 
 def test_online(runner, mock_repo, monkeypatch):
     # Build-up
-    def mock_setup_gh_repo(github_repository, github_username, note):
+    def mock_setup_gh_repo(*args, **kwargs):
         return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
 
-    def mock_setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
+    def mock_setup_travis_ci(*args, **kwargs):
         return "mock_secret"
 
     monkeypatch.setattr(
@@ -177,7 +177,6 @@ def test_online(runner, mock_repo, monkeypatch):
     context_settings = ConfigFileProcessor.read_config()
     github_repository = context_settings["github_repository"]
     github_username = context_settings["github_username"]
-    print(github_username)
 
     result = runner.invoke(
         cli,

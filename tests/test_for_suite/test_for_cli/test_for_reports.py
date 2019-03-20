@@ -45,7 +45,7 @@ def test_snapshot(runner, model_file):
 
 def test_diff(runner, model_file):
     """Expect the diff report to function."""
-    output = model_file.split(".", 1)[0] + ".html"
+    output = "diff.html"
     result = runner.invoke(report, [
         "diff", "--filename", output, model_file, model_file])
     assert result.exit_code == 0
