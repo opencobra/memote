@@ -55,18 +55,18 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
 
     """
     ann = test_gene_essentiality_from_data_qualitative.annotation
-    exp = pytest.memote.experimental.essentiality[experiment]
+    name, exp = experiment
     expected = exp.data
     test = exp.evaluate(model)
-    ann["data"][experiment] = confusion_matrix(
+    ann["data"][name] = result = confusion_matrix(
         set(test.loc[test["essential"], "gene"]),
         set(expected.loc[expected["essential"], "gene"]),
         set(test.loc[~test["essential"], "gene"]),
         set(expected.loc[~expected["essential"], "gene"])
     )
-    ann["metric"][experiment] = ann["data"][experiment]["ACC"]
-    ann["message"][experiment] = wrapper.fill(
+    ann["metric"][name] = result["ACC"]
+    ann["message"][name] = wrapper.fill(
         """Ideally, every model would show a perfect accuracy of 1. In
-        experiment '{}' the model has  {:.2}.""".format(
-            experiment, ann["data"][experiment]["MCC"]))
-    assert ann["data"][experiment]["ACC"] > threshold
+        name '{}' the model has  {:.2}.""".format(
+            name, result["MCC"]))
+    assert result["ACC"] > threshold

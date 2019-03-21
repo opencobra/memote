@@ -76,7 +76,8 @@ def test_load_medium(filename, model, media, growth):
 def test_load_essentiality(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
-    config.load_data(model)
+    config.load_medium(model)
+    config.load_essentiality(model)
     exp = config.essentiality[experiment]
     expected = exp.data
     expected.sort_values("gene", inplace=True)
@@ -91,7 +92,8 @@ def test_load_essentiality(filename, model, experiment):
 def test_load_growth(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
-    config.load_data(model)
+    config.load_medium(model)
+    config.load_growth(model)
     exp = config.growth[experiment]
     expected = exp.data
     expected.sort_values("exchange", inplace=True)

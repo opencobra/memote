@@ -1,0 +1,16 @@
+version: "0.1"
+medium:
+  path: "media/"
+  definitions:
+    m9_minimal:
+    glucose:
+essentiality:
+  path: "essentiality/"
+  experiments:
+    core_deletion:
+      medium: "glucose"
+growth:
+  path: "growth/"
+  experiments:
+    core:
+      filename: "growth.csv"

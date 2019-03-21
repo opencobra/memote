@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Repair the experimental testing and add a test case for the runner with
+  experimental data.
 * Update docstring of test_find_duplicate_reactions.
 * Add a guide explaining the structure of and how to interpret the memote
   reports.
