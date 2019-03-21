@@ -4,6 +4,9 @@ History
 Next Release
 ------------
 * Update docstring of test_find_duplicate_reactions.
+* Add a guide explaining the structure of and how to interpret the memote
+  reports.
+* Add guidelines on writing custom tests to the documentation.
 
 0.9.6 (2019-03-06)
 ------------------

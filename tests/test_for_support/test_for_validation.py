@@ -31,7 +31,7 @@ sbml_invalid = join(dirname(__file__), "data", "validation", "tiny_FBC2.xml")
 
 
 @pytest.mark.parametrize("filename, expected", [
-    (sbml_valid, [0, 1, False]),
+    (sbml_valid, [0, 0, False]),
     (sbml_invalid, [2, 0, True])])
 def test_load_cobra_model(filename, expected):
     notifications = {"warnings": [], "errors": []}

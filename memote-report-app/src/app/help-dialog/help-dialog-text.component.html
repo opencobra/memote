@@ -1,41 +1,135 @@
 <h2 mat-dialog-title>Readme</h2>
 <mat-dialog-content>
-    <mat-card>
-    <mat-card-title>What do the colours mean?</mat-card-title>
-    <mat-card-content>
-    <h4>Snapshot Report</h4>
-    Results without highlights are kept in the main
-        <span style="color: rgb(42, 123, 184)"> <b> blue </b> </span> 
-        colour of the memote colour scheme. Scored results will be marked with a gradient ranging from 
-        <span style="color: rgb(161, 18, 18)"> <b> red </b> </span> to 
-        <span style="color: rgb(18, 161, 46)"> <b> green </b> </span> denoting a low or a high score respectively:
-        <div fxLayoutAlign='center center'>
-            <span> <b>0%</b></span>
-            <div style="display: inline-block; vertical-align: middle">
-                <svg width="120" height="60">
-                    <defs>
-                        <linearGradient id="grad1">
-                        <stop offset="0%" style="stop-color:rgb(161, 18, 18);stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:rgb(18, 161, 46);stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <rect fill="url(#grad1)"
-                        x="10" y="10" width="100" height="100"/>
-                </svg>
-            </div>     
-        <span> <b>100% </b></span>
-        </div>
-        <h4>Diff Report</h4>
-        The colour in the Diff Report depends on the ratio of the sample minimum to the sample maxium. 
-        Result sets where the sample minimum and the sample maximum are identical will be coloured in the main
-        <span style="color: rgb(42, 123, 184)"> <b> blue </b> </span> 
-        colour of the memote colour scheme. Result sets where the sample minimum is very small relative to the sample maximum will appear
-        <span style="color: rgb(161, 18, 18)"> <b> red </b> </span>. 
-        This ratio is calculated with the following formula:
-        <br>
-        <b> 1 - (Min / Max)) * 100 </b>
-        This is then mapped to the following gradient:
-        <div fxLayoutAlign='center center'>
+<mat-card>
+<mat-card-title> Understanding the reports </mat-card-title>
+<mat-card-content>
+<p>Memote will return one of four possible outputs.
+If your preferred workflow is to benchmark one or several genome-scale
+metabolic models (GSM) memote generates either a snapshot or a diff report,
+respectively. For the reconstruction workflow the primary output is a history
+report. This will only work if the provided input models are formatted
+correctly in the systems biology markup language (<a href="http://sbml.org/Main_Page"> SBML </a>). However, if a
+provided model is not a valid SBML file, memote composes a report
+enumerating errors and warnings from the SBML validator in
+order of appearance. To better understand the output of the error report we
+refer the reader to this section of the <a href="http://sbml.org/Facilities/Documentation/Error_Categories"> SBML documentation </a>. In this section
+we will focus on how to understand the snapshot, diff and history reports.</p>
+
+</mat-card-content>
+</mat-card>
+
+<mat-card>
+<mat-card-title> Orientation </mat-card-title>
+<mat-card-content>
+
+<h3>Toolbar</h3>
+
+
+<p>In all three reports, the blue toolbar at the top shows (from left to right)
+the memote logo, a button which expand/ collapses all test results, a button
+which displays the readme and the github icon which links to memote's github
+page. On the snapshot report, the toolbar will also display the identifier of
+the tested GSM and a timestamp showing when the test run was initiated.</p>
+
+<h3>Main Body</h3>
+
+<p>The main body of the reports is divided into an independent section to the left
+and a specific section to the right.</p>
+
+<p> The tests in the independent section are
+agnostic of the type of modeled organism, preferred modeling paradigms,
+the complexity of a genome-scale metabolic model (GSM) or the types of
+identifiers that are used to describe its components. The tests in this section
+focus on testing adherence to fundamental principles of
+constraint-based modeling: mass, charge and stoichiometric balance as well as
+the presence of annotations. The results in this section can be normalized, and
+thus enable a comparison of GSMs. The <b>Score</b> at the bottom
+of the page summarises the results to further simplify comparison.</p>
+
+<p>The specific section on the right provides model specific statistics
+and covers aspects of a metabolic network that can not be normalized
+without introducing bias. For instance, dedicated quality control of the biomass
+equation only applies to GSMs which are used to investigate cell growth, i.e.,
+those for which a biomass equation has been generated. Some tests in this
+section are also influenced by whether the tested GSM represents a prokaryote or
+a eukaryote. Therefore the results cannot be generalized and direct comparisons
+ought to take bias into account.</p>
+
+<h3>Test Results</h3>
+
+<p>Test results are arranged in rows with the title visible to the left and the
+result on the right. The result is displayed as white text in a coloured
+rectangle detailed in <b>Color</b>.</p>
+
+<p>By default only the minimum information is visible as indicated by an arrow pointing
+down right of the result. Clicking anywhere in the row will expand the result
+revealing a description of the concept behind the test, its implementation
+and a brief summary of the result.
+In addition, there is a text field which contains plaintext representations of
+Python objects which can be copy/pasted into Python code for follow up
+procedures.</p>
+
+<p>Some tests carry out one operation on several parameters and therefore deviate
+slightly from the descriptions above. Expanding the title row reveals only the
+description, while rows of the individual parameters reveal the text fields.</p>
+
+<p>In the history report, instead of text fields scatterplots show how the
+respective metrics developed over the commit history for each branch of a
+repository. By clicking an entry in the legend, it is possible to toggle
+its visibility in the plot.</p>
+
+</mat-card-content>
+</mat-card>
+
+<mat-card>
+<mat-card-title> Interpretation </mat-card-title>
+<mat-card-content>
+
+<p>The variety of constraints-based modeling approaches and differences between
+various organisms compound the assessment of GSMs. While memote facilitates
+model assessment it can only do so within limitations. Please bear in mind the
+diversity of Paradigms_ that challenge some of memote's results. </p>
+
+    <h3> Color </h3>
+
+
+<h4> Snapshot Report </h4>
+
+<p>Results without highlights are kept in the main <span style="color: rgb(42, 123, 184)"> <b> blue </b> </span>  color of the memote
+color scheme. Scored results will be marked with a gradient ranging from <span style="color: rgb(161, 18, 18)"> <b> red </b> </span>
+to <span style="color: rgb(18, 161, 46)"> <b> green </b> </span> denoting a low or a high score respectively: </p>
+
+
+    <div fxLayoutAlign='center center'>
+    <span> <b>0%</b></span>
+    <div style="display: inline-block; vertical-align: middle">
+    <svg width="120" height="60">
+    <defs>
+    <linearGradient id="grad1">
+    <stop offset="0%" style="stop-color:rgb(161, 18, 18);stop-opacity:1" />
+    <stop offset="100%" style="stop-color:rgb(18, 161, 46);stop-opacity:1" />
+    </linearGradient>
+    </defs>
+    <rect fill="url(#grad1)" x="10" y="10" width="100" height="100"/>
+    </svg>
+    </div>
+    <span> <b>100% </b></span>
+    </div>
+    <br>
+
+
+<h4> Diff Report</h4>
+
+<p>The colour in the Diff Report depends on the ratio of the sample minimum to
+the sample maxium. Result sets where the sample minimum and the sample
+maximum are identical will be coloured in the main <span style="color: rgb(42, 123, 184)"> <b> blue </b> </span> colour of the
+memote colour scheme. Result sets where the sample minimum is very small
+relative to the sample maximum will appear red . This ratio is calculated
+with as <b> 1 - (Min / Max)) * 100</b>. </p>
+
+<p>This is then mapped to the following gradient: </p>
+
+<div fxLayoutAlign='center center'>
             <span> <b>Identical</b></span>
             <div style="display: inline-block; vertical-align: middle">
                 <svg width="120" height="60">
@@ -48,37 +142,20 @@
                     <rect fill="url(#grad2)"
                         x="10" y="10" width="100" height="100"/>
                 </svg>
-            </div>     
-        <span> <b>Different</b></span>
-        </div>
-    </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-title>Why are the tests divided into two principal sections?</mat-card-title>
-        <mat-card-content>
-    <p>The tests in the left section are independent of the class of modeled organism, the complexity of a genome-scale metabolic model (GSM) or the types of identifiers
-         that are used to describe its components. Because of this, it is possible to calculate a score for these tests which further allows for the quick comparison of GSMs. The unscored section on ther right 
-         provides general statistics and covers specific aspects of a metabolic network that are not universally applicable. For instance,
-           dedicated quality control of the biomass equation only applies to GSM which are used to investigate cell growth.</p>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-            <mat-card-title>"Reconstructions" versus "Models"</mat-card-title>
-            <mat-card-content>
-        <p>The variety of constraints-based modeling approaches and the fundamental differences between various organisms compound the assessment of GSMs. For
-                instance, some authors may publish metabolic networks which are parameterized, ready to run flux balance analysis (FBA), these are referred to simply as 'models'. Alternatively,
-                 others may publish unconstrained metabolic databases (referred to as 'reconstructions'), from which several models can be derived by applying differential constraints. Both can be encoded in SBML. 
-                 With having an independent scored test section, we attempt to make both 'models' and 'reconstructions' comparable, although a user should be aware that this difference exists and is subject to <a href="https://github.com/opencobra/memote/issues/228"> some discussion </a>.
-                Please note, that some tests in the specific section may error for a reconstruction as they require initialization.</p>
-            </mat-card-content>
-        </mat-card>
-    <mat-card>
-    <mat-card-title>How is the score calculated?</mat-card-title>
-    <mat-card-content>
-    <p>Each test in the independent section provides a relative measure of completeness with regard to the tested property. The final score is the weighted sum of all individual test
-         results normalized by the maximally achievable score i.e. all individual results at 100%. Individual tests can be weighted, but it is also possible to apply weighting to entire test 
-         categories. Hence the final score is calculated:</p>
-         <br>
+            </div>
+                <span> <b>Different</b></span>
+    </div>
+
+<h3> Score</h3>
+
+
+<p>Each test in the independent section provides a relative measure of
+completeness with regard to the tested property. The final score is the
+weighted sum of all individual test results normalized by the maximally
+achievable score, i.e., all individual results at 100%. Individual tests can
+be weighted, but it is also possible to apply weighting to entire test
+categories. Hence the final score is calculated:</p>
+  <br>
          <!-- Generated with this latex formula \[ TotalScore = \frac{\sum_{Sections} weight_{section} \times ( \sum_{Tests} weight_{test} \times score_{test})}{MaxScore}\] at http://www.tlhiv.org/ltxpreview/ -->
          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310 23">
             <defs>
@@ -264,10 +341,13 @@
             <g>
               <use x="205.76" y="21.91" xlink:href="#i"/>
             </g>
-         </svg>          
+         </svg>
          <br>
-    <p> Weights for sections and individual tests are indicated by a white number inside a margenta badge. Like so: </p>
-        <mat-expansion-panel>
+
+<p>Weights for sections and individual tests are indicated by a white number
+inside a magenta badge. No badge means that the weight is defaults to 1.</p>
+
+            <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title fxLayoutAlign='space-between center'>
                     <td class="test-title"> Test Title </td>
@@ -276,10 +356,60 @@
                 <div class='badge'> <span class='vert-align'> X3 </span> </div>
             </mat-expansion-panel-header>
           </mat-expansion-panel>
-    <p> No badge means that the weight is either equal to 1 or undefined.</p>
-    </mat-card-content>
-    </mat-card>
+
+</mat-card-content>
+</mat-card>
+
+
+<mat-card>
+<mat-card-title>Paradigms</mat-card-title>
+<mat-card-content>
+
+<h3>"Reconstructions" and "Models"</h3>
+
+<p>Some authors may publish metabolic networks which are parameterized,
+ready to run flux balance analysis (FBA), these are referred to simply as
+'models'. Alternatively, others may publish unconstrained metabolic knowledgebases
+(referred to as 'reconstructions'), from which several models can be derived
+by applying different constraints. Both can be encoded in SBML. With having
+an independent test section, we attempt to make both 'models' and
+'reconstructions' comparable, although a user should be aware that this
+difference exists and is subject to <a href="https://github.com/opencobra/memote/issues/228"> some discussion </a>. Please note, that some
+tests in the specific section may error for a reconstruction as they
+require initialization.</p>
+
+<h3>"Lumped" and "Split" Biomass Reaction</h3>
+
+<p>There are two basic ways of specifying the biomass composition. The most
+common is a single lumped reaction containing all biomass precursors.
+Alternatively, the biomass equation can be split into several reactions
+each focusing on a different macromolecular component for instance
+a (1 gDW ash) + b (1 gDW phospholipids) + c (free fatty acids)+
+d (1 gDW carbs) + e (1 gDW protein) + f (1 gDW RNA) + g (1 gDW DNA) +
+h (vitamins/cofactors) + xATP + xH2O-> 1 gDCW biomass + xADP + xH + xPi. The
+benefit of either approach depends very much on the use cases which are
+<a href="https://github.com/opencobra/memote/issues/243"> discussed by the community </a>. Memote employs heuristics to identify the type
+of biomass which may fail to distinguish edge cases.</p>
+
+
+<h3>"Average" and "Unique" Metabolites</h3>
+
+<p>A metabolite consisting of a fixed core with variable branches such as a
+membrane lipid are sometimes implemented by averaging over the distribution of
+individual lipid species. The resulting pseudo-metabolite is assigned an
+average chemical formula, which requires scaling of stoichiometries of
+associated reactions to avoid floating point numbers in the chemical formulae.
+An alternative approach is to implement each species as a distinct
+metabolite in the model, which increases the total count of reactions. Memote
+cannot yet distinguish between these paradigms, which means that results
+in the specific sections that rely on the total number of reactions or scaling
+of stochiometric parameters may be biased.</p>
+
+</mat-card-content>
+</mat-card>
+
 </mat-dialog-content>
 <mat-dialog-actions>
-        <button mat-button mat-dialog-close>Close</button>
+        <button mat-raised-button mat-dialog-close color="primary">Close</button>
+        <a mat-raised-button color="primary" href="https://memote.readthedocs.io/en/latest/index.html" target="_blank" rel="noopener noreferrer">Open Online Documentation</a>
 </mat-dialog-actions>
