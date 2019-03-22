@@ -507,10 +507,12 @@ def _setup_gh_repo(github_repository, github_username, note):
             json=payload
         )
         response.raise_for_status()
-    except HTTPError:
+    except HTTPError as error:
         LOGGER.info(
-            "An authentication token with the note '{}' already "
-            "exists. Please delete it and try again.'.".format(auth_note))
+            "An error occurred. Most likely an authentication token with the "
+            "note '{}' already exists. If so, please delete it and try again."
+            "If not, please refer to the following error code for "
+            "further information: {}".format(auth_note, str(error)))
         sys.exit(1)
     else:
         auth_response = response.json()
@@ -530,11 +532,13 @@ def _setup_gh_repo(github_repository, github_username, note):
             json=payload
         )
         response.raise_for_status()
-    except HTTPError:
+    except HTTPError as error:
         LOGGER.critical(
-            "A repo access token with the note '{}' already exists. "
+            "An error occurred. Most likely a repo access token with the "
+            "note '{}' already exists. "
             "Either delete it or choose another note using the option "
-            "'--note'.".format(note))
+            "'--note'. If not, please refer to the following error code for "
+            "further information: {}".format(note, str(error)))
         sys.exit(1)
     else:
         repo_access_response = response.json()
@@ -565,11 +569,12 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             data={'github_token': auth_token}
         )
         response.raise_for_status()
-    except HTTPError:
+    except HTTPError as error:
         LOGGER.critical(
             "Something is wrong with the generated APIv3 authentication token "
             "or you did not link your GitHub account on "
-            "'https://travis-ci.org/'!")
+            "'https://travis-ci.org/'? Please refer to the following error "
+            "code for further information:".format(str(error)))
         sys.exit(1)
     else:
         LOGGER.info("Success!")
@@ -589,10 +594,12 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             "https://api.travis-ci.org/user", headers=headers
         )
         response.raise_for_status()
-    except HTTPError:
+    except HTTPError as error:
         LOGGER.critical(
             "Something is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!")
+            "link your GitHub account on 'https://travis-ci.org/'? Please "
+            "refer to the following error code for "
+            "further information:".format(str(error)))
         sys.exit(1)
     else:
         LOGGER.info("Success!")
@@ -628,11 +635,17 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             headers=headers
         )
         response.raise_for_status()
-    except HTTPError:
-        LOGGER.critical(
-            "Repository could not be found. Is it on GitHub already and "
-            "spelled correctly?")
-        sys.exit(1)
+    except HTTPError as error:
+        if error.response.status_code == 404:
+            LOGGER.critical(
+                "Repository could not be found. Is it on GitHub already and "
+                "spelled correctly?")
+            sys.exit(1)
+        else:
+            LOGGER.critical(
+                "An error occurred. Please refer to the following error "
+            "code for further information:".format(str(error)))
+            sys.exit(1)
     else:
         LOGGER.info("Success!")
         t_repo = response.json()
@@ -650,8 +663,10 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             headers=headers
         )
         response.raise_for_status()
-    except HTTPError:
-        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+    except HTTPError as error:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI! "
+                        "Please refer to the following error code for further "
+                        "information:".format(str(error)))
         sys.exit(1)
 
     # Check if activation was successful
