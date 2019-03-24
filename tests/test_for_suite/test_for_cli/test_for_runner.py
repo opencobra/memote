@@ -21,7 +21,10 @@ from __future__ import absolute_import
 
 import os
 from builtins import str
-from os.path import exists, join, pardir
+from os.path import exists, join, dirname, pardir
+
+import pytest
+
 
 from memote.suite.cli.runner import cli
 import memote.suite.cli.runner
@@ -40,6 +43,15 @@ def test_run_simple(runner, model_file):
     """Expect a simple run to function."""
     result = runner.invoke(cli, [
         "run", "--no-collect", "--ignore-git", model_file])
+    assert result.exit_code == 0
+
+
+def test_run_with_experimental_data(runner, model_file):
+    """Expect a simple run to function."""
+    result = runner.invoke(cli, [
+        "run", "--no-collect", "--ignore-git", "--experimental",
+        join(dirname(__file__), "data", "valid.yml"), model_file
+    ])
     assert result.exit_code == 0
 
 

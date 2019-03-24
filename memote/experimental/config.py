@@ -64,9 +64,9 @@ class ExperimentConfiguration(object):
         self.essentiality = dict()
         self.growth = dict()
 
-    def load_data(self, model):
+    def load(self, model):
         """
-        Load a configuration file and validate it.
+        Load all information from an experimental configuration file.
 
         Parameters
         ----------
@@ -74,7 +74,6 @@ class ExperimentConfiguration(object):
             The metabolic model under investigation.
 
         """
-        self.validate()
         self.load_medium(model)
         self.load_essentiality(model)
         self.load_growth(model)
