@@ -650,7 +650,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         else:
             LOGGER.critical(
                 "An error occurred. Please refer to the following error "
-            "code for further information:".format(str(error)))
+                "code for further information:".format(str(error)))
             sys.exit(1)
     else:
         LOGGER.info("Success!")
