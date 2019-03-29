@@ -3,12 +3,19 @@ History
 
 Next Release
 ------------
+
+0.9.7 (2019-03-29)
+------------------
 * Repair the experimental testing and add a test case for the runner with
   experimental data.
 * Update docstring of test_find_duplicate_reactions.
 * Add a guide explaining the structure of and how to interpret the memote
   reports.
 * Add guidelines on writing custom tests to the documentation.
+* Add unit tests to the CLI workflow.
+* Remove dependency on GitHub and Travis API wrappers, make calls through
+  python `requests`.
+* Fix bugs in memote
 
 0.9.6 (2019-03-06)
 ------------------
