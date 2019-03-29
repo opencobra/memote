@@ -676,12 +676,24 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         sys.exit(1)
 
     # Check if activation was successful
-    if t_repo["active"]:
-        LOGGER.info(
-            "Your repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!")
-    else:
-        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+    activated = False
+    for _ in range(60):
+        if t_repo["active"]:
+            activated = True
+            LOGGER.info(
+                "Your repository is now on GitHub and automatic testing has "
+                "been enabled on Travis CI. Congrats!")
+            break
+        else:
+            LOGGER.info("Still activating...")
+            sleep(0.5)
+    if not activated:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI! "
+                        "Delete all tokens belonging to this repo at "
+                        "https://github.com/settings/tokens then try running "
+                        "`memote new` again. If this fails yet again, please "
+                        "open an issue at "
+                        "https://github.com/opencobra/memote/issues.")
         sys.exit(1)
     LOGGER.info(
         "Encrypting GitHub token for repo '{}'.".format(gh_repo_name))
