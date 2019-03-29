@@ -71,11 +71,9 @@ def mock_repo(tmpdir_factory):
     mock_repo_tarfile.close()
     # Obtain the repository as a gitpython Repo object
     path = join(base_path, "memote-mock-repo")
-    chdir(path)
     try:
-        repo = Repo()
+        repo = Repo(path)
     except InvalidGitRepositoryError:
         LOGGER.warning(
             "Could not find memote-mock-repository. Is the path correct?")
-    chdir(cwd)
     return path, repo
