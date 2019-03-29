@@ -678,6 +678,20 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
     # Check if activation was successful
     activated = False
     for _ in range(60):
+        try:
+            LOGGER.info("Check if activation {} on Travis CI "
+                        "was successful".format(gh_repo_name))
+            response = requests.get(
+                "https://api.travis-ci.org/repo/{}".format(url_safe_repo_name),
+                headers=headers
+            )
+        except HTTPError as error:
+            LOGGER.critical(
+                "An error occurred. Please refer to the following error "
+                "code for further information:".format(str(error)))
+            sys.exit(1)
+        else:
+            t_repo = response.json()
         if t_repo["active"]:
             activated = True
             LOGGER.info(
