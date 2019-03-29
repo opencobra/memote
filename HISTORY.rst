@@ -3,6 +3,10 @@ History
 
 Next Release
 ------------
+* Repair `memote online` which would not get the most up-to-date status when
+  checking whether a repo had already been activate for testing on Travis CI.
+* Pin `travis-encode` due to conflicts in dependency on `click` with
+  `goodtables` and `jsonschema`.
 
 0.9.7 (2019-03-29)
 ------------------
