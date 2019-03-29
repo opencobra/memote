@@ -35,12 +35,8 @@ import click_log
 import git
 import travis.encrypt as te
 from cookiecutter.main import cookiecutter, get_user_config
-from github import (
-    Github, BadCredentialsException, UnknownObjectException, GithubException)
 from sqlalchemy import create_engine
 from sqlalchemy.exc import ArgumentError
-from travispy import TravisPy
-from travispy.errors import TravisError
 
 import memote.suite.api as api
 import memote.suite.cli.callbacks as callbacks
@@ -50,6 +46,15 @@ from memote.suite.cli.reports import report
 from memote.suite.results import (
     ResultManager, RepoResultManager, SQLResultManager, HistoryManager)
 from memote.utils import is_modified, stdout_notifications
+
+import requests
+from requests.exceptions import HTTPError
+import tempfile
+
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    from urllib import quote_plus
 
 
 LOGGER = logging.getLogger()
@@ -241,11 +246,17 @@ def new(directory, replay):
 
 
 def _model_from_stream(stream, filename):
+    fd, path = tempfile.mkstemp(suffix=".xml", text=True)
+    LOGGER.debug("Creating temporary model file at {}.".format(path))
     if filename.endswith(".gz"):
         with GzipFile(fileobj=stream) as file_handle:
-            model, sbml_ver, notifications = api.validate_model(file_handle)
+            os.write(fd, file_handle.read())
     else:
-        model, sbml_ver, notifications = api.validate_model(stream)
+        os.write(fd, stream.read())
+    os.close(fd)
+    model, sbml_ver, notifications = api.validate_model(path)
+    LOGGER.debug("Cleaning up temporary file.")
+    os.remove(path)
     return model, sbml_ver, notifications
 
 
@@ -312,22 +323,26 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
        for those only. This can also be achieved by supplying a commit range.
 
     """
-    callbacks.validate_path(model)
+    # callbacks.validate_path(model)
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     if "--tb" not in pytest_args:
         pytest_args = ["--tb", "no"] + pytest_args
     try:
+        LOGGER.info("Identifying git repository!")
         repo = git.Repo()
     except git.InvalidGitRepositoryError:
         LOGGER.critical(
             "The history requires a git repository in order to follow "
             "the model's commit history.")
         sys.exit(1)
-    previous = repo.active_branch
+    else:
+        LOGGER.info("Success!")
+        previous = repo.active_branch
+        LOGGER.info("Checking out deployment branch {}.".format(deployment))
+        repo.git.checkout(deployment)
     # Temporarily move the results to a new location so that they are
     # available while checking out the various commits.
-    repo.heads[deployment].checkout()
     engine = None
     tmp_location = mkdtemp()
     try:
@@ -352,6 +367,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         move(location, tmp_location)
         new_location = join(tmp_location, location)
         manager = RepoResultManager(repository=repo, location=new_location)
+    LOGGER.info("Recomputing result history!")
     history = HistoryManager(repository=repo, manager=manager)
     history.load_history(model, skip={deployment})
     if len(commits) == 0:
@@ -389,8 +405,10 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
                   pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()
+    LOGGER.info("Finished recomputing!")
     # Copy back all new and modified files and add them to the index.
-    repo.heads[deployment].checkout()
+    LOGGER.info("Committing recomputed results!")
+    repo.git.checkout(deployment)
     if engine is not None:
         manager.session.close()
         if location.startswith("sqlite"):
@@ -399,9 +417,279 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
         move(new_location, os.getcwd())
     repo.git.add(".")
     repo.index.commit(message)
+    LOGGER.info("Success!")
     # Checkout the original branch.
     previous.checkout()
     LOGGER.info("Done.")
+
+
+def _setup_gh_repo(github_repository, github_username, note):
+    password = getpass("GitHub Password: ")
+
+    headers = {"Accept": "application/vnd.github.v3+json",
+               "User-Agent": "Memote Query"}
+    credentials = (github_username, password)
+
+    # Authenticate user on GitHub
+    try:
+        LOGGER.info("Using your credentials to authenticate you on GitHub.")
+        response = requests.get(
+            'https://api.github.com/user', auth=credentials, headers=headers
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        if error.response.status_code == 401:
+            LOGGER.critical("Authentication failed! "
+                            "Incorrect username or password?")
+            sys.exit(1)
+        else:
+            LOGGER.critical(
+                "Your account could not be authenticated. "
+                "{}".format(str(error)))
+            sys.exit(1)
+    else:
+        user = response.json()
+        when = user[u"created_at"]
+        LOGGER.info(
+            "Logged in to user '{}' created on '{}'.".format(
+                user[u"login"], when)
+        )
+
+    # Get a user's repository or create the repository if it doesn't exist on
+    # GitHub.
+    try:
+        LOGGER.info("Retrieving repository {}".format(github_repository))
+        endpoint = 'https://api.github.com/repos/{}/{}'.format(
+            user["login"], github_repository
+        )
+        response = requests.get(endpoint, auth=credentials, headers=headers)
+        response.raise_for_status()
+        LOGGER.warning(
+            "Using existing repository '{}'. This may override previous "
+            "settings.".format(github_repository))
+        gh_repo = response.json()
+    except HTTPError as error:
+        if error.response.status_code == 404:
+            try:
+                LOGGER.info(
+                    "'{}' did not exist on GitHub yet."
+                    " Creating it for you now!".format(github_repository))
+                response = requests.post(
+                    'https://api.github.com/user/repos',
+                    auth=credentials,
+                    headers=headers,
+                    json={"name": github_repository}
+                )
+                response.raise_for_status()
+            except HTTPError as error:
+                LOGGER.critical(
+                    "The repository cannot be created on GitHub. "
+                    "{}".format(str(error)))
+                sys.exit(1)
+            else:
+                gh_repo = response.json()
+        else:
+            LOGGER.critical(
+                "The repository cannot be found on GitHub. "
+                "{}".format(str(error)))
+            sys.exit(1)
+
+    # Create a personal access token on GitHub which is only used to generate
+    # the Travis APIv3 access token.
+    auth_note = "Travis APIv3 Auth for {}".format(github_repository)
+    payload = {
+        "scopes": [
+            "read:org", "user:email", "repo_deployment",
+            "repo:status", "write:repo_hook"
+        ],
+        "note": auth_note
+    }
+    try:
+        LOGGER.info("Creating Travis APIv3 authentication token for you now!")
+        response = requests.post(
+            'https://api.github.com/authorizations',
+            auth=credentials,
+            headers=headers,
+            json=payload
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        LOGGER.info(
+            "An error occurred. Most likely an authentication token with the "
+            "note '{}' already exists. If so, please delete it and try again."
+            "If not, please refer to the following error code for "
+            "further information: {}".format(auth_note, str(error)))
+        sys.exit(1)
+    else:
+        auth_response = response.json()
+        LOGGER.info("Success!")
+
+    # Create a personal access token that allows Travis to push to a repo.
+    payload = {
+        "scopes": ["repo"],
+        "note": note
+    }
+    try:
+        LOGGER.info("Creating repo access token.")
+        response = requests.post(
+            'https://api.github.com/authorizations',
+            auth=credentials,
+            headers=headers,
+            json=payload
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        LOGGER.critical(
+            "An error occurred. Most likely a repo access token with the "
+            "note '{}' already exists. "
+            "Either delete it or choose another note using the option "
+            "'--note'. If not, please refer to the following error code for "
+            "further information: {}".format(note, str(error)))
+        sys.exit(1)
+    else:
+        repo_access_response = response.json()
+        LOGGER.info("Success!")
+    return gh_repo["full_name"], auth_response["token"], \
+        repo_access_response["token"]
+
+
+def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
+    # travis-ci.org is the open source endpoint only! We will need to hit
+    # travis-ci.com for private projects!
+
+    # Headers for API v2. This is only necessary because generating a Travis
+    # API token from a GitHub Token isn't possible in the API v3 yet. This way
+    # is recommended as per:
+    # https://github.com/travis-ci/travis-ci/issues/9273
+    headers_v2_only = {
+        'User-Agent': 'Memote',
+        'Accept': 'application/vnd.travis-ci.2+json',
+    }
+
+    # Generate Travis API token:
+    try:
+        LOGGER.info("Generating Travis API token.")
+        response = requests.post(
+            "https://api.travis-ci.org/auth/github",
+            headers=headers_v2_only,
+            data={'github_token': auth_token}
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        LOGGER.critical(
+            "Something is wrong with the generated APIv3 authentication token "
+            "or you did not link your GitHub account on "
+            "'https://travis-ci.org/'? Please refer to the following error "
+            "code for further information:".format(str(error)))
+        sys.exit(1)
+    else:
+        LOGGER.info("Success!")
+        travis_api_token = response.json()["access_token"]
+
+    # Headers for API v3!
+    headers = {
+        'Travis-API-Version': '3',
+        'Authorization': 'token {}'.format(travis_api_token),
+        'User-Agent': 'Memote Query'
+    }
+
+    # Authenticate the User on Travis
+    try:
+        LOGGER.info("Authorizing with TravisCI.")
+        response = requests.get(
+            "https://api.travis-ci.org/user", headers=headers
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        LOGGER.critical(
+            "Something is wrong with the generated token or you did not "
+            "link your GitHub account on 'https://travis-ci.org/'? Please "
+            "refer to the following error code for "
+            "further information:".format(str(error)))
+        sys.exit(1)
+    else:
+        LOGGER.info("Success!")
+        t_user = response.json()
+
+    # Synchronize a User's projects between GitHub and Travis
+    LOGGER.info("Synchronizing user projects between GitHub and Travis.")
+    synced = False
+    for _ in range(60):
+        response = requests.post(
+            "https://api.travis-ci.org/user/{}/sync".format(t_user["id"]),
+            headers=headers
+        )
+        if response.status_code == 200:
+            synced = True
+            LOGGER.info("Success!")
+            break
+        else:
+            LOGGER.info("Still synchronizing...")
+            sleep(0.5)
+    if not synced:
+        LOGGER.critical(
+            "Could not synchronize your projects between GitHub and Travis!"
+            "The latest response code is {}".format(response.status_code))
+        sys.exit(1)
+
+    # Make sure GitHub repo can be found on Travis CI.#
+    url_safe_repo_name = quote_plus(gh_repo_name)
+    try:
+        LOGGER.info("Find repository {} on Travis CI".format(gh_repo_name))
+        response = requests.get(
+            "https://api.travis-ci.org/repo/{}".format(url_safe_repo_name),
+            headers=headers
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        if error.response.status_code == 404:
+            LOGGER.critical(
+                "Repository could not be found. Is it on GitHub already and "
+                "spelled correctly?")
+            sys.exit(1)
+        else:
+            LOGGER.critical(
+                "An error occurred. Please refer to the following error "
+                "code for further information:".format(str(error)))
+            sys.exit(1)
+    else:
+        LOGGER.info("Success!")
+        t_repo = response.json()
+
+    # Use repo ID to activate Travis CI for this repo
+    try:
+        LOGGER.info(
+            "Activating automatic testing for you "
+            "on Travis CI.")
+        endpoint = "https://api.travis-ci.org/repo/{}/activate".format(
+            url_safe_repo_name
+        )
+        response = requests.post(
+            endpoint,
+            headers=headers
+        )
+        response.raise_for_status()
+    except HTTPError as error:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI! "
+                        "Please refer to the following error code for further "
+                        "information:".format(str(error)))
+        sys.exit(1)
+
+    # Check if activation was successful
+    if t_repo["active"]:
+        LOGGER.info(
+            "Your repository is now on GitHub and automatic testing has "
+            "been enabled on Travis CI. Congrats!")
+    else:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+        sys.exit(1)
+    LOGGER.info(
+        "Encrypting GitHub token for repo '{}'.".format(gh_repo_name))
+    key = te.retrieve_public_key(gh_repo_name)
+    secret = te.encrypt_key(
+        key, "GITHUB_TOKEN={}".format(repo_access_token).encode()
+    )
+    return secret
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -423,64 +711,22 @@ def online(note, github_repository, github_username):
             "'memote online' requires a git repository in order to follow "
             "the current branch's commit history.")
         sys.exit(1)
-    password = getpass("GitHub Password: ")
-    gh = Github(github_username, password)
-    user = gh.get_user()
-    try:
-        when = user.created_at.isoformat(sep=" ")
-        LOGGER.info(
-            "Logged in to user '{}' created on '{}'.".format(user.login, when))
-    except BadCredentialsException:
-        LOGGER.critical("Incorrect username or password!")
-        sys.exit(1)
-    try:
-        gh_repo = user.get_repo(github_repository)
-        LOGGER.warning(
-            "Using existing repository '{}'. This may override previous "
-            "settings.".format(github_repository))
-    except UnknownObjectException:
-        gh_repo = user.create_repo(github_repository)
     if note == "memote-ci access":
         note = "{} to {}".format(note, github_repository)
-    try:
-        LOGGER.info("Creating token.")
-        auth = user.create_authorization(scopes=["repo"], note=note)
-    except GithubException:
-        LOGGER.critical(
-            "A personal access token with the note '{}' already exists. "
-            "Either delete it or choose another note using the option "
-            "'--note'.".format(note))
-        sys.exit(1)
-    try:
-        LOGGER.info("Authorizing with TravisCI.")
-        travis = TravisPy.github_auth(auth.token)
-        t_user = travis.user()
-    except TravisError:
-        LOGGER.critical(
-            "Something is wrong with the generated token or you did not "
-            "link your GitHub account on 'https://travis-ci.org/'!")
-        sys.exit(1)
-    LOGGER.info("Synchronizing repositories.")
-    while not t_user.sync():
-        sleep(0.1)
-    try:
-        t_repo = travis.repo(gh_repo.full_name)
-    except TravisError:
-        LOGGER.critical(
-            "Repository could not be found. Is it on GitHub already and "
-            "spelled correctly?")
-        sys.exit(1)
-    if t_repo.enable():
-        LOGGER.info(
-            "Your repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!")
-    else:
-        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
-        sys.exit(1)
-    LOGGER.info(
-        "Encrypting GitHub token for repo '{}'.".format(gh_repo.full_name))
-    key = te.retrieve_public_key(gh_repo.full_name)
-    secret = te.encrypt_key(key, "GITHUB_TOKEN={}".format(auth.token).encode())
+
+    # Github API calls
+    # Set up the git repository on GitHub via API v3.
+    gh_repo_name, auth_token, repo_access_token = _setup_gh_repo(
+        github_repository,
+        github_username,
+        note
+    )
+
+    # Travis API calls
+    # Configure Travis CI to use Github auth token then return encrypted token.
+    secret = _setup_travis_ci(gh_repo_name, auth_token, repo_access_token)
+
+    # Save the encrypted token in the travis config then commit and push
     LOGGER.info("Storing GitHub token in '.travis.yml'.")
     config = te.load_travis_configuration(".travis.yml")
     global_env = config.setdefault("env", {}).get("global")
@@ -491,6 +737,7 @@ def online(note, github_repository, github_username):
     except TypeError:
         global_env.append({"secure": secret})
     te.dump_travis_configuration(config, ".travis.yml")
+    LOGGER.info("Add, commit and push changes to '.travis.yml' to GitHub.")
     repo.index.add([".travis.yml"])
     repo.index.commit("chore: add encrypted GitHub access token")
     repo.remotes.origin.push(all=True)
