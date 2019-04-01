@@ -580,7 +580,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             "Something is wrong with the generated APIv3 authentication token "
             "or you did not link your GitHub account on "
             "'https://travis-ci.org/'? Please refer to the following error "
-            "code for further information:".format(str(error)))
+            "message for further information: {}".format(str(error)))
         sys.exit(1)
     else:
         LOGGER.info("Success!")
@@ -650,7 +650,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         else:
             LOGGER.critical(
                 "An error occurred. Please refer to the following error "
-                "code for further information:".format(str(error)))
+                "message for further information: {}".format(str(error)))
             sys.exit(1)
     else:
         LOGGER.info("Success!")
@@ -671,17 +671,43 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         response.raise_for_status()
     except HTTPError as error:
         LOGGER.critical("Unable to enable automatic testing on Travis CI! "
-                        "Please refer to the following error code for further "
-                        "information:".format(str(error)))
+                        "Please refer to the following error message for "
+                        "further information: {}".format(str(error)))
         sys.exit(1)
 
     # Check if activation was successful
-    if t_repo["active"]:
-        LOGGER.info(
-            "Your repository is now on GitHub and automatic testing has "
-            "been enabled on Travis CI. Congrats!")
-    else:
-        LOGGER.critical("Unable to enable automatic testing on Travis CI!")
+    activated = False
+    for _ in range(60):
+        try:
+            LOGGER.info("Check if activation {} on Travis CI "
+                        "was successful".format(gh_repo_name))
+            response = requests.get(
+                "https://api.travis-ci.org/repo/{}".format(url_safe_repo_name),
+                headers=headers
+            )
+        except HTTPError as error:
+            LOGGER.critical(
+                "An error occurred. Please refer to the following error "
+                "message for further information: {}".format(str(error)))
+            sys.exit(1)
+        else:
+            t_repo = response.json()
+        if t_repo["active"]:
+            activated = True
+            LOGGER.info(
+                "Your repository is now on GitHub and automatic testing has "
+                "been enabled on Travis CI. Congrats!")
+            break
+        else:
+            LOGGER.info("Still activating...")
+            sleep(0.5)
+    if not activated:
+        LOGGER.critical("Unable to enable automatic testing on Travis CI! "
+                        "Delete all tokens belonging to this repo at "
+                        "https://github.com/settings/tokens then try running "
+                        "`memote online` again. If this fails yet again, "
+                        "please open an issue at "
+                        "https://github.com/opencobra/memote/issues.")
         sys.exit(1)
     LOGGER.info(
         "Encrypting GitHub token for repo '{}'.".format(gh_repo_name))
