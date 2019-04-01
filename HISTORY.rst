@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.9.8 (2019-04-01)
+------------------
 * Repair `memote online` which would not get the most up-to-date status when
   checking whether a repo had already been activate for testing on Travis CI.
 * Pin `travis-encode` due to conflicts in dependency on `click` with
