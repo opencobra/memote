@@ -705,8 +705,8 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
         LOGGER.critical("Unable to enable automatic testing on Travis CI! "
                         "Delete all tokens belonging to this repo at "
                         "https://github.com/settings/tokens then try running "
-                        "`memote online` again. If this fails yet again, please "
-                        "open an issue at "
+                        "`memote online` again. If this fails yet again, "
+                        "please open an issue at "
                         "https://github.com/opencobra/memote/issues.")
         sys.exit(1)
     LOGGER.info(
