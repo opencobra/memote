@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { ElementRef } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
 // import { PassThrough } from 'stream';
 
@@ -9,36 +10,49 @@ import { ReportDataService } from '../report-data.service';
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartHistoryComponent implements OnInit {
-  @Input() position: string;
-  scoreType = 'Total Score';
-  modelScore: string[] = [];
-  formulae: string[] = [];
-  sections: Object[] = [];
-  sectionWeight = 1;
+  @Input() testObject: any;
+  @Input() testId: string;
+  format_type: string;
+  nativeElement: any;
+  chart: any;
 
-  constructor(private data: ReportDataService) {
+  constructor(private data: ReportDataService, private elementRef: ElementRef) {
+    this.nativeElement = elementRef.nativeElement;
+  }
+
+  public initialize() {
+    this.chart.renderTo(this.nativeElement);
   }
 
   ngOnInit() {
+    this.format_type = this.testObject.format_type;
 
-    const datasource = [{
-      type:'us', count:20, date:'12-2013'
-    },{
-      type:'us', count:10, date:'01-2014'
-    },{
-      type:'bug', count:15, date:'02-2014'
-    },{
-      type:'bug', count:23, date:'05-2014'
-    }];
+    // Define settings for fast and responsive loading:
+    const tau_settings = {
+      asyncRendering: true,
+    }
 
-    const chart = new Taucharts.Chart({
-      data: datasource,
+    // Determine wether to plot data or metric.
+    if (this.data.isScored(this.data.getParam(this.testId, 0))) {
+      this.format_type = 'metric';
+    } else {
+      this.format_type = 'data';
+    }
+
+    this.chart = new Taucharts.Chart({
+      data: this.testObject.history,
       type: 'line',
-      x: 'date',
-      y: 'count',
-      color: 'type' // there will be two lines with different colors on the chart
+      x: 'commit',
+      y: this.format_type,
+      color: 'branch',
+      settings: tau_settings,
+      guide: {
+        showAnchors: 'always',
+        interpolate: 'linear',
+        x: { tickFormat: 's' }
+      }
   });
 
-  chart.renderTo('#tauchart');
+  this.initialize();
   }
 }

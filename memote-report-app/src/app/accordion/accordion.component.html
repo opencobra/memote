@@ -99,8 +99,7 @@
               <div *ngSwitchCase="'history'">
                   <br>
                     <div>
-                      <app-vega-plot [testObject]="data.byID(testId)"></app-vega-plot>
-                      <app-tauchart-history [testObject]="data.byID(testId)"></app-tauchart-history>
+                      <app-tauchart-history [testObject]="data.byID(testId)" [testId]="testId" ></app-tauchart-history>
                     </div>
               </div>
              </div>
