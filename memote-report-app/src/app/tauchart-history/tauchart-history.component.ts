@@ -46,6 +46,10 @@ export class TauChartHistoryComponent implements OnInit {
       y: this.format_type,
       color: 'branch',
       settings: tau_settings,
+      plugins: [
+        Taucharts.api.plugins.get('legend')(),
+        Taucharts.api.plugins.get('tooltip')()
+      ],
       guide: {
         showAnchors: 'always',
         interpolate: 'linear',
