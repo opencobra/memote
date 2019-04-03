@@ -4,11 +4,11 @@ import { ReportDataService } from '../report-data.service';
 import { Chart, api } from 'taucharts';
 import 'taucharts/dist/plugins/tooltip';
 import 'taucharts/dist/plugins/legend';
+import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-history',
   template: '<div> </div>',
-  styleUrls: ['./tauchart-history.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartHistoryComponent implements OnInit {
@@ -39,7 +39,7 @@ export class TauChartHistoryComponent implements OnInit {
     // Define settings for fast and responsive loading:
     const tau_settings = {
       asyncRendering: true,
-      renderingTimeout: 1,
+      renderingTimeout: 1000,
     };
 
     const tau_guide = {
@@ -51,16 +51,25 @@ export class TauChartHistoryComponent implements OnInit {
     };
 
     // Determine wether to plot data or metric.
-    if (this.data.isScored(this.data.getParam(this.testId, 0))) {
+    if (this.testId) {
+      if (this.data.isScored(this.data.getParam(this.testId, 0))) {
+        this.format_type = 'metric';
+        this.invertScoredData(this.testObject.history);
+        tau_guide['y'] = { min: 0,
+          max: 1,
+          nice: false,
+          tickFormat: 'percent'
+        };
+      } else {
+        this.format_type = 'data';
+      }
+    } else {
       this.format_type = 'metric';
-      this.invertScoredData(this.testObject.history);
       tau_guide['y'] = { min: 0,
         max: 1,
         nice: false,
         tickFormat: 'percent'
       };
-    } else {
-      this.format_type = 'data';
     }
 
     this.chart = new Chart({
@@ -72,7 +81,8 @@ export class TauChartHistoryComponent implements OnInit {
       settings: tau_settings,
       plugins: [
         api.plugins.get('legend')(),
-        api.plugins.get('tooltip')()
+        api.plugins.get('tooltip')(),
+        api.plugins.get('export-to')()
       ],
       guide: tau_guide
   });
