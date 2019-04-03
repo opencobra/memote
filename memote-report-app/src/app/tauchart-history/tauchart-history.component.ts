@@ -5,7 +5,7 @@ import { ReportDataService } from '../report-data.service';
 
 @Component({
   selector: 'app-tauchart-history',
-  templateUrl: './tauchart-history.component.html',
+  template: '<div> </div>',
   styleUrls: ['./tauchart-history.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
@@ -15,6 +15,7 @@ export class TauChartHistoryComponent implements OnInit {
   format_type: string;
   nativeElement: any;
   chart: any;
+  historyData: Object[];
 
   constructor(private data: ReportDataService, private elementRef: ElementRef) {
     this.nativeElement = elementRef.nativeElement;
@@ -24,17 +25,40 @@ export class TauChartHistoryComponent implements OnInit {
     this.chart.renderTo(this.nativeElement);
   }
 
+  public invertScoredData(history: Object[]) {
+    for (const result of history){
+      console.log(result.metric)
+      result.metric = 1 - result.metric;
+      console.log(result.metric)
+    }
+  }
+
   ngOnInit() {
     this.format_type = this.testObject.format_type;
 
     // Define settings for fast and responsive loading:
     const tau_settings = {
       asyncRendering: true,
-    }
+      renderingTimeout: 1000,
+    };
+
+    const tau_guide = {
+      showAnchors: 'always',
+      interpolate: 'linear',
+      showGridLines: 'xy',
+      x: { nice: false
+         },
+    };
 
     // Determine wether to plot data or metric.
     if (this.data.isScored(this.data.getParam(this.testId, 0))) {
       this.format_type = 'metric';
+      this.invertScoredData(this.testObject.history);
+      tau_guide['y'] = { min: 0,
+        max: 1,
+        nice: false,
+        tickFormat: 'percent'
+      };
     } else {
       this.format_type = 'data';
     }
@@ -50,11 +74,7 @@ export class TauChartHistoryComponent implements OnInit {
         Taucharts.api.plugins.get('legend')(),
         Taucharts.api.plugins.get('tooltip')()
       ],
-      guide: {
-        showAnchors: 'always',
-        interpolate: 'linear',
-        x: { tickFormat: 's' }
-      }
+      guide: tau_guide
   });
 
   this.initialize();
