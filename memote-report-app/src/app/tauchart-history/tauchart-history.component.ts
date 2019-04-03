@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
-// import { PassThrough } from 'stream';
+import { Chart, api } from 'taucharts';
+import 'taucharts/dist/plugins/tooltip';
+import 'taucharts/dist/plugins/legend';
 
 @Component({
   selector: 'app-tauchart-history',
@@ -27,9 +29,7 @@ export class TauChartHistoryComponent implements OnInit {
 
   public invertScoredData(history: Object[]) {
     for (const result of history){
-      console.log(result.metric)
       result.metric = 1 - result.metric;
-      console.log(result.metric)
     }
   }
 
@@ -39,7 +39,7 @@ export class TauChartHistoryComponent implements OnInit {
     // Define settings for fast and responsive loading:
     const tau_settings = {
       asyncRendering: true,
-      renderingTimeout: 1000,
+      renderingTimeout: 1,
     };
 
     const tau_guide = {
@@ -63,7 +63,7 @@ export class TauChartHistoryComponent implements OnInit {
       this.format_type = 'data';
     }
 
-    this.chart = new Taucharts.Chart({
+    this.chart = new Chart({
       data: this.testObject.history,
       type: 'line',
       x: 'commit',
@@ -71,8 +71,8 @@ export class TauChartHistoryComponent implements OnInit {
       color: 'branch',
       settings: tau_settings,
       plugins: [
-        Taucharts.api.plugins.get('legend')(),
-        Taucharts.api.plugins.get('tooltip')()
+        api.plugins.get('legend')(),
+        api.plugins.get('tooltip')()
       ],
       guide: tau_guide
   });
