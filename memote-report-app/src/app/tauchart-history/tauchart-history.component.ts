@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, AfterViewInit } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
 import { Chart, api } from 'taucharts';
@@ -8,25 +8,23 @@ import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-history',
-  template: '<div> </div>',
+  template: '<div id="tau-history-{{css_tag}}" style="height: 50vh; width: 40vw"> </div>',
   encapsulation: ViewEncapsulation.None
 })
-export class TauChartHistoryComponent implements OnInit {
+export class TauChartHistoryComponent implements OnInit, AfterViewInit {
   @Input() testObject: any;
   @Input() testId: string;
   format_type: string;
-  nativeElement: any;
   chart: any;
   historyData: Object[];
+  css_tag = 'total';
 
-  constructor(private data: ReportDataService, private elementRef: ElementRef) {
-    this.nativeElement = elementRef.nativeElement;
-  }
+  constructor(private data: ReportDataService) {}
 
   public initialize() {
-    this.chart.renderTo(this.nativeElement);
+    this.chart.renderTo('#tau-history-' + this.css_tag);
   }
-
+ 
   public invertScoredData(history: Object[]) {
     for (const result of history){
       result['metric'] = 1 - result['metric'];
@@ -52,16 +50,22 @@ export class TauChartHistoryComponent implements OnInit {
 
     // Determine wether to plot data or metric.
     if (this.testId) {
+      this.css_tag = this.testId.replace(/:|\./g, '_');
       if (this.data.isScored(this.data.getParam(this.testId, 0))) {
         this.format_type = 'metric';
         this.invertScoredData(this.testObject.history);
+        console.log(this.testObject.history);
         tau_guide['y'] = { min: 0,
           max: 1,
           nice: false,
-          tickFormat: 'percent'
+          tickFormat: 'percent',
+          label: {text: this.testObject.title}
         };
       } else {
         this.format_type = 'data';
+        tau_guide['y'] = {
+          label: {text: this.testObject.title}
+        };
       }
     } else {
       this.format_type = 'metric';
@@ -71,7 +75,6 @@ export class TauChartHistoryComponent implements OnInit {
         tickFormat: 'percent'
       };
     }
-
     this.chart = new Chart({
       data: this.testObject.history,
       type: 'line',
@@ -86,7 +89,9 @@ export class TauChartHistoryComponent implements OnInit {
       ],
       guide: tau_guide
   });
+  }
 
-  this.initialize();
+  ngAfterViewInit() {
+    this.initialize();
   }
 }
