@@ -20,6 +20,9 @@ export class VegaBarChartComponent implements OnInit {
 
   public initialize() {
     // Initialize the vega bar chart
+
+    console.log(this.data.score.sections)
+
     specBarChart.data[0]['values'] = this.data.score.sections;
     const view = new View(parse(specBarChart))
       .renderer('svg')

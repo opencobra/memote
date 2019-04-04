@@ -46,14 +46,14 @@ export class ReportDataService {
         // .subscribe(data => {this.convertDiffResults(data); });
         // this.reportType = 'diff';
         // break;
-        // this.http.get('/data/testData.json')
-        // .subscribe(data => {this.convertResults(data); });
-        // this.reportType = 'snapshot';
-        // break;
-        this.http.get('/data/testHistory.json')
-        .subscribe(data => {this.convertHistoryResults(data); });
-        this.reportType = 'history';
+        this.http.get('/data/testData.json')
+        .subscribe(data => {this.convertResults(data); });
+        this.reportType = 'snapshot';
         break;
+        // this.http.get('/data/testHistory.json')
+        // .subscribe(data => {this.convertHistoryResults(data); });
+        // this.reportType = 'history';
+        // break;
       }
   }
 }

@@ -43,11 +43,8 @@
           <hr>
           </div>
       <div
-        fxLayout='row'
-        fxLayout.lt-lg='column'
-        fxLayoutAlign='space-between start'
         *ngIf="data.reportType != 'history'; else vegaHistoryScore">
-        <div fxFlex> Total Score
+        <div > Total Score
           <div *ngIf="data.reportType === 'snapshot'; else diffScore">
             <div style="font-size:10vw">{{ data.score.total_score | percent:'.'  }}</div>
           </div>
@@ -59,14 +56,11 @@
         </div>
         <div>
         <div 
-          fxFlex 
-          class="svg-container"
           *ngIf="data.reportType === 'snapshot'; else diffSectionScore"> Score per Category
-          <br>
-              <app-vega-bar-chart ></app-vega-bar-chart>
+              <app-tauchart-bar> </app-tauchart-bar>
         </div>
         <ng-template #diffSectionScore>
-            <div fxFlex class="svg-container"> Score per Category
+            <div> Score per Category
             <br>
                 <app-vega-grouped-bar-chart ></app-vega-grouped-bar-chart>
           </div>
