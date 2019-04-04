@@ -29,7 +29,7 @@ export class TauChartHistoryComponent implements OnInit {
 
   public invertScoredData(history: Object[]) {
     for (const result of history){
-      result.metric = 1 - result.metric;
+      result['metric'] = 1 - result['metric'];
     }
   }
 
@@ -42,7 +42,7 @@ export class TauChartHistoryComponent implements OnInit {
       renderingTimeout: 1000,
     };
 
-    const tau_guide = {
+    const tau_guide: any = {
       showAnchors: 'always',
       interpolate: 'linear',
       showGridLines: 'xy',

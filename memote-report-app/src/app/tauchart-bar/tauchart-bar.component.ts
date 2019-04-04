@@ -14,7 +14,7 @@ export class TauChartBarComponent implements OnInit {
   @Input() plotType: string;
   nativeElement: any;
   chart: any;
-  chart_settings: Object;
+  chart_settings: any;
 
   constructor(private data: ReportDataService, private elementRef: ElementRef) {
     this.nativeElement = elementRef.nativeElement;
