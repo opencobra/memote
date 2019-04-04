@@ -42,18 +42,18 @@ export class ReportDataService {
       default: {
         // This is for development purposes only. When no matching reportType is specified the
         // app resorts to displaying the test data.
-        // this.http.get('/data/testDiff.json')
-        // .subscribe(data => {this.convertDiffResults(data); });
-        // this.reportType = 'diff';
-        // break;
+        this.http.get('/data/testDiff.json')
+        .subscribe(data => {this.convertDiffResults(data); });
+        this.reportType = 'diff';
+        break;
         // this.http.get('/data/testData.json')
         // .subscribe(data => {this.convertResults(data); });
         // this.reportType = 'snapshot';
         // break;
-        this.http.get('/data/testHistory.json')
-        .subscribe(data => {this.convertHistoryResults(data); });
-        this.reportType = 'history';
-        break;
+        // this.http.get('/data/testHistory.json')
+        // .subscribe(data => {this.convertHistoryResults(data); });
+        // this.reportType = 'history';
+        // break;
       }
   }
 }

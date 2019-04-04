@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation, Input, AfterViewInit } from '@angular/core';
-import { ElementRef } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
 import { Chart, api } from 'taucharts';
 import 'taucharts/dist/plugins/tooltip';

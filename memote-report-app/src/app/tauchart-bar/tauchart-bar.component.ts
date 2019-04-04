@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
-import { ElementRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, AfterViewInit } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
 import { Chart, api } from 'taucharts';
 import 'taucharts/dist/plugins/tooltip';
@@ -7,22 +6,21 @@ import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-bar',
-  template: '<div style="width: 100%; height: 70%, padding: 2%"> </div>',
+  template: '<div id="tau-horizbar-{{css_tag}}" style="height: 50vh; width: 40vw"> </div>',
   encapsulation: ViewEncapsulation.None
 })
-export class TauChartBarComponent implements OnInit {
+export class TauChartBarComponent implements OnInit, AfterViewInit {
   @Input() plotType: string;
-  nativeElement: any;
   chart: any;
   chart_settings: any;
+  css_tag = 'total';
 
-  constructor(private data: ReportDataService, private elementRef: ElementRef) {
-    this.nativeElement = elementRef.nativeElement;
+  constructor(private data: ReportDataService) {
   }
 
   public initialize() {
     this.chart = new Chart(this.chart_settings);
-    this.chart.renderTo(this.nativeElement);
+    this.chart.renderTo('#tau-horizbar-' + this.css_tag);
   }
 
   public composeChartSettings() {
@@ -39,6 +37,7 @@ export class TauChartBarComponent implements OnInit {
         this.chart_settings['guide']['color'] = {
           brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
         };
+        this.css_tag = 'sections';
         break;
       }
       case 'diff-sections': {
@@ -53,6 +52,7 @@ export class TauChartBarComponent implements OnInit {
         this.chart_settings['guide']['color'] = {
             brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
           };
+        this.css_tag = 'sections';
         break;
       }
       case 'diff-total': {
@@ -88,6 +88,9 @@ export class TauChartBarComponent implements OnInit {
       settings: { fitModel: 'normal'}
     };
     this.composeChartSettings();
+  }
+
+  ngAfterViewInit() {
     this.initialize();
   }
 }
