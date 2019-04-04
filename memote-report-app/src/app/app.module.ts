@@ -17,7 +17,6 @@ import { ResultButtonComponent } from './result-button/result-button.component';
 import { DiffButtonComponent } from './diff-button/diff-button.component';
 import {TauChartHistoryComponent} from './tauchart-history/tauchart-history.component';
 import {TauChartBarComponent} from './tauchart-bar/tauchart-bar.component';
-import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
 import { VegaTotalScoreBarChartComponent } from './vega-total-score-bar-chart/vega-total-score-bar-chart.component';
 import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grouped-bar-chart.component';
 import { HelpDialogComponent, HelpDialogTextComponent} from './help-dialog/help-dialog.component';
@@ -38,7 +37,6 @@ import { ScoreFormulaComponent } from './score-formula/score-formula.component';
     DiffButtonComponent,
     TauChartHistoryComponent,
     TauChartBarComponent,
-    VegaBarChartComponent,
     VegaGroupedBarChartComponent,
     VegaTotalScoreBarChartComponent,
     HelpDialogComponent,

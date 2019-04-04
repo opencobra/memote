@@ -3,9 +3,7 @@ import { ElementRef } from '@angular/core';
 import { ReportDataService } from '../report-data.service';
 import { Chart, api } from 'taucharts';
 import 'taucharts/dist/plugins/tooltip';
-import 'taucharts/dist/plugins/legend';
 import 'taucharts/dist/plugins/export-to';
-import { isNgTemplate } from '@angular/compiler';
 
 @Component({
   selector: 'app-tauchart-bar',
@@ -13,43 +11,83 @@ import { isNgTemplate } from '@angular/compiler';
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartBarComponent implements OnInit {
-  @Input() testObject: any;
+  @Input() plotType: string;
   nativeElement: any;
   chart: any;
+  chart_settings: Object;
 
   constructor(private data: ReportDataService, private elementRef: ElementRef) {
     this.nativeElement = elementRef.nativeElement;
   }
 
   public initialize() {
+    this.chart = new Chart(this.chart_settings);
     this.chart.renderTo(this.nativeElement);
+  }
+
+  public composeChartSettings() {
+    switch (this.plotType) {
+      case 'snapshot-sections': {
+        this.chart_settings['y'] = 'section';
+        this.chart_settings['x'] = 'score';
+        this.chart_settings['color'] = 'score';
+        this.chart_settings['data'] = this.data.score.sections;
+        this.chart_settings['guide']['x'] = {
+          nice: false,
+          min: 0, max : 1,
+          tickFormat: 'percent'};
+        this.chart_settings['guide']['color'] = {
+          brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
+        };
+        break;
+      }
+      case 'diff-sections': {
+        console.log(this.data.score.sections.diff);
+        this.chart_settings['y'] = 'model';
+        this.chart_settings['x'] = 'percent';
+        this.chart_settings['color'] = 'score';
+        this.chart_settings['data'] = this.data.score.sections.diff;
+        this.chart_settings['guide']['x'] = {
+          nice: false,
+          min: 0, max : 100};
+        this.chart_settings['guide']['color'] = {
+            brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
+          };
+        break;
+      }
+      case 'diff-total': {
+        console.log(this.data.score.total_score.diff);
+        this.chart_settings['y'] = 'model';
+        this.chart_settings['x'] = 'total_score';
+        this.chart_settings['data'] = this.data.score.total_score.diff;
+        this.chart_settings['guide']['x'] = {
+          nice: false,
+          min: 0, max : 1, tickFormat: 'percent'};
+        break;
+      }
+    }
   }
 
   ngOnInit() {
 
-    const tau_guide = {
-      showGridLines: 'xy',
-      x: { nice: false,
-        min: 0, max : 1,
-        tickFormat: 'percent'
-         },
-      color: { brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']}
-    };
+    console.log(this.plotType);
 
-    this.chart = new Chart({
+    this.chart_settings = {
       type: 'horizontal-bar',
-      y: 'section',
-      x: 'score',
-      color: 'score',
-      data: this.data.score.sections,
+      y: NaN,
+      x: NaN,
+      color: NaN,
+      data: NaN,
       plugins: [
         api.plugins.get('tooltip')(),
         api.plugins.get('export-to')()
       ],
-      guide: tau_guide,
+      guide: {
+        showGridLines: 'xy'
+      },
       settings: { fitModel: 'normal'}
-  });
-
-  this.initialize();
+    };
+    this.composeChartSettings();
+    this.initialize();
   }
 }
