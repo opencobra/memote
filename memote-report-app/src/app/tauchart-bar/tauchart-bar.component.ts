@@ -7,7 +7,7 @@ import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-bar',
-  template: '<div style="width:100%; height:100%"> </div>',
+  template: '<div style="width: 100%; height: 70%, padding: 2%"> </div>',
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartBarComponent implements OnInit {
@@ -44,12 +44,12 @@ export class TauChartBarComponent implements OnInit {
       case 'diff-sections': {
         console.log(this.data.score.sections.diff);
         this.chart_settings['y'] = 'model';
-        this.chart_settings['x'] = 'percent';
+        this.chart_settings['x'] = 'score';
         this.chart_settings['color'] = 'score';
         this.chart_settings['data'] = this.data.score.sections.diff;
         this.chart_settings['guide']['x'] = {
           nice: false,
-          min: 0, max : 100};
+          min: 0, max : 1, tickFormat: 'percent'};
         this.chart_settings['guide']['color'] = {
             brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
           };
