@@ -58,15 +58,19 @@ at via GitHub pages for your repository.
 Installation
 ============
 
-We highly recommend creating a Python virtualenv for your model testing purposes.
+Before installing `memote`, make sure that you have correctly installed the
+latest version of `git <https://git-scm.com/>`_.
 
-To install memote, run this command in your terminal:
+Moreover, we highly recommend creating a Python virtualenv for your model
+testing purposes.
+
+To install `memote`, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install memote
 
-This is the preferred method to install memote, as it will always install the
+This is the preferred method to install `memote`, as it will always install the
 most recent stable release.
 
 .. who-start
@@ -99,7 +103,7 @@ Credits
 This package was created with Cookiecutter_ and the
 `audreyr/cookiecutter-pypackage`_ project template.
 
-Memote relies on click_ for the command line interface, pytest_ for unit 
+`Memote` relies on click_ for the command line interface, pytest_ for unit
 and model tests, gitpython_ for interacting with git repositories, 
 pandas_ for tabular datastructures and data input, jinja2_ for interacting 
 with HTML templates, cobrapy_ for analysing genome-scale metabolic 
@@ -116,7 +120,7 @@ The Memote Report App user interface is built with `Angular 5`_,
 `Angular Flex-Layout`_, and `Angular Material`_. We rely on Vega_ for plotting 
 results.
 
-The initial development of memote has received funding from:
+The initial development of `memote` has received funding from:
 
 .. image:: https://upload.wikimedia.org/wikipedia/commons/d/d5/Novo_nordisk_foundation_Logo.png
         :target: http://novonordiskfonden.dk/en
