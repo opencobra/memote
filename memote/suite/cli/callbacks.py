@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import shlex
 import sys
 import logging
+from subprocess import check_output
 
 import click
 import git
@@ -97,3 +98,15 @@ def abort_if_false(ctx, param, value):
     """Require confirmation."""
     if not value:
         ctx.abort()
+
+
+def git_installed():
+    """Interrupt execution of memote if `git` has not been installed."""
+    LOGGER.info("Checking `git` installation.")
+    try:
+        check_output(['git', '--version'])
+    except Exception as e:
+        LOGGER.critical(
+            "The execution of memote was interrupted since no installation of "
+            "`git` could be detected. {}".format(str(e)))
+        sys.exit(1)
