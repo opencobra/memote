@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Include memote's requirement for git on installation instructions.
+* Check for the presence of `git` in CLI commands that require it.
 
 0.9.8 (2019-04-01)
 ------------------
