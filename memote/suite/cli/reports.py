@@ -153,7 +153,6 @@ def history(location, model, filename, deployment, custom_config):
             "The history report requires a git repository in order to check "
             "the model's commit history.")
         sys.exit(1)
-    previous = repo.active_branch
     LOGGER.info("Obtaining history of results from "
                 "the deployment branch {}.".format(deployment))
     repo.git.checkout(deployment)
@@ -171,7 +170,6 @@ def history(location, model, filename, deployment, custom_config):
     history.load_history(model, skip={deployment})
     LOGGER.info("Composing the history report.")
     report = api.history_report(history, config=config)
-    previous.checkout()
     with open(filename, "w", encoding="utf-8") as file_handle:
         file_handle.write(report)
 
