@@ -6,21 +6,21 @@ import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-bar',
-  template: '<div id="tau-horizbar-{{css_tag}}" style="height: 50vh; width: 40vw"> </div>',
+  template: '<div id="tau-horizbar-{{unique_id}}" style="height: 50vh; width: 40vw"> </div>',
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartBarComponent implements OnInit, AfterViewInit {
   @Input() plotType: string;
   chart: any;
   chart_settings: any;
-  css_tag = 'total';
+  unique_id = 'total';
 
   constructor(private data: ReportDataService) {
   }
 
   public initialize() {
     this.chart = new Chart(this.chart_settings);
-    this.chart.renderTo('#tau-horizbar-' + this.css_tag);
+    this.chart.renderTo('#tau-horizbar-' + this.unique_id);
   }
 
   public composeChartSettings() {
@@ -37,7 +37,7 @@ export class TauChartBarComponent implements OnInit, AfterViewInit {
         this.chart_settings['guide']['color'] = {
           brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
         };
-        this.css_tag = 'sections';
+        this.unique_id = 'sections';
         break;
       }
       case 'diff-sections': {
@@ -51,7 +51,7 @@ export class TauChartBarComponent implements OnInit, AfterViewInit {
         this.chart_settings['guide']['color'] = {
             brewer : ['rgb(161, 18, 18)', 'rgb(18, 161, 46)']
           };
-        this.css_tag = 'sections';
+        this.unique_id = 'sections';
         break;
       }
       case 'diff-total': {

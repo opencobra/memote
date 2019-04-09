@@ -7,7 +7,7 @@ import 'taucharts/dist/plugins/export-to';
 
 @Component({
   selector: 'app-tauchart-history',
-  template: '<div id="tau-history-{{css_tag}}" style="height: 50vh; width: 40vw"> </div>',
+  template: '<div id="tau-history-{{unique_id}}" style="height: 50vh; width: 40vw"> </div>',
   encapsulation: ViewEncapsulation.None
 })
 export class TauChartHistoryComponent implements OnInit, AfterViewInit {
@@ -16,12 +16,12 @@ export class TauChartHistoryComponent implements OnInit, AfterViewInit {
   format_type: string;
   chart: any;
   historyData: Object[];
-  css_tag = 'total';
+  unique_id = 'total';
 
   constructor(private data: ReportDataService) {}
 
   public initialize() {
-    this.chart.renderTo('#tau-history-' + this.css_tag);
+    this.chart.renderTo('#tau-history-' + this.unique_id);
   }
  
   public invertScoredData(history: Object[]) {
@@ -49,7 +49,7 @@ export class TauChartHistoryComponent implements OnInit, AfterViewInit {
 
     // Determine wether to plot data or metric.
     if (this.testId) {
-      this.css_tag = this.testId.replace(/:|\./g, '_');
+      this.unique_id = this.testId.replace(/:|\./g, '_');
       if (this.data.isScored(this.data.getParam(this.testId, 0))) {
         this.format_type = 'metric';
         this.invertScoredData(this.testObject.history);
