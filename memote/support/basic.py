@@ -343,8 +343,8 @@ def find_reactions_with_partially_identical_annotations(model):
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         mutual_pair = tuple(ann_a & ann_b)
         if len(mutual_pair) > 0:
-            duplicates.setdefault(mutual_pair, set())
-            duplicates[mutual_pair].update([rxn_a.id, rxn_b.id])
+            duplicates.setdefault(mutual_pair, set()).update(
+                [rxn_a.id, rxn_b.id])
     # Transform the object for JSON compatibility
     num_duplicated = set()
     duplicated = {}
@@ -508,12 +508,13 @@ def find_reactions_with_identical_genes(model):
     """
     duplicates = dict()
     for rxn_a, rxn_b in combinations(model.reactions, 2):
-        if rxn_a.genes is None or rxn_b.genes is None:
+        if not (rxn_a.genes and rxn_b.genes):
             continue
         if rxn_a.genes == rxn_b.genes:
+            # This works because the `genes` are frozen sets.
             identifiers = rxn_a.genes
-            duplicates.setdefault(identifiers, set())
-            duplicates[identifiers].update([rxn_a.id, rxn_b.id])
+            duplicates.setdefault(identifiers, set()).update(
+                [rxn_a.id, rxn_b.id])
     # Transform the object for JSON compatibility
     num_duplicated = set()
     duplicated = {}
