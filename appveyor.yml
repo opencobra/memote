@@ -12,15 +12,29 @@ environment:
     PIP_DISABLE_PIP_VERSION_CHECK: "yes"
 
   matrix:
+    # Python 2.7, 64-bit
+    - TOXENV: "py27"
+      TOX_APPVEYOR_X64=1
 
-    - PYTHON: "C:\\Python27-x64"
-      TOXENV: py27
+    # Python 2.7, 32-bit
+    - TOXENV: "py27"
+      TOX_APPVEYOR_X64=0
 
-    - PYTHON: "C:\\Python35-x64"
-      TOXENV: py35
+    # Python 3.5, 64-bit
+    - TOXENV: "py35"
+      TOX_APPVEYOR_X64=1
 
-    - PYTHON: "C:\\Python36-x64"
-      TOXENV: py36
+    # Python 3.5, 32-bit
+    - TOXENV: "py36"
+      TOX_APPVEYOR_X64=0
+
+    # Python 3.7, 64-bit
+    - TOXENV: "py36"
+      TOX_APPVEYOR_X64=1
+
+    # Python 3.7, 32-bit
+    - TOXENV: "py36"
+      TOX_APPVEYOR_X64=0
 
 matrix:
   fast_finish: true
@@ -36,9 +50,9 @@ cache:
     - pip_cache -> appveyor.yml
 
 install:
-  - ps: pip install --user --upgrade pip setuptools wheel tox
+  - "build.cmd py -3.6 -m pip install pip setuptools wheel tox tox-appveyor"
 
 build: off
 
 test_script:
-  - ps: tox
+  - "build.cmd py -3.6 -m tox"
