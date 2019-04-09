@@ -53,7 +53,6 @@ export class TauChartHistoryComponent implements OnInit, AfterViewInit {
       if (this.data.isScored(this.data.getParam(this.testId, 0))) {
         this.format_type = 'metric';
         this.invertScoredData(this.testObject.history);
-        console.log(this.testObject.history);
         tau_guide['y'] = { min: 0,
           max: 1,
           nice: false,

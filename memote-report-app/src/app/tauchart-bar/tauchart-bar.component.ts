@@ -41,7 +41,6 @@ export class TauChartBarComponent implements OnInit, AfterViewInit {
         break;
       }
       case 'diff-sections': {
-        console.log(this.data.score.sections.diff);
         this.chart_settings['y'] = 'model';
         this.chart_settings['x'] = 'score';
         this.chart_settings['color'] = 'score';
@@ -56,7 +55,6 @@ export class TauChartBarComponent implements OnInit, AfterViewInit {
         break;
       }
       case 'diff-total': {
-        console.log(this.data.score.total_score.diff);
         this.chart_settings['y'] = 'model';
         this.chart_settings['x'] = 'total_score';
         this.chart_settings['data'] = this.data.score.total_score.diff;
@@ -69,8 +67,6 @@ export class TauChartBarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
-    console.log(this.plotType);
 
     this.chart_settings = {
       type: 'horizontal-bar',
