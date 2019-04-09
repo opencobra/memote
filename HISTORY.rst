@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Fix the reactions with identical genes test case to not group all reactions
+  without any GPR together.
 
 0.9.8 (2019-04-01)
 ------------------
