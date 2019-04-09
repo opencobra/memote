@@ -14,11 +14,11 @@ environment:
   matrix:
     # Python 3.6, 64-bit
     - TOXENV: "py36"
-      TOX_APPVEYOR_X64=1
+      TOX_APPVEYOR_X64: 1
 
     # Python 3.6, 32-bit
     - TOXENV: "py36"
-      TOX_APPVEYOR_X64=0
+      TOX_APPVEYOR_X64: 0
 
 matrix:
   fast_finish: true
