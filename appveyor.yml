@@ -36,7 +36,7 @@ cache:
     - pip_cache -> appveyor.yml
 
 install:
-  - ps: pip install --user -qq --upgrade pip setuptools wheel tox
+  - ps: pip install --user --upgrade pip setuptools wheel tox
 
 build: off
 
