@@ -34,9 +34,9 @@ cache:
   - pip_cache -> appveyor.yml
 
 install:
-  - "build.cmd py -3.6 -m pip install pip setuptools wheel tox tox-appveyor"
+  - "py -3.6 -m pip install pip setuptools wheel tox tox-appveyor"
 
 build: off
 
 test_script:
-  - "build.cmd py -3.6 -m tox"
+  - "py -3.6 -m tox"
