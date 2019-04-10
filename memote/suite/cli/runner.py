@@ -213,8 +213,7 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             repo.git.add(".")
             check_call(
               ['git', 'commit', 
-               '-m', "chore: add result for {}".format(previous_cmt.hexsha)], 
-              shell=True
+               '-m', "chore: add result for {}".format(previous_cmt.hexsha)]
             )
             if is_branch:
                 previous.checkout()
@@ -420,7 +419,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
     else:
         move(new_location, os.getcwd())
     repo.git.add(".")
-    check_call(['git', 'commit', '-m', message], shell=True)
+    check_call(['git', 'commit', '-m', message])
     LOGGER.info("Success!")
     # Checkout the original branch.
     previous.checkout()
@@ -770,17 +769,14 @@ def online(note, github_repository, github_username):
     LOGGER.info("Add, commit and push changes to '.travis.yml' to GitHub.")
     repo.index.add([".travis.yml"])
     check_call(
-      ['git', 'commit', '-m', "chore: add encrypted GitHub access token"], 
-      shell=True
+      ['git', 'commit', '-m', "chore: add encrypted GitHub access token"]
     )
     git_remote_https = 'https://github.com/{}.git'.format(gh_repo_name)
     check_call(
-      ['git', 'remote', 'add', 'origin', git_remote_https], 
-      shell=True
+      ['git', 'remote', 'add', 'origin', git_remote_https]
     )
     check_call(
-      ['git', 'push', '--set-upstream', 'origin', repo.active_branch.name], 
-      shell=True
+      ['git', 'push', '--set-upstream', 'origin', repo.active_branch.name]
     )
 
 
