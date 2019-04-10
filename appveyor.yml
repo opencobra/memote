@@ -26,6 +26,8 @@ matrix:
 clone_depth: 2
 
 init:
+  - git config --global user.email "cobrapy-bot@opencobra.com"
+  - git config --global user.name "cobrapy-bot"
   - "ECHO %PYTHON%"
   - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - python -V
