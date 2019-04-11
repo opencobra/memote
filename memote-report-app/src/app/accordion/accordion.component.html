@@ -17,9 +17,11 @@
          </td>
        </mat-panel-title>
      </mat-expansion-panel-header>
+     <ng-template matExpansionPanelContent>
        <div>
          <p> {{ data.byID(data.byReg(case)[0])?.summary }} </p>
        </div>
+     </ng-template>
  </mat-expansion-panel>
 </div>
   <mat-accordion
@@ -70,6 +72,7 @@
               <div class='badge' style="background-color: white"></div> 
           </ng-template>
           </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
           <div fxLayout='column' flexLayoutAlign='space-between center'>
             <div *ngIf="data.byReg(case).length === 1; else justMessages">
               <p>{{ data.byID(testId)?.summary }}</p>
@@ -99,10 +102,11 @@
               <div *ngSwitchCase="'history'">
                   <br>
                     <div>
-                      <app-vega-plot [testObject]="data.byID(testId)"></app-vega-plot>
+                      <app-tauchart-history [testObject]="data.byID(testId)" [testId]="testId" ></app-tauchart-history>
                     </div>
               </div>
              </div>
           </div>
+        </ng-template>
       </mat-expansion-panel>
   </mat-accordion>
