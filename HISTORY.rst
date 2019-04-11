@@ -16,6 +16,8 @@ Next Release
 * Add hover-over tooltips for all plots.
 * Implement lazy loading for all the reports, meaning that the content of 
   an expansion panel in any of the reports is only rendered when it is open.
+* Fix the reactions with identical genes test case to not group all reactions
+  without any GPR together.
 
 0.9.8 (2019-04-01)
 ------------------
