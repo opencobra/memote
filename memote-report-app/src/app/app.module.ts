@@ -15,10 +15,8 @@ import { SystemInformationComponent } from './dashboard/system-information/syste
 import { AccordionComponent } from './accordion/accordion.component';
 import { ResultButtonComponent } from './result-button/result-button.component';
 import { DiffButtonComponent } from './diff-button/diff-button.component';
-import { VegaPlotComponent } from './vega-plot/vega-plot.component';
-import { VegaBarChartComponent } from './vega-bar-chart/vega-bar-chart.component';
-import { VegaTotalScoreBarChartComponent } from './vega-total-score-bar-chart/vega-total-score-bar-chart.component';
-import { VegaGroupedBarChartComponent } from './vega-grouped-bar-chart/vega-grouped-bar-chart.component';
+import {TauChartHistoryComponent} from './tauchart-history/tauchart-history.component';
+import {TauChartBarComponent} from './tauchart-bar/tauchart-bar.component';
 import { HelpDialogComponent, HelpDialogTextComponent} from './help-dialog/help-dialog.component';
 import { ScoreFormulaComponent } from './score-formula/score-formula.component';
 
@@ -35,10 +33,8 @@ import { ScoreFormulaComponent } from './score-formula/score-formula.component';
     AccordionComponent,
     ResultButtonComponent,
     DiffButtonComponent,
-    VegaPlotComponent,
-    VegaBarChartComponent,
-    VegaGroupedBarChartComponent,
-    VegaTotalScoreBarChartComponent,
+    TauChartHistoryComponent,
+    TauChartBarComponent,
     HelpDialogComponent,
     HelpDialogTextComponent,
     ScoreFormulaComponent
