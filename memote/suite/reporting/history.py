@@ -116,11 +116,11 @@ class HistoryReport(Report):
                                     "data": format_data(data.get(param)),
                                     "result": res.get(param)})
                     else:
-                        tests[test].setdefault("history", list())
-                        tests[test]["history"].append({
+                        tests[test].setdefault("history", list()).append({
                             "branch": branch,
                             "commit": commit,
                             "metric": metric,
                             "data": format_data(data),
-                            "result": res})
+                            "result": res
+                        })
         return base
