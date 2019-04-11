@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import os
 from builtins import str
 from os.path import exists, join, dirname, pardir
+from subprocess import check_output
 
 import pytest
 
@@ -176,6 +177,10 @@ def test_online(runner, mock_repo, monkeypatch):
     # Use the Repository from the mock_repo fixture as the origin to clone from
     path2origin = mock_repo[0]
     originrepo = mock_repo[1]
+
+    # We have to set the local repo to allow pushing into it.
+    os.chdir(path2origin)
+    check_output(['git', 'config', 'receive.denyCurrentBranch', 'ignore'])
 
     # Create a directory at a temporary path to clone the mock_repo into.
     # Cloning configures the mock_repo as the origin of the "local" repo which

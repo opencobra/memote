@@ -771,13 +771,8 @@ def online(note, github_repository, github_username):
     check_call(
       ['git', 'commit', '-m', "chore: add encrypted GitHub access token"]
     )
-    git_remote_https = 'https://github.com/{}.git'.format(gh_repo_name)
-    check_call(
-      ['git', 'remote', 'add', 'origin', git_remote_https]
-    )
     check_call(
       ['git', 'push', '--set-upstream', 'origin', repo.active_branch.name]
     )
-
 
 cli.add_command(report)
