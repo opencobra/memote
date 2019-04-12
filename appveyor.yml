@@ -1,9 +1,8 @@
 branches:
  only:
  - master
- - devel
+ - develop
  - /^[0-9]+\.[0-9]+\.[0-9]+[.0-9ab]*$/
- - enable-appveyor
 
 environment:
 
