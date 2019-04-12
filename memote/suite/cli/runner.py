@@ -29,6 +29,7 @@ from getpass import getpass
 from time import sleep
 from tempfile import mkdtemp
 from shutil import copy2, move
+from subprocess import check_call
 
 import click
 import click_log
@@ -211,8 +212,10 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
                 "Committing result and changing back to working branch.")
             manager.store(result, commit=previous_cmt.hexsha)
             repo.git.add(".")
-            repo.index.commit(
-                "chore: add result for {}".format(previous_cmt.hexsha))
+            check_call(
+              ['git', 'commit', 
+               '-m', "chore: add result for {}".format(previous_cmt.hexsha)]
+            )
             if is_branch:
                 previous.checkout()
             else:
@@ -419,7 +422,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
     else:
         move(new_location, os.getcwd())
     repo.git.add(".")
-    repo.index.commit(message)
+    check_call(['git', 'commit', '-m', message])
     LOGGER.info("Success!")
     # Checkout the original branch.
     previous.checkout()
@@ -769,8 +772,11 @@ def online(note, github_repository, github_username):
     te.dump_travis_configuration(config, ".travis.yml")
     LOGGER.info("Add, commit and push changes to '.travis.yml' to GitHub.")
     repo.index.add([".travis.yml"])
-    repo.index.commit("chore: add encrypted GitHub access token")
-    repo.remotes.origin.push(all=True)
-
+    check_call(
+      ['git', 'commit', '-m', "chore: add encrypted GitHub access token"]
+    )
+    check_call(
+      ['git', 'push', '--set-upstream', 'origin', repo.active_branch.name]
+    )
 
 cli.add_command(report)

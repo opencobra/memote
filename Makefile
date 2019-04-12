@@ -81,3 +81,6 @@ dist: clean reports ## builds source and wheel package
 
 install: clean reports ## install the package to the active Python's site-packages
 	python setup.py install
+
+mockrepo: ## build the mock repo used for CLI unit tests
+	python scripts/update_mock_repo.py
