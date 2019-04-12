@@ -213,8 +213,8 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
             manager.store(result, commit=previous_cmt.hexsha)
             repo.git.add(".")
             check_call(
-              ['git', 'commit', 
-               '-m', "chore: add result for {}".format(previous_cmt.hexsha)]
+                ['git', 'commit',
+                 '-m', "chore: add result for {}".format(previous_cmt.hexsha)]
             )
             if is_branch:
                 previous.checkout()
@@ -778,5 +778,6 @@ def online(note, github_repository, github_username):
     check_call(
       ['git', 'push', '--set-upstream', 'origin', repo.active_branch.name]
     )
+
 
 cli.add_command(report)
