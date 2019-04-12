@@ -63,6 +63,14 @@ def update_mock_repo():
             ['git', 'config',
              'core.fileMode', 'false']
         )
+        call(
+            ['git', 'config',
+             'user.email', 'memote@opencobra.com']
+        )
+        call(
+            ['git', 'config',
+             'user.name', 'memote-bot']
+        )
     finally:
         LOGGER.info("Compressing to tarball.")
         tar = tarfile.open(target_file, "w:gz")
