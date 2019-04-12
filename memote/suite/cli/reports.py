@@ -143,6 +143,7 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
                    "option can be specified multiple times.")
 def history(location, model, filename, deployment, custom_config):
     """Generate a report over a model's git commit history."""
+    callbacks.git_installed()
     LOGGER.info("Initialising history report generation.")
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")

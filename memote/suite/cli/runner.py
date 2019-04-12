@@ -147,6 +147,7 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     if ignore_git:
         repo = None
     else:
+        callbacks.git_installed()
         repo = callbacks.probe_git()
     if collect:
         if repo is not None:
@@ -239,6 +240,7 @@ def new(directory, replay):
     --directory option.
 
     """
+    callbacks.git_installed()
     if directory is None:
         directory = os.getcwd()
     cookiecutter("gh:opencobra/cookiecutter-memote", output_dir=directory,
@@ -324,6 +326,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
 
     """
     # callbacks.validate_path(model)
+    callbacks.git_installed()
     if location is None:
         raise click.BadParameter("No 'location' given or configured.")
     if "--tb" not in pytest_args:
@@ -730,6 +733,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
               help="The GitHub username. Usually this is configured for you.")
 def online(note, github_repository, github_username):
     """Upload the repository to GitHub and enable testing on Travis CI."""
+    callbacks.git_installed()
     try:
         repo = git.Repo()
     except git.InvalidGitRepositoryError:

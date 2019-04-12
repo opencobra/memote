@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Include memote's requirement for git on installation instructions.
+* Check for the presence of `git` in CLI commands that require it.
 * Replace vega with taucharts in all reports.
 * Fix plots to be large enough.
 * Fix responsive behaviour. 

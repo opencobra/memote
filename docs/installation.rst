@@ -4,10 +4,14 @@
 Installation
 ============
 
+Before installing memote, make sure that you have correctly installed the
+latest version of `git`_.
+
 We highly recommend creating a Python `virtualenv`_ for your model testing
 purposes.
 
 .. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+.. _git: https://git-scm.com/
 
 Stable release
 --------------
