@@ -1,54 +1,46 @@
+branches:
+ only:
+ - master
+ - devel
+ - /^[0-9]+\.[0-9]+\.[0-9]+[.0-9ab]*$/
+ - enable-appveyor
+
 environment:
+
+  global:
+    PIP_CACHE_DIR: "pip_cache"
+    PIP_DISABLE_PIP_VERSION_CHECK: "yes"
+
   matrix:
-    - PYTHON: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7.12"
-      PYTHON_ARCH: "64"
-      TOX_ENV: "py27"
+    # Python 3.6, 64-bit
+    - TOXENV: "py36"
+      TOX_APPVEYOR_X64: 1
 
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4.5"
-      PYTHON_ARCH: "64"
-      TOX_ENV: "py34"
+    # Python 3.6, 32-bit
+    - TOXENV: "py36"
+      TOX_APPVEYOR_X64: 0
 
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.2"
-      PYTHON_ARCH: "64"
-      TOX_ENV: "py35"
-password:
-    secure: COPY PASTE FROM APPVEYORS ONLINE ENCRYPTION TOOL
+matrix:
+  fast_finish: true
+
+clone_depth: 2
 
 init:
-  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%bit"
-  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
-  - "git config --system http.sslcainfo \"C:\\Program Files\\Git\\mingw64\\ssl\\certs\\ca-bundle.crt\""
-  - "%PYTHON%/python -V"
-  - "%PYTHON%/python -c \"import struct;print(8 * struct.calcsize(\'P\'))\""
+  - git config --global user.email "cobrapy-bot@opencobra.com"
+  - git config --global user.name "cobrapy-bot"
+  - git config --global core.autocrlf true
+  - git config --global core.filemode false
+  - "ECHO %PYTHON%"
+  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - python -V
+
+cache:
+  - pip_cache -> appveyor.yml
 
 install:
-  - "%PYTHON%/Scripts/easy_install -U pip"
-  - "%PYTHON%/Scripts/pip install tox"
-  - "%PYTHON%/Scripts/pip install wheel"
-  - "%PYTHON%/Scripts/pip install twine"
+  - "py -3.6 -m pip install pip setuptools wheel tox tox-appveyor"
 
-build: false
+build: off
 
 test_script:
-  - "%PYTHON%/Scripts/tox -e %TOX_ENV%"
-
-after_test:
-  - "%PYTHON%/python setup.py bdist_wheel"
-  - ps: "ls dist"
-
-artifacts:
-  - path: dist\*
-
-deploy_script:
-  - "echo [pypi] > %USERPROFILE%\\.pypirc"
-  - "echo username: midnighter >> %USERPROFILE%\\.pypirc"
-  - "echo password: %password% >> %USERPROFILE%\\.pypirc"
-  - ps: >-
-      if($env:appveyor_repo_tag -eq 'True') {
-        if($env:appveyor_repo_branch -eq 'master') {
-          Invoke-Expression "$env:PYTHON/Scripts/twine upload --skip-existing dist/*"
-        }
-      }
+  - "py -3.6 -m tox"

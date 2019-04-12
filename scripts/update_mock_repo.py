@@ -26,14 +26,15 @@ same project.
 from __future__ import absolute_import
 
 import logging
-from os.path import dirname, join, pardir
+import os
+from os.path import join
 from shutil import rmtree
-from git import Repo
+from subprocess import check_output, call
 from tempfile import mkdtemp
 import tarfile
 
+logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger()
-
 
 def update_mock_repo():
     """
@@ -44,24 +45,45 @@ def update_mock_repo():
     separately from
 
     """
-    target_file = join(
-        dirname(__file__), pardir, "tests", "data", "memote-mock-repo.tar.gz"
+    target_file = os.path.abspath(
+        join("tests", "data", "memote-mock-repo.tar.gz")
     )
     temp_dir = mkdtemp(prefix='tmp_mock')
+    previous_wd = os.getcwd()
     try:
         LOGGER.info("Cloning repository.")
-        Repo.clone_from(
-            'https://github.com/ChristianLieven/memote-mock-repo.git',
-            temp_dir)
+        os.chdir(temp_dir)
+        check_output(
+            ['git', 'clone',
+             'https://github.com/ChristianLieven/memote-mock-repo.git']
+        )
+        os.chdir('memote-mock-repo/')
+        LOGGER.info("Setting git to ignore filemode changes.")
+        call(
+            ['git', 'config',
+             'core.fileMode', 'false']
+        )
+        call(
+            ['git', 'config',
+             'user.email', 'memote@opencobra.com']
+        )
+        call(
+            ['git', 'config',
+             'user.name', 'memote-bot']
+        )
     finally:
         LOGGER.info("Compressing to tarball.")
         tar = tarfile.open(target_file, "w:gz")
-        tar.add(temp_dir, arcname="memote-mock-repo")
+        tar.add(
+            join(temp_dir, 'memote-mock-repo/'),
+            arcname="memote-mock-repo"
+        )
         tar.close()
         LOGGER.info("Success!")
         LOGGER.info("Removing temporary directory.")
         rmtree(temp_dir)
         LOGGER.info("Success! The mock repo has been updated.")
+        os.chdir(previous_wd)
 
 
 if __name__ == "__main__":

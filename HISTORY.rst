@@ -20,6 +20,12 @@ Next Release
   an expansion panel in any of the reports is only rendered when it is open.
 * Fix the reactions with identical genes test case to not group all reactions
   without any GPR together.
+* Enable CI on Appveyor (unit tests on Windows as opposed to linux which we do
+  on Travis).
+* Replace any commit operations through gitpython with direct subprocess
+  invocations of git.
+* Regenerate the mock repo we use in some tests so that filemode changes are
+  ignored by default.
 
 0.9.8 (2019-04-01)
 ------------------
