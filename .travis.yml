@@ -26,6 +26,8 @@ matrix:
 install:
 - make reports
 - pip install --upgrade pip setuptools wheel tox tox-travis
+- git config --global user.email "memote-bot@opencobra.com"
+- git config --global user.name "memote-bot"
 script:
 - travis_wait tox -- --cov-report=xml --cov-report=term
 after_success:
