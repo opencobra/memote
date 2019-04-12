@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import os
 from builtins import str
 from os.path import exists, join, dirname, pardir
-from subprocess import check_output
+from subprocess import check_output, call
 
 import pytest
 
@@ -178,7 +178,7 @@ def test_online(runner, mock_repo, monkeypatch):
     path2origin = mock_repo[0]
     originrepo = mock_repo[1]
 
-    # We have to set the local repo to allow pushing into it.
+    # We have to allow pushing into the 'origin' repo.
     os.chdir(path2origin)
     check_output(['git', 'config', 'receive.denyCurrentBranch', 'ignore'])
 
@@ -189,6 +189,16 @@ def test_online(runner, mock_repo, monkeypatch):
     os.mkdir(path2local)
     localrepo = originrepo.clone(path2local)
     os.chdir(path2local)
+
+    # Setting the config for the local repo.
+    call(
+        ['git', 'config',
+         'user.email', 'memote@opencobra.com']
+    )
+    call(
+        ['git', 'config',
+         'user.name', 'memote-bot']
+    )
 
     # Build context_settings
     context_settings = ConfigFileProcessor.read_config()
