@@ -3,20 +3,23 @@ History
 
 Next Release
 ------------
+
+0.9.9 (2019-04-17)
+------------------
 * Include memote's requirement for git on installation instructions.
 * Check for the presence of `git` in CLI commands that require it.
 * Replace vega with taucharts in all reports.
 * Fix plots to be large enough.
-* Fix responsive behaviour. 
+* Fix responsive behaviour.
 * Add clear axis labels and understandable titles.
 * Add an option to save all plots to png, json and csv.
-* Color code the category plots just like the results buttons 
+* Color code the category plots just like the results buttons
   on the snapshot report.
-* Fix the data that is displayed in the independent an specific sections 
+* Fix the data that is displayed in the independent an specific sections
   of the history report.
 * Invert metrices and display as percentages.
 * Add hover-over tooltips for all plots.
-* Implement lazy loading for all the reports, meaning that the content of 
+* Implement lazy loading for all the reports, meaning that the content of
   an expansion panel in any of the reports is only rendered when it is open.
 * Fix the reactions with identical genes test case to not group all reactions
   without any GPR together.
