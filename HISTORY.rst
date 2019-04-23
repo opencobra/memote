@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.9.10 (2019-04-23)
+-------------------
+* Pin cobrapy version to 0.14.2 (because cobra==0.15.1,0.15.2 SBML parsing
+  is broken).
+
 0.9.9 (2019-04-17)
 ------------------
 * Include memote's requirement for git on installation instructions.
