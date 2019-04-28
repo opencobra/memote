@@ -268,7 +268,7 @@ def flatten(list_of_lists):
 
 def is_modified(path, commit):
     """
-    Test whether a given file was modified in a specific commit.
+    Test whether a given file was present and modified in a specific commit.
 
     Parameters
     ----------
@@ -280,10 +280,19 @@ def is_modified(path, commit):
     Returns
     -------
     bool
-        Whether or not the given path is among the modified files.
+        Whether or not the given path is among the modified files
+        and was not deleted in this commit.
 
     """
-    return path in commit.stats.files
+    try:
+        d = commit.stats.files["path"]
+        if (d["insertions"] == 0) and (d["deletions"] == d["lines"]):
+            # File was deleted in commit, so cannot be tested
+            return False
+        else:
+            return True
+    except KeyError:
+        return False
 
 
 def stdout_notifications(notifications):

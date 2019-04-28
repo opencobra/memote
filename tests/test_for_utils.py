@@ -15,7 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import pytest
+import git
 
 import memote.utils as utils
 
@@ -116,3 +119,40 @@ def test_show_versions(capsys):
     assert lines[7].startswith("Package Versions")
     assert lines[8].startswith("================")
     assert any(l.startswith("memote") for l in lines[9:])
+
+
+@pytest.fixture(scope="function")
+def mock_repo(tmpdir_factory):
+    """Mock repo with history: add, modify, do nothing, delete file."""
+    path = tmpdir_factory.mktemp("memote-mock-repo")
+    repo = git.Repo.init(path)
+    relname = "test_file.txt"
+    absname = os.path.join(path, relname)
+
+    for message in "Add file.", "Modify file.":
+        with open(absname, "w") as f:
+            f.write(message)
+        repo.index.add([relname])
+        repo.index.commit(message)
+
+    repo.index.add([relname])
+    repo.index.commit("Empty commit.")
+
+    repo.index.remove([relname], working_tree=True)
+    repo.index.commit("Delete file.")
+
+    return relname, repo
+
+
+def test_is_modified_deleted(mock_repo):
+    """Don't report file deletion as modification."""
+    relname, repo = mock_repo
+    # File history (newest first): deleted, unchanged, modified, created
+    # Don't report file deletion as "modification"
+    # for purposes of running memote tests on the file.
+    want = False, False, True, True
+    # Convert to tuple so we can compare want == got,
+    # which pytest will introspect helpfully if the assertion fails.
+    got = tuple(utils.is_modified(relname, commit)
+                for commit in repo.iter_commits())
+    assert want == got
