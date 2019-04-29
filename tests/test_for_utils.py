@@ -135,8 +135,10 @@ def mock_repo(tmpdir_factory):
         repo.index.add([relname])
         repo.index.commit(message)
 
-    repo.index.add([relname])
-    repo.index.commit("Empty commit.")
+    with open(os.path.join(path, "unrelated_file.txt"), "w") as f:
+        f.write("Unrelated file.")
+    repo.index.add(["unrelated_file.txt"])
+    repo.index.commit("A commit that does not touch {}".format(relname))
 
     repo.index.remove([relname], working_tree=True)
     repo.index.commit("Delete file.")

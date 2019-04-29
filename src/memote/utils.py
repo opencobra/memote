@@ -285,7 +285,7 @@ def is_modified(path, commit):
 
     """
     try:
-        d = commit.stats.files["path"]
+        d = commit.stats.files[path]
         if (d["insertions"] == 0) and (d["deletions"] == d["lines"]):
             # File was deleted in commit, so cannot be tested
             return False
