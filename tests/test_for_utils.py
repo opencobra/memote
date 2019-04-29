@@ -124,7 +124,7 @@ def test_show_versions(capsys):
 @pytest.fixture(scope="function")
 def mock_repo(tmpdir_factory):
     """Mock repo with history: add, modify, do nothing, delete file."""
-    path = tmpdir_factory.mktemp("memote-mock-repo")
+    path = str(tmpdir_factory.mktemp("memote-mock-repo"))
     repo = git.Repo.init(path)
     relname = "test_file.txt"
     absname = os.path.join(path, relname)
