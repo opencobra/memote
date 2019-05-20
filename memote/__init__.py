@@ -32,4 +32,4 @@ from memote.jinja2_extension import *
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.9.11"
+__version__ = "0.9.12"
