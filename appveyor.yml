@@ -4,42 +4,39 @@ branches:
  - develop
  - /^[0-9]+\.[0-9]+\.[0-9]+[.0-9ab]*$/
 
-environment:
-
-  global:
-    PIP_CACHE_DIR: "pip_cache"
-    PIP_DISABLE_PIP_VERSION_CHECK: "yes"
-
-  matrix:
-    # Python 3.6, 64-bit
-    - TOXENV: "py36"
-      TOX_APPVEYOR_X64: 1
-
-    # Python 3.6, 32-bit
-    - TOXENV: "py36"
-      TOX_APPVEYOR_X64: 0
-
-matrix:
-  fast_finish: true
-
-clone_depth: 2
-
 init:
   - git config --global user.email "cobrapy-bot@opencobra.com"
   - git config --global user.name "cobrapy-bot"
   - git config --global core.autocrlf true
   - git config --global core.filemode false
-  - "ECHO %PYTHON%"
-  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  - python -V
+
+clone_depth: 2
+
+environment:
+  global:
+    PIP_CACHE_DIR: "pip_cache"
+    PIP_DISABLE_PIP_VERSION_CHECK: "yes"
+  matrix:
+    -  CONDA_ROOT: "C:\\Miniconda36-x64"
+       TOXENV: "py36"
+    -  CONDA_ROOT: "C:\\Miniconda37-x64"
+       TOXENV: "py37"
+
+matrix:
+  fast_finish: true
 
 cache:
   - pip_cache -> appveyor.yml
 
-install:
-  - "py -3.6 -m pip install pip setuptools wheel tox tox-appveyor"
+platform: x64
 
 build: off
 
+install:
+  - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
+  - conda info
+  - python --version
+  - pip install --upgrade pip setuptools wheel tox
+
 test_script:
-  - "py -3.6 -m tox"
+  - tox
