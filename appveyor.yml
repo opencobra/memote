@@ -33,10 +33,10 @@ platform: x64
 build: off
 
 install:
-  - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%CONDA_ROOT%\Library\bin;%PATH%"
+  - set "PATH=%CONDA_ROOT%;%CONDA_ROOT%\\Scripts;%CONDA_ROOT%\\Library\\bin;%PATH%"
   - conda info
-  - python --version
-  - C:\Miniconda36-x64\python.exe -m pip install --upgrade pip setuptools wheel tox
+  - python.exe --version
+  - python.exe -m pip install --upgrade pip setuptools wheel tox
 
 test_script:
   - tox
