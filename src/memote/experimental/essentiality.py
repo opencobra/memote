@@ -87,7 +87,6 @@ class EssentialityExperiment(Experiment):
             essen = single_gene_deletion(
                 model, gene_list=self.data["gene"], processes=1)
         essen["gene"] = [list(g)[0] for g in essen.index]
-        essen.index = essen["gene"]
         essen["essential"] = (essen["growth"] < (max_val * 0.1)) \
             | essen["growth"].isna()
         return essen
