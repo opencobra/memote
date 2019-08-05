@@ -168,3 +168,12 @@ class ResultCollectionPlugin(object):
     def sbml_version(self):
         """Provide SBML level, version, and FBC use."""
         return self._sbml_ver
+
+    def pytest_configure(self, config):
+        """Register custom markers at runtime """
+        config.addinivalue_line("markers",
+                                "biomass: ")
+        config.addinivalue_line("markers",
+                                "essentiality: ")
+        config.addinivalue_line("markers",
+                                "growth: ")
