@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Explicitly register custom markers `biomass`, `essentiality` and `growth`
+  used for custom test parametrization in pytest.
 
 0.9.11 (2019-04-23)
 -------------------
