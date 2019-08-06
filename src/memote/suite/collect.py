@@ -170,7 +170,7 @@ class ResultCollectionPlugin(object):
         return self._sbml_ver
 
     def pytest_configure(self, config):
-        """Register custom markers at runtime """
+        """Register custom markers at runtime."""
         config.addinivalue_line("markers",
                                 "biomass: ")
         config.addinivalue_line("markers",
