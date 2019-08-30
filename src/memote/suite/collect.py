@@ -172,8 +172,8 @@ class ResultCollectionPlugin(object):
     def pytest_configure(self, config):
         """Register custom markers at runtime."""
         config.addinivalue_line("markers",
-                                "biomass: ")
+                                "biomass")
         config.addinivalue_line("markers",
-                                "essentiality: ")
+                                "essentiality")
         config.addinivalue_line("markers",
-                                "growth: ")
+                                "growth")
