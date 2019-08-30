@@ -31,17 +31,15 @@ from memote.suite.reporting import *
 from memote.jinja2_extension import *
 
 import sys
-import logging
+import warnings
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
 __version__ = "0.9.12"
 
-LOGGER = logging.getLogger()
-
 if sys.version_info < (3,):
-    LOGGER.warning('You are using `Memote` with Python 2. '
+    warnings.warn('You are using `Memote` with Python 2. '
                   'Memote will soon be Python 3 only, and we have ceased to '
                   'test against Python 2. This means that memote may no '
                   'longer work as exprected. Please consider migrating to '
-                  'Python 3.')
+                  'Python 3.', FutureWarning)
