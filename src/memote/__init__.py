@@ -40,7 +40,7 @@ LOGGER = logging.getLogger()
 
 if sys.version_info < (3,):
     LOGGER.warning('You are using `Memote` with Python 2. '
-                  'Memote will soon be Python 3 only, and we have ceised to '
+                  'Memote will soon be Python 3 only, and we have ceased to '
                   'test against Python 2. This means that memote may no '
                   'longer work as exprected. Please consider migrating to '
                   'Python 3.')
