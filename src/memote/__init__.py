@@ -22,8 +22,6 @@ The memote Python package is a community-driven effort towards a standardized
 genome-scale metabolic model test suite.
 """
 
-import sys
-import logging
 from __future__ import absolute_import
 
 from memote.utils import show_versions
@@ -31,6 +29,9 @@ from memote.suite.api import *
 from memote.suite.results import *
 from memote.suite.reporting import *
 from memote.jinja2_extension import *
+
+import sys
+import logging
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
