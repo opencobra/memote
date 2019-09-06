@@ -61,6 +61,14 @@ at via GitHub pages for your repository.
 Installation
 ============
 
+**Please Note**: With its
+`retirement on the horizon <https://pythonclock.org>`_ we decided to stop
+testing against Python 2.7,
+and `like many others <https://python3statement.org>`_, want to focus entirely
+on Python 3.
+Hence, we cannot guarantee that `memote` will still function as expected
+on older versions of Python.
+
 Before installing `memote`, make sure that you have correctly installed the
 latest version of `git <https://git-scm.com/>`_.
 
