@@ -126,6 +126,9 @@ def mock_repo(tmpdir_factory):
     """Mock repo with history: add, modify, do nothing, delete file."""
     path = str(tmpdir_factory.mktemp("memote-mock-repo"))
     repo = git.Repo.init(path)
+    with repo.config_writer() as writer:
+        writer.set_value("user", "name", "memote-bot").release()
+        writer.set_value("user", "email", "bot@memote.io").release()
     relname = "test_file.txt"
     absname = os.path.join(path, relname)
 
@@ -133,15 +136,18 @@ def mock_repo(tmpdir_factory):
         with open(absname, "w") as f:
             f.write(message)
         repo.index.add([relname])
-        repo.index.commit(message)
+        repo.git.commit("--message", message)
 
     with open(os.path.join(path, "unrelated_file.txt"), "w") as f:
         f.write("Unrelated file.")
     repo.index.add(["unrelated_file.txt"])
-    repo.index.commit("A commit that does not touch {}".format(relname))
+    repo.git.commit(
+        "--message",
+        "A commit that does not touch {}".format(relname)
+    )
 
     repo.index.remove([relname], working_tree=True)
-    repo.index.commit("Delete file.")
+    repo.git.commit("--message", "Delete file.")
 
     return relname, repo
 
