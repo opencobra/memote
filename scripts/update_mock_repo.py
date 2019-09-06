@@ -27,16 +27,17 @@ from __future__ import absolute_import
 
 import logging
 import os
+import tarfile
 from os.path import join
 from shutil import rmtree
-from subprocess import check_output, call
 from tempfile import mkdtemp
-import tarfile
 
-logging.basicConfig(level=logging.INFO)
+import git
+
 LOGGER = logging.getLogger()
 
-def update_mock_repo():
+
+def update_mock_repo(temp_dir):
     """
     Clone and gzip the memote-mock-repo used for CLI and integration tests.
 
@@ -48,43 +49,34 @@ def update_mock_repo():
     target_file = os.path.abspath(
         join("tests", "data", "memote-mock-repo.tar.gz")
     )
-    temp_dir = mkdtemp(prefix='tmp_mock')
-    previous_wd = os.getcwd()
-    try:
-        LOGGER.info("Cloning repository.")
-        os.chdir(temp_dir)
-        check_output(
-            ['git', 'clone',
-             'https://github.com/ChristianLieven/memote-mock-repo.git']
-        )
-        os.chdir('memote-mock-repo/')
-        LOGGER.info("Setting git to ignore filemode changes.")
-        call(
-            ['git', 'config',
-             'core.fileMode', 'false']
-        )
-        call(
-            ['git', 'config',
-             'user.email', 'memote@opencobra.com']
-        )
-        call(
-            ['git', 'config',
-             'user.name', 'memote-bot']
-        )
-    finally:
-        LOGGER.info("Compressing to tarball.")
-        tar = tarfile.open(target_file, "w:gz")
-        tar.add(
-            join(temp_dir, 'memote-mock-repo/'),
+    repo_dir = join(temp_dir, 'memote-mock-repo')
+    LOGGER.info("Cloning repository.")
+    repo = git.Repo.clone_from(
+        'https://github.com/ChristianLieven/memote-mock-repo.git',
+        repo_dir
+    )
+    LOGGER.info("Setting git to ignore filemode changes.")
+    with repo.config_writer() as writer:
+        writer.set_value("core", "fileMode", "false").release()
+        writer.set_value("user", "name", "memote-bot").release()
+        writer.set_value("user", "email", "bot@memote.io").release()
+    LOGGER.info("Compressing to tarball.")
+    with tarfile.open(target_file, "w:gz") as archive:
+        archive.add(
+            repo_dir,
             arcname="memote-mock-repo"
         )
-        tar.close()
-        LOGGER.info("Success!")
-        LOGGER.info("Removing temporary directory.")
-        rmtree(temp_dir)
-        LOGGER.info("Success! The mock repo has been updated.")
-        os.chdir(previous_wd)
+    LOGGER.info("Success! The mock repo has been updated.")
 
 
 if __name__ == "__main__":
-    update_mock_repo()
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[%(levelname)s] %(message)s"
+    )
+    temp_dir = mkdtemp(prefix='tmp_mock')
+    try:
+        update_mock_repo(temp_dir)
+    finally:
+        LOGGER.info("Removing temporary directory.")
+        rmtree(temp_dir)
