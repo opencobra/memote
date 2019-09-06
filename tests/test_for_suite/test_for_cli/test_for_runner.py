@@ -22,9 +22,6 @@ from __future__ import absolute_import
 import os
 from builtins import str
 from os.path import exists, join, dirname, pardir
-from subprocess import check_output, call
-
-import pytest
 
 
 from memote.suite.cli.runner import cli
@@ -176,29 +173,25 @@ def test_online(runner, mock_repo, monkeypatch):
 
     # Use the Repository from the mock_repo fixture as the origin to clone from
     path2origin = mock_repo[0]
-    originrepo = mock_repo[1]
+    origin_repo = mock_repo[1]
 
     # We have to allow pushing into the 'origin' repo.
     os.chdir(path2origin)
-    check_output(['git', 'config', 'receive.denyCurrentBranch', 'ignore'])
+    with origin_repo.config_writer() as writer:
+        writer.set_value("receive", "denyCurrentBranch", "ignore").release()
 
     # Create a directory at a temporary path to clone the mock_repo into.
     # Cloning configures the mock_repo as the origin of the "local" repo which
     # allows us to push from one local directory to another.
     path2local = join(path2origin, pardir, 'cloned_repo')
     os.mkdir(path2local)
-    localrepo = originrepo.clone(path2local)
+    local_repo = origin_repo.clone(path2local)
     os.chdir(path2local)
 
     # Setting the config for the local repo.
-    call(
-        ['git', 'config',
-         'user.email', 'memote@opencobra.com']
-    )
-    call(
-        ['git', 'config',
-         'user.name', 'memote-bot']
-    )
+    with local_repo.config_writer() as writer:
+        writer.set_value("user", "name", "memote-bot").release()
+        writer.set_value("user", "email", "bot@memote.io").release()
 
     # Build context_settings
     context_settings = ConfigFileProcessor.read_config()
@@ -212,8 +205,8 @@ def test_online(runner, mock_repo, monkeypatch):
     assert result.exit_code == 0
 
     # Teardown
-    localrepo.git.reset("--hard", 'HEAD~')
-    localrepo.git.push('--force', 'origin', 'master')
+    local_repo.git.reset("--hard", 'HEAD~')
+    local_repo.git.push('--force', 'origin', 'master')
     os.chdir(previous_wd)
 
 
