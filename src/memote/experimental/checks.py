@@ -53,15 +53,12 @@ class UnknownIdentifier:
 
     def check_row(self, cells):
         """Check each row in the data table."""
-
-        # Get cell
         cell = None
         for item in cells:
             if item['header'] == self.column:
                 cell = item
                 break
 
-        # Check cell
         if cell is None:
             error = Error(
                 'unknown-identifier',
@@ -71,7 +68,6 @@ class UnknownIdentifier:
             )
             return [error]
 
-        # Check value
         value = cell.get('value')
         if value not in self.identifiers:
             error = Error(
