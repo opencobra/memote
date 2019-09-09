@@ -28,7 +28,7 @@ from goodtables import validate
 import memote.experimental.schemata
 from memote.experimental.tabular import read_tabular
 # The following import is necessary in order to register the custom check.
-from memote.experimental.checks import UnknownIdentifier
+from memote.experimental.checks import UnknownIdentifier  # noqa: F401
 
 
 __all__ = ("ExperimentalBase",)
