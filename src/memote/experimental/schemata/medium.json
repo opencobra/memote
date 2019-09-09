@@ -24,10 +24,7 @@
       "name": "comment",
       "title": "Comment",
       "description": "Optional comment which is not processed further.",
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     }
   ]
 }

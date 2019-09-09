@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import logging
 
 from memote.experimental.experimental_base import ExperimentalBase
-from memote.experimental.checks import check_partial, reaction_id_check
+
 
 __all__ = ("Medium",)
 
@@ -48,8 +48,12 @@ class Medium(ExperimentalBase):
     def validate(self, model, checks=[]):
         """Use a defined schema to validate the medium table format."""
         custom = [
-            check_partial(reaction_id_check,
-                          frozenset(r.id for r in model.reactions))
+            {
+                "unknown-identifier": {
+                    "column": "exchange",
+                    "identifiers": {r.id for r in model.reactions}
+                }
+            }
         ]
         super(Medium, self).validate(model=model, checks=checks + custom)
 

@@ -27,6 +27,9 @@ from goodtables import validate
 
 import memote.experimental.schemata
 from memote.experimental.tabular import read_tabular
+# The following import is necessary in order to register the custom check.
+from memote.experimental.checks import UnknownIdentifier
+
 
 __all__ = ("ExperimentalBase",)
 
@@ -93,7 +96,7 @@ class ExperimentalBase(object):
         self.evaluate_report(
             validate(records, headers=list(records[0]),
                      preset='table', schema=self.schema,
-                     order_fields=True, custom_checks=checks))
+                     order_fields=True, checks=checks))
 
     @staticmethod
     def evaluate_report(report):

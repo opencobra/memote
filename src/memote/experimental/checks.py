@@ -19,113 +19,68 @@
 
 from __future__ import absolute_import
 
-from functools import partial
-
-from goodtables import check
+from goodtables import check, Error
 
 
-def check_partial(func, *args, **kwargs):
-    """Create a partial to be used by goodtables."""
-    new_func = partial(func, *args, **kwargs)
-    new_func.check = func.check
-    return new_func
-
-
-@check('gene-not-in-model', type='custom', context='body')
-def gene_id_check(genes, errors, columns, row_number):
+@check('unknown-identifier', type='custom', context='body')
+class UnknownIdentifier:
     """
-    Validate gene identifiers against a known set.
+    Validate data identifiers against a known set.
 
-    Parameters
+    Attributes
     ----------
-    genes : set
-        The known set of gene identifiers.
-    errors :
-        Passed by goodtables.
-    columns :
-        Passed by goodtables.
-    row_number :
-        Passed by goodtables.
+    column : str
+        The header of the data column to check.
+    identifiers : iterable of str
+        The known set of identifiers.
 
     """
-    message = ("Gene '{value}' in column {col} and row {row} does not "
-               "appear in the metabolic model.")
-    for column in columns:
-        if "gene" in column['header'] and column['value'] not in genes:
-            message = message.format(
-                value=column['value'],
-                row=row_number,
-                col=column['number'])
-            errors.append({
-                'code': 'bad-value',
-                'message': message,
-                'row-number': row_number,
-                'column-number': column['number'],
-            })
 
+    def __init__(self, column, identifiers, **_):
+        """
+        Initialize the custom identfier check.
 
-@check('reaction-not-in-model', type='custom', context='body')
-def reaction_id_check(reactions, errors, columns, row_number):
-    """
-    Validate reactions identifiers against a known set.
+        Parameters
+        ----------
+        column : str
+            The header of the data column to check.
+        identifiers : iterable of str
+            The known set of identifiers.
 
-    Parameters
-    ----------
-    reactions : set
-        The known set of reaction identifiers.
-    errors :
-        Passed by goodtables.
-    columns :
-        Passed by goodtables.
-    row_number :
-        Passed by goodtables.
+        """
+        self.column = column
+        self.identifiers = frozenset(identifiers)
 
-    """
-    message = ("Reaction '{value}' in column {col} and row {row} does not "
-               "appear in the metabolic model.")
-    for column in columns:
-        if "reaction" in column['header'] and column['value'] not in reactions:
-            message = message.format(
-                value=column['value'],
-                row=row_number,
-                col=column['number'])
-            errors.append({
-                'code': 'bad-value',
-                'message': message,
-                'row-number': row_number,
-                'column-number': column['number'],
-            })
+    def check_row(self, cells):
+        """Check each row in the data table."""
 
+        # Get cell
+        cell = None
+        for item in cells:
+            if item['header'] == self.column:
+                cell = item
+                break
 
-@check('metabolite-not-in-model', type='custom', context='body')
-def metabolite_id_check(metabolites, errors, columns, row_number):
-    """
-    Validate metabolite identifiers against a known set.
+        # Check cell
+        if cell is None:
+            error = Error(
+                'unknown-identifier',
+                row_number=cells[0]['row-number'],
+                message="Checking identifiers requires the column "
+                        "'{column}' to exist.".format(column=self.column)
+            )
+            return [error]
 
-    Parameters
-    ----------
-    metabolites : set
-        The known set of metabolite identifiers.
-    errors :
-        Passed by goodtables.
-    columns :
-        Passed by goodtables.
-    row_number :
-        Passed by goodtables.
-
-    """
-    message = ("Metabolite '{value}' in column {col} and row {row} does not "
-               "appear in the metabolic model.")
-    for column in columns:
-        if "metabolite" in column['header'] and \
-                column['value'] not in metabolites:
-            message = message.format(
-                value=column['value'],
-                row=row_number,
-                col=column['number'])
-            errors.append({
-                'code': 'bad-value',
-                'message': message,
-                'row-number': row_number,
-                'column-number': column['number'],
-            })
+        # Check value
+        value = cell.get('value')
+        if value not in self.identifiers:
+            error = Error(
+                'unknown-identifier',
+                cell,
+                message="Value '{value}' in column {header} on row "
+                        "{row_number} is an unknown identifier.",
+                message_substitutions={
+                    'value': value,
+                }
+            )
+            return [error]
