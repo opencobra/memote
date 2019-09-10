@@ -24,7 +24,6 @@ import logging
 from cobra.flux_analysis import single_gene_deletion
 
 from memote.experimental.experiment import Experiment
-from memote.experimental.checks import check_partial, gene_id_check
 
 
 __all__ = ("EssentialityExperiment",)
@@ -70,7 +69,12 @@ class EssentialityExperiment(Experiment):
     def validate(self, model, checks=[]):
         """Use a defined schema to validate the medium table format."""
         custom = [
-            check_partial(gene_id_check, frozenset(g.id for g in model.genes))
+            {
+                "unknown-identifier": {
+                    "column": "gene",
+                    "identifiers": {g.id for g in model.genes}
+                }
+            }
         ]
         super(EssentialityExperiment, self).validate(
             model=model, checks=checks + custom)
