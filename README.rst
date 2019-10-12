@@ -92,7 +92,7 @@ Contact
 For comments and questions get in touch via
 
 * our `gitter chatroom <https://gitter.im/opencobra/memote>`_
-* or our `mailing list <https://groups.google.com/forum/#!forum/memote>`_.
+* or open a `GitHub issue <https://github.com/opencobra/memote/issues/new>`_.
 
 Are you excited about this project? Consider `contributing
 <https://memote.readthedocs.io/en/latest/contributing.html>`_ by adding novel
