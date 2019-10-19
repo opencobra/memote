@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Improve the biomass reaction finding logic.
 * Explicitly register custom markers `biomass`, `essentiality` and `growth`
   used for custom test parametrization in pytest.
 
