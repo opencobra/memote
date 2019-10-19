@@ -22,8 +22,7 @@ from __future__ import absolute_import
 import logging
 import re
 from collections import defaultdict
-from operator import itemgetter
-
+from operator import itemgetter, attrgetter
 
 import numpy as np
 import pandas as pd
@@ -278,21 +277,59 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
+def filter_biomass(
+    component,
+    sbo_term,
+    buzzwords,
+):
+    """
+    Return True if the component matches a biomass description.
+
+    Parameters
+    ----------
+    component : cobra.Reaction or cobra.Metabolite
+        Either a reaction or a metabolite instance.
+    sbo_term : str
+        The term for either biomass production or biomass.
+    buzzwords : collection of patterns
+        One or more regular expression patterns to match against the name or
+        identifier of the component.
+
+    Returns
+    -------
+    bool
+        True if there was any match at all.
+
+    """
+    if component.annotation is not None and 'sbo' in component.annotation and \
+            component.annotation['sbo'] == sbo_term:
+        return True
+    if component.name is not None:
+        name = component.name.lower()
+        if any(b.match(name) for b in buzzwords):
+            return True
+    if component.id is not None:
+        identifier = component.id.lower()
+        if any(b.match(identifier) for b in buzzwords):
+            return True
+    return False
+
+
 @lrudecorator(size=2)
 def find_biomass_reaction(model):
     """
     Return a list of the biomass reaction(s) of the model.
 
-    This function identifies possible biomass reactions using two steps:
-    1. Return reactions that include the SBO annotation "SBO:0000629" for
-    biomass.
-    If no reactions can be identifies this way:
-    2. Look for the ``buzzwords`` "biomass", "growth" and "bof" in reaction IDs.
-    3. Look for metabolite IDs or names that contain the ``buzzword`` "biomass"
-    and obtain the set of reactions they are involved in.
-    4. Remove boundary reactions from this set.
-    5. Return the union of reactions that match the buzzwords and of the
-    reactions that metabolites are involved in that match the buzzword.
+    Identifiy possible biomass reactions using multiple steps:
+    1. Look for candidate reactions that include the SBO term ``SBO:0000629``
+    for biomass production,
+    2. the 'buzzwords' biomass, growth, and bof in reaction names
+    and identifiers,
+    3. reactions that involve a metabolite with the SBO term ``SBO:0000649``
+    for biomass,
+    3. or reactions that involve a metabolite whose name or identifier
+    contains the 'buzzword' biomass.
+    Return identified reactions excluding any boundary reactions.
 
     Parameters
     ----------
@@ -302,35 +339,25 @@ def find_biomass_reaction(model):
     Returns
     -------
     list
-        Identified biomass reactions.
+        Identified biomass reactions (if any).
 
     """
-    sbo_matches = set([rxn for rxn in model.reactions if
-                       rxn.annotation is not None and
-                       'sbo' in rxn.annotation and
-                       rxn.annotation['sbo'] == 'SBO:0000629'])
-
-    if len(sbo_matches) > 0:
-        return list(sbo_matches)
-
-    buzzwords = ['biomass', 'growth', 'bof']
-
-    buzzword_matches = set([rxn for rxn in model.reactions if any(
-        string in rxn.id.lower() for string in buzzwords)])
-
-    biomass_met = []
-    for met in model.metabolites:
-        if 'biomass' in met.id.lower() or (
-                met.name is not None and 'biomass' in met.name.lower()):
-            biomass_met.append(met)
-    if biomass_met == 1:
-        biomass_met_matches = set(
-            biomass_met.reactions
-        ) - set(model.boundary)
-    else:
-        biomass_met_matches = set()
-
-    return list(buzzword_matches | biomass_met_matches)
+    # Patterns are necessary here to prevent, for example, 'non-growth' from
+    # matching.
+    buzzwords = (
+        re.compile(r'\bbiomass'), re.compile(r'\bgrowth'), re.compile(r'bof')
+    )
+    candidates = {
+        r for r in model.reactions
+        if filter_biomass(r, 'SBO:0000629', buzzwords)
+    }
+    buzzwords = (re.compile(r'\bbiomass'),)
+    metabolites = {
+        m for m in model.metabolites
+        if filter_biomass(m, 'SBO:0000649', buzzwords)
+    }
+    candidates.update({r for m in metabolites for r in m.reactions})
+    return sorted(candidates.difference(model.boundary), key=attrgetter('id'))
 
 
 @lrudecorator(size=2)
