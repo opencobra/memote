@@ -22,18 +22,18 @@ from __future__ import absolute_import
 import logging
 import re
 from collections import defaultdict
-from operator import itemgetter, attrgetter
+from operator import attrgetter, itemgetter
 
 import numpy as np
 import pandas as pd
-from six import iteritems, itervalues
-from importlib_resources import open_text
 from cobra.exceptions import Infeasible
 from cobra.medium.boundary_types import find_boundary_types
+from importlib_resources import open_text
 from pylru import lrudecorator
+from six import iteritems, itervalues
 
-import memote.utils as utils
 import memote.support.data
+import memote.utils as utils
 
 LOGGER = logging.getLogger(__name__)
 
