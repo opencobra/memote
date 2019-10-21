@@ -327,7 +327,7 @@ def find_biomass_reaction(model):
     and identifiers,
     3. reactions that involve a metabolite with the SBO term ``SBO:0000649``
     for biomass,
-    3. or reactions that involve a metabolite whose name or identifier
+    4. or reactions that involve a metabolite whose name or identifier
     contains the 'buzzword' biomass.
     Return identified reactions excluding any boundary reactions.
 
