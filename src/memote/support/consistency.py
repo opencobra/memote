@@ -490,9 +490,42 @@ def find_disconnected(model):
     return [met for met in model.metabolites if len(met.reactions) == 0]
 
 
+def solve_boundary(metabolite, rxn, val=-1):
+    """
+    Solves the model when some reaction `rxn` has been added to a `metabolite`'s
+    contraints.
+
+    Parameters
+    ----------
+    metabolite: cobra.Metabolite
+        the reaction will be added to this metabolite as a linear coefficient
+    rxn: optlang.Variable || cobra.Reaction
+        the reaction to be added to the linear coefficients. It must be in the
+        variables of the model.
+    val: float
+        the value of the linear coefficient of `rxn` in `metabolite`
+
+    Returns
+    -------
+    solution: float
+        The value of the solution of the LP problem, *NaN* if infeasible.
+
+    """
+    metabolite.constraint.set_linear_coefficients({rxn: val})
+    # TODO: check if the "try except is required for older versions of cobra
+    solution = metabolite.model.slim_optimize()
+    # TODO: it seems like with context doesn't catch these changes, check
+    # restore constraint
+    metabolite.constraint.set_linear_coefficients({rxn: 0})
+    return solution
+
+
 def find_metabolites_not_produced_with_open_bounds(model):
     """
     Return metabolites that cannot be produced with open exchange reactions.
+
+    A demand reaction is set as the objective. Then, it is sequentally added as
+    a coefficient for every metabolite and the solution is inspected.
 
     A perfect model should be able to produce each and every metabolite when
     all medium components are available.
@@ -510,12 +543,15 @@ def find_metabolites_not_produced_with_open_bounds(model):
     """
     mets_not_produced = list()
     helpers.open_exchanges(model)
-    for met in model.metabolites:
-        with model:
-            exch = model.add_boundary(
-                met, type="irrex", reaction_id="IRREX", lb=0, ub=1000)
-            solution = helpers.run_fba(model, exch.id)
-            if np.isnan(solution) or solution < TOLERANCE_THRESHOLD:
+    # custom Variable (demand reaction)
+    irr = model.problem.Variable("irr", lb=0, ub=1000)
+    with model:
+        model.add_cons_vars(irr)
+        # helper.run_fba() only accepts reactions in the model
+        model.objective = irr
+        for met in model.metabolites:
+            solution = solve_boundary(met, irr)
+            if np.isnan(solution) or solution < model.tolerance:
                 mets_not_produced.append(met)
     return mets_not_produced
 
