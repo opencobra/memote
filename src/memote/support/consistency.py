@@ -492,7 +492,7 @@ def find_disconnected(model):
     return [met for met in model.metabolites if len(met.reactions) == 0]
 
 
-def _init_worker(model, irr):
+def _init_worker(model, irr, val):
     """Initialize a global model object for multiprocessing.
 
     Parameters
@@ -502,12 +502,16 @@ def _init_worker(model, irr):
     irr: optlang.Variable || cobra.Reaction
         the reaction to be added to the linear coefficients. It must be in the
         variables of the model.
+    val: int
+        value of the coefficient: -1 for production and 1 for consumption
     """
     global _model
     global _irr
+    global _val
     _model = model
     _model.objective = irr
     _irr = irr
+    _val = val
 
 
 def _solve_metabolite_production(metabolite):
@@ -529,14 +533,15 @@ def _solve_metabolite_production(metabolite):
     """
     global _model
     global _irr
+    global _val
     constraint = _model.metabolites.get_by_id(metabolite.id).constraint
-    constraint.set_linear_coefficients({_irr: -1})
+    constraint.set_linear_coefficients({_irr: _val})
     solution = _model.slim_optimize()
     constraint.set_linear_coefficients({_irr: 0})
     return solution, metabolite
 
 
-def find_metabolites_not_produced_with_open_bounds(model, processes=None):
+def find_metabolites_not_produced_with_open_bounds(model, processes=None, prod=True):
     """
     Return metabolites that cannot be produced with open exchange reactions.
 
@@ -552,6 +557,8 @@ def find_metabolites_not_produced_with_open_bounds(model, processes=None):
         The metabolic model under investigation.
     processes: int
         Number of processes to be used (Default to `cobra.Configuration()`).
+    prod: bool
+        If False, it checks for consumption instead of production (Default True)
 
     Returns
     -------
@@ -564,6 +571,10 @@ def find_metabolites_not_produced_with_open_bounds(model, processes=None):
         processes = Configuration().processes
     n_mets = len(model.metabolites)
     processes = min(processes, n_mets)
+    # manage the value of the linear coefficient to be added to each metabolite
+    val = -1 # production
+    if not prod:
+        val = 1 # consumption
 
     helpers.open_exchanges(model)
     irr = model.problem.Variable("irr", lb=0, ub=1000)
@@ -573,7 +584,7 @@ def find_metabolites_not_produced_with_open_bounds(model, processes=None):
         pool = multiprocessing.Pool(
             processes,
             initializer=_init_worker,
-            initargs=(model, irr),
+            initargs=(model, irr, val),
         )
         # use map as filter
         mets_not_produced = [met for solution, met in pool.imap_unordered(
@@ -590,7 +601,7 @@ def find_metabolites_not_produced_with_open_bounds(model, processes=None):
     return mets_not_produced
 
 
-def find_metabolites_not_consumed_with_open_bounds(model):
+def find_metabolites_not_consumed_with_open_bounds(model, processes=None):
     """
     Return metabolites that cannot be consumed with open boundary reactions.
 
@@ -601,6 +612,8 @@ def find_metabolites_not_consumed_with_open_bounds(model):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
+    processes: int
+        Number of processes to be used (Default to `cobra.Configuration()`).
 
     Returns
     -------
@@ -608,16 +621,7 @@ def find_metabolites_not_consumed_with_open_bounds(model):
         Those metabolites that could not be consumed.
 
     """
-    mets_not_consumed = list()
-    helpers.open_exchanges(model)
-    for met in model.metabolites:
-        with model:
-            exch = model.add_boundary(
-                met, type="irrex", reaction_id="IRREX", lb=-1000, ub=0)
-            solution = helpers.run_fba(model, exch.id, direction="min")
-            if np.isnan(solution) or abs(solution) < TOLERANCE_THRESHOLD:
-                mets_not_consumed.append(met)
-    return mets_not_consumed
+    find_metabolites_not_produced_with_open_bounds(model, processes=processes, prod=False)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
