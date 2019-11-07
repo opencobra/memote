@@ -541,7 +541,9 @@ def _solve_metabolite_production(metabolite):
     return solution, metabolite
 
 
-def find_metabolites_not_produced_with_open_bounds(model, processes=None, prod=True):
+def find_metabolites_not_produced_with_open_bounds(
+    model, processes=None, prod=True
+):
     """
     Return metabolites that cannot be produced with open exchange reactions.
 
@@ -572,9 +574,9 @@ def find_metabolites_not_produced_with_open_bounds(model, processes=None, prod=T
     n_mets = len(model.metabolites)
     processes = min(processes, n_mets)
     # manage the value of the linear coefficient to be added to each metabolite
-    val = -1 # production
+    val = -1  # production
     if not prod:
-        val = 1 # consumption
+        val = 1  # consumption
 
     helpers.open_exchanges(model)
     irr = model.problem.Variable("irr", lb=0, ub=1000)
@@ -621,7 +623,9 @@ def find_metabolites_not_consumed_with_open_bounds(model, processes=None):
         Those metabolites that could not be consumed.
 
     """
-    find_metabolites_not_produced_with_open_bounds(model, processes=processes, prod=False)
+    find_metabolites_not_produced_with_open_bounds(
+        model, processes=processes, prod=False
+    )
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):
