@@ -518,8 +518,8 @@ def _init_worker(model, irr, val):
 
 def _solve_metabolite_production(metabolite):
     """
-    Add reaction to a `metabolite`'s contraints. 
-    
+    Add reaction to a `metabolite`'s contraints.
+
     The reaction and the model are passed as globals.
 
     Parameters
