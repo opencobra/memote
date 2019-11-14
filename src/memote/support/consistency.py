@@ -623,7 +623,7 @@ def find_metabolites_not_consumed_with_open_bounds(model, processes=None):
         Those metabolites that could not be consumed.
 
     """
-    find_metabolites_not_produced_with_open_bounds(
+    return find_metabolites_not_produced_with_open_bounds(
         model, processes=processes, prod=False
     )
 
