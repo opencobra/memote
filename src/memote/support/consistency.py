@@ -493,7 +493,8 @@ def find_disconnected(model):
 
 
 def _init_worker(model, irr, val):
-    """Initialize a global model object for multiprocessing.
+    """
+    Initialize a global model object for multiprocessing.
 
     Parameters
     ----------
@@ -504,6 +505,7 @@ def _init_worker(model, irr, val):
         variables of the model.
     val: int
         value of the coefficient: -1 for production and 1 for consumption
+
     """
     global _model
     global _irr
@@ -516,8 +518,9 @@ def _init_worker(model, irr, val):
 
 def _solve_metabolite_production(metabolite):
     """
-    Solves the model when some reaction has been added to a `metabolite`'s
-    contraints. The reaction and the model are passed as globals.
+    Add reaction to a `metabolite`'s contraints. 
+    
+    The reaction and the model are passed as globals.
 
     Parameters
     ----------
@@ -530,6 +533,7 @@ def _solve_metabolite_production(metabolite):
         the value of the solution of the LP problem, *NaN* if infeasible.
     metabolite: cobra.Metabolite
         metabolite passed as argument (to use map as a filter)
+
     """
     global _model
     global _irr
