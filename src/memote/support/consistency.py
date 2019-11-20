@@ -535,9 +535,6 @@ def _solve_metabolite_production(metabolite):
         metabolite passed as argument (to use map as a filter)
 
     """
-    global _model
-    global _irr
-    global _val
     constraint = _model.metabolites.get_by_id(metabolite.id).constraint
     constraint.set_linear_coefficients({_irr: _val})
     solution = _model.slim_optimize()
