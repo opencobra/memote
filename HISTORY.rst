@@ -11,7 +11,7 @@ Next Release
 -------------------
 * New logic for `consistency` tests of production and consumption of metabolites
   with open bounds. It allows multiprocessing, currently relying on 
-  `cobra.Configuration` to select the number of processors).
+  `cobra.Configuration` to select the number of processors.
 
 0.9.11 (2019-04-23)
 -------------------
