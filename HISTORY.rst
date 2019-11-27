@@ -6,6 +6,12 @@ Next Release
 * Improve the biomass reaction finding logic.
 * Explicitly register custom markers `biomass`, `essentiality` and `growth`
   used for custom test parametrization in pytest.
+  
+0.9.12 (2019-11-27)
+-------------------
+* New logic for `consistency` tests of production and consumption of metabolites
+  with open bounds. It allows multiprocessing, currently relying on 
+  `cobra.Configuration` to select the number of processors).
 
 0.9.11 (2019-04-23)
 -------------------
