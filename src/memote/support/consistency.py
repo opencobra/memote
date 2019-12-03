@@ -510,12 +510,12 @@ def _init_worker(model, variable_name, coefficient):
 
     """
     global _model
-    global _irr
-    global _val
+    global _sink
+    global _coefficient
     _model = model
-    _irr = model.variables[variable_name]
-    _model.objective = _irr
-    _val = coefficient
+    _sink = model.variables[variable_name]
+    _model.objective = _sink
+    _coefficient = coefficient
 
 
 def _solve_metabolite_exchange(metabolite_id):
@@ -545,12 +545,12 @@ def _solve_metabolite_exchange(metabolite_id):
 
     """
     global _model
-    global _irr
-    global _val
+    global _sink
+    global _coefficient
     constraint = _model.constraints[metabolite_id]
-    constraint.set_linear_coefficients({_irr: _val})
+    constraint.set_linear_coefficients({_sink: _coefficient})
     solution = _model.slim_optimize()
-    constraint.set_linear_coefficients({_irr: 0})
+    constraint.set_linear_coefficients({_sink: 0})
     return solution, metabolite_id
 
 
