@@ -594,7 +594,8 @@ def find_blocked_metabolites(model, coefficient, processes=None):
                 initargs=(model, sink.name, coefficient),
             )
             result_iter = pool.imap_unordered(
-                _solve_metabolite_exchange, met_identifiers, chunksize=chunk_size
+                _solve_metabolite_exchange, met_identifiers,
+                chunksize=chunk_size
             )
             pool.close()
             blocked = [met_id for solution, met_id in result_iter
