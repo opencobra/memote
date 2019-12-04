@@ -20,15 +20,14 @@
 from __future__ import absolute_import, division
 
 import logging
+import multiprocessing
 from operator import attrgetter
 
 import numpy as np
-import multiprocessing
-from cobra import Reaction
+from cobra import Configuration, Reaction
 from cobra.exceptions import Infeasible
 from cobra.flux_analysis import flux_variability_analysis
-from cobra import Configuration
-from optlang.interface import OPTIMAL, INFEASIBLE
+from optlang.interface import INFEASIBLE, OPTIMAL
 from optlang.symbolics import Zero
 
 import memote.support.consistency_helpers as con_helpers
@@ -60,6 +59,8 @@ ENERGY_COUPLES = {
     'MNXM21': 'MNXM12',
     'MNXM89557': 'MNXM20'}
 TOLERANCE_THRESHOLD = 1E-07
+
+cobra_configuration = Configuration()
 
 
 def check_stoichiometric_consistency(model):
@@ -492,7 +493,7 @@ def find_disconnected(model):
     return [met for met in model.metabolites if len(met.reactions) == 0]
 
 
-def _init_worker(model, irr, val):
+def _init_worker(model, variable_name, coefficient):
     """
     Initialize a global model object for multiprocessing.
 
@@ -500,56 +501,117 @@ def _init_worker(model, irr, val):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    irr: optlang.Variable || cobra.Reaction
-        the reaction to be added to the linear coefficients. It must be in the
-        variables of the model.
-    val: int
-        value of the coefficient: -1 for production and 1 for consumption
+    variable_name: str
+        The name of the variable representing the metabolite exchange.
+    coefficient: int
+        The value of the metabolite's stoichiometric coefficient: -1 to test
+        if the model can produce the metabolite and 1 to test if it can be
+        consumed.
 
     """
     global _model
-    global _irr
-    global _val
+    global _sink
+    global _coefficient
     _model = model
-    _model.objective = irr
-    _irr = irr
-    _val = val
+    _sink = model.variables[variable_name]
+    _model.objective = _sink
+    _coefficient = coefficient
 
 
-def _solve_metabolite_production(metabolite):
+def _solve_metabolite_exchange(metabolite_id):
     """
-    Add reaction to a `metabolite`'s contraints.
+    Solve for a metabolite's exchange flux.
 
-    The reaction and the model are passed as globals.
+    By adding the exchange variable to the metabolite constraint,
+    the solution tests whether the metabolic model produce or consume the
+    metabolite.
+
+    Notes
+    -----
+    The model, exchange variable, and stoichiometric coefficient are globals.
 
     Parameters
     ----------
-    metabolite: cobra.Metabolite
-        the reaction will be added to this metabolite as a linear coefficient
+    metabolite_id: str
+        The exchange will be added to this metabolite as a linear coefficient.
 
     Returns
     -------
-    solution: float
-        the value of the solution of the LP problem, *NaN* if infeasible.
-    metabolite: cobra.Metabolite
-        metabolite passed as argument (to use map as a filter)
+    float
+        The numeric value of the solution of the flux-balance problem; *NaN* if
+        infeasible.
+    str
+        The identifier of the considered metabolite.
 
     """
-    constraint = _model.metabolites.get_by_id(metabolite.id).constraint
-    constraint.set_linear_coefficients({_irr: _val})
+    global _model
+    global _sink
+    global _coefficient
+    constraint = _model.constraints[metabolite_id]
+    constraint.set_linear_coefficients({_sink: _coefficient})
     solution = _model.slim_optimize()
-    constraint.set_linear_coefficients({_irr: 0})
-    return solution, metabolite
+    constraint.set_linear_coefficients({_sink: 0})
+    return solution, metabolite_id
 
 
-def find_metabolites_not_produced_with_open_bounds(
-    model, processes=None, prod=True
-):
+def find_blocked_metabolites(model, coefficient, processes=None):
     """
-    Return metabolites that cannot be produced with open exchange reactions.
+    Return metabolite identifiers that cannot be produced or consumed.
 
-    A demand reaction is set as the objective. Then, it is sequentally added as
-    a coefficient for every metabolite and the solution is inspected.
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    coefficient: int
+        Test if production is possible with -1 and consumption with 1.
+    processes: int, optional
+        Number of processes to be used (the default is taken from
+        `cobra.Configuration.processes`).
+
+    Returns
+    -------
+    list
+        The identifiers of blocked metabolites.
+
+    """
+    if processes is None:
+        processes = cobra_configuration.processes
+    met_identifiers = [m.id for m in model.metabolites]
+    num_mets = len(met_identifiers)
+    processes = min(processes, num_mets)
+
+    with model:
+        helpers.open_exchanges(model)
+        sink = model.problem.Variable("__multi_sink", lb=0, ub=1000)
+        model.add_cons_vars([sink])
+        model.solver.update()
+
+        if processes > 1:
+            chunk_size = num_mets // processes
+            pool = multiprocessing.Pool(
+                processes,
+                initializer=_init_worker,
+                initargs=(model, sink.name, coefficient),
+            )
+            result_iter = pool.imap_unordered(
+                _solve_metabolite_exchange, met_identifiers,
+                chunksize=chunk_size
+            )
+            pool.close()
+            blocked = [met_id for solution, met_id in result_iter
+                       if np.isnan(solution) or solution < model.tolerance]
+            pool.join()
+        else:
+            _init_worker(model, sink.name, coefficient)
+            blocked = [met_id for solution, met_id in map(
+                _solve_metabolite_exchange, met_identifiers
+            ) if np.isnan(solution) or solution < model.tolerance]
+    return sorted(blocked)
+
+
+def find_metabolites_not_produced_with_open_bounds(model, processes=None):
+    """
+    Return metabolite identifiers that cannot be produced with open exchanges.
 
     A perfect model should be able to produce each and every metabolite when
     all medium components are available.
@@ -558,55 +620,22 @@ def find_metabolites_not_produced_with_open_bounds(
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    processes: int
-        Number of processes to be used (Default to `cobra.Configuration()`).
-    prod: bool
-        If False, it checks for consumption instead of production (Default True)
+    processes: int, optional
+        Number of processes to be used (the default is taken from
+        `cobra.Configuration.processes`).
 
     Returns
     -------
     list
-        Those metabolites that could not be produced.
+        The metabolite identifiers that could not be produced.
 
     """
-    if processes is None:
-        # For now, borrow the number of processes from cobra's configuration
-        processes = Configuration().processes
-    n_mets = len(model.metabolites)
-    processes = min(processes, n_mets)
-    # manage the value of the linear coefficient to be added to each metabolite
-    val = -1  # production
-    if not prod:
-        val = 1  # consumption
-
-    helpers.open_exchanges(model)
-    irr = model.problem.Variable("irr", lb=0, ub=1000)
-
-    if processes > 1:
-        chunk_s = n_mets // processes
-        pool = multiprocessing.Pool(
-            processes,
-            initializer=_init_worker,
-            initargs=(model, irr, val),
-        )
-        # use map as filter
-        mets_not_produced = [met for solution, met in pool.imap_unordered(
-            _solve_metabolite_production, model.metabolites, chunksize=chunk_s
-        ) if np.isnan(solution) or solution < model.tolerance]
-        pool.close()
-        pool.join()
-    else:
-        _init_worker(model, irr)
-        # use map as filter
-        mets_not_produced = [met for solution, met in map(
-            _solve_metabolite_production, model.metabolites
-        ) if np.isnan(solution) or solution < model.tolerance]
-    return mets_not_produced
+    return find_blocked_metabolites(model, -1, processes=processes)
 
 
 def find_metabolites_not_consumed_with_open_bounds(model, processes=None):
     """
-    Return metabolites that cannot be consumed with open boundary reactions.
+    Return metabolite identifiers that cannot be consumed with open exchanges.
 
     When all metabolites can be secreted, it should be possible for each and
     every metabolite to be consumed in some form.
@@ -615,18 +644,17 @@ def find_metabolites_not_consumed_with_open_bounds(model, processes=None):
     ----------
     model : cobra.Model
         The metabolic model under investigation.
-    processes: int
-        Number of processes to be used (Default to `cobra.Configuration()`).
+    processes: int, optional
+        Number of processes to be used (the default is taken from
+        `cobra.Configuration.processes`).
 
     Returns
     -------
     list
-        Those metabolites that could not be consumed.
+        The metabolite identifiers that could not be consumed.
 
     """
-    return find_metabolites_not_produced_with_open_bounds(
-        model, processes=processes, prod=False
-    )
+    return find_blocked_metabolites(model, 1, processes=processes)
 
 
 def find_reactions_with_unbounded_flux_default_condition(model):

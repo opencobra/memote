@@ -324,9 +324,8 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_produced_with_open_bounds.annotation
-    ann["data"] = get_ids(
-        consistency.find_metabolites_not_produced_with_open_bounds(model)
-    )
+    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(
+        model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be produced in complete
@@ -355,9 +354,8 @@ def test_find_metabolites_not_consumed_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
-    ann["data"] = get_ids(
-        consistency.find_metabolites_not_consumed_with_open_bounds(model)
-    )
+    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(
+        model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be consumed in complete
