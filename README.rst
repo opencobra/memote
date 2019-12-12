@@ -128,7 +128,7 @@ depinfo_ for pretty printing our dependencies, six_ and future_ for backward
 and forward compatibility.
 
 The Memote Report App user interface is built with `Angular 5`_, 
-`Angular Flex-Layout`_, and `Angular Material`_. We rely on Vega_ for plotting 
+`Angular Flex-Layout`_, and `Angular Material`_. We rely on Taucharts_ for plotting 
 results.
 
 The initial development of `memote` has received funding from:
@@ -169,4 +169,4 @@ The initial development of `memote` has received funding from:
 .. _Angular 5: https://angular.io/
 .. _Angular Flex-Layout: https://github.com/angular/flex-layout
 .. _Angular Material: https://material.angular.io/
-.. _Vega: https://vega.github.io/vega/
+.. _Taucharts: https://taucharts.com/
