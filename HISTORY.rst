@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Setting the log level to DEBUG now also enables the solver log output.
 
 0.9.13 (2019-12-04)
 -------------------
