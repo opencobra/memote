@@ -74,6 +74,8 @@ class ResultCollectionPlugin(object):
         self.results.add_environment_information(self.results.meta)
         self._xcld = frozenset() if exclusive is None else frozenset(exclusive)
         self._skip = frozenset() if skip is None else frozenset(skip)
+        if LOGGER.getEffectiveLevel() <= logging.DEBUG:
+            self._model.solver.configuration.verbosity = 3
 
     def pytest_generate_tests(self, metafunc):
         """Parametrize marked functions at runtime."""

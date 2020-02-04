@@ -99,6 +99,10 @@ def test_model(model, sbml_version=None, results=False, pytest_args=None,
         pytest_args.extend(["--tb", "short"])
     if TEST_DIRECTORY not in pytest_args:
         pytest_args.append(TEST_DIRECTORY)
+    if "-s" not in pytest_args and LOGGER.getEffectiveLevel() <= logging.DEBUG:
+        # Disable pytest capturing so that the solver log output can be seen
+        # immediately.
+        pytest_args.insert(0, "-s")
     plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
                                     exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)
