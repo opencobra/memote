@@ -111,6 +111,10 @@ def cli():
               type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--timeout-solver",
+        type=int,
+        help="Timeout to put in the LP solver. If not supplied, it will be"
+               "set to default during FVA computation, to avoid infinite loops.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
               default=None, callback=callbacks.validate_experimental,
               help="Define additional tests using experimental data.")
@@ -130,7 +134,7 @@ def cli():
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment,
+        skip, solver, timeout_solver, experimental, custom_tests, deployment,
         skip_unchanged):
     """
     Run the test suite on a single model and collect results.
@@ -177,6 +181,8 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         stdout_notifications(notifications)
         sys.exit(1)
     model.solver = solver
+    if timeout_solver:
+        model.solver.configuration.timeout = timeout_solver
     # Load the experimental configuration using model information.
     if experimental is not None:
         experimental.load(model)

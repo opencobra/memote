@@ -51,6 +51,7 @@ class ConfigSectionSchema(object):
             type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
             default="glpk"
         )
+        timeout_solver = Param(type=int)
         experimental = Param(type=click.Path(exists=False, dir_okay=False),
                              default=None)
 
