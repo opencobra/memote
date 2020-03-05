@@ -62,18 +62,6 @@ def test_run_output(runner, model_file):
     assert exists(output)
 
 
-def test_run_with_timeout(runner, model_file):
-    """Expect a simple run with timeout to function."""
-    result = runner.invoke(cli, [
-        "run",
-        "--timeout-solver", "2",
-        "--no-collect",
-        "--ignore-git",
-        model_file
-    ])
-    assert result.exit_code == 0
-
-
 def test_run_no_location(runner, mock_repo):
     """
     Expect memote run to error when in repo but without specified location.
