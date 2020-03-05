@@ -111,7 +111,7 @@ def cli():
               type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--solver_timeout",
+@click.option("--solver-timeout",
               type=int, default=None,
               help="Timeout in seconds to set on the mathematical "
                    "optimization solver.")
@@ -298,7 +298,7 @@ def _test_history(model, sbml_ver, solver, solver_timeout, manager, commit,
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
-@click.option("--solver_timeout",
+@click.option("--solver-timeout",
               type=int, default=None,
               help="Timeout in seconds to set on the mathematical "
                    "optimization solver.")
