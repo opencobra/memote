@@ -62,6 +62,9 @@ def model(request, solver):
     elif request.param == "textbook":
         model = read_sbml_model(join(dirname(__file__), "data",
                                      "EcoliCore.xml.gz"))
+    elif request.param == "bigger-model":
+        model = read_sbml_model(join(dirname(__file__), "data",
+                                     "iJR904.xml.gz"))
     else:
         builder = getattr(request.module, "MODEL_REGISTRY")[request.param]
         model = builder(Model(id_or_model=request.param, name=request.param))
