@@ -66,6 +66,16 @@ def test_test_model_result(model):
     assert len(result) > 0
 
 
+@pytest.mark.parametrize("model", ["textbook"], indirect=["model"])
+def test_test_model_timeout(model):
+    api.test_model(
+        model,
+        solver_timeout=1,
+        exclusive="test_find_reactions_unbounded_flux_default_condition",
+    )
+    assert model.solver.configuration.timeout == 1
+
+
 @pytest.mark.parametrize("model", [
     "complete_failure",
 ], indirect=["model"])

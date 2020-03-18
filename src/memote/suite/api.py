@@ -64,8 +64,16 @@ def validate_model(path):
     return model, sbml_ver, notifications
 
 
-def test_model(model, sbml_version=None, results=False, pytest_args=None,
-               exclusive=None, skip=None, experimental=None):
+def test_model(
+    model,
+    sbml_version=None,
+    results=False,
+    pytest_args=None,
+    exclusive=None,
+    skip=None,
+    experimental=None,
+    solver_timeout=None
+):
     """
     Test a model and optionally store results as JSON.
 
@@ -84,6 +92,8 @@ def test_model(model, sbml_version=None, results=False, pytest_args=None,
         precedence over ``skip``.
     skip : iterable, optional
         Names of test cases or modules to skip.
+    solver_timeout: int, optional
+        Timeout in seconds to set on the mathematical optimization solver.
 
     Returns
     -------
@@ -103,6 +113,7 @@ def test_model(model, sbml_version=None, results=False, pytest_args=None,
         # Disable pytest capturing so that the solver log output can be seen
         # immediately.
         pytest_args.insert(0, "-s")
+    model.solver.configuration.timeout = solver_timeout
     plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
                                     exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)

@@ -69,6 +69,10 @@ def report():
               type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--solver-timeout",
+              type=int, default=None,
+              help="Timeout in seconds to set on the mathematical "
+                   "optimization solver.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
               default=None, callback=callbacks.validate_experimental,
               help="Define additional tests using experimental data.")
@@ -87,7 +91,7 @@ def report():
                    "the documentation for the expected YAML format used. This "
                    "option can be specified multiple times.")
 def snapshot(model, filename, pytest_args, exclusive, skip, solver,
-             experimental, custom_tests, custom_config):
+             solver_timeout, experimental, custom_tests, custom_config):
     """
     Take a snapshot of a model's state and generate a report.
 
@@ -113,7 +117,8 @@ def snapshot(model, filename, pytest_args, exclusive, skip, solver,
     model_obj.solver = solver
     _, results = api.test_model(model_obj, sbml_version=sbml_ver, results=True,
                                 pytest_args=pytest_args, skip=skip,
-                                exclusive=exclusive, experimental=experimental)
+                                exclusive=exclusive, experimental=experimental,
+                                solver_timeout=solver_timeout)
     with open(filename, "w", encoding="utf-8") as file_handle:
         LOGGER.info("Writing snapshot report to '%s'.", filename)
         file_handle.write(api.snapshot_report(results, config))
@@ -176,11 +181,12 @@ def history(location, model, filename, deployment, custom_config):
 
 
 def _test_diff(model_and_model_ver_tuple, pytest_args, skip,
-               exclusive, experimental):
+               exclusive, experimental, solver_timeout):
     model, sbml_ver = model_and_model_ver_tuple
     _, diff_results = api.test_model(
         model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
-        skip=skip, exclusive=exclusive, experimental=experimental)
+        skip=skip, exclusive=exclusive, experimental=experimental,
+        solver_timeout=solver_timeout)
     return diff_results
 
 
@@ -204,6 +210,10 @@ def _test_diff(model_and_model_ver_tuple, pytest_args, skip,
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--solver-timeout",
+              type=int, default=None,
+              help="Timeout in seconds to set on the mathematical "
+                   "optimization solver.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
               default=None, callback=callbacks.validate_experimental,
               help="Define additional tests using experimental data.")
@@ -224,7 +234,7 @@ def _test_diff(model_and_model_ver_tuple, pytest_args, skip,
                    "(memote.readthedocs.io). This option can be specified "
                    "multiple times.")
 def diff(models, filename, pytest_args, exclusive, skip, solver,
-         experimental, custom_tests, custom_config):
+         solver_timeout, experimental, custom_tests, custom_config):
     """
     Take a snapshot of all the supplied models and generate a diff report.
 
@@ -274,7 +284,8 @@ def diff(models, filename, pytest_args, exclusive, skip, solver,
     # Running pytest in individual processes to avoid interference
     partial_test_diff = partial(_test_diff, pytest_args=pytest_args,
                                 skip=skip, exclusive=exclusive,
-                                experimental=experimental)
+                                experimental=experimental,
+                                solver_timeout=solver_timeout)
     pool = Pool(min(len(models), cpu_count()))
     results = pool.map(partial_test_diff, model_and_model_ver_tuple)
 

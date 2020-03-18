@@ -111,6 +111,10 @@ def cli():
               type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--solver-timeout",
+              type=int, default=None,
+              help="Timeout in seconds to set on the mathematical "
+                   "optimization solver.")
 @click.option("--experimental", type=click.Path(exists=True, dir_okay=False),
               default=None, callback=callbacks.validate_experimental,
               help="Define additional tests using experimental data.")
@@ -130,7 +134,7 @@ def cli():
 @click.argument("model", type=click.Path(exists=True, dir_okay=False),
                 envvar="MEMOTE_MODEL")
 def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
-        skip, solver, experimental, custom_tests, deployment,
+        skip, solver, solver_timeout, experimental, custom_tests, deployment,
         skip_unchanged):
     """
     Run the test suite on a single model and collect results.
@@ -183,7 +187,8 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
     code, result = api.test_model(
         model=model, sbml_version=sbml_ver, results=True,
         pytest_args=pytest_args, skip=skip,
-        exclusive=exclusive, experimental=experimental)
+        exclusive=exclusive, experimental=experimental,
+        solver_timeout=solver_timeout)
     if collect:
         if repo is None:
             manager = ResultManager()
@@ -264,15 +269,16 @@ def _model_from_stream(stream, filename):
     return model, sbml_ver, notifications
 
 
-def _test_history(model, sbml_ver, solver, manager, commit, pytest_args, skip,
-                  exclusive, experimental):
+def _test_history(model, sbml_ver, solver, solver_timeout, manager, commit,
+                  pytest_args, skip, exclusive, experimental):
     model.solver = solver
     # Load the experimental configuration using model information.
     if experimental is not None:
         experimental.load(model)
     _, result = api.test_model(
         model, sbml_version=sbml_ver, results=True, pytest_args=pytest_args,
-        skip=skip, exclusive=exclusive, experimental=experimental)
+        skip=skip, exclusive=exclusive, experimental=experimental,
+        solver_timeout=solver_timeout)
     manager.store(result, commit=commit)
 
 
@@ -292,6 +298,10 @@ def _test_history(model, sbml_ver, solver, manager, commit, pytest_args, skip,
 @click.option("--solver", type=click.Choice(["cplex", "glpk", "gurobi"]),
               default="glpk", show_default=True,
               help="Set the solver to be used.")
+@click.option("--solver-timeout",
+              type=int, default=None,
+              help="Timeout in seconds to set on the mathematical "
+                   "optimization solver.")
 @click.option("--exclusive", multiple=True, metavar="TEST",
               help="The name of a test or test module to be run exclusively. "
                    "All other tests are skipped. This option can be used "
@@ -303,8 +313,9 @@ def _test_history(model, sbml_ver, solver, manager, commit, pytest_args, skip,
                 envvar="MEMOTE_MODEL")
 @click.argument("message")
 @click.argument("commits", metavar="[COMMIT] ...", nargs=-1)
-def history(model, message, rewrite, solver, location, pytest_args, deployment,
-            commits, skip, exclusive, experimental=None):  # noqa: D301
+def history(model, message, rewrite, solver, solver_timeout, location,
+            pytest_args, deployment, commits, skip, exclusive,
+            experimental=None):  # noqa: D301
     """
     Re-compute test results for the git branch history.
 
@@ -406,7 +417,7 @@ def history(model, message, rewrite, solver, location, pytest_args, deployment,
             continue
         proc = Process(
             target=_test_history,
-            args=(model_obj, sbml_ver, solver, manager, commit,
+            args=(model_obj, sbml_ver, solver, solver_timeout, manager, commit,
                   pytest_args, skip, exclusive, experimental))
         proc.start()
         proc.join()
