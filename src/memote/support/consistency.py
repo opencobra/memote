@@ -85,6 +85,12 @@ def check_stoichiometric_consistency(model):
     problem = model.problem
     # The transpose of the stoichiometric matrix N.T in the paper.
     stoich_trans = problem.Model()
+    # We clone the existing configuration in order to apply non-default settings, for
+    # example, for solver verbosity or timeout.
+    stoich_trans.configuration = problem.Configuration.clone(
+        config=model.solver.configuration,
+        problem=stoich_trans
+    )
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     LOGGER.info("model '%s' has %d internal reactions", model.id,
@@ -135,6 +141,12 @@ def find_unconserved_metabolites(model):
     """
     problem = model.problem
     stoich_trans = problem.Model()
+    # We clone the existing configuration in order to apply non-default settings, for
+    # example, for solver verbosity or timeout.
+    stoich_trans.configuration = problem.Configuration.clone(
+        config=model.solver.configuration,
+        problem=stoich_trans
+    )
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
     # The binary variables k[i] in the paper.
@@ -214,6 +226,12 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     inc_minimal = set()
     (problem, indicators) = con_helpers.create_milp_problem(
         left_ns, metabolites, Model, Variable, Constraint, Objective)
+    # We clone the existing configuration in order to apply non-default settings, for
+    # example, for solver verbosity or timeout.
+    problem.configuration = model.problem.Configuration.clone(
+        config=model.solver.configuration,
+        problem=problem
+    )
     LOGGER.debug(str(problem))
     cuts = list()
     for met in unconserved_mets:
