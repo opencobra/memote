@@ -66,29 +66,14 @@ def test_test_model_result(model):
     assert len(result) > 0
 
 
-@pytest.mark.xfail(reason="invalid test, it needs a bigger model.")
-@pytest.mark.parametrize("model", [
-    "bigger-model",
-], indirect=["model"])
+@pytest.mark.parametrize("model", ["textbook"], indirect=["model"])
 def test_test_model_timeout(model):
-    model.solver = "glpk"
-    model.solver.configuration.timeout = 1
-    configuration = cobra.Configuration()
-    conf_processes = configuration.processes
-    configuration.processes = 1
-
-    solver_has_timeout = False
-    try:
-        api.test_model(
-            model,
-            solver_timeout=1,
-            exclusive="test_find_reactions_unbounded_flux_default_condition",
-        )
-    except cobra.exceptions.OptimizationError:
-        solver_has_timeout = True
-    configuration.processes = conf_processes
-
-    assert solver_has_timeout
+    api.test_model(
+        model,
+        solver_timeout=1,
+        exclusive="test_find_reactions_unbounded_flux_default_condition",
+    )
+    assert model.solver.configuration.timeout == 1
 
 
 @pytest.mark.parametrize("model", [
