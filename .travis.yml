@@ -1,12 +1,13 @@
+---
 language: python
 node_js: "node"
 os:
   - linux
 python:
+  - "3.8"
   - "3.7"
   - "3.6"
   - "3.5"
-sudo: false
 git:
   depth: 2
 cache:
@@ -21,44 +22,41 @@ branches:
 env:
   global:
     - GITHUB_REPO=opencobra/memote
-matrix:
-  fast_finish: true
 install:
-- make reports
 - pip install --upgrade pip setuptools wheel tox tox-travis
+- make reports
 script:
 - travis_wait tox -- --cov-report=xml
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-
 stages:
   - test
   - name: deploy
     if: tag IS present
-
 jobs:
+  fast_finish: true
   include:
     - stage: deploy
-      install: skip
-      script:
+      python: "3.6"
+      install:
+        - pip install --upgrade setuptools wheel
         - make reports
-        - pip install --upgrade pip setuptools wheel
-      after_success:
-        - pip --version
+      script: skip
+      after_success: echo "Deploying..."
       deploy:
         - provider: pypi
-          skip_cleanup: true
+          cleanup: false
           distributions: sdist bdist_wheel
-          user: midnighter
+          username: midnighter
           password:
             secure: kNj5W/9vLd77d9FXEi8QZxb+8NDJzqDQYrIrrqq5tqqVRcBt/PAkMQ5PrwuBeNxNJALun8RSM2Mq/hDYijQ6lqxyFMpECKXmtDXb5OeMgQvQ5y96OHo0VXqoA1nELdJJp6lHKUxKaH75bfp9s7506n9teHUvlGdP0eE+E17XtRax5zuWv/IOqolF//mT6TzdKIIMrnZFZ2XxxNYuqk7GNym7ywccuZNNRSLJn6lKEAYlsGUQlm76YbGSSvrDKMfTrB2nChzrjEzsfpPUZJfdqSjz8vjJgyLgGZhMJ/hfWM3i6buaAhpvxsVW9SXbUA9DTfQkMOUKd3RmhE6HgOp9Bd04g4oY7e7v72b3Agiz7H2edJCrtLlVMTS5uzqqzgoL0lfYfu3dn/g8xxla3FeQy2GFDdDmEJ3XhFTgUyLKhW8CCjmEX4Fgi0bf2CUqt/NXK3JU2iSrFndpvRfD+BvA3WCfPX5IhwSOkYh1HESxhc6POPw2hYj8L/Gpa30sbGh8XMTMW7mKp9se6xy/vfNVxB0J7fnKyh94API7U32Zsuw4CVIU/FXrgkjvZf7DR2lM0KXDKldixsyhyEbo3IdOkg5GHZE+PiREmUFioOAZfxD+GrcTj4Xw53WhDu2wi4RtH5J21PhdNDzM61gK1iiSSDt9At6XnJkHDz1z7jdDt0E=
           on:
             tags: true
             repo: $GITHUB_REPO
         - provider: releases
-          skip_cleanup: true
-          api_key: $GITHUB_TOKEN
-          body: "Please see https://github.com/${GITHUB_REPO}/blob/${TRAVIS_TAG}/HISTORY.rst for the full release notes."
+          cleanup: false
+          token: $GITHUB_TOKEN
+          release_notes: "Please see https://github.com/${GITHUB_REPO}/blob/${TRAVIS_TAG}/HISTORY.rst for the full release notes."
           on:
             tags: true
             repo: $GITHUB_REPO
