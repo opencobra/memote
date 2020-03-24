@@ -68,5 +68,5 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
     ann["message"][name] = wrapper.fill(
         """Ideally, every model would show a perfect accuracy of 1. In
         name '{}' the model has  {:.2}.""".format(
-            name, result["MCC"]))
+            name, result["ACC"]))
     assert result["ACC"] > threshold
