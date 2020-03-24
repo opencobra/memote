@@ -114,6 +114,9 @@ def test_model(
         # immediately.
         pytest_args.insert(0, "-s")
     model.solver.configuration.timeout = solver_timeout
+    # Load the experimental configuration using model information.
+    if experimental is not None:
+        experimental.load(model)
     plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
                                     exclusive=exclusive, skip=skip,
                                     experimental_config=experimental)

@@ -181,9 +181,6 @@ def run(model, collect, filename, location, ignore_git, pytest_args, exclusive,
         stdout_notifications(notifications)
         sys.exit(1)
     model.solver = solver
-    # Load the experimental configuration using model information.
-    if experimental is not None:
-        experimental.load(model)
     code, result = api.test_model(
         model=model, sbml_version=sbml_ver, results=True,
         pytest_args=pytest_args, skip=skip,
