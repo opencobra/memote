@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.10.1 (2020-03-24)
+-------------------
+* Make the confusion matrix computation more robust.
+
 0.10.0 (2020-03-24)
 -------------------
 * Fix an issue where experimental data was not loaded.
