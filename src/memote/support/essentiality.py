@@ -21,7 +21,7 @@ from __future__ import absolute_import, division
 
 import logging
 
-from numpy import sqrt
+from math import sqrt
 
 LOGGER = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ def confusion_matrix(predicted_essential, expected_essential,
     except ZeroDivisionError:
         ppv = None
     # false discovery rate
-    fdr = 1 - ppv
+    fdr = 1 - ppv if ppv is not None else None
     # accuracy
     try:
         acc = (tp + tn) / (tp + tn + fp + fn)
