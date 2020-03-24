@@ -35,7 +35,7 @@ import warnings
 
 __author__ = "Moritz E. Beber"
 __email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.9.13"
+__version__ = "0.10.0"
 
 if sys.version_info < (3,):
     warnings.warn('You are using `Memote` with Python 2. '
