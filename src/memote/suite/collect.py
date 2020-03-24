@@ -92,8 +92,9 @@ class ResultCollectionPlugin(object):
             if exp is None:
                 metafunc.parametrize("experiment", [])
             else:
+                names = sorted(exp)
                 metafunc.parametrize(
-                    "experiment", list(exp.items()))
+                    "experiment", argvalues=[(n, exp[n]) for n in names], ids=names)
             # We only expect one kind of experimental marker per test case
             # and thus end execution here.
             return
