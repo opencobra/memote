@@ -3,6 +3,11 @@ History
 
 Next Release
 ------------
+
+0.10.0 (2020-03-24)
+-------------------
+* Fix an issue where experimental data was not loaded.
+* Enable command line options for solver timeouts.
 * Setting the log level to DEBUG now also enables the solver log output.
 
 0.9.13 (2019-12-04)
