@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.10.2 (2020-03-24)
+-------------------
+* Correct the names of parametrized experiments.
+
 0.10.1 (2020-03-24)
 -------------------
 * Make the confusion matrix computation more robust.
