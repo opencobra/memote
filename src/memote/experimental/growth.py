@@ -21,6 +21,8 @@ from __future__ import absolute_import
 
 import logging
 
+from math import isnan
+
 from pandas import DataFrame
 
 from memote.experimental.experiment import Experiment
@@ -73,6 +75,12 @@ class GrowthExperiment(Experiment):
                 model.objective = self.objective
             model.add_cons_vars(self.constraints)
             threshold *= model.slim_optimize()
+            if isnan(threshold):
+                LOGGER.debug(
+                    f"Threshold set to {model.tolerance} "
+                    f"due to infeasible solution (NaN produced)."
+                )
+                threshold = model.tolerance
             growth = list()
             for row in self.data.itertuples(index=False):
                 with model:
