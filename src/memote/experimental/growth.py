@@ -77,8 +77,8 @@ class GrowthExperiment(Experiment):
             threshold *= model.slim_optimize()
             if isnan(threshold):
                 LOGGER.debug(
-                    f"Threshold set to {model.tolerance} "
-                    f"due to infeasible solution (NaN produced)."
+                    "Threshold set to {} due to infeasible "
+                    "solution (NaN produced).".format(model.tolerance)
                 )
                 threshold = model.tolerance
             growth = list()
