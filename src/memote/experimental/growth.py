@@ -21,8 +21,6 @@ from __future__ import absolute_import
 
 import logging
 
-from math import isnan
-
 from pandas import DataFrame
 
 from memote.experimental.experiment import Experiment
