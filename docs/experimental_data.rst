@@ -49,6 +49,27 @@ The file simply states that files relating to media, essentiality, and growth
 experiments can be found at directories stated under ``path:`` relative to the
 location of the file.
 
+Minimum growth threshold
+------------------------
+Both growth and essentiality experiments require a threshold for the biomass
+function to determine if the model is growing. This value can be set via the
+``min_growth`` option in the ``experiments.yml`` file.
+For instance:
+
+.. code-block:: yaml
+
+    version: "0.1"
+    medium:
+      path: "media/"
+    essentiality:
+      path: "essentiality/"
+    growth:
+      path: "growth/"
+    min_growth: 0.05
+
+By default, ``min_growth`` is set to 10% of the biomass function value
+under the default constraints in the model.
+
 Media
 =====
 
