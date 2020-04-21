@@ -3,6 +3,7 @@ medium:
   path: "media/"
   definitions:
     m9_minimal:
+min_growth: 0.002
 growth:
   path: "growth"
   experiments:
