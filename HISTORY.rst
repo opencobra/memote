@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 * Fix an issue where experimental growth was incorrectly not reported.
+* Allow the user to set a threshold value for growth in experimental data.
 
 0.10.2 (2020-03-24)
 -------------------
