@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import json
 import logging
+from math import isnan
 from io import open
 from os.path import dirname, join, isabs
 
@@ -120,6 +121,7 @@ class ExperimentConfiguration(object):
             return
         path = self.get_path(data,
                              join("data", "experimental", "essentiality"))
+        min_growth = self.get_min_growth(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
                 exp = dict()
@@ -129,7 +131,9 @@ class ExperimentConfiguration(object):
             elif not isabs(filename):
                 filename = join(path, filename)
             experiment = EssentialityExperiment(
-                identifier=exp_id, obj=exp, filename=filename)
+                identifier=exp_id, obj=exp,
+                filename=filename, min_growth=min_growth
+            )
             if experiment.medium is not None:
                 assert experiment.medium in self.media, \
                     "Experiment '{}' has an undefined medium '{}'.".format(
@@ -149,6 +153,7 @@ class ExperimentConfiguration(object):
             return
         path = self.get_path(data,
                              join("data", "experimental", "growth"))
+        min_growth = self.get_min_growth(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
                 exp = dict()
@@ -158,7 +163,9 @@ class ExperimentConfiguration(object):
             elif not isabs(filename):
                 filename = join(path, filename)
             growth = GrowthExperiment(
-                identifier=exp_id, obj=exp, filename=filename)
+                identifier=exp_id, obj=exp,
+                filename=filename, min_growth=min_growth
+            )
             if growth.medium is not None:
                 assert growth.medium in self.media, \
                     "Growth-experiment '{}' has an undefined medium '{}'." \
@@ -176,3 +183,30 @@ class ExperimentConfiguration(object):
         if not isabs(path):
             path = join(self._base, path)
         return path
+
+    def get_min_growth(self, model, threshold=0.1):
+        """Calculate min growth default value or return input value.
+
+        This value is used to determine if a model is capable of growth under
+        certain experimental conditions.
+
+        Parameters
+        ----------
+        model : cobra.Model
+        threshold : float
+            If no input is provided by the user the default value is set to a
+            coefficient `threshold` times the growth under default constraints.
+            Default: 0.1.
+
+        """
+        min_growth = self.config.get("min_growth")
+        if min_growth is None:
+            min_growth = model.slim_optimize() * threshold
+            if isnan(min_growth):
+                LOGGER.debug(
+                    "Threshold set to {} due to infeasible "
+                    "solution (NaN produced) with default "
+                    "constraints.".format(model.tolerance)
+                )
+                min_growth = model.tolerance
+        return min_growth

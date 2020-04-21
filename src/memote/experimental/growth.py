@@ -66,7 +66,7 @@ class GrowthExperiment(Experiment):
         super(GrowthExperiment, self).load(dtype_conversion=dtype_conversion)
         self.data["growth"] = self.data["growth"].isin(self.TRUTHY)
 
-    def evaluate(self, model, threshold=0.1):
+    def evaluate(self, model):
         """Evaluate in silico growth rates."""
         with model:
             if self.medium is not None:
@@ -74,13 +74,6 @@ class GrowthExperiment(Experiment):
             if self.objective is not None:
                 model.objective = self.objective
             model.add_cons_vars(self.constraints)
-            threshold *= model.slim_optimize()
-            if isnan(threshold):
-                LOGGER.debug(
-                    "Threshold set to {} due to infeasible "
-                    "solution (NaN produced).".format(model.tolerance)
-                )
-                threshold = model.tolerance
             growth = list()
             for row in self.data.itertuples(index=False):
                 with model:
@@ -89,7 +82,7 @@ class GrowthExperiment(Experiment):
                         exchange.lower_bound = -row.uptake
                     else:
                         exchange.upper_bound = row.uptake
-                    growth.append(model.slim_optimize() >= threshold)
+                    growth.append(model.slim_optimize() >= 0.002)
         return DataFrame({
             "exchange": self.data["exchange"],
             "growth": growth
