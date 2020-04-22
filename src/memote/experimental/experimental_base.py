@@ -51,7 +51,7 @@ class ExperimentalBase(object):
     }
 
     def __init__(
-        self, identifier, obj, filename, minimal_growth_rate=None, **kwargs
+        self, identifier, obj, filename, **kwargs
     ):
         """
         Initialize a medium.
@@ -62,9 +62,6 @@ class ExperimentalBase(object):
         obj : dict
         filename : str or pathlib.Path
             The full file path. May be a compressed file.
-        minimal_growth_rate : float
-            minimum value of biomass function for the model to be considered as
-            growing. Not used by Medium. Default: None
         kwargs
 
         """
@@ -76,7 +73,6 @@ class ExperimentalBase(object):
         self.filename = filename
         self.data = None
         self.schema = None
-        self.minimal_growth_rate = minimal_growth_rate
 
     def load(self, dtype_conversion=None):
         """

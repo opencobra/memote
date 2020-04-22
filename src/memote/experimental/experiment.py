@@ -31,13 +31,16 @@ LOGGER = logging.getLogger(__name__)
 class Experiment(ExperimentalBase):
     """Base class for experimental data."""
 
-    def __init__(self, obj, **kwargs):
+    def __init__(self, obj, minimal_growth_rate, **kwargs):
         """
         Initialize an experiment.
 
         Parameters
         ----------
         obj : dict
+        minimal_growth_rate : float
+            minimum value of biomass function for the model to be considered as
+            growing. Not used by Medium. Default: None
         kwargs
 
         """
@@ -51,6 +54,7 @@ class Experiment(ExperimentalBase):
             raise NotImplementedError(
                 "This feature is not implemented yet. Please let us know that "
                 "you want it at https://github.com/opencobra/memote/issues.")
+        self.minimal_growth_rate = minimal_growth_rate
 
     def evaluate(self, model):
         """Abstract base method for evaluating experimental data."""
