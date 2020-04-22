@@ -49,7 +49,16 @@ def klass(request):
     {"label": "bird"}
 ])
 def test_init(klass, obj):
-    exp = klass(identifier="that", obj=obj, filename=join(DATA_PATH, "."))
+    kwargs = {
+        "identifier": "that",
+        "obj": obj,
+        "filename": join(DATA_PATH, "."),
+    }
+    if issubclass(klass, Experiment):
+        # minimal_growth_rate is required and only used by classes derived
+        # from Experiment (GrowthExperiment and EssentialityExperiment)
+        kwargs["minimal_growth_rate"] = 0.002
+    exp = klass(**kwargs)
     for key, value in iteritems(obj):
         assert getattr(exp, key) == value
 
