@@ -193,10 +193,10 @@ class ExperimentConfiguration(object):
         Parameters
         ----------
         model : cobra.Model
-        threshold : float
+        threshold : float, optional
             If no input is provided by the user the default value is set to a
-            coefficient `threshold` times the growth under default constraints.
-            Default: 0.1.
+            coefficient `threshold` times the growth under default constraints
+            (default: 0.1).
 
         """
         minimal_growth_rate = self.config.get("minimal_growth_rate")

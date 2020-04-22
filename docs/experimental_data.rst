@@ -51,9 +51,9 @@ location of the file.
 
 Minimal growth rate
 -------------------
-Both growth and essentiality experiments require a threshold for the biomass
-function to determine if the model is growing. This value can be set via the
-``minimal_growth_rate`` option in the ``experiments.yml`` file.
+Both growth and essentiality experiments require a minimal biomass function
+value to determine if the model predicts viability. This value can be set via
+the ``minimal_growth_rate`` option in the ``experiments.yml`` file.
 For instance:
 
 .. code-block:: yaml
