@@ -50,7 +50,9 @@ class ExperimentalBase(object):
         "YES"
     }
 
-    def __init__(self, identifier, obj, filename, **kwargs):
+    def __init__(
+        self, identifier, obj, filename, **kwargs
+    ):
         """
         Initialize a medium.
 

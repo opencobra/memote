@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Fix an issue where experimental growth was incorrectly not reported.
+* Allow the user to set a threshold value for growth in experimental data.
 
 0.10.2 (2020-03-24)
 -------------------
@@ -184,14 +186,14 @@ Next Release
 
 0.8.9 (2018-12-11)
 ------------------
-* Compress JSON and SQLite storage of results using gzip by default. JSON 
-  continues to work either compressed or uncompressed. At the moment we 
-  offer no database migration, please contact us if you need help in 
+* Compress JSON and SQLite storage of results using gzip by default. JSON
+  continues to work either compressed or uncompressed. At the moment we
+  offer no database migration, please contact us if you need help in
   migrating a large existing SQLite database rather than just re-computing it.
 
 0.8.8 (2018-12-10)
 ------------------
-* Adjust the reversibility index test to not use name matching and increase 
+* Adjust the reversibility index test to not use name matching and increase
   the threshold slightly. Also adjust the description of the test.
 * Adjust tests to the change in the ``add_boundary`` interface.
 * Identify blocked reactions using the cobrapy built-in function.
@@ -202,16 +204,16 @@ Next Release
 * Add a test that checks if reactions are annotated with reactome identifiers.
 * Add a feature that allows identifying specific metabolites by matching
   annotation information against the metabolite shortlist for a given MNX ID.
-* Change every usage of SBO key to lower case to conform to the identifiers.org 
+* Change every usage of SBO key to lower case to conform to the identifiers.org
   namespace for the Systems Biology Ontology.
-* Remove that metabolite SBO terms are used when identifying transport 
+* Remove that metabolite SBO terms are used when identifying transport
   reactions as this may lead to false positives.
-* Return metabolite IDs when finding duplicate metabolites to avoid 
+* Return metabolite IDs when finding duplicate metabolites to avoid
   serialization errors.
 * Identify transport reactions first by formula then by annotation.
 * For the diff report, run pytest in different processes to avoid accidentally
   overwriting the results of the former with the results of the later runs.
-* In the diff report, fix a typo that allowed the diff button to depart the 
+* In the diff report, fix a typo that allowed the diff button to depart the
   defined colour scheme (blue -> red) to cyan.
 * Fix the snapshot report not showing environment information.
 * Allow ``memote run`` to skip commits where the model was not
@@ -253,7 +255,7 @@ Next Release
   category are grouped logically.
 * Updated the documentation to include a newer flowchart, up-to-date getting
   started and custom test sections.
-* Update code to account for breaking changes in the most recent version of 
+* Update code to account for breaking changes in the most recent version of
   cobrapy (0.13.0) and subsequently unpin cobrapy dependency (set to >=0.13.0).
 
 0.8.1 (2018-06-27)

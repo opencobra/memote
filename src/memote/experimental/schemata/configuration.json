@@ -118,6 +118,12 @@
     },
     "growth": {
       "$ref": "#/definitions/experiments"
+    },
+    "minimal_growth_rate": {
+      "type": [
+        "number",
+        "null"
+      ]
     }
   },
   "required": [
