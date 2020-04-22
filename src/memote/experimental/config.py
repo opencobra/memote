@@ -121,7 +121,7 @@ class ExperimentConfiguration(object):
             return
         path = self.get_path(data,
                              join("data", "experimental", "essentiality"))
-        min_growth = self.get_minimal_growth_rate(model)
+        minimal_growth_rate = self.get_minimal_growth_rate(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
                 exp = dict()
@@ -132,7 +132,7 @@ class ExperimentConfiguration(object):
                 filename = join(path, filename)
             experiment = EssentialityExperiment(
                 identifier=exp_id, obj=exp,
-                filename=filename, min_growth=min_growth
+                filename=filename, minimal_growth_rate=minimal_growth_rate
             )
             if experiment.medium is not None:
                 assert experiment.medium in self.media, \
@@ -203,7 +203,7 @@ class ExperimentConfiguration(object):
         if minimal_growth_rate is None:
             minimal_growth_rate = model.slim_optimize() * threshold
             if isnan(minimal_growth_rate):
-                LOGGER.debug(
+                LOGGER.error(
                     "Threshold set to {} due to infeasible "
                     "solution (NaN produced) with default "
                     "constraints.".format(model.tolerance)
