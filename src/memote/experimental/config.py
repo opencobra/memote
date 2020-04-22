@@ -121,7 +121,7 @@ class ExperimentConfiguration(object):
             return
         path = self.get_path(data,
                              join("data", "experimental", "essentiality"))
-        min_growth = self.get_min_growth(model)
+        min_growth = self.get_minimal_growth_rate(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
                 exp = dict()
@@ -153,7 +153,7 @@ class ExperimentConfiguration(object):
             return
         path = self.get_path(data,
                              join("data", "experimental", "growth"))
-        min_growth = self.get_min_growth(model)
+        minimal_growth_rate = self.get_minimal_growth_rate(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
                 exp = dict()
@@ -164,7 +164,7 @@ class ExperimentConfiguration(object):
                 filename = join(path, filename)
             growth = GrowthExperiment(
                 identifier=exp_id, obj=exp,
-                filename=filename, min_growth=min_growth
+                filename=filename, minimal_growth_rate=minimal_growth_rate
             )
             if growth.medium is not None:
                 assert growth.medium in self.media, \
@@ -184,7 +184,7 @@ class ExperimentConfiguration(object):
             path = join(self._base, path)
         return path
 
-    def get_min_growth(self, model, threshold=0.1):
+    def get_minimal_growth_rate(self, model, threshold=0.1):
         """Calculate min growth default value or return input value.
 
         This value is used to determine if a model is capable of growth under
@@ -199,14 +199,14 @@ class ExperimentConfiguration(object):
             Default: 0.1.
 
         """
-        min_growth = self.config.get("min_growth")
-        if min_growth is None:
-            min_growth = model.slim_optimize() * threshold
-            if isnan(min_growth):
+        minimal_growth_rate = self.config.get("minimal_growth_rate")
+        if minimal_growth_rate is None:
+            minimal_growth_rate = model.slim_optimize() * threshold
+            if isnan(minimal_growth_rate):
                 LOGGER.debug(
                     "Threshold set to {} due to infeasible "
                     "solution (NaN produced) with default "
                     "constraints.".format(model.tolerance)
                 )
-                min_growth = model.tolerance
-        return min_growth
+                minimal_growth_rate = model.tolerance
+        return minimal_growth_rate

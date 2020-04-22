@@ -80,7 +80,9 @@ class GrowthExperiment(Experiment):
                         exchange.lower_bound = -row.uptake
                     else:
                         exchange.upper_bound = row.uptake
-                    growth.append(model.slim_optimize() >= self.min_growth)
+                    growth.append(
+                        model.slim_optimize() >= self.minimal_growth_rate
+                    )
         return DataFrame({
             "exchange": self.data["exchange"],
             "growth": growth
