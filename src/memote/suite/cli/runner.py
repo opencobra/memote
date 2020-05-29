@@ -618,7 +618,7 @@ def _setup_travis_ci(gh_repo_name, auth_token, repo_access_token):
             "Something is wrong with the generated token or you did not "
             "link your GitHub account on 'https://travis-ci.org/'? Please "
             "refer to the following error code for "
-            "further information:".format(str(error)))
+            "further information: {}".format(str(error)))
         sys.exit(1)
     else:
         LOGGER.info("Success!")
