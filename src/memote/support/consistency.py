@@ -180,9 +180,7 @@ def find_unconserved_metabolites(model):
             " Solver status is '{}' (only optimal expected).".format(status))
 
 
-# FIXME: The results of this function are currently inconsistent with
-# published results.
-def find_inconsistent_min_stoichiometry(model, atol=1e-13):
+def find_inconsistent_min_stoichiometry(model, atol=None):
     """
     Detect inconsistent minimal net stoichiometries.
 
