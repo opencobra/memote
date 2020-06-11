@@ -24,7 +24,6 @@ from collections import defaultdict
 
 import numpy as np
 import sympy
-from numpy.linalg import svd
 from six import iteritems, itervalues
 from builtins import zip, dict
 from pylru import lrudecorator
@@ -97,12 +96,31 @@ def stoichiometry_matrix(metabolites, reactions):
     return matrix, met_index, rxn_index
 
 
-def rank(matrix, atol=1e-13, rtol=0):
+def _build_is_zero(atol):
+    return sympy.matrices._iszero if atol is None else lambda x: x < atol
+
+
+def rank(matrix, atol=None):
     """
     Estimate the rank, i.e., the dimension of the column space, of a matrix.
 
-    The algorithm used by this function is based on the singular value
-    decomposition of `stoichiometry_matrix`.
+    Parameters
+    ----------
+    matrix : ndarray
+        The matrix should be at most 2-D.  A 1-D array with length k
+        will be treated as a 2-D with shape (1, k)
+    atol : float
+        The absolute tolerance for a zero singular value.  Singular values
+        smaller than ``atol`` are considered to be zero. Default: rely on sympy
+        definition of 0 (`sympy.matrices._iszero`).
+
+    """
+    return sympy.Matrix(np.atleast_2d(matrix)).rank(_build_is_zero(atol=atol))
+
+
+def nullspace(matrix, atol=None):  # noqa: D402
+    """
+    Compute normalized basis for the null space (kernel) of a matrix.
 
     Parameters
     ----------
@@ -111,67 +129,8 @@ def rank(matrix, atol=1e-13, rtol=0):
         will be treated as a 2-D with shape (1, k)
     atol : float
         The absolute tolerance for a zero singular value.  Singular values
-        smaller than ``atol`` are considered to be zero.
-    rtol : float
-        The relative tolerance for a zero singular value.  Singular values less
-        than the relative tolerance times the largest singular value are
-        considered to be zero.
-
-    Notes
-    -----
-    If both `atol` and `rtol` are positive, the combined tolerance is the
-    maximum of the two; that is::
-
-        tol = max(atol, rtol * smax)
-
-    Singular values smaller than ``tol`` are considered to be zero.
-
-    Returns
-    -------
-    int
-        The estimated rank of the matrix.
-
-    See Also
-    --------
-    numpy.linalg.matrix_rank
-        matrix_rank is basically the same as this function, but it does not
-        provide the option of the absolute tolerance.
-
-    """
-    matrix = np.atleast_2d(matrix)
-    sigma = svd(matrix, compute_uv=False)
-    tol = max(atol, rtol * sigma[0])
-    return int((sigma >= tol).sum())
-
-
-def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
-    """
-    Compute an approximate basis for the null space (kernel) of a matrix.
-
-    The algorithm used by this function is based on the singular value
-    decomposition of the given matrix.
-
-    Parameters
-    ----------
-    matrix : ndarray
-        The matrix should be at most 2-D.  A 1-D array with length k
-        will be treated as a 2-D with shape (1, k)
-    atol : float
-        The absolute tolerance for a zero singular value.  Singular values
-        smaller than ``atol`` are considered to be zero.
-    rtol : float
-        The relative tolerance for a zero singular value.  Singular values less
-        than the relative tolerance times the largest singular value are
-        considered to be zero.
-
-    Notes
-    -----
-    If both `atol` and `rtol` are positive, the combined tolerance is the
-    maximum of the two; that is::
-
-        tol = max(atol, rtol * smax)
-
-    Singular values smaller than ``tol`` are considered to be zero.
+        smaller than ``atol`` are considered to be zero. Default: rely on sympy
+        definition of 0 (`sympy.matrices._iszero`).
 
     Returns
     -------
@@ -180,17 +139,11 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
         nullspace will be an array with shape ``(k, n)``, where n is the
         estimated dimension of the nullspace.
 
-    References
-    ----------
-    Adapted from:
-    https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-
     """
-    matrix = np.atleast_2d(matrix)
-    _, sigma, vh = svd(matrix)
-    tol = max(atol, rtol * sigma[0])
-    num_nonzero = (sigma >= tol).sum()
-    return vh[num_nonzero:].conj().T
+    return np.array(
+        sympy.Matrix(np.atleast_2d(matrix))
+        .nullspace(iszerofunc=_build_is_zero(atol=atol))
+    ).T.astype(float)
 
 
 @lrudecorator(size=2)
