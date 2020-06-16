@@ -584,7 +584,7 @@ def test_find_unconserved_metabolites(model, inconsistent):
 
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
-    ("figure_1", [("A'",), ("B'",), ("C'",)]),
+    ("figure_1", [("A'", "B'", "C'",)]),
     ("equation_8", [("A",), ("B",), ("C",)]),
     ("figure_2", [("X",)]),
 ], indirect=["model"])
