@@ -227,9 +227,11 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
         k_var = Variable("k_{}".format(met.id), type="binary")
         k_vars.append(k_var)
         ns_problem.add([y_var, k_var])
-        # This constraint is equivalent to 0 <= y[i] <= k[i].
+        # These following constraints are equivalent to 0 <= y[i] <= k[i].
         ns_problem.add(Constraint(
             y_var - k_var, ub=0, name="switch_{}".format(met.id)))
+        ns_problem.add(Constraint(
+            y_var, lb=0, name="switch2_{}".format(met.id)))
     ns_problem.update()
     # add nullspace constraints
     for (j, column) in enumerate(kernel.T):
