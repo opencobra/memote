@@ -223,18 +223,22 @@ def find_inconsistent_min_stoichiometry(model, atol=None):
             "nullspace has dimension %d", left_ns.shape[1]
             if len(left_ns.shape) > 1 else 0)
     inc_minimal = set()
-    (problem, indicators) = con_helpers.create_milp_problem(
-        left_ns, metabolites, Model, Variable, Constraint, Objective)
-    # We clone the existing configuration in order to apply non-default
-    # settings, for example, for solver verbosity or timeout.
-    problem.configuration = model.problem.Configuration.clone(
-        config=model.solver.configuration,
-        problem=problem
-    )
-    LOGGER.debug(str(problem))
+    if left_ns.size != 0:
+        (problem, indicators) = con_helpers.create_milp_problem(
+            left_ns, metabolites, Model, Variable, Constraint, Objective)
+        # We clone the existing configuration in order to apply non-default
+        # settings, for example, for solver verbosity or timeout.
+        problem.configuration = model.problem.Configuration.clone(
+            config=model.solver.configuration,
+            problem=problem
+        )
+        LOGGER.debug(str(problem))
+    else:
+        LOGGER.info("Left nullspace is empty!")
     cuts = list()
     for met in unconserved_mets:
-        row = met_index[met]
+        # always add the met as an uncoserved set if there is no left nullspace
+        row = met_index[met] if left_ns.size != 0 else None
         if (left_ns[row] == 0.0).all():
             LOGGER.debug("%s: singleton minimal unconservable set", met.id)
             # singleton set!
