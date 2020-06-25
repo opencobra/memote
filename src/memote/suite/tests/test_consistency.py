@@ -58,8 +58,10 @@ def test_stoichiometric_consistency(model):
     ann["data"] = {
         "unconserved_metabolites":  [] if is_consistent else get_ids(
             consistency.find_unconserved_metabolites(model)),
-        "minimal_unconservable_sets": [] if is_consistent else get_ids(
-            consistency.find_inconsistent_min_stoichiometry(model)),
+        "minimal_unconservable_sets": [] if is_consistent else [
+            get_ids(mets)
+            for mets in
+            consistency.find_inconsistent_min_stoichiometry(model)],
     }
     ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(
         model.metabolites
