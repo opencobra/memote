@@ -66,14 +66,14 @@ def test_stoichiometric_consistency(model):
     )
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
-        metabolites: {}; and {} minimal uncoservable sets""".format(
+        metabolites: {}; and {} minimal unconservable sets: {}""".format(
             len(ann["data"]["unconserved_metabolites"]),
             ann["metric"],
             truncate(ann["data"]["unconserved_metabolites"]),
+            len(ann["data"]["minimal_unconservable_sets"]),
             truncate(ann["data"]["minimal_unconservable_sets"]),
         )
     )
-    print(f"ANN OBJ -> {ann}")
     assert is_consistent, ann["message"]
 
 
