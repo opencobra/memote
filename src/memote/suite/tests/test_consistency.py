@@ -27,7 +27,7 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 import memote.support.consistency_helpers as con_helpers
 
 
-@annotate(title="Stoichiometric Consistency", format_type="count")
+@annotate(title="Stoichiometric Consistency", format_type="percent")
 def test_stoichiometric_consistency(model):
     """
     Expect that the stoichiometry is consistent.
@@ -48,55 +48,29 @@ def test_stoichiometric_consistency(model):
     doi: 10.1093/bioinformatics/btn425
     Should the model be inconsistent, then the list of unconserved metabolites
     is computed using the algorithm described in section 3.2 of the same
-    publication.
+    publication. In addition, the list of min unconservable sets is computed
+    using the algorithm described in section 3.3.
 
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(
         model)
-    ann["data"] = [] if is_consistent else get_ids(
-        consistency.find_unconserved_metabolites(model))
-    ann["metric"] = len(ann["data"]) / len(model.metabolites)
+    ann["data"] = {
+        "unconserved_metabolites":  [] if is_consistent else get_ids(
+            consistency.find_unconserved_metabolites(model)),
+        "minimal_uncoservable_sets": [] if is_consistent else get_ids(
+            consistency.find_inconsistent_min_stoichiometry(model)),
+    }
+    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(
+        model.metabolites
+    )
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
-        metabolites: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
-    assert is_consistent, ann["message"]
-
-
-@annotate(title="Inconsistent Minimal Sets", format_type="count")
-def test_inconsistent_min_stoichiometry(model):
-    """
-    Return minimal uncoservable sets, when stoichiometry is incosistent.
-
-    Stoichiometric inconsistency violates universal constraints:
-    1. Molecular masses are always positive, and
-    2. On each side of a reaction the mass is conserved.
-    A single incorrectly defined reaction can lead to stoichiometric
-    inconsistency in the model, and consequently to unconserved metabolites.
-    Similar to insufficient constraints, this may give rise to cycles which
-    either produce mass from nothing or consume mass from the model.
-
-    Implementation:
-    This test first uses an implementation of the algorithm presented in
-    section 3.3 by Gevorgyan, A., M. G Poolman, and D. A Fell.
-    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
-    Bioinformatics 24, no. 19 (2008): 2245.
-    doi: 10.1093/bioinformatics/btn425
-    Should the model be inconsistent, then the list of min uncoservable sets
-    is computed using the algorithm described in section 3.3 of the same
-    publication.
-
-    """
-    ann = test_stoichiometric_consistency.annotation
-    is_consistent = consistency.check_stoichiometric_consistency(model)
-    ann["data"] = [] if is_consistent else get_ids(
-        consistency.find_inconsistent_min_stoichiometry(model))
-    ann["metric"] = float(len(ann["data"]))
-    ann["message"] = wrapper.fill(
-        """This model contains {} ({:.2}) minimal uncoservable sets: {}"""
-        .format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        metabolites: {}; and {} minimal uncoservable sets""".format(
+            len(ann["data"]["uncoserved_metabolites"]),
+            ann["metric"],
+            truncate(ann["data"]["uncoserved_metabolites"]),
+            truncate(ann["data"]["minimal_uncoservable_sets"]),
         )
     )
     assert is_consistent, ann["message"]
