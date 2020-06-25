@@ -218,11 +218,6 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     stoich, met_index, rxn_index = con_helpers.stoichiometry_matrix(
         metabolites, reactions)
     left_ns = con_helpers.nullspace(stoich.T, atol)
-    if len(left_ns.shape) > 1:
-        LOGGER.info(
-            "nullspace has dimension %d", left_ns.shape[1]
-            if len(left_ns.shape) > 1 else 0)
-    inc_minimal = set()
     if left_ns.size != 0:
         (problem, indicators) = con_helpers.create_milp_problem(
             left_ns, metabolites, Model, Variable, Constraint, Objective)
@@ -232,9 +227,14 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
             config=model.solver.configuration,
             problem=problem
         )
+        LOGGER.info(
+            "nullspace has dimension %d", left_ns.shape[1]
+            if len(left_ns.shape) > 1 else 0)
         LOGGER.debug(str(problem))
     else:
         LOGGER.info("Left nullspace is empty!")
+        return {(met,) for met in unconserved_mets}
+    inc_minimal = set()
     cuts = list()
     for met in unconserved_mets:
         # always add the met as an uncoserved set if there is no left nullspace
