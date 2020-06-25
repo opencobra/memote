@@ -58,7 +58,7 @@ def test_stoichiometric_consistency(model):
     ann["data"] = {
         "unconserved_metabolites":  [] if is_consistent else get_ids(
             consistency.find_unconserved_metabolites(model)),
-        "minimal_uncoservable_sets": [] if is_consistent else get_ids(
+        "minimal_unconservable_sets": [] if is_consistent else get_ids(
             consistency.find_inconsistent_min_stoichiometry(model)),
     }
     ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(
@@ -67,12 +67,13 @@ def test_stoichiometric_consistency(model):
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
         metabolites: {}; and {} minimal uncoservable sets""".format(
-            len(ann["data"]["uncoserved_metabolites"]),
+            len(ann["data"]["unconserved_metabolites"]),
             ann["metric"],
-            truncate(ann["data"]["uncoserved_metabolites"]),
-            truncate(ann["data"]["minimal_uncoservable_sets"]),
+            truncate(ann["data"]["unconserved_metabolites"]),
+            truncate(ann["data"]["minimal_unconservable_sets"]),
         )
     )
+    print(f"ANN OBJ -> {ann}")
     assert is_consistent, ann["message"]
 
 
