@@ -218,29 +218,28 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     stoich, met_index, rxn_index = con_helpers.stoichiometry_matrix(
         metabolites, reactions)
     left_ns = con_helpers.nullspace(stoich.T, atol)
-    if left_ns.size != 0:
-        (problem, indicators) = con_helpers.create_milp_problem(
-            left_ns, metabolites, Model, Variable, Constraint, Objective)
-        # We clone the existing configuration in order to apply non-default
-        # settings, for example, for solver verbosity or timeout.
-        problem.configuration = model.problem.Configuration.clone(
-            config=model.solver.configuration,
-            problem=problem
-        )
-        LOGGER.info(
-            "nullspace has dimension %d", left_ns.shape[1]
-            if len(left_ns.shape) > 1 else 0)
-        LOGGER.debug(str(problem))
-    else:
+    if left_ns.size == 0:
         LOGGER.info("Left nullspace is empty!")
         return {(met,) for met in unconserved_mets}
+    (problem, indicators) = con_helpers.create_milp_problem(
+        left_ns, metabolites, Model, Variable, Constraint, Objective)
+    # We clone the existing configuration in order to apply non-default
+    # settings, for example, for solver verbosity or timeout.
+    problem.configuration = model.problem.Configuration.clone(
+        config=model.solver.configuration,
+        problem=problem
+    )
+    LOGGER.info(
+        "Left nullspace has a dimension of %d.", left_ns.shape[1]
+    )
+    LOGGER.debug("%s", str(problem))
     inc_minimal = set()
     cuts = list()
     for met in unconserved_mets:
         # always add the met as an uncoserved set if there is no left nullspace
-        row = met_index[met] if left_ns.size != 0 else None
+        row = met_index[met]
         if (left_ns[row] == 0.0).all():
-            LOGGER.debug("%s: singleton minimal unconservable set", met.id)
+            LOGGER.debug("%s: singleton minimal unconservable set.", met.id)
             # singleton set!
             inc_minimal.add((met,))
             continue
