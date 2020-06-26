@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.11.0 (2020-06-26)
+-------------------
 * Fix an issue where experimental growth was incorrectly not reported.
 * Allow the user to set a threshold value for growth in experimental data.
 * Fix and enable the consistency test for minimal unconservable sets.
