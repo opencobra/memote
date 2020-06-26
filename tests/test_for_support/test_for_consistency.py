@@ -582,10 +582,9 @@ def test_find_unconserved_metabolites(model, inconsistent):
     assert set([met.id for met in unconserved_mets]) == set(inconsistent)
 
 
-@pytest.mark.xfail(reason="Bug in current implementation.")
 @pytest.mark.parametrize("model, inconsistent", [
     ("textbook", []),
-    ("figure_1", [("A'",), ("B'",), ("C'",)]),
+    ("figure_1", [("A'", "B'", "C'",)]),
     ("equation_8", [("A",), ("B",), ("C",)]),
     ("figure_2", [("X",)]),
 ], indirect=["model"])

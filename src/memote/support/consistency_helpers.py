@@ -24,6 +24,7 @@ from collections import defaultdict
 
 import numpy as np
 import sympy
+
 from numpy.linalg import svd
 from six import iteritems, itervalues
 from builtins import zip, dict
@@ -115,15 +116,13 @@ def rank(matrix, atol=1e-13, rtol=0):
     rtol : float
         The relative tolerance for a zero singular value.  Singular values less
         than the relative tolerance times the largest singular value are
-        considered to be zero.
+        considered to be zero
 
     Notes
     -----
     If both `atol` and `rtol` are positive, the combined tolerance is the
     maximum of the two; that is::
-
         tol = max(atol, rtol * smax)
-
     Singular values smaller than ``tol`` are considered to be zero.
 
     Returns
@@ -168,9 +167,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
     -----
     If both `atol` and `rtol` are positive, the combined tolerance is the
     maximum of the two; that is::
-
         tol = max(atol, rtol * smax)
-
     Singular values smaller than ``tol`` are considered to be zero.
 
     Returns
@@ -274,9 +271,11 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
         k_var = Variable("k_{}".format(met.id), type="binary")
         k_vars.append(k_var)
         ns_problem.add([y_var, k_var])
-        # This constraint is equivalent to 0 <= y[i] <= k[i].
+        # These following constraints are equivalent to 0 <= y[i] <= k[i].
         ns_problem.add(Constraint(
             y_var - k_var, ub=0, name="switch_{}".format(met.id)))
+        ns_problem.add(Constraint(
+            y_var, lb=0, name="switch2_{}".format(met.id)))
     ns_problem.update()
     # add nullspace constraints
     for (j, column) in enumerate(kernel.T):

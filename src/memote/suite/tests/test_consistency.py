@@ -27,7 +27,7 @@ from memote.utils import annotate, truncate, get_ids, wrapper
 import memote.support.consistency_helpers as con_helpers
 
 
-@annotate(title="Stoichiometric Consistency", format_type="count")
+@annotate(title="Stoichiometric Consistency", format_type="percent")
 def test_stoichiometric_consistency(model):
     """
     Expect that the stoichiometry is consistent.
@@ -48,19 +48,34 @@ def test_stoichiometric_consistency(model):
     doi: 10.1093/bioinformatics/btn425
     Should the model be inconsistent, then the list of unconserved metabolites
     is computed using the algorithm described in section 3.2 of the same
-    publication.
+    publication. In addition, the list of min unconservable sets is computed
+    using the algorithm described in section 3.3.
 
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(
         model)
-    ann["data"] = [] if is_consistent else get_ids(
-        consistency.find_unconserved_metabolites(model))
-    ann["metric"] = len(ann["data"]) / len(model.metabolites)
+    ann["data"] = {
+        "unconserved_metabolites":  [] if is_consistent else get_ids(
+            consistency.find_unconserved_metabolites(model)),
+        "minimal_unconservable_sets": [] if is_consistent else [
+            get_ids(mets)
+            for mets in
+            consistency.find_inconsistent_min_stoichiometry(model)],
+    }
+    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(
+        model.metabolites
+    )
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
-        metabolites: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        metabolites: {}; and {} minimal unconservable sets: {}""".format(
+            len(ann["data"]["unconserved_metabolites"]),
+            ann["metric"],
+            truncate(ann["data"]["unconserved_metabolites"]),
+            len(ann["data"]["minimal_unconservable_sets"]),
+            truncate(ann["data"]["minimal_unconservable_sets"]),
+        )
+    )
     assert is_consistent, ann["message"]
 
 

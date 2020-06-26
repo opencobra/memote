@@ -58,8 +58,8 @@ def number_independent_conservation_relations(model):
     s_matrix, _, _ = con_helpers.stoichiometry_matrix(
         model.metabolites, model.reactions
     )
-    ln_matrix = con_helpers.nullspace(s_matrix.T)
-    return ln_matrix.shape[1]
+    left_ns = con_helpers.nullspace(s_matrix.T)
+    return left_ns.shape[1] if len(left_ns) > 1 else 0
 
 
 def matrix_rank(model):
