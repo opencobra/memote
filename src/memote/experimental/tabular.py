@@ -55,7 +55,7 @@ def read_tabular(filename, dtype_conversion=None):
             filename, sep="\t", dtype=dtype_conversion, encoding="utf-8"
         )
     elif "xls" in ext or "xlsx" in ext:
-        df = pd.read_excel(filename, dtype=dtype_conversion, encoding="utf-8")
+        df = pd.read_excel(filename, dtype=dtype_conversion)
     # TODO: Add a function to parse ODS data into a pandas data frame.
     else:
         raise ValueError("Unknown file format '{}'.".format(ext))

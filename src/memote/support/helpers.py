@@ -277,13 +277,9 @@ def find_converting_reactions(model, pair):
     return frozenset(hits)
 
 
-def filter_biomass(
-    component,
-    sbo_term,
-    buzzwords,
-):
+def filter_sbo_term(component, sbo_term):
     """
-    Return True if the component matches a biomass description.
+    Return true if the component is annotated with the given SBO term.
 
     Parameters
     ----------
@@ -291,9 +287,27 @@ def filter_biomass(
         Either a reaction or a metabolite instance.
     sbo_term : str
         The term for either biomass production or biomass.
-    buzzwords : collection of patterns
-        One or more regular expression patterns to match against the name or
-        identifier of the component.
+
+    """
+    return component.annotation.get("sbo", "") == sbo_term
+
+
+def filter_match_name(component, buzzwords):
+    """
+    Return whether the component's name matches a biomass description.
+
+    Notes
+    -----
+    Regex patterns are necessary here to prevent, for example, 'non-growth' from
+    matching.
+
+    Parameters
+    ----------
+    component : cobra.Reaction or cobra.Metabolite
+        Either a reaction or a metabolite instance.
+    buzzwords : collection of regex patterns
+        One or more regular expression patterns to match against the name of the
+        component.
 
     Returns
     -------
@@ -301,18 +315,36 @@ def filter_biomass(
         True if there was any match at all.
 
     """
-    if component.annotation is not None and 'sbo' in component.annotation and \
-            component.annotation['sbo'] == sbo_term:
-        return True
-    if component.name is not None:
-        name = component.name.lower()
-        if any(b.match(name) for b in buzzwords):
-            return True
-    if component.id is not None:
-        identifier = component.id.lower()
-        if any(b.match(identifier) for b in buzzwords):
-            return True
-    return False
+    if component.name is None:
+        return False
+    name = component.name.lower()
+    return any(b.match(name) for b in buzzwords)
+
+
+def filter_identifier(component, buzzwords):
+    """
+    Return whether the component's identifier contains a biomass description.
+
+    Notes
+    -----
+    We check substring presence here because identifiers are often prefixed with
+    ``M_`` or ``R_``.
+
+    Parameters
+    ----------
+    component : cobra.Reaction or cobra.Metabolite
+        Either a reaction or a metabolite instance.
+    buzzwords : iterable of str
+        One or more buzzwords that the identifier should contain.
+
+    Returns
+    -------
+    bool
+        True if there was any match at all.
+
+    """
+    identifier = component.id.lower()
+    return any(b in identifier for b in buzzwords)
 
 
 @lrudecorator(size=2)
@@ -342,22 +374,59 @@ def find_biomass_reaction(model):
         Identified biomass reactions (if any).
 
     """
-    # Patterns are necessary here to prevent, for example, 'non-growth' from
-    # matching.
-    buzzwords = (
-        re.compile(r'\bbiomass'), re.compile(r'\bgrowth'), re.compile(r'bof')
-    )
+    boundary = frozenset(model.boundary)
+
+    # 1.
     candidates = {
         r for r in model.reactions
-        if filter_biomass(r, 'SBO:0000629', buzzwords)
+        if filter_sbo_term(r, 'SBO:0000629')
     }
-    buzzwords = (re.compile(r'\bbiomass'),)
+    candidates.difference_update(boundary)
+    if candidates:
+        return sorted(candidates, key=attrgetter('id'))
+
+    # 2.
+    name_buzzwords = (
+        re.compile(r'\bbiomass'), re.compile(r'\bgrowth'), re.compile(r'bof')
+    )
+    id_buzzwords = ('biomass',)
+    candidates = {
+        r for r in model.reactions
+        if filter_match_name(r, name_buzzwords) or
+        filter_identifier(r, id_buzzwords)
+    }
+    candidates.difference_update(boundary)
+    if candidates:
+        return sorted(candidates, key=attrgetter('id'))
+
+    # 3.
+    name_buzzwords = (re.compile(r'\bbiomass'),)
+    id_buzzwords = ('biomass',)
+    sbo_metabolites = {
+        m for m in model.metabolites
+        if filter_sbo_term(m, 'SBO:0000649')
+    }
     metabolites = {
         m for m in model.metabolites
-        if filter_biomass(m, 'SBO:0000649', buzzwords)
+        if filter_match_name(m, name_buzzwords) or
+        filter_identifier(m, id_buzzwords)
     }
-    candidates.update({r for m in metabolites for r in m.reactions})
-    return sorted(candidates.difference(model.boundary), key=attrgetter('id'))
+    # Many metabolites may match 'SBO:0000649', we filter those further by name
+    # and ID.
+    sbo_metabolites.intersection_update(metabolites)
+    if sbo_metabolites:
+        candidates = {r for m in sbo_metabolites for r in m.reactions}
+        candidates.difference_update(boundary)
+        if candidates:
+            return sorted(candidates, key=attrgetter('id'))
+
+    # 4.
+    candidates = {r for m in metabolites for r in m.reactions}
+    candidates.difference_update(boundary)
+    if candidates:
+        return sorted(candidates, key=attrgetter('id'))
+
+    return []
 
 
 @lrudecorator(size=2)

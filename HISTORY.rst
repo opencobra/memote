@@ -3,6 +3,7 @@ History
 
 Next Release
 ------------
+* Change the logic for identifying biomass reactions to be less eager.
 
 0.11.0 (2020-06-26)
 -------------------
