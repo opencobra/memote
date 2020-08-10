@@ -456,12 +456,33 @@ def biomass_sbo(base):
 
 @register_with(MODEL_REGISTRY)
 def biomass_metabolite(base):
-    """Provide a model with a reaction that will be identified as biomass."""
+    """Provide a model with a metabolite that will be identified as biomass."""
     a = cobra.Metabolite("Protein_c", compartment="c")
     b = cobra.Metabolite("DNA_c", compartment="c")
     c = cobra.Metabolite("RNA_c", compartment="c")
     d = cobra.Metabolite("GAM_c", compartment="c")
     e = cobra.Metabolite("Biomass_c", compartment="c")
+    rxn1 = cobra.Reaction("R0001")
+    rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1, e: 1})
+    rxn2 = cobra.Reaction("EX_Biomass")
+    rxn2.add_metabolites({e: -1})
+    base.add_reactions([rxn1, rxn2])
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def biomass_sbo_metabolite(base):
+    """Provide a model with a metabolite that will be identified as biomass."""
+    a = cobra.Metabolite("Protein_c", compartment="c")
+    a.annotation["sbo"] = "SBO:0000649"
+    b = cobra.Metabolite("DNA_c", compartment="c")
+    b.annotation["sbo"] = "SBO:0000649"
+    c = cobra.Metabolite("RNA_c", compartment="c")
+    c.annotation["sbo"] = "SBO:0000649"
+    d = cobra.Metabolite("GAM_c", compartment="c")
+    d.annotation["sbo"] = "SBO:0000649"
+    e = cobra.Metabolite("Biomass_c", compartment="c")
+    e.annotation["sbo"] = "SBO:0000649"
     rxn1 = cobra.Reaction("R0001")
     rxn1.add_metabolites({a: -1, b: -1, c: -1, d: -1, e: 1})
     rxn2 = cobra.Reaction("EX_Biomass")
@@ -653,6 +674,7 @@ def test_largest_compartment_id_met(model, expected):
     ("biomass_buzzwords", 1),
     ("biomass_sbo", 1),
     ("biomass_metabolite", 1),
+    ("biomass_sbo_metabolite", 1),
 ], indirect=["model"])
 def test_find_biomass_reaction(model, expected):
     """
