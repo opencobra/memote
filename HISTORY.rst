@@ -3,7 +3,11 @@ History
 
 Next Release
 ------------
+
+0.11.1 (2020-08-10)
+-------------------
 * Change the logic for identifying biomass reactions to be less eager.
+* Fix failing excel reader.
 
 0.11.0 (2020-06-26)
 -------------------
