@@ -9,6 +9,11 @@ qa:
 	isort src/memote tests/ setup.py
 	black src/memote tests/ setup.py
 
+## Compile the report template.
+reports:
+	$(MAKE) -C memote-report-app bundle
+	cp memote-report-app/build/index.html src/memote/suite/templates/index.html
+
 ## Prepare a release by generating the automatic code documentation.
 release:
 	sphinx-apidoc -f -o docs/source/autogen src/memote
