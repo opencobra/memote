@@ -23,8 +23,8 @@ import logging
 from goodtables import validate
 from importlib_resources import open_text
 
+# Importing the checks is necessary in order to register them.
 import memote.experimental.schemata
-# The following import is necessary in order to register the custom check.
 from memote.experimental.checks import UnknownIdentifier  # noqa: F401
 from memote.experimental.tabular import read_tabular
 
