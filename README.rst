@@ -1,27 +1,42 @@
 ====================================================
-memote - the genome-scale metabolic model test suite
+MEMOTE - the genome-scale metabolic model test suite
 ====================================================
 
 .. image:: https://img.shields.io/pypi/v/memote.svg
-        :target: https://pypi.python.org/pypi/memote
+   :target: https://pypi.org/project/memote/
+   :alt: Current PyPI Version
 
-.. image:: https://img.shields.io/travis/opencobra/memote.svg
-        :target: https://travis-ci.org/opencobra/memote
+.. image:: https://img.shields.io/pypi/pyversions/memote.svg
+   :target: https://pypi.org/project/memote/
+   :alt: Supported Python Versions
 
-.. image:: https://ci.appveyor.com/api/projects/status/github/opencobra/memote?branch=develop&svg=true
-        :target: https://ci.appveyor.com/project/cobrapy39491/memote/branch/develop
+.. image:: https://img.shields.io/pypi/l/memote.svg
+   :target: https://www.apache.org/licenses/LICENSE-2.0
+   :alt: Apache Software License Version 2.0
 
-.. image:: https://readthedocs.org/projects/memote/badge/?version=latest
-        :target: https://memote.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+   :target: .github/CODE_OF_CONDUCT.md
+   :alt: Code of Conduct
+
+.. image:: https://github.com/opencobra/memote/workflows/CI-CD/badge.svg
+   :target: https://github.com/opencobra/memote/workflows/CI-CD
+   :alt: GitHub Actions
 
 .. image:: https://codecov.io/gh/opencobra/memote/branch/master/graph/badge.svg
-        :target: https://codecov.io/gh/opencobra/memote
-        :alt: Coverage
+   :target: https://codecov.io/gh/opencobra/memote
+   :alt: Codecov
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/ambv/black
+   :alt: Code Style Black
+
+.. image:: https://readthedocs.org/projects/memote/badge/?version=latest
+   :target: https://memote.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 .. image:: https://badges.gitter.im/opencobra/memote.svg
-        :target: https://gitter.im/opencobra/memote
-        :alt: Gitter
+   :target: https://gitter.im/opencobra/memote
+   :alt: Gitter
 
 .. summary-start
 
@@ -35,7 +50,7 @@ model building community:
 2. Models should, for the benefit of the community and for research gain, live
    up to certain standards and minimal functionality.
 
-The `memote` tool therefore performs four subfunctions:
+The `MEMOTE` tool therefore performs four subfunctions:
 
 1. Create a skeleton git repository for the model.
 2. Run the current model through a `test suite that represents the community
@@ -61,27 +76,19 @@ at via GitHub pages for your repository.
 Installation
 ============
 
-**Please Note**: With its
-`retirement on the horizon <https://pythonclock.org>`_ we decided to stop
-testing against Python 2.7,
-and `like many others <https://python3statement.org>`_, want to focus entirely
-on Python 3.
-Hence, we cannot guarantee that `memote` will still function as expected
-on older versions of Python.
-
-Before installing `memote`, make sure that you have correctly installed the
+Before installing `MEMOTE`, please make sure that you have correctly installed the
 latest version of `git <https://git-scm.com/>`_.
 
 Moreover, we highly recommend creating a Python virtualenv for your model
 testing purposes.
 
-To install `memote`, run this command in your terminal:
+To install `MEMOTE`, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install memote
 
-This is the preferred method to install `memote`, as it will always install the
+This is the preferred method to install `MEMOTE`, as it will always install the
 most recent stable release.
 
 .. who-start
@@ -131,16 +138,16 @@ The Memote Report App user interface is built with `Angular 5`_,
 `Angular Flex-Layout`_, and `Angular Material`_. We rely on Taucharts_ for plotting 
 results.
 
-The initial development of `memote` has received funding from:
+The initial development of `MEMOTE` has received funding from:
 
 .. image:: https://upload.wikimedia.org/wikipedia/commons/d/d5/Novo_nordisk_foundation_Logo.png
-        :target: http://novonordiskfonden.dk/en
+   :target: http://novonordiskfonden.dk/en
 
 .. image:: https://innovationsfonden.dk/sites/all/themes/novigo/logo.png
-        :target: https://innovationsfonden.dk/da
+   :target: https://innovationsfonden.dk/da
 
 .. image:: http://dd-decaf.eu/images/decaf-logo-md.svg
-        :target: http://dd-decaf.eu/
+   :target: http://dd-decaf.eu/
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: 
