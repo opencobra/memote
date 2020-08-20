@@ -22,13 +22,14 @@ from __future__ import absolute_import
 import json
 import logging
 
-from importlib_resources import open_text
 from goodtables import validate
+from importlib_resources import open_text
 
 import memote.experimental.schemata
-from memote.experimental.tabular import read_tabular
+
 # The following import is necessary in order to register the custom check.
 from memote.experimental.checks import UnknownIdentifier  # noqa: F401
+from memote.experimental.tabular import read_tabular
 
 
 __all__ = ("ExperimentalBase",)
@@ -40,19 +41,9 @@ class ExperimentalBase(object):
     """Represent a specific medium condition."""
 
     SCHEMA = None
-    TRUTHY = {
-        "true",
-        "True",
-        "TRUE",
-        "1",
-        "yes",
-        "Yes",
-        "YES"
-    }
+    TRUTHY = {"true", "True", "TRUE", "1", "yes", "Yes", "YES"}
 
-    def __init__(
-        self, identifier, obj, filename, **kwargs
-    ):
+    def __init__(self, identifier, obj, filename, **kwargs):
         """
         Initialize a medium.
 
@@ -88,17 +79,24 @@ class ExperimentalBase(object):
 
         """
         self.data = read_tabular(self.filename, dtype_conversion)
-        with open_text(memote.experimental.schemata, self.SCHEMA,
-                       encoding="utf-8") as file_handle:
+        with open_text(
+            memote.experimental.schemata, self.SCHEMA, encoding="utf-8"
+        ) as file_handle:
             self.schema = json.load(file_handle)
 
     def validate(self, model, checks=[]):
         """Use a defined schema to validate the given table."""
         records = self.data.to_dict("records")
         self.evaluate_report(
-            validate(records, headers=list(records[0]),
-                     preset='table', schema=self.schema,
-                     order_fields=True, checks=checks))
+            validate(
+                records,
+                headers=list(records[0]),
+                preset="table",
+                schema=self.schema,
+                order_fields=True,
+                checks=checks,
+            )
+        )
 
     @staticmethod
     def evaluate_report(report):

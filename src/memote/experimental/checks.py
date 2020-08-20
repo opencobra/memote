@@ -19,10 +19,10 @@
 
 from __future__ import absolute_import
 
-from goodtables import check, Error
+from goodtables import Error, check
 
 
-@check('unknown-identifier', type='custom', context='body')
+@check("unknown-identifier", type="custom", context="body")
 class UnknownIdentifier:
     """
     Validate data identifiers against a known set.
@@ -55,28 +55,26 @@ class UnknownIdentifier:
         """Check each row in the data table."""
         cell = None
         for item in cells:
-            if item['header'] == self.column:
+            if item["header"] == self.column:
                 cell = item
                 break
 
         if cell is None:
             error = Error(
-                'unknown-identifier',
-                row_number=cells[0]['row-number'],
+                "unknown-identifier",
+                row_number=cells[0]["row-number"],
                 message="Checking identifiers requires the column "
-                        "'{column}' to exist.".format(column=self.column)
+                "'{column}' to exist.".format(column=self.column),
             )
             return [error]
 
-        value = cell.get('value')
+        value = cell.get("value")
         if value not in self.identifiers:
             error = Error(
-                'unknown-identifier',
+                "unknown-identifier",
                 cell,
                 message="Value '{value}' in column {header} on row "
-                        "{row_number} is an unknown identifier.",
-                message_substitutions={
-                    'value': value,
-                }
+                "{row_number} is an unknown identifier.",
+                message_substitutions={"value": value,},
             )
             return [error]

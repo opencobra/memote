@@ -18,9 +18,12 @@
 """Provide a collective access to a test suite result.."""
 
 from __future__ import absolute_import
-from datetime import datetime
-from depinfo import get_pkg_info
+
 import platform
+from datetime import datetime
+
+from depinfo import get_pkg_info
+
 
 __all__ = ("MemoteResult",)
 

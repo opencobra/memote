@@ -24,30 +24,31 @@ from os.path import dirname, join
 import pytest
 from six import iteritems
 
-from memote.experimental.experimental_base import ExperimentalBase
-from memote.experimental.medium import Medium
-from memote.experimental.experiment import Experiment
 from memote.experimental.essentiality import EssentialityExperiment
+from memote.experimental.experiment import Experiment
+from memote.experimental.experimental_base import ExperimentalBase
 from memote.experimental.growth import GrowthExperiment
+from memote.experimental.medium import Medium
+
 
 DATA_PATH = join(dirname(__file__), "data")
 
 
-@pytest.fixture(scope="module", params=[
-    ExperimentalBase,
-    Medium,
-    Experiment,
-    EssentialityExperiment,
-    GrowthExperiment
-])
+@pytest.fixture(
+    scope="module",
+    params=[
+        ExperimentalBase,
+        Medium,
+        Experiment,
+        EssentialityExperiment,
+        GrowthExperiment,
+    ],
+)
 def klass(request):
     return request.param
 
 
-@pytest.mark.parametrize("obj", [
-    {},
-    {"label": "bird"}
-])
+@pytest.mark.parametrize("obj", [{}, {"label": "bird"}])
 def test_init(klass, obj):
     kwargs = {
         "identifier": "that",

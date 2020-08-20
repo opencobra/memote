@@ -20,45 +20,57 @@
 from __future__ import absolute_import
 
 import json
-from jsonschema import Draft4Validator, ValidationError
-from os.path import dirname, join
 from builtins import zip
+from os.path import dirname, join
 
 import pytest
 from importlib_resources import open_text
+from jsonschema import Draft4Validator, ValidationError
 from numpy import isclose
 
 from memote.experimental.config import ExperimentConfiguration
+
 
 DATA_PATH = join(dirname(__file__), "data")
 
 
 def test_configuration_schema():
     """Validate the schema itself against its specification."""
-    with open_text("memote.experimental.schemata", "configuration.json",
-                   encoding="utf-8") as file_handle:
+    with open_text(
+        "memote.experimental.schemata", "configuration.json", encoding="utf-8"
+    ) as file_handle:
         schema = json.load(file_handle)
     Draft4Validator.check_schema(schema)  # Will raise an exception if invalid.
 
 
-@pytest.mark.parametrize("filename", [
-    pytest.param("empty.yml",
-                 marks=pytest.mark.raises(exception=ValidationError)),
-    pytest.param("invalid.yml",
-                 marks=pytest.mark.raises(exception=ValidationError)),
-    "valid.yml",
-    "medium_only.yml"
-])
+@pytest.mark.parametrize(
+    "filename",
+    [
+        pytest.param("empty.yml", marks=pytest.mark.raises(exception=ValidationError)),
+        pytest.param(
+            "invalid.yml", marks=pytest.mark.raises(exception=ValidationError)
+        ),
+        "valid.yml",
+        "medium_only.yml",
+    ],
+)
 def test_configuration(filename):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
 
 
-@pytest.mark.parametrize("filename, model, media, growth", [
-    ("medium_only.yml", "textbook",
-     [u"glucose", u"m9_fructose", u"pyruvate"],
-     [0.874, 0.416, 0.291])
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "filename, model, media, growth",
+    [
+        (
+            "medium_only.yml",
+            "textbook",
+            [u"glucose", u"m9_fructose", u"pyruvate"],
+            [0.874, 0.416, 0.291],
+        )
+    ],
+    indirect=["model"],
+)
 def test_load_medium(filename, model, media, growth):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
@@ -67,12 +79,14 @@ def test_load_medium(filename, model, media, growth):
         assert medium_id in config.media
         with model:
             config.media[medium_id].apply(model)
-            assert isclose(model.slim_optimize(), value, atol=1E-03)
+            assert isclose(model.slim_optimize(), value, atol=1e-03)
 
 
-@pytest.mark.parametrize("filename, model, experiment", [
-    (u"essentiality_only.yml", u"textbook", u"core_deletion")
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "filename, model, experiment",
+    [(u"essentiality_only.yml", u"textbook", u"core_deletion")],
+    indirect=["model"],
+)
 def test_load_essentiality(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()
@@ -86,9 +100,11 @@ def test_load_essentiality(filename, model, experiment):
     assert (test["essential"].values == expected["essential"].values).all()
 
 
-@pytest.mark.parametrize("filename, model, experiment", [
-    (u"growth.yml", u"textbook", u"core")
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "filename, model, experiment",
+    [(u"growth.yml", u"textbook", u"core")],
+    indirect=["model"],
+)
 def test_load_growth(filename, model, experiment):
     config = ExperimentConfiguration(join(DATA_PATH, filename))
     config.validate()

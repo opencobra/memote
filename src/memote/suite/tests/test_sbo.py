@@ -24,8 +24,7 @@ import pytest
 import memote.support.basic as basic
 import memote.support.helpers as helpers
 import memote.support.sbo as sbo
-
-from memote.utils import annotate, truncate, get_ids, wrapper
+from memote.utils import annotate, get_ids, truncate, wrapper
 
 
 @annotate(title="Metabolite General SBO Presence", format_type="count")
@@ -43,14 +42,15 @@ def test_metabolite_sbo_presence(model):
 
     """
     ann = test_metabolite_sbo_presence.annotation
-    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
-        model, "metabolites"))
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(model, "metabolites"))
     try:
         ann["metric"] = len(ann["data"]) / len(model.metabolites)
         ann["message"] = wrapper.fill(
             """A total of {} metabolites ({:.2%}) lack annotation with any type
             of SBO term: {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolites."
@@ -73,14 +73,15 @@ def test_reaction_sbo_presence(model):
 
     """
     ann = test_reaction_sbo_presence.annotation
-    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
-        model, "reactions"))
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(model, "reactions"))
     try:
         ann["metric"] = len(ann["data"]) / len(model.reactions)
         ann["message"] = wrapper.fill(
             """A total of {} reactions ({:.2%}) lack annotation with any type
             of SBO term: {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no reactions."
@@ -102,14 +103,15 @@ def test_gene_sbo_presence(model):
 
     """
     ann = test_gene_sbo_presence.annotation
-    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(
-        model, "genes"))
+    ann["data"] = get_ids(sbo.find_components_without_sbo_terms(model, "genes"))
     try:
         ann["metric"] = len(ann["data"]) / len(model.genes)
         ann["message"] = wrapper.fill(
             """A total of {} genes ({:.2%}) lack annotation with any type of
             SBO term: {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no genes."
@@ -134,15 +136,18 @@ def test_metabolic_reaction_specific_sbo_presence(model):
     """
     ann = test_metabolic_reaction_specific_sbo_presence.annotation
     pure = basic.find_pure_metabolic_reactions(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        pure, "SBO:0000176"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(pure, "SBO:0000176")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(pure)
         ann["message"] = wrapper.fill(
             """A total of {} metabolic reactions ({:.2%} of all purely
             metabolic reactions) lack annotation with the SBO term
             "SBO:0000176" for 'biochemical reaction': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolic reactions."
@@ -171,16 +176,21 @@ def test_transport_reaction_specific_sbo_presence(model):
     sbo_transport_terms = helpers.TRANSPORT_RXN_SBO_TERMS
     ann = test_transport_reaction_specific_sbo_presence.annotation
     transports = helpers.find_transport_reactions(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        transports, sbo_transport_terms))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(transports, sbo_transport_terms)
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(transports)
         ann["message"] = wrapper.fill(
             """A total of {} metabolic reactions ({:.2%} of all transport
             reactions) lack annotation with one of the SBO terms: {} for
             'biochemical reaction': {}""".format(
-                len(ann["data"]), ann["metric"], sbo_transport_terms,
-                truncate(ann["data"])))
+                len(ann["data"]),
+                ann["metric"],
+                sbo_transport_terms,
+                truncate(ann["data"]),
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no transport reactions."
@@ -202,15 +212,18 @@ def test_metabolite_specific_sbo_presence(model):
 
     """
     ann = test_metabolite_specific_sbo_presence.annotation
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        model.metabolites, "SBO:0000247"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(model.metabolites, "SBO:0000247")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(model.metabolites)
         ann["message"] = wrapper.fill(
             """A total of {} transport reactions ({:.2%} of all metabolites)
             lack annotation with the SBO term "SBO:0000247" for
             'simple chemical': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolites."
@@ -232,15 +245,18 @@ def test_gene_specific_sbo_presence(model):
 
     """
     ann = test_gene_specific_sbo_presence.annotation
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        model.genes, "SBO:0000243"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(model.genes, "SBO:0000243")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(model.genes)
         ann["message"] = wrapper.fill(
             """A total of {} genes ({:.2%} of all genes) lack
             annotation with the SBO term "SBO:0000243" for
             'gene': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no genes."
@@ -274,15 +290,18 @@ def test_exchange_specific_sbo_presence(model):
     """
     ann = test_exchange_specific_sbo_presence.annotation
     exchanges = helpers.find_exchange_rxns(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        exchanges, "SBO:0000627"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(exchanges, "SBO:0000627")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(exchanges)
         ann["message"] = wrapper.fill(
             """A total of {} exchange reactions ({:.2%} of all exchange
             reactions) lack annotation with the SBO term "SBO:0000627" for
             'exchange reaction': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no exchange reactions."
@@ -315,15 +334,18 @@ def test_demand_specific_sbo_presence(model):
     """
     ann = test_demand_specific_sbo_presence.annotation
     demands = helpers.find_demand_reactions(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        demands, "SBO:0000628"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(demands, "SBO:0000628")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(demands)
         ann["message"] = wrapper.fill(
             """A total of {} genes ({:.2%} of all demand reactions) lack
             annotation with the SBO term "SBO:0000628" for
             'demand reaction': {}""".format(
-                len(ann["data"]), ann["metric"], truncate(ann["data"])))
+                len(ann["data"]), ann["metric"], truncate(ann["data"])
+            )
+        )
     except ZeroDivisionError:
         ann["metric"] = 1.0
         ann["message"] = "The model has no demand reactions."
@@ -359,8 +381,9 @@ def test_sink_specific_sbo_presence(model):
     """
     ann = test_sink_specific_sbo_presence.annotation
     sinks = helpers.find_sink_reactions(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        sinks, "SBO:0000632"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(sinks, "SBO:0000632")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(sinks)
     except ZeroDivisionError:
@@ -372,7 +395,8 @@ def test_sink_specific_sbo_presence(model):
         annotation with the SBO term "SBO:0000632" for
         'sink reaction': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+        )
+    )
     assert len(ann["data"]) == len(sinks), ann["message"]
 
 
@@ -404,8 +428,9 @@ def test_biomass_specific_sbo_presence(model):
     """
     ann = test_biomass_specific_sbo_presence.annotation
     biomass = helpers.find_biomass_reaction(model)
-    ann["data"] = get_ids(sbo.check_component_for_specific_sbo_term(
-        biomass, "SBO:0000629"))
+    ann["data"] = get_ids(
+        sbo.check_component_for_specific_sbo_term(biomass, "SBO:0000629")
+    )
     try:
         ann["metric"] = len(ann["data"]) / len(biomass)
     except ZeroDivisionError:
@@ -417,5 +442,6 @@ def test_biomass_specific_sbo_presence(model):
         lack annotation with the SBO term "SBO:0000629" for
         'biomass production': {}""".format(
             len(ann["data"]), ann["metric"], truncate(ann["data"])
-        ))
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]

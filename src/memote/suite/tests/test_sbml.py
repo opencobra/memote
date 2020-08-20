@@ -35,14 +35,12 @@ def test_sbml_level(sbml_version):
     The level and version are parsed directly from the SBML document.
 
     """
-    version_tag = 'SBML Level {} Version {}'.format(
-        sbml_version[0], sbml_version[1])
+    version_tag = "SBML Level {} Version {}".format(sbml_version[0], sbml_version[1])
     ann = test_sbml_level.annotation
     ann["data"] = version_tag
     outcome = sbml_version[:2] >= (3, 1)
     ann["metric"] = 1.0 - float(outcome)
-    ann["message"] = wrapper.fill(
-        """The SBML file uses: {}""".format(ann["data"]))
+    ann["message"] = wrapper.fill("""The SBML file uses: {}""".format(ann["data"]))
     assert sbml_version[:2] >= (3, 1), ann["message"]
 
 

@@ -22,10 +22,11 @@ from __future__ import absolute_import
 import logging
 from builtins import open
 
-from ruamel.yaml import YAML
 from importlib_resources import open_text
+from ruamel.yaml import YAML
 
 import memote.suite.templates as templates
+
 
 __all__ = ("ReportConfiguration",)
 
@@ -53,8 +54,9 @@ class ReportConfiguration(dict):
         """Load a test report configuration."""
         if filename is None:
             LOGGER.debug("Loading default configuration.")
-            with open_text(templates, "test_config.yml",
-                           encoding="utf-8") as file_handle:
+            with open_text(
+                templates, "test_config.yml", encoding="utf-8"
+            ) as file_handle:
                 content = yaml.load(file_handle)
         else:
             LOGGER.debug("Loading custom configuration '%s'.", filename)
@@ -63,8 +65,8 @@ class ReportConfiguration(dict):
                     content = yaml.load(file_handle)
             except IOError as err:
                 LOGGER.error(
-                    "Failed to load the custom configuration '%s'. Skipping.",
-                    filename)
+                    "Failed to load the custom configuration '%s'. Skipping.", filename
+                )
                 LOGGER.debug(str(err))
                 content = dict()
         return cls(content)

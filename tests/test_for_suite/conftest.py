@@ -18,15 +18,16 @@
 from __future__ import absolute_import
 
 import logging
-from os import chdir, getcwd
 from builtins import str
-from os.path import basename, dirname, pardir, join
+from os import chdir, getcwd
+from os.path import basename, dirname, join, pardir
 from shutil import copyfile
-from git import Repo, InvalidGitRepositoryError
 from tarfile import open
 
 import pytest
 from click.testing import CliRunner
+from git import InvalidGitRepositoryError, Repo
+
 
 LOGGER = logging.getLogger()
 
@@ -38,16 +39,16 @@ def runner():
 
 @pytest.fixture(scope="session")
 def model_file(small_file, tmpdir_factory):
-    filename = str(tmpdir_factory.mktemp("small_models").join(
-        basename(small_file)))
+    filename = str(tmpdir_factory.mktemp("small_models").join(basename(small_file)))
     copyfile(small_file, filename)
     return filename
 
 
 @pytest.fixture(scope="session")
 def invalid_file(invalid_model, tmpdir_factory):
-    filename = str(tmpdir_factory.mktemp("invalid_models").join(
-        basename(invalid_model)))
+    filename = str(
+        tmpdir_factory.mktemp("invalid_models").join(basename(invalid_model))
+    )
     copyfile(invalid_model, filename)
     return filename
 
@@ -62,9 +63,7 @@ def mock_repo(tmpdir_factory):
     # Define the path to the temporary folder
     base_path = str(tmpdir_factory.mktemp("mock-repo"))
     # and the tarball that we will decompress there
-    tar_file = join(
-        dirname(__file__), pardir, "data", "memote-mock-repo.tar.gz"
-    )
+    tar_file = join(dirname(__file__), pardir, "data", "memote-mock-repo.tar.gz")
     # Extract the gzipped tarball
     mock_repo_tarfile = open(tar_file)
     mock_repo_tarfile.extractall(base_path)
@@ -74,6 +73,5 @@ def mock_repo(tmpdir_factory):
     try:
         repo = Repo(path)
     except InvalidGitRepositoryError:
-        LOGGER.warning(
-            "Could not find memote-mock-repository. Is the path correct?")
+        LOGGER.warning("Could not find memote-mock-repository. Is the path correct?")
     return path, repo

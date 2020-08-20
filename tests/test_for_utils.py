@@ -17,8 +17,8 @@
 
 import os
 
-import pytest
 import git
+import pytest
 
 import memote.utils as utils
 
@@ -57,12 +57,9 @@ def four():
     pass
 
 
-@pytest.mark.parametrize("func, func_name", [
-    (one, "one"),
-    (two, "two"),
-    (three, "three"),
-    (four, "four")
-])
+@pytest.mark.parametrize(
+    "func, func_name", [(one, "one"), (two, "two"), (three, "three"), (four, "four")]
+)
 def test_register_with(func, func_name):
     registry = dict()
     utils.register_with(registry)(func)
@@ -70,20 +67,29 @@ def test_register_with(func, func_name):
     assert registry[func_name] is func
 
 
-@pytest.mark.parametrize("notes, func, summary", [
-    (dict(title="One", data=4, format_type="raw"), one,
-     """One line."""),
-    (dict(title="Two", data="some text", format_type="raw"), two,
-     """Two lines.
+@pytest.mark.parametrize(
+    "notes, func, summary",
+    [
+        (dict(title="One", data=4, format_type="raw"), one, """One line."""),
+        (
+            dict(title="Two", data="some text", format_type="raw"),
+            two,
+            """Two lines.
     Why?
-    """),
-    (dict(title="Three", data=[2, 4, 51, 63], format_type="count"), three,
-     """
+    """,
+        ),
+        (
+            dict(title="Three", data=[2, 4, 51, 63], format_type="count"),
+            three,
+            """
     Three lines.
     Why?
-    """),
-    (dict(title="Four", data=None, format_type="raw"), four,
-     """
+    """,
+        ),
+        (
+            dict(title="Four", data=None, format_type="raw"),
+            four,
+            """
     Fourth summary.
 
     A proper description.
@@ -92,10 +98,16 @@ def test_register_with(func, func_name):
     -------
     None
 
-    """),
-    pytest.param(dict(title="Some Title",format_type="wrong_type"), one, "",
-                 marks=pytest.mark.raises(exception=ValueError))
-])
+    """,
+        ),
+        pytest.param(
+            dict(title="Some Title", format_type="wrong_type"),
+            one,
+            "",
+            marks=pytest.mark.raises(exception=ValueError),
+        ),
+    ],
+)
 def test_annotate(notes, func, summary):
     res = utils.annotate(**notes)(func)
     assert res.annotation["title"] == notes["title"]
@@ -141,10 +153,7 @@ def mock_repo(tmpdir_factory):
     with open(os.path.join(path, "unrelated_file.txt"), "w") as f:
         f.write("Unrelated file.")
     repo.index.add(["unrelated_file.txt"])
-    repo.git.commit(
-        "--message",
-        "A commit that does not touch {}".format(relname)
-    )
+    repo.git.commit("--message", "A commit that does not touch {}".format(relname))
 
     repo.index.remove([relname], working_tree=True)
     repo.git.commit("--message", "Delete file.")
@@ -161,6 +170,5 @@ def test_is_modified_deleted(mock_repo):
     want = False, False, True, True
     # Convert to tuple so we can compare want == got,
     # which pytest will introspect helpfully if the assertion fails.
-    got = tuple(utils.is_modified(relname, commit)
-                for commit in repo.iter_commits())
+    got = tuple(utils.is_modified(relname, commit) for commit in repo.iter_commits())
     assert want == got

@@ -26,18 +26,14 @@ from six import iteritems
 
 from memote.experimental.medium import Medium
 
+
 DATA_PATH = join(dirname(__file__), "data")
 
 
 class TestMedium(object):
-
-    @pytest.mark.parametrize("obj", [
-        {},
-        {"label": "bird"}
-    ])
+    @pytest.mark.parametrize("obj", [{}, {"label": "bird"}])
     def test_init(self, obj):
-        exp = Medium(identifier="that", obj=obj,
-                     filename=join(DATA_PATH, "."))
+        exp = Medium(identifier="that", obj=obj, filename=join(DATA_PATH, "."))
         for key, value in iteritems(obj):
             assert getattr(exp, key) == value
 

@@ -20,9 +20,10 @@
 from __future__ import absolute_import
 
 import os
-from os.path import join, isabs, basename, expanduser
+from os.path import basename, expanduser, isabs, join
 
 from jinja2.ext import Extension
+
 
 __all__ = ("MemoteExtension",)
 

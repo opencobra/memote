@@ -23,6 +23,7 @@ import logging
 
 from memote.suite.reporting.report import Report
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -51,7 +52,8 @@ class HistoryReport(Report):
 
         """
         super(HistoryReport, self).__init__(
-            result=None, configuration=configuration, **kwargs)
+            result=None, configuration=configuration, **kwargs
+        )
         self._report_type = "history"
         self._history = history
         self.config = configuration
@@ -60,6 +62,7 @@ class HistoryReport(Report):
 
     def collect_history(self):
         """Build the structure of results in terms of a commit history."""
+
         def format_data(data):
             """Format result data according to the user-defined type."""
             # TODO Remove this failsafe once proper error handling is in place.
@@ -85,10 +88,9 @@ class HistoryReport(Report):
                 total_score = self.result["score"]["total_score"]
                 score_collection.setdefault("history", list())
                 score_collection["format_type"] = "score"
-                score_collection["history"].append({
-                    "branch": branch,
-                    "commit": commit,
-                    "metric": total_score})
+                score_collection["history"].append(
+                    {"branch": branch, "commit": commit, "metric": total_score}
+                )
                 # Now arrange the results for each test into the appropriate
                 # format. Specifically such that the Accordion and the Vega
                 # Plot components can easily read them.
@@ -99,8 +101,7 @@ class HistoryReport(Report):
                     if "summary" not in tests[test]:
                         tests[test]["summary"] = result.cases[test]["summary"]
                     if "type" not in tests[test]:
-                        tests[test]["format_type"] = result.cases[test][
-                            "format_type"]
+                        tests[test]["format_type"] = result.cases[test]["format_type"]
                     type = tests[test]["format_type"]
                     metric = result.cases[test].get("metric")
                     data = result.cases[test].get("data")
@@ -108,19 +109,23 @@ class HistoryReport(Report):
                     if isinstance(metric, dict):
                         tests[test].setdefault("history", dict())
                         for param in metric:
-                            tests[test]["history"].setdefault(param, list()). \
-                                append({
+                            tests[test]["history"].setdefault(param, list()).append(
+                                {
                                     "branch": branch,
                                     "commit": commit,
                                     "metric": metric.get(param),
                                     "data": format_data(data.get(param)),
-                                    "result": res.get(param)})
+                                    "result": res.get(param),
+                                }
+                            )
                     else:
-                        tests[test].setdefault("history", list()).append({
-                            "branch": branch,
-                            "commit": commit,
-                            "metric": metric,
-                            "data": format_data(data),
-                            "result": res
-                        })
+                        tests[test].setdefault("history", list()).append(
+                            {
+                                "branch": branch,
+                                "commit": commit,
+                                "metric": metric,
+                                "data": format_data(data),
+                                "result": res,
+                            }
+                        )
         return base

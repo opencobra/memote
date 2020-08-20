@@ -27,6 +27,7 @@ import pytest
 from memote.suite.results.result import MemoteResult
 from memote.support.helpers import find_biomass_reaction
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -45,8 +46,15 @@ class ResultCollectionPlugin(object):
     # Seems brittle, can we do better?
     _param = re.compile(r"\[(?P<param>[a-zA-Z0-9_.\-]+)\]$")
 
-    def __init__(self, model, sbml_version=None, experimental_config=None,
-                 exclusive=None, skip=None, **kwargs):
+    def __init__(
+        self,
+        model,
+        sbml_version=None,
+        experimental_config=None,
+        exclusive=None,
+        skip=None,
+        **kwargs
+    ):
         """
         Collect and store values during testing.
 
@@ -80,8 +88,9 @@ class ResultCollectionPlugin(object):
     def pytest_generate_tests(self, metafunc):
         """Parametrize marked functions at runtime."""
         if metafunc.definition.get_closest_marker("biomass"):
-            metafunc.parametrize("reaction_id", [
-                rxn.id for rxn in find_biomass_reaction(self._model)])
+            metafunc.parametrize(
+                "reaction_id", [rxn.id for rxn in find_biomass_reaction(self._model)]
+            )
             return
         # Parametrize experimental test cases.
         for kind in ["essentiality", "growth"]:
@@ -94,9 +103,7 @@ class ResultCollectionPlugin(object):
             else:
                 names = sorted(exp)
                 metafunc.parametrize(
-                    "experiment",
-                    argvalues=[(n, exp[n]) for n in names],
-                    ids=names
+                    "experiment", argvalues=[(n, exp[n]) for n in names], ids=names
                 )
             # We only expect one kind of experimental marker per test case
             # and thus end execution here.
@@ -123,8 +130,9 @@ class ResultCollectionPlugin(object):
         if hasattr(item.obj, "annotation"):
             case.update(item.obj.annotation)
         else:
-            LOGGER.debug("Test case '%s' has no annotation (%s).",
-                         item.obj.__name__, item.nodeid)
+            LOGGER.debug(
+                "Test case '%s' has no annotation (%s).", item.obj.__name__, item.nodeid
+            )
 
     def pytest_report_teststatus(self, report):
         """
@@ -138,7 +146,7 @@ class ResultCollectionPlugin(object):
             A test report object from pytest with test case result.
 
         """
-        if report.when == 'teardown':
+        if report.when == "teardown":
             return
         item_name = report.location[2]
 
@@ -146,12 +154,10 @@ class ResultCollectionPlugin(object):
         match = self._param.search(item_name)
         if match is not None:
             param = match.group("param")
-            item_name = item_name[:match.start()]
-            LOGGER.debug(
-                "%s with parameter %s %s", item_name, param, report.outcome)
+            item_name = item_name[: match.start()]
+            LOGGER.debug("%s with parameter %s %s", item_name, param, report.outcome)
         else:
-            LOGGER.debug(
-                "%s %s", item_name, report.outcome)
+            LOGGER.debug("%s %s", item_name, report.outcome)
 
         case = self.results.cases.setdefault(item_name, dict())
 
@@ -177,9 +183,6 @@ class ResultCollectionPlugin(object):
 
     def pytest_configure(self, config):
         """Register custom markers at runtime."""
-        config.addinivalue_line("markers",
-                                "biomass")
-        config.addinivalue_line("markers",
-                                "essentiality")
-        config.addinivalue_line("markers",
-                                "growth")
+        config.addinivalue_line("markers", "biomass")
+        config.addinivalue_line("markers", "essentiality")
+        config.addinivalue_line("markers", "growth")

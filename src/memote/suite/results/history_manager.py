@@ -19,14 +19,15 @@
 
 from __future__ import absolute_import
 
-import logging
 import json
+import logging
 
 from six import iteritems, iterkeys
 from sqlalchemy.orm.exc import NoResultFound
 
 from memote.suite.results import MemoteResult
 from memote.utils import is_modified
+
 
 __all__ = ("HistoryManager",)
 
@@ -79,7 +80,8 @@ class HistoryManager(object):
                 if not is_modified(model, commit):
                     LOGGER.info(
                         "The model was not modified in commit '{}'. "
-                        "Skipping.".format(commit))
+                        "Skipping.".format(commit)
+                    )
                     continue
                 branch_history.append(commit.hexsha)
                 if commit.hexsha not in commits:
@@ -117,12 +119,10 @@ class HistoryManager(object):
 
     def get_result(self, commit, default=MemoteResult()):
         """Return an individual result from the history if it exists."""
-        assert self._results is not None, \
-            "Please call the method `load_history` first."
+        assert self._results is not None, "Please call the method `load_history` first."
         return self._results.get(commit, default)
 
     def __contains__(self, commit):
         """Test for the existence of a result for a commit."""
-        assert self._results is not None, \
-            "Please call the method `load_history` first."
+        assert self._results is not None, "Please call the method `load_history` first."
         return commit in self._results

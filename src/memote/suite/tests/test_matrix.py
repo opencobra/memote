@@ -23,8 +23,7 @@ import memote.support.matrix as matrix
 from memote.utils import annotate, wrapper
 
 
-@annotate(title="Ratio Min/Max Non-Zero Coefficients",
-          format_type="percent")
+@annotate(title="Ratio Min/Max Non-Zero Coefficients", format_type="percent")
 def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     """
     Show the ratio of the absolute largest and smallest non-zero coefficients.
@@ -52,7 +51,9 @@ def test_absolute_extreme_coefficient_ratio(model, threshold=1e9):
     ann["message"] = wrapper.fill(
         """The ratio of the absolute values of the largest coefficient {} and
         the lowest, non-zero coefficient {} is: {:.3G}.""".format(
-            high, low, ann["data"]))
+            high, low, ann["data"]
+        )
+    )
     assert ann["data"] < threshold, ann["message"]
 
 
@@ -80,7 +81,9 @@ def test_number_independent_conservation_relations(model):
     ann["metric"] = ann["data"] / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """The number of independent conservation relations is {}.""".format(
-            ann["data"]))
+            ann["data"]
+        )
+    )
 
 
 @annotate(title="Rank", format_type="raw")
@@ -102,7 +105,8 @@ def test_matrix_rank(model):
     # Report the rank scaled by the number of reactions.
     ann["metric"] = ann["data"] / len(model.reactions)
     ann["message"] = wrapper.fill(
-        """The rank of the S-Matrix is {}.""".format(ann["data"]))
+        """The rank of the S-Matrix is {}.""".format(ann["data"])
+    )
 
 
 @annotate(title="Degrees Of Freedom", format_type="raw")
@@ -125,5 +129,5 @@ def test_degrees_of_freedom(model):
     # Report the degrees of freedom scaled by the number of reactions.
     ann["metric"] = ann["data"] / len(model.reactions)
     ann["message"] = wrapper.fill(
-        """The degrees of freedom of the S-Matrix are {}.""".format(
-            ann["data"]))
+        """The degrees of freedom of the S-Matrix are {}.""".format(ann["data"])
+    )

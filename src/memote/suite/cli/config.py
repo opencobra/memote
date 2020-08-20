@@ -20,8 +20,7 @@
 from __future__ import absolute_import
 
 import click
-from click_configfile import (
-    ConfigFileReader, Param, SectionSchema, matches_section)
+from click_configfile import ConfigFileReader, Param, SectionSchema, matches_section
 
 
 class ConfigSectionSchema(object):
@@ -48,12 +47,12 @@ class ConfigSectionSchema(object):
         exclusive = Param(type=str, multiple=True)
         skip = Param(type=str, multiple=True)
         solver = Param(
-            type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
-            default="glpk"
+            type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]), default="glpk"
         )
         solver_timeout = Param(type=int, default=None)
-        experimental = Param(type=click.Path(exists=False, dir_okay=False),
-                             default=None)
+        experimental = Param(
+            type=click.Path(exists=False, dir_okay=False), default=None
+        )
 
 
 class ConfigFileProcessor(ConfigFileReader):

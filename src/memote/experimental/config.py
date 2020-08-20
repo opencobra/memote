@@ -21,18 +21,19 @@ from __future__ import absolute_import
 
 import json
 import logging
-from math import isnan
 from io import open
-from os.path import dirname, join, isabs
+from math import isnan
+from os.path import dirname, isabs, join
 
-from ruamel.yaml import YAML
-from jsonschema import Draft4Validator
 from importlib_resources import open_text
+from jsonschema import Draft4Validator
+from ruamel.yaml import YAML
 from six import iteritems
 
-from memote.experimental.medium import Medium
 from memote.experimental.essentiality import EssentialityExperiment
 from memote.experimental.growth import GrowthExperiment
+from memote.experimental.medium import Medium
+
 
 __all__ = ("ExperimentConfiguration",)
 
@@ -43,8 +44,9 @@ yaml = YAML(typ="safe")
 class ExperimentConfiguration(object):
     """Represent an experimental configuration."""
 
-    with open_text("memote.experimental.schemata", "configuration.json",
-                   encoding="utf-8") as file_handle:
+    with open_text(
+        "memote.experimental.schemata", "configuration.json", encoding="utf-8"
+    ) as file_handle:
         SCHEMA = json.load(file_handle)
 
     def __init__(self, filename, **kwargs):
@@ -119,8 +121,7 @@ class ExperimentConfiguration(object):
         experiments = data.get("experiments")
         if experiments is None or len(experiments) == 0:
             return
-        path = self.get_path(data,
-                             join("data", "experimental", "essentiality"))
+        path = self.get_path(data, join("data", "experimental", "essentiality"))
         minimal_growth_rate = self.get_minimal_growth_rate(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
@@ -131,13 +132,17 @@ class ExperimentConfiguration(object):
             elif not isabs(filename):
                 filename = join(path, filename)
             experiment = EssentialityExperiment(
-                identifier=exp_id, obj=exp,
-                filename=filename, minimal_growth_rate=minimal_growth_rate
+                identifier=exp_id,
+                obj=exp,
+                filename=filename,
+                minimal_growth_rate=minimal_growth_rate,
             )
             if experiment.medium is not None:
-                assert experiment.medium in self.media, \
-                    "Experiment '{}' has an undefined medium '{}'.".format(
-                        exp_id, experiment.medium)
+                assert (
+                    experiment.medium in self.media
+                ), "Experiment '{}' has an undefined medium '{}'.".format(
+                    exp_id, experiment.medium
+                )
                 experiment.medium = self.media[experiment.medium]
             experiment.load()
             experiment.validate(model)
@@ -151,8 +156,7 @@ class ExperimentConfiguration(object):
         experiments = data.get("experiments")
         if experiments is None or len(experiments) == 0:
             return
-        path = self.get_path(data,
-                             join("data", "experimental", "growth"))
+        path = self.get_path(data, join("data", "experimental", "growth"))
         minimal_growth_rate = self.get_minimal_growth_rate(model)
         for exp_id, exp in iteritems(experiments):
             if exp is None:
@@ -163,13 +167,16 @@ class ExperimentConfiguration(object):
             elif not isabs(filename):
                 filename = join(path, filename)
             growth = GrowthExperiment(
-                identifier=exp_id, obj=exp,
-                filename=filename, minimal_growth_rate=minimal_growth_rate
+                identifier=exp_id,
+                obj=exp,
+                filename=filename,
+                minimal_growth_rate=minimal_growth_rate,
             )
             if growth.medium is not None:
-                assert growth.medium in self.media, \
-                    "Growth-experiment '{}' has an undefined medium '{}'." \
+                assert growth.medium in self.media, (
+                    "Growth-experiment '{}' has an undefined medium '{}'."
                     "".format(exp_id, growth.medium)
+                )
                 growth.medium = self.media[growth.medium]
             growth.load()
             growth.validate(model)

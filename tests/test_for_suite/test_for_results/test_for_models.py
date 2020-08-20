@@ -23,10 +23,11 @@ from datetime import datetime
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker
 
 import memote.suite.results.models as models
+
 
 Session = sessionmaker()
 
@@ -73,13 +74,10 @@ def session(connection):
 
 
 class TestResult(object):
-
     def test_create(self):
         timestamp = datetime.now()
         commit = models.Result(
-            hexsha="abcdef",
-            authored_on=timestamp,
-            memote_result={"foo": "bar"}
+            hexsha="abcdef", authored_on=timestamp, memote_result={"foo": "bar"}
         )
         assert commit.hexsha == "abcdef"
         assert commit.authored_on == timestamp
@@ -88,9 +86,7 @@ class TestResult(object):
     def test_insert(self, session):
         timestamp = datetime.now()
         commit = models.Result(
-            hexsha="abcdef",
-            authored_on=timestamp,
-            memote_result={"foo": "bar"}
+            hexsha="abcdef", authored_on=timestamp, memote_result={"foo": "bar"}
         )
         session.add(commit)
         session.commit()
@@ -99,22 +95,22 @@ class TestResult(object):
         assert len(results) == 1
         assert results[0] == commit
 
-    @pytest.mark.parametrize("name_a, name_b", [
-        ("abcdef", "ghijkl"),
-        pytest.param("same", "same",
-                     marks=pytest.mark.raises(exception=IntegrityError))
-    ])
+    @pytest.mark.parametrize(
+        "name_a, name_b",
+        [
+            ("abcdef", "ghijkl"),
+            pytest.param(
+                "same", "same", marks=pytest.mark.raises(exception=IntegrityError)
+            ),
+        ],
+    )
     def test_unique_hexsha(self, session, name_a, name_b):
         timestamp = datetime.now()
         commit_a = models.Result(
-            hexsha=name_a,
-            authored_on=timestamp,
-            memote_result={"foo": "bar"}
+            hexsha=name_a, authored_on=timestamp, memote_result={"foo": "bar"}
         )
         commit_b = models.Result(
-            hexsha=name_b,
-            authored_on=timestamp,
-            memote_result={"foo": "bar"}
+            hexsha=name_b, authored_on=timestamp, memote_result={"foo": "bar"}
         )
         session.add_all([commit_a, commit_b])
         session.commit()

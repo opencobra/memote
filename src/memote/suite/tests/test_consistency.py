@@ -23,8 +23,8 @@ import pytest
 from cobra.flux_analysis import find_blocked_reactions
 
 import memote.support.consistency as consistency
-from memote.utils import annotate, truncate, get_ids, wrapper
 import memote.support.consistency_helpers as con_helpers
+from memote.utils import annotate, get_ids, truncate, wrapper
 
 
 @annotate(title="Stoichiometric Consistency", format_type="percent")
@@ -53,19 +53,19 @@ def test_stoichiometric_consistency(model):
 
     """
     ann = test_stoichiometric_consistency.annotation
-    is_consistent = consistency.check_stoichiometric_consistency(
-        model)
+    is_consistent = consistency.check_stoichiometric_consistency(model)
     ann["data"] = {
-        "unconserved_metabolites":  [] if is_consistent else get_ids(
-            consistency.find_unconserved_metabolites(model)),
-        "minimal_unconservable_sets": [] if is_consistent else [
+        "unconserved_metabolites": []
+        if is_consistent
+        else get_ids(consistency.find_unconserved_metabolites(model)),
+        "minimal_unconservable_sets": []
+        if is_consistent
+        else [
             get_ids(mets)
-            for mets in
-            consistency.find_inconsistent_min_stoichiometry(model)],
+            for mets in consistency.find_inconsistent_min_stoichiometry(model)
+        ],
     }
-    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(
-        model.metabolites
-    )
+    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """This model contains {} ({:.2%}) unconserved
         metabolites: {}; and {} minimal unconservable sets: {}""".format(
@@ -80,8 +80,13 @@ def test_stoichiometric_consistency(model):
 
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])
-@annotate(title="Erroneous Energy-generating Cycles", format_type="count",
-          data=dict(), message=dict(), metric=dict())
+@annotate(
+    title="Erroneous Energy-generating Cycles",
+    format_type="count",
+    data=dict(),
+    message=dict(),
+    metric=dict(),
+)
 def test_detect_energy_generating_cycles(model, met):
     u"""
     Expect that no energy metabolite can be produced out of nothing.
@@ -110,8 +115,10 @@ def test_detect_energy_generating_cycles(model, met):
     """
     ann = test_detect_energy_generating_cycles.annotation
     if met not in model.metabolites:
-        pytest.skip("This test has been skipped since metabolite {} could "
-                    "not be found in the model.".format(met))
+        pytest.skip(
+            "This test has been skipped since metabolite {} could "
+            "not be found in the model.".format(met)
+        )
     ann["data"][met] = consistency.detect_energy_generating_cycles(model, met)
     # Report the number of cycles scaled by the number of reactions.
     ann["metric"][met] = len(ann["data"][met]) / len(model.reactions)
@@ -120,7 +127,9 @@ def test_detect_energy_generating_cycles(model, met):
         caused by improperly constrained reactions leading to erroneous
         energy-generating cycles. The following {} reactions are involved in
         those cycles: {}""".format(
-            met, len(ann["data"][met]), truncate(ann["data"][met])))
+            met, len(ann["data"][met]), truncate(ann["data"][met])
+        )
+    )
     assert len(ann["data"][met]) == 0, ann["message"][met]
 
 
@@ -147,14 +156,15 @@ def test_reaction_charge_balance(model):
     """
     ann = test_reaction_charge_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(
-        consistency.find_charge_unbalanced_reactions(internal_rxns))
+    ann["data"] = get_ids(consistency.find_charge_unbalanced_reactions(internal_rxns))
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge unbalanced with at
         least one of the metabolites not having a charge or the overall
         charge not equal to 0: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -181,15 +191,15 @@ def test_reaction_mass_balance(model):
     """
     ann = test_reaction_mass_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(
-        consistency.find_mass_unbalanced_reactions(internal_rxns)
-    )
+    ann["data"] = get_ids(consistency.find_mass_unbalanced_reactions(internal_rxns))
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are mass unbalanced with at least
         one of the metabolites not having a formula or the overall mass not
         equal to 0: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -218,7 +228,9 @@ def test_blocked_reactions(model):
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) blocked reactions in
         the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -242,7 +254,9 @@ def test_find_stoichiometrically_balanced_cycles(model):
     ann["message"] = wrapper.fill(
         """There are {} ({:.2%}) reactions
         which participate in SBC in the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -267,7 +281,9 @@ def test_find_orphans(model):
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not produced by any reaction
         of the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -291,7 +307,9 @@ def test_find_deadends(model):
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not consumed by any reaction
         of the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert ann["data"] == 0, ann["message"]
 
 
@@ -315,12 +333,13 @@ def test_find_disconnected(model):
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites are not associated with any
         reaction of the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Production In Complete Medium",
-          format_type="count")
+@annotate(title="Metabolite Production In Complete Medium", format_type="count")
 def test_find_metabolites_not_produced_with_open_bounds(model):
     """
     Expect metabolites to be producible in complete medium.
@@ -339,18 +358,18 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_produced_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(
-        model)
+    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be produced in complete
         medium: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Consumption In Complete Medium",
-          format_type="count")
+@annotate(title="Metabolite Consumption In Complete Medium", format_type="count")
 def test_find_metabolites_not_consumed_with_open_bounds(model):
     """
     Expect metabolites to be consumable in complete medium.
@@ -369,19 +388,18 @@ def test_find_metabolites_not_consumed_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(
-        model)
+    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be consumed in complete
         medium: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Unbounded Flux In Default Medium",
-    format_type="percent")
+@annotate(title="Unbounded Flux In Default Medium", format_type="percent")
 def test_find_reactions_unbounded_flux_default_condition(model):
     """
     Expect the fraction of unbounded reactions to be low.
@@ -397,8 +415,11 @@ def test_find_reactions_unbounded_flux_default_condition(model):
 
     """
     ann = test_find_reactions_unbounded_flux_default_condition.annotation
-    unbounded_rxn_ids, fraction, _ = \
-        consistency.find_reactions_with_unbounded_flux_default_condition(model)
+    (
+        unbounded_rxn_ids,
+        fraction,
+        _,
+    ) = consistency.find_reactions_with_unbounded_flux_default_condition(model)
     ann["data"] = unbounded_rxn_ids
     ann["metric"] = fraction
     ann["message"] = wrapper.fill(

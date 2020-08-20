@@ -23,6 +23,7 @@ import logging
 
 from memote.experimental.experimental_base import ExperimentalBase
 
+
 __all__ = ("Experiment",)
 
 LOGGER = logging.getLogger(__name__)
@@ -53,7 +54,8 @@ class Experiment(ExperimentalBase):
         if len(self.constraints) > 0:
             raise NotImplementedError(
                 "This feature is not implemented yet. Please let us know that "
-                "you want it at https://github.com/opencobra/memote/issues.")
+                "you want it at https://github.com/opencobra/memote/issues."
+            )
         self.minimal_growth_rate = minimal_growth_rate
 
     def evaluate(self, model):

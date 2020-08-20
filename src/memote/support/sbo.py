@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import logging
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -41,8 +42,11 @@ def find_components_without_sbo_terms(model, components):
         The components without any SBO term annotation.
 
     """
-    return [elem for elem in getattr(model, components) if
-            elem.annotation is None or 'sbo' not in elem.annotation]
+    return [
+        elem
+        for elem in getattr(model, components)
+        if elem.annotation is None or "sbo" not in elem.annotation
+    ]
 
 
 def check_component_for_specific_sbo_term(items, term):
@@ -66,12 +70,18 @@ def check_component_for_specific_sbo_term(items, term):
     """
     # check for multiple allowable SBO terms
     if isinstance(term, list):
-        return [elem for elem in items if
-                elem.annotation is None or
-                'sbo' not in elem.annotation or
-                not any(i in elem.annotation['sbo'] for i in term)]
+        return [
+            elem
+            for elem in items
+            if elem.annotation is None
+            or "sbo" not in elem.annotation
+            or not any(i in elem.annotation["sbo"] for i in term)
+        ]
     else:
-        return [elem for elem in items if
-                elem.annotation is None or
-                'sbo' not in elem.annotation or
-                term not in elem.annotation['sbo']]
+        return [
+            elem
+            for elem in items
+            if elem.annotation is None
+            or "sbo" not in elem.annotation
+            or term not in elem.annotation["sbo"]
+        ]

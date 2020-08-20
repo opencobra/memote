@@ -19,19 +19,21 @@
 
 from __future__ import absolute_import
 
-from os.path import join, dirname
+from os.path import dirname, join
 
 import pytest
+from cobra import Model
 from cobra.io import read_sbml_model
 from optlang import available_solvers
-from cobra import Model
+
 
 pytest_plugins = ["pytester"]
 
 # Gurobi MILP is currently not fully supported in optlang.
 # A MOSEK interface still needs to be completed.
-SUPPORTED_SOLVERS = [solver for solver in ["glpk", "cplex"]
-                     if available_solvers[solver.upper()]]
+SUPPORTED_SOLVERS = [
+    solver for solver in ["glpk", "cplex"] if available_solvers[solver.upper()]
+]
 
 
 @pytest.fixture(scope="session", params=SUPPORTED_SOLVERS)
@@ -49,9 +51,7 @@ def small_file(request):
 def invalid_model(request):
     if request.param == "invalid":
         return join(
-            dirname(__file__),
-            "test_for_support/data/validation",
-            "tiny_FBC2.xml"
+            dirname(__file__), "test_for_support/data/validation", "tiny_FBC2.xml"
         )
 
 
@@ -60,8 +60,7 @@ def model(request, solver):
     if request.param == "empty":
         model = Model(id_or_model=request.param, name=request.param)
     elif request.param == "textbook":
-        model = read_sbml_model(join(dirname(__file__), "data",
-                                     "EcoliCore.xml.gz"))
+        model = read_sbml_model(join(dirname(__file__), "data", "EcoliCore.xml.gz"))
     else:
         builder = getattr(request.module, "MODEL_REGISTRY")[request.param]
         model = builder(Model(id_or_model=request.param, name=request.param))
@@ -75,7 +74,6 @@ def reaction(request):
     return builder()
 
 
-@pytest.fixture(scope="session",
-                params=["e", "pp", "c"])
+@pytest.fixture(scope="session", params=["e", "pp", "c"])
 def compartment_suffix(request):
     return request.param

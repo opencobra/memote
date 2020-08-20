@@ -21,11 +21,11 @@ from __future__ import absolute_import
 
 import logging
 import re
-from future.utils import native_str
+from collections import OrderedDict
 
 import pandas as pd
+from future.utils import native_str
 
-from collections import OrderedDict
 
 LOGGER = logging.getLogger(__name__)
 
@@ -59,67 +59,93 @@ LOGGER = logging.getLogger(__name__)
 # 'HPRD'        ['gen']         'http://www.hprd.org/'
 # 'ASAP'        ['gen']         'http://asap.ahabs.wisc.edu/asap/home.php'
 
-GENE_PRODUCT_ANNOTATIONS = OrderedDict([
-    ('refseq', re.compile(
-        r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
-        r"NW|XM|XP|XR|YP|ZP)_\d+|"
-        r"(NZ\_[A-Z]{4}\d+))(\.\d+)?$")),
-    ('uniprot', re.compile(
-        r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9]"
-        r"[A-Z, 0-9][0-9]){1,2})|([O,P,Q]"
-        r"[0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9]"
-        r"[0-9])(\.\d+)?$")),
-    ('ecogene', re.compile(r"^EG\d+$")),
-    ('kegg.genes', re.compile(r"^\w+:[\w\d\.-]*$")),
-    ('ncbigi', re.compile(r"^(GI|gi)\:\d+$")),
-    ('ncbigene', re.compile(r"^\d+$")),
-    ('ncbiprotein', re.compile(r"^(\w+\d+(\.\d+)?)|(NP_\d+)$")),
-    ('ccds', re.compile(r"^CCDS\d+\.\d+$")),
-    ('hprd', re.compile(r"^\d+$")),
-    ('asap', re.compile(r"^[A-Za-z0-9-]+$"))
-])
+GENE_PRODUCT_ANNOTATIONS = OrderedDict(
+    [
+        (
+            "refseq",
+            re.compile(
+                r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
+                r"NW|XM|XP|XR|YP|ZP)_\d+|"
+                r"(NZ\_[A-Z]{4}\d+))(\.\d+)?$"
+            ),
+        ),
+        (
+            "uniprot",
+            re.compile(
+                r"^([A-N,R-Z][0-9]([A-Z][A-Z, 0-9]"
+                r"[A-Z, 0-9][0-9]){1,2})|([O,P,Q]"
+                r"[0-9][A-Z, 0-9][A-Z, 0-9][A-Z, 0-9]"
+                r"[0-9])(\.\d+)?$"
+            ),
+        ),
+        ("ecogene", re.compile(r"^EG\d+$")),
+        ("kegg.genes", re.compile(r"^\w+:[\w\d\.-]*$")),
+        ("ncbigi", re.compile(r"^(GI|gi)\:\d+$")),
+        ("ncbigene", re.compile(r"^\d+$")),
+        ("ncbiprotein", re.compile(r"^(\w+\d+(\.\d+)?)|(NP_\d+)$")),
+        ("ccds", re.compile(r"^CCDS\d+\.\d+$")),
+        ("hprd", re.compile(r"^\d+$")),
+        ("asap", re.compile(r"^[A-Za-z0-9-]+$")),
+    ]
+)
 
 
-REACTION_ANNOTATIONS = OrderedDict([
-    ('rhea', re.compile(r"^\d{5}$")),
-    ('kegg.reaction', re.compile(r"^R\d+$")),
-    ('seed.reaction', re.compile(r"^rxn\d+$")),
-    ('metanetx.reaction', re.compile(r"^MNXR\d+$")),
-    ('bigg.reaction', re.compile(r"^[a-z_A-Z0-9]+$")),
-    ('reactome', re.compile(
-        r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)")),
-    ('ec-code', re.compile(
-        r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-        r"\d+\.\d+\.\d+\.-|"
-        r"\d+\.\d+\.\d+\.(n)?\d+$")),
-    ('brenda', re.compile(
-        r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-        r"\d+\.\d+\.\d+\.-|"
-        r"\d+\.\d+\.\d+\.(n)?\d+$")),
-    ('biocyc', re.compile(
-        r"^[A-Z-0-9]+(?<!CHEBI)"
-        r"(\:)?[A-Za-z0-9+_.%-]+$"))
-])
+REACTION_ANNOTATIONS = OrderedDict(
+    [
+        ("rhea", re.compile(r"^\d{5}$")),
+        ("kegg.reaction", re.compile(r"^R\d+$")),
+        ("seed.reaction", re.compile(r"^rxn\d+$")),
+        ("metanetx.reaction", re.compile(r"^MNXR\d+$")),
+        ("bigg.reaction", re.compile(r"^[a-z_A-Z0-9]+$")),
+        (
+            "reactome",
+            re.compile(r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)"),
+        ),
+        (
+            "ec-code",
+            re.compile(
+                r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                r"\d+\.\d+\.\d+\.-|"
+                r"\d+\.\d+\.\d+\.(n)?\d+$"
+            ),
+        ),
+        (
+            "brenda",
+            re.compile(
+                r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
+                r"\d+\.\d+\.\d+\.-|"
+                r"\d+\.\d+\.\d+\.(n)?\d+$"
+            ),
+        ),
+        ("biocyc", re.compile(r"^[A-Z-0-9]+(?<!CHEBI)" r"(\:)?[A-Za-z0-9+_.%-]+$")),
+    ]
+)
 
 
-METABOLITE_ANNOTATIONS = OrderedDict([
-    ('pubchem.compound', re.compile(r"^\d+$")),
-    ('kegg.compound', re.compile(r"^C\d+$")),
-    ('seed.compound', re.compile(r"^cpd\d+$")),
-    ('inchikey', re.compile(
-        r"^[A-Z]{14}\-[A-Z]{10}(\-[A-Z])?")),
-    ('inchi', re.compile(
-        r"^InChI\=1S?\/[A-Za-z0-9\.]+(\+[0-9]+)?"
-        r"(\/[cnpqbtmsih][A-Za-z0-9\-\+\(\)\,\/\?\;\.]+)*$")),
-    ('chebi', re.compile(r"^CHEBI:\d+$")),
-    ('hmdb', re.compile(r"^HMDB\d{5}$")),
-    ('reactome', re.compile(
-        r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)")),
-    ('metanetx.chemical', re.compile(r"^MNXM\d+$")),
-    ('bigg.metabolite', re.compile(r"^[a-z_A-Z0-9]+$")),
-    ('biocyc', re.compile(
-        r"^[A-Z-0-9]+(?<!CHEBI)(\:)?[A-Za-z0-9+_.%-]+$"))
-])
+METABOLITE_ANNOTATIONS = OrderedDict(
+    [
+        ("pubchem.compound", re.compile(r"^\d+$")),
+        ("kegg.compound", re.compile(r"^C\d+$")),
+        ("seed.compound", re.compile(r"^cpd\d+$")),
+        ("inchikey", re.compile(r"^[A-Z]{14}\-[A-Z]{10}(\-[A-Z])?")),
+        (
+            "inchi",
+            re.compile(
+                r"^InChI\=1S?\/[A-Za-z0-9\.]+(\+[0-9]+)?"
+                r"(\/[cnpqbtmsih][A-Za-z0-9\-\+\(\)\,\/\?\;\.]+)*$"
+            ),
+        ),
+        ("chebi", re.compile(r"^CHEBI:\d+$")),
+        ("hmdb", re.compile(r"^HMDB\d{5}$")),
+        (
+            "reactome",
+            re.compile(r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)"),
+        ),
+        ("metanetx.chemical", re.compile(r"^MNXM\d+$")),
+        ("bigg.metabolite", re.compile(r"^[a-z_A-Z0-9]+$")),
+        ("biocyc", re.compile(r"^[A-Z-0-9]+(?<!CHEBI)(\:)?[A-Za-z0-9+_.%-]+$")),
+    ]
+)
 
 
 def find_components_without_annotation(model, components):
@@ -139,8 +165,11 @@ def find_components_without_annotation(model, components):
         The components without any annotation.
 
     """
-    return [elem for elem in getattr(model, components) if
-            elem.annotation is None or len(elem.annotation) == 0]
+    return [
+        elem
+        for elem in getattr(model, components)
+        if elem.annotation is None or len(elem.annotation) == 0
+    ]
 
 
 def generate_component_annotation_overview(elements, db):
@@ -187,6 +216,7 @@ def generate_component_annotation_miriam_match(elements, component, db):
         MIRIAM database.
 
     """
+
     def is_faulty(annotation, key, pattern):
         # Ignore missing annotation for this database.
         if key not in annotation:
@@ -200,10 +230,9 @@ def generate_component_annotation_miriam_match(elements, component, db):
     pattern = {
         "metabolites": METABOLITE_ANNOTATIONS,
         "reactions": REACTION_ANNOTATIONS,
-        "genes": GENE_PRODUCT_ANNOTATIONS
+        "genes": GENE_PRODUCT_ANNOTATIONS,
     }[component][db]
-    return [elem for elem in elements
-            if is_faulty(elem.annotation, db, pattern)]
+    return [elem for elem in elements if is_faulty(elem.annotation, db, pattern)]
 
 
 def generate_component_id_namespace_overview(model, components):
@@ -228,15 +257,14 @@ def generate_component_id_namespace_overview(model, components):
     patterns = {
         "metabolites": METABOLITE_ANNOTATIONS,
         "reactions": REACTION_ANNOTATIONS,
-        "genes": GENE_PRODUCT_ANNOTATIONS
+        "genes": GENE_PRODUCT_ANNOTATIONS,
     }[components]
     databases = list(patterns)
     data = list()
     index = list()
     for elem in getattr(model, components):
         index.append(elem.id)
-        data.append(tuple(patterns[db].match(elem.id) is not None
-                          for db in databases))
+        data.append(tuple(patterns[db].match(elem.id) is not None for db in databases))
     df = pd.DataFrame(data, index=index, columns=databases)
     if components != "genes":
         # Clean up of the dataframe. Unfortunately the Biocyc patterns match
@@ -246,12 +274,12 @@ def generate_component_id_namespace_overview(model, components):
         # First determine all rows in which 'biocyc' and other entries are
         # True simultaneously and use this Boolean series to create another
         # column temporarily.
-        df['duplicate'] = df[df['biocyc']].sum(axis=1) >= 2
+        df["duplicate"] = df[df["biocyc"]].sum(axis=1) >= 2
         # Replace all nan values with False
-        df['duplicate'].fillna(False, inplace=True)
+        df["duplicate"].fillna(False, inplace=True)
         # Use the additional column to index the original dataframe to identify
         # false positive biocyc hits and set them to False.
-        df.loc[df['duplicate'], 'biocyc'] = False
+        df.loc[df["duplicate"], "biocyc"] = False
         # Delete the additional column
-        del df['duplicate']
+        del df["duplicate"]
     return df

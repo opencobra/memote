@@ -29,13 +29,10 @@ from memote.suite.cli.config import ConfigFileProcessor
 LOGGER = logging.getLogger(__name__)
 
 try:
-    CONTEXT_SETTINGS = dict(
-        default_map=ConfigFileProcessor.read_config()
-    )
+    CONTEXT_SETTINGS = dict(default_map=ConfigFileProcessor.read_config())
 except click.BadParameter as err:
     LOGGER.error(
         "Error in configuration file: {}\nAll configured values will "
-        "be ignored!".format(str(err)))
+        "be ignored!".format(str(err))
+    )
     CONTEXT_SETTINGS = dict()
-
-

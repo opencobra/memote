@@ -21,13 +21,14 @@ from __future__ import absolute_import, division
 
 import logging
 from itertools import combinations
-from pylru import lrudecorator
 
 from cobra.medium import find_external_compartment
+from pylru import lrudecorator
 
 import memote.support.helpers as helpers
 from memote.support.gpr_helpers import find_top_level_complex
 from memote.utils import filter_none
+
 
 __all__ = ("check_metabolites_formula_presence",)
 
@@ -53,16 +54,18 @@ def check_gene_protein_reaction_rule_presence(model):
 def find_nonzero_constrained_reactions(model):
     """Return list of reactions with non-zero, non-maximal bounds."""
     lower_bound, upper_bound = helpers.find_bounds(model)
-    return [rxn for rxn in model.reactions if
-            0 > rxn.lower_bound > lower_bound or
-            0 < rxn.upper_bound < upper_bound]
+    return [
+        rxn
+        for rxn in model.reactions
+        if 0 > rxn.lower_bound > lower_bound or 0 < rxn.upper_bound < upper_bound
+    ]
 
 
 def find_zero_constrained_reactions(model):
     """Return list of reactions that are constrained to zero flux."""
-    return [rxn for rxn in model.reactions if
-            rxn.lower_bound == 0 and
-            rxn.upper_bound == 0]
+    return [
+        rxn for rxn in model.reactions if rxn.lower_bound == 0 and rxn.upper_bound == 0
+    ]
 
 
 def find_irreversible_reactions(model):
@@ -73,9 +76,11 @@ def find_irreversible_reactions(model):
 def find_unconstrained_reactions(model):
     """Return list of reactions that are not constrained at all."""
     lower_bound, upper_bound = helpers.find_bounds(model)
-    return [rxn for rxn in model.reactions if
-            rxn.lower_bound <= lower_bound and
-            rxn.upper_bound >= upper_bound]
+    return [
+        rxn
+        for rxn in model.reactions
+        if rxn.lower_bound <= lower_bound and rxn.upper_bound >= upper_bound
+    ]
 
 
 def find_ngam(model):
@@ -114,33 +119,42 @@ def find_ngam(model):
           http://doi.org/10.1038/nprot.2009.203
 
     """
-    atp_adp_conv_rxns = helpers.find_converting_reactions(
-        model, ("MNXM3", "MNXM7")
-    )
-    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+    atp_adp_conv_rxns = helpers.find_converting_reactions(model, ("MNXM3", "MNXM7"))
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, "c")
 
     reactants = {
         helpers.find_met_in_model(model, "MNXM3", id_of_main_compartment)[0],
-        helpers.find_met_in_model(model, "MNXM2", id_of_main_compartment)[0]
+        helpers.find_met_in_model(model, "MNXM2", id_of_main_compartment)[0],
     }
 
     products = {
         helpers.find_met_in_model(model, "MNXM7", id_of_main_compartment)[0],
         helpers.find_met_in_model(model, "MNXM1", id_of_main_compartment)[0],
-        helpers.find_met_in_model(model, "MNXM9", id_of_main_compartment)[0]
+        helpers.find_met_in_model(model, "MNXM9", id_of_main_compartment)[0],
     }
 
-    candidates = [rxn for rxn in atp_adp_conv_rxns
-                  if rxn.reversibility is False and
-                  set(rxn.reactants) == reactants and
-                  set(rxn.products) == products]
+    candidates = [
+        rxn
+        for rxn in atp_adp_conv_rxns
+        if rxn.reversibility is False
+        and set(rxn.reactants) == reactants
+        and set(rxn.products) == products
+    ]
 
-    buzzwords = ['maintenance', 'atpm', 'requirement',
-                 'ngam', 'non-growth', 'associated']
+    buzzwords = [
+        "maintenance",
+        "atpm",
+        "requirement",
+        "ngam",
+        "non-growth",
+        "associated",
+    ]
 
-    refined_candidates = [rxn for rxn in candidates if any(
-        string in filter_none(rxn.name, '').lower() for string in buzzwords
-    )]
+    refined_candidates = [
+        rxn
+        for rxn in candidates
+        if any(string in filter_none(rxn.name, "").lower() for string in buzzwords)
+    ]
 
     if refined_candidates:
         return refined_candidates
@@ -229,8 +243,7 @@ def find_pure_metabolic_reactions(model):
         The metabolic model under investigation.
 
     """
-    return set(model.reactions) - helpers.find_interchange_biomass_reactions(
-        model)
+    return set(model.reactions) - helpers.find_interchange_biomass_reactions(model)
 
 
 def is_constrained_reaction(model, rxn):
@@ -245,9 +258,14 @@ def is_constrained_reaction(model, rxn):
 def find_oxygen_reactions(model):
     """Return list of oxygen-producing/-consuming reactions."""
     o2_in_model = helpers.find_met_in_model(model, "MNXM4")
-    return set([rxn for met in model.metabolites for
-                rxn in met.reactions if met.formula == "O2" or
-                met in o2_in_model])
+    return set(
+        [
+            rxn
+            for met in model.metabolites
+            for rxn in met.reactions
+            if met.formula == "O2" or met in o2_in_model
+        ]
+    )
 
 
 def find_unique_metabolites(model):
@@ -257,7 +275,7 @@ def find_unique_metabolites(model):
         is_missing = True
         for comp in model.compartments:
             if met.id.endswith("_{}".format(comp)):
-                unique.add(met.id[:-(len(comp) + 1)])
+                unique.add(met.id[: -(len(comp) + 1)])
                 is_missing = False
                 break
         if is_missing:
@@ -325,8 +343,14 @@ def find_reactions_with_partially_identical_annotations(model):
 
     """
     duplicates = {}
-    rxn_db_identifiers = ["metanetx.reaction", "kegg.reaction", "brenda",
-                          "rhea", "biocyc", "bigg.reaction"]
+    rxn_db_identifiers = [
+        "metanetx.reaction",
+        "kegg.reaction",
+        "brenda",
+        "rhea",
+        "biocyc",
+        "bigg.reaction",
+    ]
     # Build a list that associates a reaction with a set of its annotations.
     ann_rxns = []
     for rxn in model.reactions:
@@ -343,8 +367,7 @@ def find_reactions_with_partially_identical_annotations(model):
     for (rxn_a, ann_a), (rxn_b, ann_b) in combinations(ann_rxns, 2):
         mutual_pair = tuple(ann_a & ann_b)
         if len(mutual_pair) > 0:
-            duplicates.setdefault(mutual_pair, set()).update(
-                [rxn_a.id, rxn_b.id])
+            duplicates.setdefault(mutual_pair, set()).update([rxn_a.id, rxn_b.id])
     # Transform the object for JSON compatibility
     num_duplicated = set()
     duplicated = {}
@@ -439,8 +462,7 @@ def find_duplicate_reactions(model):
         The number of unique reactions that have a duplicates
 
     """
-    met2mol = map_metabolites_to_structures(model.metabolites,
-                                            model.compartments)
+    met2mol = map_metabolites_to_structures(model.metabolites, model.compartments)
     # Build a list associating reactions with their stoichiometry in molecular
     # structure space.
     structural = []
@@ -450,18 +472,13 @@ def find_duplicate_reactions(model):
             continue
         # We consider substrates and products separately since, for example,
         # the InChI for H2O and OH is the same.
-        substrates = {
-            met2mol[met]: rxn.get_coefficient(met) for met in rxn.reactants
-        }
-        products = {
-            met2mol[met]: rxn.get_coefficient(met) for met in rxn.products
-        }
+        substrates = {met2mol[met]: rxn.get_coefficient(met) for met in rxn.reactants}
+        products = {met2mol[met]: rxn.get_coefficient(met) for met in rxn.products}
         structural.append((rxn, substrates, products))
     # Compare reactions using their structure-based stoichiometries.
     num_duplicated = set()
     duplicates = []
-    for (rxn_a, sub_a, prod_a), (rxn_b, sub_b, prod_b) in combinations(
-            structural, 2):
+    for (rxn_a, sub_a, prod_a), (rxn_b, sub_b, prod_b) in combinations(structural, 2):
         # Compare the substrates.
         if sub_a != sub_b:
             continue
@@ -513,8 +530,7 @@ def find_reactions_with_identical_genes(model):
         if rxn_a.genes == rxn_b.genes:
             # This works because the `genes` are frozen sets.
             identifiers = rxn_a.genes
-            duplicates.setdefault(identifiers, set()).update(
-                [rxn_a.id, rxn_b.id])
+            duplicates.setdefault(identifiers, set()).update([rxn_a.id, rxn_b.id])
     # Transform the object for JSON compatibility
     num_duplicated = set()
     duplicated = {}
@@ -528,14 +544,20 @@ def find_reactions_with_identical_genes(model):
 
 def check_transport_reaction_gpr_presence(model):
     """Return the list of transport reactions that have no associated gpr."""
-    return [rxn for rxn in helpers.find_transport_reactions(model)
-            if not rxn.gene_reaction_rule]
+    return [
+        rxn
+        for rxn in helpers.find_transport_reactions(model)
+        if not rxn.gene_reaction_rule
+    ]
 
 
 def find_medium_metabolites(model):
     """Return the list of metabolites ingested/excreted by the model."""
-    return [met.id for rxn in model.medium
-            for met in model.reactions.get_by_id(rxn).metabolites]
+    return [
+        met.id
+        for rxn in model.medium
+        for met in model.reactions.get_by_id(rxn).metabolites
+    ]
 
 
 def find_external_metabolites(model):

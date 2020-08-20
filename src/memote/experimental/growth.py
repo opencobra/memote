@@ -25,6 +25,7 @@ from pandas import DataFrame
 
 from memote.experimental.experiment import Experiment
 
+
 __all__ = ("GrowthExperiment",)
 
 LOGGER = logging.getLogger(__name__)
@@ -80,10 +81,5 @@ class GrowthExperiment(Experiment):
                         exchange.lower_bound = -row.uptake
                     else:
                         exchange.upper_bound = row.uptake
-                    growth.append(
-                        model.slim_optimize() >= self.minimal_growth_rate
-                    )
-        return DataFrame({
-            "exchange": self.data["exchange"],
-            "growth": growth
-        })
+                    growth.append(model.slim_optimize() >= self.minimal_growth_rate)
+        return DataFrame({"exchange": self.data["exchange"], "growth": growth})

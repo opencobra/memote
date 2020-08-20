@@ -33,6 +33,7 @@ from optlang.symbolics import Zero
 import memote.support.consistency_helpers as con_helpers
 import memote.support.helpers as helpers
 
+
 LOGGER = logging.getLogger(__name__)
 
 # The following dictionary is based on the list of energy metabolites chosen
@@ -42,23 +43,24 @@ LOGGER = logging.getLogger(__name__)
 # metabolic networks: Identification and removal. PLoS Computational
 # Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 ENERGY_COUPLES = {
-    'MNXM3': 'MNXM7',
-    'MNXM63': 'MNXM220',
-    'MNXM51': 'MNXM30',
-    'MNXM121': 'MNXM17',
-    'MNXM423': 'MNXM495',
-    'MNXM6': 'MNXM5',
-    'MNXM10': 'MNXM8',
-    'MNXM38': 'MNXM33',
-    'MNXM208': 'MNXM119',
-    'MNXM191': 'MNXM232',
-    'MNXM223': 'MNXM509',
-    'MNXM7517': 'MNXM12235',
-    'MNXM12233': 'MNXM12236',
-    'MNXM558': 'MNXM2178',
-    'MNXM21': 'MNXM12',
-    'MNXM89557': 'MNXM20'}
-TOLERANCE_THRESHOLD = 1E-07
+    "MNXM3": "MNXM7",
+    "MNXM63": "MNXM220",
+    "MNXM51": "MNXM30",
+    "MNXM121": "MNXM17",
+    "MNXM423": "MNXM495",
+    "MNXM6": "MNXM5",
+    "MNXM10": "MNXM8",
+    "MNXM38": "MNXM33",
+    "MNXM208": "MNXM119",
+    "MNXM191": "MNXM232",
+    "MNXM223": "MNXM509",
+    "MNXM7517": "MNXM12235",
+    "MNXM12233": "MNXM12236",
+    "MNXM558": "MNXM2178",
+    "MNXM21": "MNXM12",
+    "MNXM89557": "MNXM20",
+}
+TOLERANCE_THRESHOLD = 1e-07
 
 cobra_configuration = Configuration()
 
@@ -88,25 +90,23 @@ def check_stoichiometric_consistency(model):
     # We clone the existing configuration in order to apply non-default
     # settings, for example, for solver verbosity or timeout.
     stoich_trans.configuration = problem.Configuration.clone(
-        config=model.solver.configuration,
-        problem=stoich_trans
+        config=model.solver.configuration, problem=stoich_trans
     )
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
-    LOGGER.info("model '%s' has %d internal reactions", model.id,
-                len(internal_rxns))
-    LOGGER.info("model '%s' has %d internal metabolites", model.id,
-                len(metabolites))
+    LOGGER.info("model '%s' has %d internal reactions", model.id, len(internal_rxns))
+    LOGGER.info("model '%s' has %d internal metabolites", model.id, len(metabolites))
 
     stoich_trans.add([problem.Variable(m.id, lb=1) for m in metabolites])
     stoich_trans.update()
     con_helpers.add_reaction_constraints(
-        stoich_trans, internal_rxns, problem.Constraint)
+        stoich_trans, internal_rxns, problem.Constraint
+    )
     # The objective is to minimize the metabolite mass vector.
-    stoich_trans.objective = problem.Objective(
-        Zero, direction="min", sloppy=True)
+    stoich_trans.objective = problem.Objective(Zero, direction="min", sloppy=True)
     stoich_trans.objective.set_linear_coefficients(
-        {var: 1. for var in stoich_trans.variables})
+        {var: 1.0 for var in stoich_trans.variables}
+    )
     status = stoich_trans.optimize()
     if status == OPTIMAL:
         return True
@@ -116,7 +116,8 @@ def check_stoichiometric_consistency(model):
         raise RuntimeError(
             "Could not determine stoichiometric consistencty."
             " Solver status is '{}'"
-            " (only optimal or infeasible expected).".format(status))
+            " (only optimal or infeasible expected).".format(status)
+        )
 
 
 def find_unconserved_metabolites(model):
@@ -144,8 +145,7 @@ def find_unconserved_metabolites(model):
     # We clone the existing configuration in order to apply non-default
     # settings, for example, for solver verbosity or timeout.
     stoich_trans.configuration = problem.Configuration.clone(
-        config=model.solver.configuration,
-        problem=stoich_trans
+        config=model.solver.configuration, problem=stoich_trans
     )
     internal_rxns = con_helpers.get_internals(model)
     metabolites = set(met for rxn in internal_rxns for met in rxn.metabolites)
@@ -158,26 +158,32 @@ def find_unconserved_metabolites(model):
         k_vars.append(k_var)
         stoich_trans.add([m_var, k_var])
         # This constraint is equivalent to 0 <= k[i] <= m[i].
-        stoich_trans.add(problem.Constraint(
-            k_var - m_var, ub=0, name="switch_{}".format(met.id)))
+        stoich_trans.add(
+            problem.Constraint(k_var - m_var, ub=0, name="switch_{}".format(met.id))
+        )
     stoich_trans.update()
     con_helpers.add_reaction_constraints(
-        stoich_trans, internal_rxns, problem.Constraint)
+        stoich_trans, internal_rxns, problem.Constraint
+    )
     # The objective is to maximize the binary indicators k[i], subject to the
     # above inequality constraints.
-    stoich_trans.objective = problem.Objective(
-        Zero, sloppy=True, direction="max")
-    stoich_trans.objective.set_linear_coefficients(
-        {var: 1. for var in k_vars})
+    stoich_trans.objective = problem.Objective(Zero, sloppy=True, direction="max")
+    stoich_trans.objective.set_linear_coefficients({var: 1.0 for var in k_vars})
     status = stoich_trans.optimize()
     if status == OPTIMAL:
         # TODO: See if that could be a Boolean test `bool(var.primal)`.
-        return set([model.metabolites.get_by_id(var.name[2:])
-                    for var in k_vars if var.primal < 0.8])
+        return set(
+            [
+                model.metabolites.get_by_id(var.name[2:])
+                for var in k_vars
+                if var.primal < 0.8
+            ]
+        )
     else:
         raise RuntimeError(
             "Could not compute list of unconserved metabolites."
-            " Solver status is '{}' (only optimal expected).".format(status))
+            " Solver status is '{}' (only optimal expected).".format(status)
+        )
 
 
 def find_inconsistent_min_stoichiometry(model, atol=1e-13):
@@ -210,28 +216,26 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
     unconserved_mets = find_unconserved_metabolites(model)
     LOGGER.info("model has %d unconserved metabolites", len(unconserved_mets))
     internal_rxns = con_helpers.get_internals(model)
-    internal_mets = set(
-        met for rxn in internal_rxns for met in rxn.metabolites)
+    internal_mets = set(met for rxn in internal_rxns for met in rxn.metabolites)
     get_id = attrgetter("id")
     reactions = sorted(internal_rxns, key=get_id)
     metabolites = sorted(internal_mets, key=get_id)
     stoich, met_index, rxn_index = con_helpers.stoichiometry_matrix(
-        metabolites, reactions)
+        metabolites, reactions
+    )
     left_ns = con_helpers.nullspace(stoich.T, atol)
     if left_ns.size == 0:
         LOGGER.info("Left nullspace is empty!")
         return {(met,) for met in unconserved_mets}
     (problem, indicators) = con_helpers.create_milp_problem(
-        left_ns, metabolites, Model, Variable, Constraint, Objective)
+        left_ns, metabolites, Model, Variable, Constraint, Objective
+    )
     # We clone the existing configuration in order to apply non-default
     # settings, for example, for solver verbosity or timeout.
     problem.configuration = model.problem.Configuration.clone(
-        config=model.solver.configuration,
-        problem=problem
+        config=model.solver.configuration, problem=problem
     )
-    LOGGER.info(
-        "Left nullspace has a dimension of %d.", left_ns.shape[1]
-    )
+    LOGGER.info("Left nullspace has a dimension of %d.", left_ns.shape[1])
     LOGGER.debug("%s", str(problem))
     inc_minimal = set()
     cuts = list()
@@ -248,18 +252,24 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13):
         status = problem.optimize()
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
-            LOGGER.debug("sum of all primal values: %f",
-                         sum(problem.primal_values.values()))
-            LOGGER.debug("sum of binary indicators: %f",
-                         sum(var.primal for var in indicators))
-            solution = [model.metabolites.get_by_id(var.name[2:])
-                        for var in indicators if var.primal > 0.2]
+            LOGGER.debug(
+                "sum of all primal values: %f", sum(problem.primal_values.values())
+            )
+            LOGGER.debug(
+                "sum of binary indicators: %f", sum(var.primal for var in indicators)
+            )
+            solution = [
+                model.metabolites.get_by_id(var.name[2:])
+                for var in indicators
+                if var.primal > 0.2
+            ]
             LOGGER.debug("%s: set size %d", met.id, len(solution))
             inc_minimal.add(tuple(solution))
             if len(solution) == 1:
                 break
-            cuts.append(con_helpers.add_cut(
-                problem, indicators, len(solution) - 1, Constraint))
+            cuts.append(
+                con_helpers.add_cut(problem, indicators, len(solution) - 1, Constraint)
+            )
             status = problem.optimize()
         LOGGER.debug("%s: last status %s", met.id, status)
         # reset
@@ -293,8 +303,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
-    raise NotImplementedError(
-        "Coming soon™ if considered useful.")
+    raise NotImplementedError("Coming soon™ if considered useful.")
 
 
 def detect_energy_generating_cycles(model, metabolite_id):
@@ -338,56 +347,70 @@ def detect_energy_generating_cycles(model, metabolite_id):
      Biology, 13(4), 1–14. http://doi.org/10.1371/journal.pcbi.1005494
 
     """
-    main_comp = helpers.find_compartment_id_in_model(model, 'c')
+    main_comp = helpers.find_compartment_id_in_model(model, "c")
     met = helpers.find_met_in_model(model, metabolite_id, main_comp)[0]
 
-    dissipation_rxn = Reaction('Dissipation')
-    if metabolite_id in ['MNXM3', 'MNXM63', 'MNXM51', 'MNXM121', 'MNXM423']:
+    dissipation_rxn = Reaction("Dissipation")
+    if metabolite_id in ["MNXM3", "MNXM63", "MNXM51", "MNXM121", "MNXM423"]:
         # build nucleotide-type dissipation reaction
-        dissipation_rxn.add_metabolites({
-            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
-            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1,
-            helpers.find_met_in_model(model, 'MNXM9', main_comp)[0]: 1,
-        })
-    elif metabolite_id in ['MNXM6', 'MNXM10']:
+        dissipation_rxn.add_metabolites(
+            {
+                helpers.find_met_in_model(model, "MNXM2", main_comp)[0]: -1,
+                helpers.find_met_in_model(model, "MNXM1", main_comp)[0]: 1,
+                helpers.find_met_in_model(model, "MNXM9", main_comp)[0]: 1,
+            }
+        )
+    elif metabolite_id in ["MNXM6", "MNXM10"]:
         # build nicotinamide-type dissipation reaction
-        dissipation_rxn.add_metabolites({
-            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1
-        })
-    elif metabolite_id in ['MNXM38', 'MNXM208', 'MNXM191', 'MNXM223',
-                           'MNXM7517', 'MNXM12233', 'MNXM558']:
+        dissipation_rxn.add_metabolites(
+            {helpers.find_met_in_model(model, "MNXM1", main_comp)[0]: 1}
+        )
+    elif metabolite_id in [
+        "MNXM38",
+        "MNXM208",
+        "MNXM191",
+        "MNXM223",
+        "MNXM7517",
+        "MNXM12233",
+        "MNXM558",
+    ]:
         # build redox-partner-type dissipation reaction
-        dissipation_rxn.add_metabolites({
-            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 2
-        })
-    elif metabolite_id == 'MNXM21':
-        dissipation_rxn.add_metabolites({
-            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
-            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 1,
-            helpers.find_met_in_model(model, 'MNXM26', main_comp)[0]: 1,
-        })
-    elif metabolite_id == 'MNXM89557':
-        dissipation_rxn.add_metabolites({
-            helpers.find_met_in_model(model, 'MNXM2', main_comp)[0]: -1,
-            helpers.find_met_in_model(model, 'MNXM1', main_comp)[0]: 2,
-            helpers.find_met_in_model(model, 'MNXM15', main_comp)[0]: 1,
-        })
+        dissipation_rxn.add_metabolites(
+            {helpers.find_met_in_model(model, "MNXM1", main_comp)[0]: 2}
+        )
+    elif metabolite_id == "MNXM21":
+        dissipation_rxn.add_metabolites(
+            {
+                helpers.find_met_in_model(model, "MNXM2", main_comp)[0]: -1,
+                helpers.find_met_in_model(model, "MNXM1", main_comp)[0]: 1,
+                helpers.find_met_in_model(model, "MNXM26", main_comp)[0]: 1,
+            }
+        )
+    elif metabolite_id == "MNXM89557":
+        dissipation_rxn.add_metabolites(
+            {
+                helpers.find_met_in_model(model, "MNXM2", main_comp)[0]: -1,
+                helpers.find_met_in_model(model, "MNXM1", main_comp)[0]: 2,
+                helpers.find_met_in_model(model, "MNXM15", main_comp)[0]: 1,
+            }
+        )
 
     dissipation_product = helpers.find_met_in_model(
-        model,
-        ENERGY_COUPLES[metabolite_id],
-        main_comp)[0]
+        model, ENERGY_COUPLES[metabolite_id], main_comp
+    )[0]
 
-    dissipation_rxn.add_metabolites(
-        {met: -1, dissipation_product: 1})
+    dissipation_rxn.add_metabolites({met: -1, dissipation_product: 1})
     helpers.close_boundaries_sensibly(model)
     model.add_reactions([dissipation_rxn])
     model.objective = dissipation_rxn
     solution = model.optimize(raise_error=True)
 
     if solution.objective_value > 0.0:
-        return solution.fluxes[solution.fluxes.abs() > 0.0].index. \
-            drop(["Dissipation"]).tolist()
+        return (
+            solution.fluxes[solution.fluxes.abs() > 0.0]
+            .index.drop(["Dissipation"])
+            .tolist()
+        )
     else:
         return []
 
@@ -402,8 +425,7 @@ def find_mass_unbalanced_reactions(reactions):
         An iterable of cobra.Reaction's.
 
     """
-    return [
-        rxn for rxn in reactions if not con_helpers.is_mass_balanced(rxn)]
+    return [rxn for rxn in reactions if not con_helpers.is_mass_balanced(rxn)]
 
 
 def find_charge_unbalanced_reactions(reactions):
@@ -416,8 +438,7 @@ def find_charge_unbalanced_reactions(reactions):
         An iterable of cobra.Reaction's.
 
     """
-    return [
-        rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
+    return [rxn for rxn in reactions if not con_helpers.is_charge_balanced(rxn)]
 
 
 def find_stoichiometrically_balanced_cycles(model):
@@ -449,8 +470,8 @@ def find_stoichiometrically_balanced_cycles(model):
     helpers.close_boundaries_sensibly(model)
     fva_result = flux_variability_analysis(model, loopless=False)
     return fva_result.index[
-        (fva_result["minimum"] <= (-1 + TOLERANCE_THRESHOLD)) |
-        (fva_result["maximum"] >= (1 - TOLERANCE_THRESHOLD))
+        (fva_result["minimum"] <= (-1 + TOLERANCE_THRESHOLD))
+        | (fva_result["maximum"] >= (1 - TOLERANCE_THRESHOLD))
     ].tolist()
 
 
@@ -469,10 +490,14 @@ def find_orphans(model):
     """
     exchange = frozenset(model.exchanges)
     return [
-        met for met in model.metabolites
-        if (len(met.reactions) > 0) and all(
-            (not rxn.reversibility) and (rxn not in exchange) and
-            (rxn.metabolites[met] < 0) for rxn in met.reactions
+        met
+        for met in model.metabolites
+        if (len(met.reactions) > 0)
+        and all(
+            (not rxn.reversibility)
+            and (rxn not in exchange)
+            and (rxn.metabolites[met] < 0)
+            for rxn in met.reactions
         )
     ]
 
@@ -492,10 +517,14 @@ def find_deadends(model):
     """
     exchange = frozenset(model.exchanges)
     return [
-        met for met in model.metabolites
-        if (len(met.reactions) > 0) and all(
-            (not rxn.reversibility) and (rxn not in exchange) and
-            (rxn.metabolites[met] > 0) for rxn in met.reactions
+        met
+        for met in model.metabolites
+        if (len(met.reactions) > 0)
+        and all(
+            (not rxn.reversibility)
+            and (rxn not in exchange)
+            and (rxn.metabolites[met] > 0)
+            for rxn in met.reactions
         )
     ]
 
@@ -614,18 +643,22 @@ def find_blocked_metabolites(model, coefficient, processes=None):
                 initargs=(model, sink.name, coefficient),
             )
             result_iter = pool.imap_unordered(
-                _solve_metabolite_exchange, met_identifiers,
-                chunksize=chunk_size
+                _solve_metabolite_exchange, met_identifiers, chunksize=chunk_size
             )
             pool.close()
-            blocked = [met_id for solution, met_id in result_iter
-                       if np.isnan(solution) or solution < model.tolerance]
+            blocked = [
+                met_id
+                for solution, met_id in result_iter
+                if np.isnan(solution) or solution < model.tolerance
+            ]
             pool.join()
         else:
             _init_worker(model, sink.name, coefficient)
-            blocked = [met_id for solution, met_id in map(
-                _solve_metabolite_exchange, met_identifiers
-            ) if np.isnan(solution) or solution < model.tolerance]
+            blocked = [
+                met_id
+                for solution, met_id in map(_solve_metabolite_exchange, met_identifiers)
+                if np.isnan(solution) or solution < model.tolerance
+            ]
     return sorted(blocked)
 
 
@@ -703,12 +736,16 @@ def find_reactions_with_unbounded_flux_default_condition(model):
     try:
         fva_result = flux_variability_analysis(model, fraction_of_optimum=1.0)
     except Infeasible as err:
-        LOGGER.error("Failed to find reactions with unbounded flux "
-                     "because '{}'. This may be a bug.".format(err))
-        raise Infeasible("It was not possible to run flux variability "
-                         "analysis on the model. Make sure that the model "
-                         "can be solved! Check if the constraints are not "
-                         "too strict.")
+        LOGGER.error(
+            "Failed to find reactions with unbounded flux "
+            "because '{}'. This may be a bug.".format(err)
+        )
+        raise Infeasible(
+            "It was not possible to run flux variability "
+            "analysis on the model. Make sure that the model "
+            "can be solved! Check if the constraints are not "
+            "too strict."
+        )
     # Per reaction (row) the flux is below threshold (close to zero).
     conditionally_blocked = fva_result.loc[
         fva_result.abs().max(axis=1) < TOLERANCE_THRESHOLD
@@ -717,23 +754,28 @@ def find_reactions_with_unbounded_flux_default_condition(model):
     # Find those reactions whose flux is close to or outside of the median
     # upper or lower bound, i.e., appears unconstrained.
     unlimited_flux = fva_result.loc[
-        np.isclose(fva_result["maximum"], large, atol=TOLERANCE_THRESHOLD) |
-        (fva_result["maximum"] > large) |
-        np.isclose(fva_result["minimum"], small, atol=TOLERANCE_THRESHOLD) |
-        (fva_result["minimum"] < small)
+        np.isclose(fva_result["maximum"], large, atol=TOLERANCE_THRESHOLD)
+        | (fva_result["maximum"] > large)
+        | np.isclose(fva_result["minimum"], small, atol=TOLERANCE_THRESHOLD)
+        | (fva_result["minimum"] < small)
     ].index.tolist()
     try:
-        fraction = len(unlimited_flux) / \
-            (len(model.reactions) - len(conditionally_blocked))
+        fraction = len(unlimited_flux) / (
+            len(model.reactions) - len(conditionally_blocked)
+        )
     except ZeroDivisionError:
-        LOGGER.error("Division by Zero! Failed to calculate the "
-                     "fraction of unbounded reactions. Does this model "
-                     "have any reactions at all?")
-        raise ZeroDivisionError("It was not possible to calculate the "
-                                "fraction of unbounded reactions to "
-                                "un-blocked reactions. This may be because"
-                                "the model doesn't have any reactions at "
-                                "all or that none of the reactions can "
-                                "carry a flux larger than zero!")
+        LOGGER.error(
+            "Division by Zero! Failed to calculate the "
+            "fraction of unbounded reactions. Does this model "
+            "have any reactions at all?"
+        )
+        raise ZeroDivisionError(
+            "It was not possible to calculate the "
+            "fraction of unbounded reactions to "
+            "un-blocked reactions. This may be because"
+            "the model doesn't have any reactions at "
+            "all or that none of the reactions can "
+            "carry a flux larger than zero!"
+        )
 
     return unlimited_flux, fraction, conditionally_blocked

@@ -35,46 +35,72 @@ from six import iteritems, itervalues
 import memote.support.data
 import memote.utils as utils
 
+
 LOGGER = logging.getLogger(__name__)
 
-TRANSPORT_RXN_SBO_TERMS = ['SBO:0000185', 'SBO:0000588', 'SBO:0000587',
-                           'SBO:0000655', 'SBO:0000654', 'SBO:0000660',
-                           'SBO:0000659', 'SBO:0000657', 'SBO:0000658']
+TRANSPORT_RXN_SBO_TERMS = [
+    "SBO:0000185",
+    "SBO:0000588",
+    "SBO:0000587",
+    "SBO:0000655",
+    "SBO:0000654",
+    "SBO:0000660",
+    "SBO:0000659",
+    "SBO:0000657",
+    "SBO:0000658",
+]
 
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-with open_text(memote.support.data, "met_id_shortlist.json",
-               encoding="utf-8") as file_handle:
+with open_text(
+    memote.support.data, "met_id_shortlist.json", encoding="utf-8"
+) as file_handle:
     METANETX_SHORTLIST = pd.read_json(file_handle)
 
 
 # Provide a compartment shortlist to identify specific compartments whenever
 # necessary.
 COMPARTMENT_SHORTLIST = {
-    'ce': ['cell envelope'],
-    'c': ['cytoplasm', 'cytosol', 'default', 'in', 'intra cellular',
-          'intracellular', 'intracellular region', 'intracellular space'],
-    'er': ['endoplasmic reticulum'],
-    'erm': ['endoplasmic reticulum membrane'],
-    'e': ['extracellular', 'extraorganism', 'out', 'extracellular space',
-          'extra organism', 'extra cellular', 'extra-organism'],
-    'f': ['flagellum', 'bacterial-type flagellum'],
-    'g': ['golgi', 'golgi apparatus'],
-    'gm': ['golgi membrane'],
-    'h': ['chloroplast'],
-    'l': ['lysosome'],
-    'im': ['mitochondrial intermembrane space'],
-    'mm': ['mitochondrial membrane'],
-    'm': ['mitochondrion', 'mitochondria'],
-    'n': ['nucleus'],
-    'p': ['periplasm', 'periplasmic space'],
-    'x': ['peroxisome', 'glyoxysome'],
-    'u': ['thylakoid'],
-    'vm': ['vacuolar membrane'],
-    'v': ['vacuole'],
-    'w': ['cell wall'],
-    's': ['eyespot', 'eyespot apparatus', 'stigma']}
+    "ce": ["cell envelope"],
+    "c": [
+        "cytoplasm",
+        "cytosol",
+        "default",
+        "in",
+        "intra cellular",
+        "intracellular",
+        "intracellular region",
+        "intracellular space",
+    ],
+    "er": ["endoplasmic reticulum"],
+    "erm": ["endoplasmic reticulum membrane"],
+    "e": [
+        "extracellular",
+        "extraorganism",
+        "out",
+        "extracellular space",
+        "extra organism",
+        "extra cellular",
+        "extra-organism",
+    ],
+    "f": ["flagellum", "bacterial-type flagellum"],
+    "g": ["golgi", "golgi apparatus"],
+    "gm": ["golgi membrane"],
+    "h": ["chloroplast"],
+    "l": ["lysosome"],
+    "im": ["mitochondrial intermembrane space"],
+    "mm": ["mitochondrial membrane"],
+    "m": ["mitochondrion", "mitochondria"],
+    "n": ["nucleus"],
+    "p": ["periplasm", "periplasmic space"],
+    "x": ["peroxisome", "glyoxysome"],
+    "u": ["thylakoid"],
+    "vm": ["vacuolar membrane"],
+    "v": ["vacuole"],
+    "w": ["cell wall"],
+    "s": ["eyespot", "eyespot apparatus", "stigma"],
+}
 
 
 def find_transported_elements(rxn):
@@ -101,15 +127,15 @@ def find_transported_elements(rxn):
     for met in rxn.metabolites:
         if met.compartment not in element_dist:
             # Multiplication by the metabolite stoichiometry.
-            element_dist[met.compartment] = \
-                {k: v * rxn.metabolites[met]
-                 for (k, v) in iteritems(met.elements)}
+            element_dist[met.compartment] = {
+                k: v * rxn.metabolites[met] for (k, v) in iteritems(met.elements)
+            }
         else:
-            x = {k: v * rxn.metabolites[met] for (k, v) in
-                 iteritems(met.elements)}
+            x = {k: v * rxn.metabolites[met] for (k, v) in iteritems(met.elements)}
             y = element_dist[met.compartment]
-            element_dist[met.compartment] = \
-                {k: x.get(k, 0) + y.get(k, 0) for k in set(x) | set(y)}
+            element_dist[met.compartment] = {
+                k: x.get(k, 0) + y.get(k, 0) for k in set(x) | set(y)
+            }
     delta_dict = defaultdict()
     # Simplification of the resulting dictionary of dictionaries.
     for elements in itervalues(element_dist):
@@ -155,16 +181,22 @@ def find_transport_reactions(model):
 
     """
     transport_reactions = []
-    transport_rxn_candidates = set(model.reactions) - set(model.boundary) \
-        - set(find_biomass_reaction(model))
+    transport_rxn_candidates = (
+        set(model.reactions) - set(model.boundary) - set(find_biomass_reaction(model))
+    )
     transport_rxn_candidates = set(
         [rxn for rxn in transport_rxn_candidates if len(rxn.compartments) >= 2]
     )
     # Add all labeled transport reactions
-    sbo_matches = set([rxn for rxn in transport_rxn_candidates if
-                       rxn.annotation is not None and
-                       'sbo' in rxn.annotation and
-                       rxn.annotation['sbo'] in TRANSPORT_RXN_SBO_TERMS])
+    sbo_matches = set(
+        [
+            rxn
+            for rxn in transport_rxn_candidates
+            if rxn.annotation is not None
+            and "sbo" in rxn.annotation
+            and rxn.annotation["sbo"] in TRANSPORT_RXN_SBO_TERMS
+        ]
+    )
     if len(sbo_matches) > 0:
         transport_reactions += list(sbo_matches)
     # Find unlabeled transport reactions via formula or annotation checks
@@ -194,8 +226,7 @@ def is_transport_reaction_formulae(rxn):
     rxn_reactants = set([met.formula for met in rxn.reactants])
     rxn_products = set([met.formula for met in rxn.products])
     # Looking for formulas that stay the same on both side of the reaction.
-    transported_mets = \
-        [formula for formula in rxn_reactants if formula in rxn_products]
+    transported_mets = [formula for formula in rxn_reactants if formula in rxn_products]
     # Collect information on the elemental differences between
     # compartments in the reaction.
     delta_dicts = find_transported_elements(rxn)
@@ -203,9 +234,7 @@ def is_transport_reaction_formulae(rxn):
     # Excluding reactions such as oxidoreductases where no net
     # transport of Hydrogen is occurring, but rather just an exchange of
     # electrons or charges effecting a change in protonation.
-    if set(transported_mets) != set('H') and list(
-        delta_dicts.keys()
-    ) == ['H']:
+    if set(transported_mets) != set("H") and list(delta_dicts.keys()) == ["H"]:
         pass
     # All other reactions for which the amount of transported elements is
     # not zero, which are not part of the model's exchange nor
@@ -226,14 +255,22 @@ def is_transport_reaction_annotations(rxn):
         The metabolic reaction under investigation.
 
     """
-    reactants = set([(k, tuple(v)) for met in rxn.reactants
-                     for k, v in iteritems(met.annotation)
-                     if met.id != "H"
-                     and k is not None and k != 'sbo' and v is not None])
-    products = set([(k, tuple(v)) for met in rxn.products
-                    for k, v in iteritems(met.annotation)
-                    if met.id != "H"
-                    and k is not None and k != 'sbo' and v is not None])
+    reactants = set(
+        [
+            (k, tuple(v))
+            for met in rxn.reactants
+            for k, v in iteritems(met.annotation)
+            if met.id != "H" and k is not None and k != "sbo" and v is not None
+        ]
+    )
+    products = set(
+        [
+            (k, tuple(v))
+            for met in rxn.products
+            for k, v in iteritems(met.annotation)
+            if met.id != "H" and k is not None and k != "sbo" and v is not None
+        ]
+    )
     # Find intersection between reactant annotations and
     # product annotations to find common metabolites between them,
     # satisfying the requirements for a transport reaction. Reactions such
@@ -268,11 +305,11 @@ def find_converting_reactions(model, pair):
     hits = list()
     for rxn in model.reactions:
         # FIXME: Use `set.issubset` much more idiomatic.
-        if len(first & set(rxn.reactants)) > 0 and len(
-                second & set(rxn.products)) > 0:
+        if len(first & set(rxn.reactants)) > 0 and len(second & set(rxn.products)) > 0:
             hits.append(rxn)
-        elif len(first & set(rxn.products)) > 0 and len(
-                second & set(rxn.reactants)) > 0:
+        elif (
+            len(first & set(rxn.products)) > 0 and len(second & set(rxn.reactants)) > 0
+        ):
             hits.append(rxn)
     return frozenset(hits)
 
@@ -377,39 +414,37 @@ def find_biomass_reaction(model):
     boundary = frozenset(model.boundary)
 
     # 1.
-    candidates = {
-        r for r in model.reactions
-        if filter_sbo_term(r, 'SBO:0000629')
-    }
+    candidates = {r for r in model.reactions if filter_sbo_term(r, "SBO:0000629")}
     candidates.difference_update(boundary)
     if candidates:
-        return sorted(candidates, key=attrgetter('id'))
+        return sorted(candidates, key=attrgetter("id"))
 
     # 2.
     name_buzzwords = (
-        re.compile(r'\bbiomass'), re.compile(r'\bgrowth'), re.compile(r'bof')
+        re.compile(r"\bbiomass"),
+        re.compile(r"\bgrowth"),
+        re.compile(r"bof"),
     )
-    id_buzzwords = ('biomass',)
+    id_buzzwords = ("biomass",)
     candidates = {
-        r for r in model.reactions
-        if filter_match_name(r, name_buzzwords) or
-        filter_identifier(r, id_buzzwords)
+        r
+        for r in model.reactions
+        if filter_match_name(r, name_buzzwords) or filter_identifier(r, id_buzzwords)
     }
     candidates.difference_update(boundary)
     if candidates:
-        return sorted(candidates, key=attrgetter('id'))
+        return sorted(candidates, key=attrgetter("id"))
 
     # 3.
-    name_buzzwords = (re.compile(r'\bbiomass'),)
-    id_buzzwords = ('biomass',)
+    name_buzzwords = (re.compile(r"\bbiomass"),)
+    id_buzzwords = ("biomass",)
     sbo_metabolites = {
-        m for m in model.metabolites
-        if filter_sbo_term(m, 'SBO:0000649')
+        m for m in model.metabolites if filter_sbo_term(m, "SBO:0000649")
     }
     metabolites = {
-        m for m in model.metabolites
-        if filter_match_name(m, name_buzzwords) or
-        filter_identifier(m, id_buzzwords)
+        m
+        for m in model.metabolites
+        if filter_match_name(m, name_buzzwords) or filter_identifier(m, id_buzzwords)
     }
     # Many metabolites may match 'SBO:0000649', we filter those further by name
     # and ID.
@@ -418,13 +453,13 @@ def find_biomass_reaction(model):
         candidates = {r for m in sbo_metabolites for r in m.reactions}
         candidates.difference_update(boundary)
         if candidates:
-            return sorted(candidates, key=attrgetter('id'))
+            return sorted(candidates, key=attrgetter("id"))
 
     # 4.
     candidates = {r for m in metabolites for r in m.reactions}
     candidates.difference_update(boundary)
     if candidates:
-        return sorted(candidates, key=attrgetter('id'))
+        return sorted(candidates, key=attrgetter("id"))
 
     return []
 
@@ -463,10 +498,10 @@ def find_demand_reactions(model):
 
     """
     try:
-        extracellular = find_compartment_id_in_model(model, 'e')
+        extracellular = find_compartment_id_in_model(model, "e")
     except KeyError:
         extracellular = None
-    return find_boundary_types(model, 'demand', extracellular)
+    return find_boundary_types(model, "demand", extracellular)
 
 
 @lrudecorator(size=2)
@@ -502,10 +537,10 @@ def find_sink_reactions(model):
 
     """
     try:
-        extracellular = find_compartment_id_in_model(model, 'e')
+        extracellular = find_compartment_id_in_model(model, "e")
     except KeyError:
         extracellular = None
-    return find_boundary_types(model, 'sink', extracellular)
+    return find_boundary_types(model, "sink", extracellular)
 
 
 @lrudecorator(size=2)
@@ -540,10 +575,10 @@ def find_exchange_rxns(model):
 
     """
     try:
-        extracellular = find_compartment_id_in_model(model, 'e')
+        extracellular = find_compartment_id_in_model(model, "e")
     except KeyError:
         extracellular = None
-    return find_boundary_types(model, 'exchange', extracellular)
+    return find_boundary_types(model, "exchange", extracellular)
 
 
 def find_interchange_biomass_reactions(model, biomass=None):
@@ -682,8 +717,7 @@ def metabolites_per_compartment(model, compartment_id):
         List of metabolites belonging to a given compartment.
 
     """
-    return [met for met in model.metabolites
-            if met.compartment == compartment_id]
+    return [met for met in model.metabolites if met.compartment == compartment_id]
 
 
 def largest_compartment_id_met(model):
@@ -703,13 +737,17 @@ def largest_compartment_id_met(model):
     """
     # Sort compartments by decreasing size and extract the largest two.
     candidate, second = sorted(
-        ((c, len(metabolites_per_compartment(model, c)))
-         for c in model.compartments), reverse=True, key=itemgetter(1))[:2]
+        ((c, len(metabolites_per_compartment(model, c))) for c in model.compartments),
+        reverse=True,
+        key=itemgetter(1),
+    )[:2]
     # Compare the size of the compartments.
     if candidate[1] == second[1]:
-        raise RuntimeError("There is a tie for the largest compartment. "
-                           "Compartment {} and {} have equal amounts of "
-                           "metabolites.".format(candidate[0], second[0]))
+        raise RuntimeError(
+            "There is a tie for the largest compartment. "
+            "Compartment {} and {} have equal amounts of "
+            "metabolites.".format(candidate[0], second[0])
+        )
     else:
         return candidate[0]
 
@@ -733,9 +771,11 @@ def find_compartment_id_in_model(model, compartment_id):
 
     """
     if compartment_id not in COMPARTMENT_SHORTLIST.keys():
-        raise KeyError("{} is not in the COMPARTMENT_SHORTLIST! Make sure "
-                       "you typed the ID correctly, if yes, update the "
-                       "shortlist manually.".format(compartment_id))
+        raise KeyError(
+            "{} is not in the COMPARTMENT_SHORTLIST! Make sure "
+            "you typed the ID correctly, if yes, update the "
+            "shortlist manually.".format(compartment_id)
+        )
 
     if len(model.compartments) == 0:
         raise KeyError(
@@ -753,7 +793,7 @@ def find_compartment_id_in_model(model, compartment_id):
             if c_name.lower() == name:
                 return c_id
 
-    if compartment_id == 'c':
+    if compartment_id == "c":
         return largest_compartment_id_met(model)
 
 
@@ -778,6 +818,7 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
         cobra.Metabolite(s) matching the mnx_id.
 
     """
+
     def compare_annotation(annotation):
         """
         Return annotation IDs that match to METANETX_SHORTLIST references.
@@ -805,21 +846,20 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
     # If the MNX ID itself cannot be found as an ID, we try all other
     # identifiers that are provided by our shortlist of MetaNetX' mapping
     # table.
-    regex = re.compile('^{}(_[a-zA-Z0-9]+)?$'.format(mnx_id))
+    regex = re.compile("^{}(_[a-zA-Z0-9]+)?$".format(mnx_id))
     if model.metabolites.query(regex):
         candidates = model.metabolites.query(regex)
-    elif model.metabolites.query(compare_annotation, attribute='annotation'):
-        candidates = model.metabolites.query(
-            compare_annotation, attribute='annotation'
-        )
+    elif model.metabolites.query(compare_annotation, attribute="annotation"):
+        candidates = model.metabolites.query(compare_annotation, attribute="annotation")
     else:
         for value in METANETX_SHORTLIST[mnx_id]:
             if value:
                 for ident in value:
-                    regex = re.compile('^{}(_[a-zA-Z0-9]+)?$'.format(ident))
-                    if model.metabolites.query(regex, attribute='id'):
+                    regex = re.compile("^{}(_[a-zA-Z0-9]+)?$".format(ident))
+                    if model.metabolites.query(regex, attribute="id"):
                         candidates.extend(
-                            model.metabolites.query(regex, attribute='id'))
+                            model.metabolites.query(regex, attribute="id")
+                        )
 
     # Return a list of all possible candidates if no specific compartment ID
     # is provided.
@@ -830,32 +870,34 @@ def find_met_in_model(model, mnx_id, compartment_id=None):
         print("compartment_id = None?")
         return candidates
     else:
-        candidates_in_compartment = \
-            [cand for cand in candidates if cand.compartment == compartment_id]
+        candidates_in_compartment = [
+            cand for cand in candidates if cand.compartment == compartment_id
+        ]
 
     if len(candidates_in_compartment) == 0:
-        raise RuntimeError("It was not possible to identify "
-                           "any metabolite in compartment {} corresponding to "
-                           "the following MetaNetX identifier: {}."
-                           "Make sure that a cross-reference to this ID in "
-                           "the MetaNetX Database exists for your "
-                           "identifier "
-                           "namespace.".format(compartment_id, mnx_id))
+        raise RuntimeError(
+            "It was not possible to identify "
+            "any metabolite in compartment {} corresponding to "
+            "the following MetaNetX identifier: {}."
+            "Make sure that a cross-reference to this ID in "
+            "the MetaNetX Database exists for your "
+            "identifier "
+            "namespace.".format(compartment_id, mnx_id)
+        )
     elif len(candidates_in_compartment) > 1:
-        raise RuntimeError("It was not possible to uniquely identify "
-                           "a single metabolite in compartment {} that "
-                           "corresponds to the following MetaNetX "
-                           "identifier: {}."
-                           "Instead these candidates were found: {}."
-                           "Check that metabolite compartment tags are "
-                           "correct. Consider switching to a namespace scheme "
-                           "where identifiers are truly "
-                           "unique.".format(compartment_id,
-                                            mnx_id,
-                                            utils.get_ids(
-                                                candidates_in_compartment
-                                            ))
-                           )
+        raise RuntimeError(
+            "It was not possible to uniquely identify "
+            "a single metabolite in compartment {} that "
+            "corresponds to the following MetaNetX "
+            "identifier: {}."
+            "Instead these candidates were found: {}."
+            "Check that metabolite compartment tags are "
+            "correct. Consider switching to a namespace scheme "
+            "where identifiers are truly "
+            "unique.".format(
+                compartment_id, mnx_id, utils.get_ids(candidates_in_compartment)
+            )
+        )
     else:
         return candidates_in_compartment
 
@@ -890,10 +932,8 @@ def find_bounds(model):
         The metabolic model under investigation.
 
     """
-    lower_bounds = np.asarray([rxn.lower_bound for rxn in model.reactions],
-                              dtype=float)
-    upper_bounds = np.asarray([rxn.upper_bound for rxn in model.reactions],
-                              dtype=float)
+    lower_bounds = np.asarray([rxn.lower_bound for rxn in model.reactions], dtype=float)
+    upper_bounds = np.asarray([rxn.upper_bound for rxn in model.reactions], dtype=float)
     lower_bound = np.nanmedian(lower_bounds[lower_bounds != 0.0])
     upper_bound = np.nanmedian(upper_bounds[upper_bounds != 0.0])
     if np.isnan(lower_bound):
