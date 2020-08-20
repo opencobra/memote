@@ -20,14 +20,18 @@
 from __future__ import absolute_import, division
 
 import logging
-
 from math import sqrt
+
 
 LOGGER = logging.getLogger(__name__)
 
 
-def confusion_matrix(predicted_essential, expected_essential,
-                     predicted_nonessential, expected_nonessential):
+def confusion_matrix(
+    predicted_essential,
+    expected_essential,
+    predicted_nonessential,
+    expected_nonessential,
+):
     """
     Compute a representation of the confusion matrix.
 
@@ -82,8 +86,7 @@ def confusion_matrix(predicted_essential, expected_essential,
         acc = None
     # Compute Matthews correlation coefficient.
     try:
-        mcc = (tp * tn - fp * fn) /\
-              sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+        mcc = (tp * tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     except ZeroDivisionError:
         mcc = None
     return {
@@ -96,5 +99,5 @@ def confusion_matrix(predicted_essential, expected_essential,
         "PPV": ppv,
         "FDR": fdr,
         "ACC": acc,
-        "MCC": mcc
+        "MCC": mcc,
     }

@@ -1,7 +1,8 @@
-
+## Install node packages.
 requirements:
-	npm install
+	npm clean-install
 
-bundle: requirements  ## build Angular project
+## Build the MEMOTE report.
+bundle: requirements
 	npm run-script build
 

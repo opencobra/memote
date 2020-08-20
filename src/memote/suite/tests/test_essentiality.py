@@ -27,15 +27,19 @@ from __future__ import absolute_import
 
 import pytest
 
-from memote.utils import annotate, wrapper
 from memote.support.essentiality import confusion_matrix
+from memote.utils import annotate, wrapper
 
 
 @pytest.mark.essentiality
-@annotate(title="Gene Essentiality Prediction", format_type="percent",
-          data=dict(), message=dict(), metric=dict())
-def test_gene_essentiality_from_data_qualitative(model, experiment,
-                                                 threshold=0.95):
+@annotate(
+    title="Gene Essentiality Prediction",
+    format_type="percent",
+    data=dict(),
+    message=dict(),
+    metric=dict(),
+)
+def test_gene_essentiality_from_data_qualitative(model, experiment, threshold=0.95):
     """
     Expect a perfect accuracy when predicting gene essentiality.
 
@@ -62,11 +66,13 @@ def test_gene_essentiality_from_data_qualitative(model, experiment,
         set(test.loc[test["essential"], "gene"]),
         set(expected.loc[expected["essential"], "gene"]),
         set(test.loc[~test["essential"], "gene"]),
-        set(expected.loc[~expected["essential"], "gene"])
+        set(expected.loc[~expected["essential"], "gene"]),
     )
     ann["metric"][name] = result["ACC"]
     ann["message"][name] = wrapper.fill(
         """Ideally, every model would show a perfect accuracy of 1. In
         name '{}' the model has  {:.2}.""".format(
-            name, result["ACC"]))
+            name, result["ACC"]
+        )
+    )
     assert result["ACC"] > threshold

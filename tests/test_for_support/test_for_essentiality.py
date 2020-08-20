@@ -19,29 +19,36 @@
 
 from __future__ import absolute_import
 
-import pytest
 import numpy as np
+import pytest
 
 import memote.support.essentiality as essentiality
 
 
-@pytest.mark.parametrize("input_values, expected_results", [
-    ([{"g1", "g2", "g3"}, {"g1", "g3"}, {"g4"}, {"g2", "g4"}], {
-        "TP": ["g1", "g3"],
-        "TN": ["g4"],
-        "FP": ["g2"],
-        "FN": [],
-        "TPR": 1,
-        "TNR": 0.5,
-        "PPV": 0.6666666666666666,
-        "FDR": 0.33333333333333337,
-        "ACC": 0.75,
-        "MCC": 0.5774
-    })])
+@pytest.mark.parametrize(
+    "input_values, expected_results",
+    [
+        (
+            [{"g1", "g2", "g3"}, {"g1", "g3"}, {"g4"}, {"g2", "g4"}],
+            {
+                "TP": ["g1", "g3"],
+                "TN": ["g4"],
+                "FP": ["g2"],
+                "FN": [],
+                "TPR": 1,
+                "TNR": 0.5,
+                "PPV": 0.6666666666666666,
+                "FDR": 0.33333333333333337,
+                "ACC": 0.75,
+                "MCC": 0.5774,
+            },
+        )
+    ],
+)
 def test_confusion_matrix(input_values, expected_results):
     result_dict = essentiality.confusion_matrix(*input_values)
     for key, value in result_dict.items():
-        if key in ['TPR', "TNR", "PPV", "FDR", "ACC", "MCC"]:
+        if key in ["TPR", "TNR", "PPV", "FDR", "ACC", "MCC"]:
             assert np.isclose(value, expected_results[key], atol=1e-03)
         else:
             assert set(value) == set(expected_results[key])

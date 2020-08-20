@@ -24,22 +24,32 @@ import logging
 from builtins import dict, str
 from textwrap import TextWrapper
 
+from depinfo import print_dependencies
 from future.utils import raise_with_traceback
 from numpy import isfinite
 from numpydoc.docscrape import NumpyDocString
 from six import string_types
-from depinfo import print_dependencies
 
-__all__ = ("register_with", "annotate", "get_ids",
-           "get_ids_and_bounds", "truncate", "wrapper",
-           "log_json_incompatible_types", "show_versions", "jsonify",
-           "is_modified", "stdout_notifications")
+
+__all__ = (
+    "register_with",
+    "annotate",
+    "get_ids",
+    "get_ids_and_bounds",
+    "truncate",
+    "wrapper",
+    "log_json_incompatible_types",
+    "show_versions",
+    "jsonify",
+    "is_modified",
+    "stdout_notifications",
+)
 
 LOGGER = logging.getLogger(__name__)
 
 LIST_SLICE = 5
 FLOAT_FORMAT = 7.2
-TYPES = frozenset(['count', 'number', 'raw', 'percent'])
+TYPES = frozenset(["count", "number", "raw", "percent"])
 JSON_TYPES = (type(None), bool, int, float, str, list, dict)
 
 wrapper = TextWrapper(width=70)
@@ -62,9 +72,11 @@ def register_with(registry):
             return base
 
     """
+
     def decorator(func):
         registry[func.__name__] = func
         return func
+
     return decorator
 
 
@@ -115,8 +127,7 @@ def annotate(title, format_type, message=None, data=None, metric=1.0):
 
     """
     if format_type not in TYPES:
-        raise ValueError(
-            "Invalid type. Expected one of: {}.".format(", ".join(TYPES)))
+        raise ValueError("Invalid type. Expected one of: {}.".format(", ".join(TYPES)))
 
     def decorator(func):
         func.annotation = dict(
@@ -125,8 +136,10 @@ def annotate(title, format_type, message=None, data=None, metric=1.0):
             message=message,
             data=data,
             format_type=format_type,
-            metric=metric)
+            metric=metric,
+        )
         return func
+
     return decorator
 
 
@@ -137,8 +150,9 @@ def get_ids(iterable):
 
 def get_ids_and_bounds(iterable):
     """Retrieve the identifier and bounds of a number of objects."""
-    return ["{0.lower_bound} <= {0.id} <= {0.upper_bound}".format(elem) for
-            elem in iterable]
+    return [
+        "{0.lower_bound} <= {0.id} <= {0.upper_bound}".format(elem) for elem in iterable
+    ]
 
 
 def filter_none(attribute, default):
@@ -236,17 +250,27 @@ def jsonify(obj, pretty=False):
 
     """
     if pretty:
-        params = dict(sort_keys=True, indent=2, allow_nan=False,
-                      separators=(",", ": "), ensure_ascii=False)
+        params = dict(
+            sort_keys=True,
+            indent=2,
+            allow_nan=False,
+            separators=(",", ": "),
+            ensure_ascii=False,
+        )
     else:
-        params = dict(sort_keys=False, indent=None, allow_nan=False,
-                      separators=(",", ":"), ensure_ascii=False)
+        params = dict(
+            sort_keys=False,
+            indent=None,
+            allow_nan=False,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
     try:
         return json.dumps(obj, **params)
     except (TypeError, ValueError) as error:
         LOGGER.critical(
-            "The memote result structure is incompatible with the JSON "
-            "standard.")
+            "The memote result structure is incompatible with the JSON " "standard."
+        )
         log_json_incompatible_types(obj)
         raise_with_traceback(error)
 

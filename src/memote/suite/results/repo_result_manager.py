@@ -25,6 +25,7 @@ from os.path import join
 
 from memote.suite.results.result_manager import ResultManager
 
+
 __all__ = ("RepoResultManager",)
 
 LOGGER = logging.getLogger(__name__)
@@ -81,7 +82,7 @@ class RepoResultManager(ResultManager):
             hexsha=commit.hexsha,
             author=commit.author.name,
             email=commit.author.email,
-            authored_on=commit.authored_datetime
+            authored_on=commit.authored_datetime,
         )
 
     def get_filename(self, git_info):
@@ -127,8 +128,7 @@ class RepoResultManager(ResultManager):
         git_info = self.record_git_info(commit)
         self.add_git(result.meta, git_info)
         filename = self.get_filename(git_info)
-        super(RepoResultManager, self).store(
-            result, filename=filename, **kwargs)
+        super(RepoResultManager, self).store(result, filename=filename, **kwargs)
 
     def load(self, commit=None):
         """Load a result from the storage directory."""

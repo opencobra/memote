@@ -25,6 +25,7 @@ from cobra import Metabolite, Reaction
 import memote.support.matrix as matrix
 from memote.utils import register_with
 
+
 MODEL_REGISTRY = dict()
 
 
@@ -98,41 +99,57 @@ def x2_cycle_open(base):
     return base
 
 
-@pytest.mark.parametrize("model, num", [
-    ("three_components_closed", (1, 1)),
-    ("three_components_open", (1, 1)),
-    ("x2_cycle_closed", (1, 1)),
-    ("x2_cycle_open", (1, 1)),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("three_components_closed", (1, 1)),
+        ("three_components_open", (1, 1)),
+        ("x2_cycle_closed", (1, 1)),
+        ("x2_cycle_open", (1, 1)),
+    ],
+    indirect=["model"],
+)
 def test_absolute_extreme_coefficient_ratio(model, num):
     assert matrix.absolute_extreme_coefficient_ratio(model) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("three_components_closed", 1),
-    ("three_components_open", 0),
-    ("x2_cycle_closed", 2),
-    ("x2_cycle_open", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("three_components_closed", 1),
+        ("three_components_open", 0),
+        ("x2_cycle_closed", 2),
+        ("x2_cycle_open", 1),
+    ],
+    indirect=["model"],
+)
 def test_number_independent_conservation_relations(model, num):
     assert matrix.number_independent_conservation_relations(model) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("three_components_closed", 2),
-    ("three_components_open", 3),
-    ("x2_cycle_closed", 3),
-    ("x2_cycle_open", 4),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("three_components_closed", 2),
+        ("three_components_open", 3),
+        ("x2_cycle_closed", 3),
+        ("x2_cycle_open", 4),
+    ],
+    indirect=["model"],
+)
 def test_matrix_rank(model, num):
     assert matrix.matrix_rank(model) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("three_components_closed", 0),
-    ("three_components_open", 1),
-    ("x2_cycle_closed", 0),
-    ("x2_cycle_open", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("three_components_closed", 0),
+        ("three_components_open", 1),
+        ("x2_cycle_closed", 0),
+        ("x2_cycle_open", 1),
+    ],
+    indirect=["model"],
+)
 def test_degrees_of_freedom(model, num):
     assert matrix.degrees_of_freedom(model) == num

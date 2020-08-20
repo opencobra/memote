@@ -24,8 +24,9 @@ import pytest
 from cobra.exceptions import Infeasible
 
 import memote.support.consistency as consistency
-from memote.utils import register_with
 import memote.support.consistency_helpers as con_helpers
+from memote.utils import register_with
+
 
 MODEL_REGISTRY = dict()
 
@@ -114,9 +115,9 @@ def blocked_reactions(base):
 @register_with(MODEL_REGISTRY)
 def produces_atp(base):
     """Returns a simple model with an EGC producing atp_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -129,17 +130,17 @@ def produces_atp(base):
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def infeasible(base):
     """Returns an infeasible model with an EGC producing atp_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
-    rd = cobra.Reaction('MAINTENANCE')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
+    rd = cobra.Reaction("MAINTENANCE")
     base.add_reactions([ra, rb, rc, rd])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -154,17 +155,17 @@ def infeasible(base):
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def maintenance_present(base):
     """Returns a model with an ATPM reaction"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
-    rd = cobra.Reaction('ATPM')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
+    rd = cobra.Reaction("ATPM")
     base.add_reactions([ra, rb, rc, rd])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -179,16 +180,16 @@ def maintenance_present(base):
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def missing_energy_partner(base):
     """Returns a broken model with a missing energy partner to atp"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -199,9 +200,9 @@ def missing_energy_partner(base):
 @register_with(MODEL_REGISTRY)
 def produces_nadh(base):
     """Returns a simple model with an EGC producing nadh_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -212,16 +213,16 @@ def produces_nadh(base):
     base.add_boundary(base.metabolites.nadh_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def produces_fadh2(base):
     """Returns a simple model with an EGC producing fadh2_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -232,16 +233,16 @@ def produces_fadh2(base):
     base.add_boundary(base.metabolites.fadh2_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def produces_accoa(base):
     """Returns a simple model with an EGC producing accoa_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -254,16 +255,16 @@ def produces_accoa(base):
     base.add_boundary(base.metabolites.accoa_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def produces_glu(base):
     """Returns a simple model with an EGC producing glu__L_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -276,7 +277,7 @@ def produces_glu(base):
     base.add_boundary(base.metabolites.glu__L_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
@@ -303,9 +304,9 @@ def produces_glu(base):
 @register_with(MODEL_REGISTRY)
 def no_atp(base):
     """Returns a simple model without an EGC producing atp_c"""
-    ra = cobra.Reaction('A')
-    rb = cobra.Reaction('B')
-    rc = cobra.Reaction('C')
+    ra = cobra.Reaction("A")
+    rb = cobra.Reaction("B")
+    rc = cobra.Reaction("C")
     base.add_reactions([ra, rb, rc])
     ra.reaction = "a <--> b"
     rb.reaction = "b <--> c"
@@ -318,14 +319,14 @@ def no_atp(base):
     base.add_boundary(base.metabolites.pi_c, type="sink")
     base.add_boundary(base.metabolites.c, type="demand")
     for met in base.metabolites:
-        met.compartment = 'c'
+        met.compartment = "c"
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def all_balanced(base):
-    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    met_a = cobra.Metabolite("A", formula="CHOPNS", charge=1)
+    met_b = cobra.Metabolite("B", formula="C2H2O2P2N2S2", charge=2)
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -2, met_b: 1})
     base.add_reactions([rxn1])
@@ -334,8 +335,8 @@ def all_balanced(base):
 
 @register_with(MODEL_REGISTRY)
 def mass_unbalanced(base):
-    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=2)
-    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    met_a = cobra.Metabolite("A", formula="CHOPNS", charge=2)
+    met_b = cobra.Metabolite("B", formula="C2H2O2P2N2S2", charge=2)
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -1, met_b: 1})
     base.add_reactions([rxn1])
@@ -344,8 +345,8 @@ def mass_unbalanced(base):
 
 @register_with(MODEL_REGISTRY)
 def charge_unbalanced(base):
-    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=1)
+    met_a = cobra.Metabolite("A", formula="CHOPNS", charge=1)
+    met_b = cobra.Metabolite("B", formula="C2H2O2P2N2S2", charge=1)
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -2, met_b: 1})
     base.add_reactions([rxn1])
@@ -355,7 +356,7 @@ def charge_unbalanced(base):
 @register_with(MODEL_REGISTRY)
 def met_no_formula(base):
     met_a = cobra.Metabolite("A", formula=None, charge=1)
-    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2', charge=2)
+    met_b = cobra.Metabolite("B", formula="C2H2O2P2N2S2", charge=2)
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -2, met_b: 1})
     base.add_reactions([rxn1])
@@ -364,8 +365,8 @@ def met_no_formula(base):
 
 @register_with(MODEL_REGISTRY)
 def met_no_charge(base):
-    met_a = cobra.Metabolite("A", formula='CHOPNS', charge=1)
-    met_b = cobra.Metabolite("B", formula='C2H2O2P2N2S2')
+    met_a = cobra.Metabolite("A", formula="CHOPNS", charge=1)
+    met_b = cobra.Metabolite("B", formula="C2H2O2P2N2S2")
     rxn1 = cobra.Reaction("RA1")
     rxn1.add_metabolites({met_a: -2, met_b: 1})
     base.add_reactions([rxn1])
@@ -375,9 +376,7 @@ def met_no_charge(base):
 @register_with(MODEL_REGISTRY)
 def loopy_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "v1", "v2", "v3"]]
-                       )
+    base.add_reactions([cobra.Reaction(i) for i in ["VA", "VB", "v1", "v2", "v3"]])
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.v1.add_metabolites({"A": -1, "B": 1})
@@ -386,7 +385,7 @@ def loopy_toy_model(base):
     base.reactions.v1.bounds = -1000, 1000
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = -1000, 1000
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -394,16 +393,14 @@ def loopy_toy_model(base):
 @register_with(MODEL_REGISTRY)
 def loopless_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "v1", "v2"]]
-                       )
+    base.add_reactions([cobra.Reaction(i) for i in ["VA", "VB", "v1", "v2"]])
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.v1.add_metabolites({"A": -1, "B": 1})
     base.reactions.v2.add_metabolites({"B": -1, "C": 1})
     base.reactions.v1.bounds = -1000, 1000
     base.reactions.v2.bounds = -1000, 1000
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -411,9 +408,7 @@ def loopless_toy_model(base):
 @register_with(MODEL_REGISTRY)
 def constrained_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "v1", "v2", "v3"]]
-                       )
+    base.add_reactions([cobra.Reaction(i) for i in ["VA", "VB", "v1", "v2", "v3"]])
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.v1.add_metabolites({"A": -1, "B": 1})
@@ -422,7 +417,7 @@ def constrained_toy_model(base):
     base.reactions.v1.bounds = -1000, 1000
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = 1, 1
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -430,9 +425,7 @@ def constrained_toy_model(base):
 @register_with(MODEL_REGISTRY)
 def infeasible_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "v1", "v2", "v3"]]
-                       )
+    base.add_reactions([cobra.Reaction(i) for i in ["VA", "VB", "v1", "v2", "v3"]])
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.v1.add_metabolites({"A": -1, "B": 1})
@@ -443,7 +436,7 @@ def infeasible_toy_model(base):
     base.reactions.v1.bounds = 2, 1000
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = 1, 1
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -451,9 +444,9 @@ def infeasible_toy_model(base):
 @register_with(MODEL_REGISTRY)
 def producing_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
-                       )
+    base.add_reactions(
+        [cobra.Reaction(i) for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+    )
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.VD.add_metabolites({"D": -1})
@@ -465,7 +458,7 @@ def producing_toy_model(base):
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = -1000, 1000
     base.reactions.v4.bounds = 0, 1
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -473,9 +466,9 @@ def producing_toy_model(base):
 @register_with(MODEL_REGISTRY)
 def consuming_toy_model(base):
     base.add_metabolites([cobra.Metabolite(i) for i in "ABCD"])
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
-                       )
+    base.add_reactions(
+        [cobra.Reaction(i) for i in ["VA", "VB", "VD", "v1", "v2", "v3", "v4"]]
+    )
     base.reactions.VA.add_metabolites({"A": 1})
     base.reactions.VB.add_metabolites({"C": -1})
     base.reactions.VD.add_metabolites({"D": -1})
@@ -487,7 +480,7 @@ def consuming_toy_model(base):
     base.reactions.v2.bounds = -1000, 1000
     base.reactions.v3.bounds = -1000, 1000
     base.reactions.v4.bounds = -1, 0
-    base.objective = 'VB'
+    base.objective = "VB"
     base.reactions.VB.bounds = 0, 1
     return base
 
@@ -513,8 +506,7 @@ def gap_model_2(base):
     b_c = cobra.Metabolite("b_c", compartment="c")
     c_c = cobra.Metabolite("c_c", compartment="c")
     d_c = cobra.Metabolite("d_c", compartment="c")
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["EX_A", "A2B", "C2D", "EX_D"]])
+    base.add_reactions([cobra.Reaction(i) for i in ["EX_A", "A2B", "C2D", "EX_D"]])
     base.reactions.EX_A.add_metabolites({a_c: -1})
     base.reactions.EX_D.add_metabolites({d_c: -1})
     base.reactions.A2B.add_metabolites({a_c: -1, b_c: 1})
@@ -561,73 +553,96 @@ def reversible_gap(base):
     return base
 
 
-@pytest.mark.parametrize("model, consistent", [
-    ("textbook", True),
-    ("figure_1", False),
-    ("equation_8", False),
-    ("figure_2", False),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, consistent",
+    [
+        ("textbook", True),
+        ("figure_1", False),
+        ("equation_8", False),
+        ("figure_2", False),
+    ],
+    indirect=["model"],
+)
 def test_check_stoichiometric_consistency(model, consistent):
     assert consistency.check_stoichiometric_consistency(model) is consistent
 
 
-@pytest.mark.parametrize("model, inconsistent", [
-    ("textbook", []),
-    ("figure_1", ["A'", "B'", "C'"]),
-    ("equation_8", ["A", "B", "C"]),
-    ("figure_2", ["X"]),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, inconsistent",
+    [
+        ("textbook", []),
+        ("figure_1", ["A'", "B'", "C'"]),
+        ("equation_8", ["A", "B", "C"]),
+        ("figure_2", ["X"]),
+    ],
+    indirect=["model"],
+)
 def test_find_unconserved_metabolites(model, inconsistent):
     unconserved_mets = consistency.find_unconserved_metabolites(model)
     assert set([met.id for met in unconserved_mets]) == set(inconsistent)
 
 
-@pytest.mark.parametrize("model, inconsistent", [
-    ("textbook", []),
-    ("figure_1", [("A'", "B'", "C'",)]),
-    ("equation_8", [("A",), ("B",), ("C",)]),
-    ("figure_2", [("X",)]),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, inconsistent",
+    [
+        ("textbook", []),
+        ("figure_1", [("A'", "B'", "C'",)]),
+        ("equation_8", [("A",), ("B",), ("C",)]),
+        ("figure_2", [("X",)]),
+    ],
+    indirect=["model"],
+)
 def test_find_inconsistent_min_stoichiometry(model, inconsistent):
     unconserved_sets = consistency.find_inconsistent_min_stoichiometry(model)
     for unconserved in unconserved_sets:
         assert tuple(met.id for met in unconserved) in set(inconsistent)
 
 
-@pytest.mark.parametrize("model, metabolite_id", [
-    # test control flow statements
-    ("produces_atp", 'MNXM3'),
-    ("produces_accoa", 'MNXM21'),
-    ("produces_fadh2", "MNXM38"),
-    ("produces_glu", "MNXM89557"),
-    ("produces_nadh", "MNXM10"),
-    ("maintenance_present", "MNXM3"),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, metabolite_id",
+    [
+        # test control flow statements
+        ("produces_atp", "MNXM3"),
+        ("produces_accoa", "MNXM21"),
+        ("produces_fadh2", "MNXM38"),
+        ("produces_glu", "MNXM89557"),
+        ("produces_nadh", "MNXM10"),
+        ("maintenance_present", "MNXM3"),
+    ],
+    indirect=["model"],
+)
 def test_detect_energy_generating_cycles_control_flow(model, metabolite_id):
     """Expect that energy-generating cycles don't exist for metabolite ID."""
     cycle = consistency.detect_energy_generating_cycles(model, metabolite_id)
-    assert set(cycle) == {'A', 'B', 'C'}
+    assert set(cycle) == {"A", "B", "C"}
 
 
-@pytest.mark.parametrize("model, metabolite_id, output", [
-    # test for possible exceptions
-    ("no_atp", "MNXM3", []),
-    ("infeasible", "MNXM3", {'A', 'B', 'C'})
-], indirect=["model"])
-def test_detect_energy_generating_cycles_exceptions(model, metabolite_id,
-                                                    output):
+@pytest.mark.parametrize(
+    "model, metabolite_id, output",
+    [
+        # test for possible exceptions
+        ("no_atp", "MNXM3", []),
+        ("infeasible", "MNXM3", {"A", "B", "C"}),
+    ],
+    indirect=["model"],
+)
+def test_detect_energy_generating_cycles_exceptions(model, metabolite_id, output):
     """Expect that energy-generating cycles don't exist for metabolite ID."""
     result = consistency.detect_energy_generating_cycles(model, metabolite_id)
     assert set(result) == set(output)
 
 
-@pytest.mark.parametrize("model, num", [
-    ("all_balanced", 0),
-    ("mass_unbalanced", 0),
-    ("charge_unbalanced", 1),
-    ("met_no_charge", 1),
-    ("met_no_formula", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("all_balanced", 0),
+        ("mass_unbalanced", 0),
+        ("charge_unbalanced", 1),
+        ("met_no_charge", 1),
+        ("met_no_formula", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_charge_unbalanced_reactions(model, num):
     """Expect all reactions to be charge balanced."""
     internal_rxns = con_helpers.get_internals(model)
@@ -635,13 +650,17 @@ def test_find_charge_unbalanced_reactions(model, num):
     assert len(reactions) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("all_balanced", 0),
-    ("mass_unbalanced", 1),
-    ("charge_unbalanced", 0),
-    ("met_no_charge", 0),
-    ("met_no_formula", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("all_balanced", 0),
+        ("mass_unbalanced", 1),
+        ("charge_unbalanced", 0),
+        ("met_no_charge", 0),
+        ("met_no_formula", 1),
+    ],
+    indirect=["model"],
+)
 def test_find_mass_unbalanced_reactions(model, num):
     """Expect all reactions to be mass balanced."""
     internal_rxns = con_helpers.get_internals(model)
@@ -649,119 +668,124 @@ def test_find_mass_unbalanced_reactions(model, num):
     assert len(reactions) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("loopy_toy_model", 3),
-    ("loopless_toy_model", 0),
-    ("infeasible_toy_model", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("loopy_toy_model", 3), ("loopless_toy_model", 0), ("infeasible_toy_model", 0),],
+    indirect=["model"],
+)
 def test_find_stoichiometrically_balanced_cycles(model, num):
     """Expect no stoichiometrically balanced loops to be present."""
-    rxns_in_loops = consistency.find_stoichiometrically_balanced_cycles(
-        model
-    )
+    rxns_in_loops = consistency.find_stoichiometrically_balanced_cycles(model)
     assert len(rxns_in_loops) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 1),
-    ("gapfilled_model", 0),
-    ("reversible_gap", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 1), ("gapfilled_model", 0), ("reversible_gap", 0)],
+    indirect=["model"],
+)
 def test_find_orphans(model, num):
     """Expect the appropriate amount of orphans to be found."""
     orphans = consistency.find_orphans(model)
     assert len(orphans) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 2),
-    ("gapfilled_model", 0),
-    ("reversible_gap", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 2), ("gapfilled_model", 0), ("reversible_gap", 1)],
+    indirect=["model"],
+)
 def test_find_deadends(model, num):
     """Expect the appropriate amount of deadends to be found."""
     deadends = consistency.find_deadends(model)
     assert len(deadends) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 1),
-    ("gapfilled_model", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num", [("gap_model", 1), ("gapfilled_model", 0),], indirect=["model"]
+)
 def test_find_disconnected(model, num):
     """Expect the appropriate amount of disconnected to be found."""
     disconnected = consistency.find_disconnected(model)
     assert len(disconnected) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 4),
-    ("gap_model_2", 1),
-    ("gapfilled_model", 0),
-], indirect=['model'])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    indirect=["model"],
+)
 def test_find_metabolites_not_produced_with_open_bounds(model, num):
     """Expect the appropriate amount of nonproduced metabolites to be found."""
     badmets = consistency.find_metabolites_not_produced_with_open_bounds(model)
     assert len(badmets) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 4),
-    ("gap_model_2", 1),
-    ("gapfilled_model", 0),
-], indirect=['model'])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    indirect=["model"],
+)
 def test_parallel_find_metabolites_not_produced_with_open_bounds(model, num):
     """Expect the appropriate amount of nonproduced metabolites to be found."""
-    badmets = consistency.find_metabolites_not_produced_with_open_bounds(
-        model, 1)
-    multi_badmets = consistency.find_metabolites_not_produced_with_open_bounds(
-        model, 2)
+    badmets = consistency.find_metabolites_not_produced_with_open_bounds(model, 1)
+    multi_badmets = consistency.find_metabolites_not_produced_with_open_bounds(model, 2)
     assert badmets == multi_badmets
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 4),
-    ("gap_model_2", 1),
-    ("gapfilled_model", 0),
-], indirect=['model'])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    indirect=["model"],
+)
 def test_find_metabolites_not_consumed_with_open_bounds(model, num):
     """Expect the appropriate amount of nonconsumed metabolites to be found."""
     badmets = consistency.find_metabolites_not_consumed_with_open_bounds(model)
     assert len(badmets) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gap_model", 4),
-    ("gap_model_2", 1),
-    ("gapfilled_model", 0),
-], indirect=['model'])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    indirect=["model"],
+)
 def test_parallel_find_metabolites_not_consumed_with_open_bounds(model, num):
     """Expect the appropriate amount of nonconsumed metabolites to be found."""
-    badmets = consistency.find_metabolites_not_consumed_with_open_bounds(
-        model, 1)
-    multi_badmets = consistency.find_metabolites_not_consumed_with_open_bounds(
-        model, 2)
+    badmets = consistency.find_metabolites_not_consumed_with_open_bounds(model, 1)
+    multi_badmets = consistency.find_metabolites_not_consumed_with_open_bounds(model, 2)
     assert badmets == multi_badmets
 
 
-@pytest.mark.parametrize("model, fraction", [
-    ("blocked_reactions", 1.0),
-    ("constrained_toy_model", 0.0),
-    ("loopy_toy_model", 0.6)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, fraction",
+    [
+        ("blocked_reactions", 1.0),
+        ("constrained_toy_model", 0.0),
+        ("loopy_toy_model", 0.6),
+    ],
+    indirect=["model"],
+)
 def test_find_reactions_with_unbounded_flux_default_condition(model, fraction):
     """Expect the number of unbounded and blocked metabolites to be correct."""
-    _, unb_fraction, _ = \
-        consistency.find_reactions_with_unbounded_flux_default_condition(model)
+    (
+        _,
+        unb_fraction,
+        _,
+    ) = consistency.find_reactions_with_unbounded_flux_default_condition(model)
     assert unb_fraction == fraction
 
 
-@pytest.mark.parametrize("model", [
-    pytest.param("missing_energy_partner",
-                 marks=pytest.mark.raises(exception=ZeroDivisionError)),
-    pytest.param("infeasible",
-                 marks=pytest.mark.raises(exception=Infeasible))
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        pytest.param(
+            "missing_energy_partner",
+            marks=pytest.mark.raises(exception=ZeroDivisionError),
+        ),
+        pytest.param("infeasible", marks=pytest.mark.raises(exception=Infeasible)),
+    ],
+    indirect=["model"],
+)
 def test_find_reactions_with_unbounded_flux_default_condition_errors(model):
     """Expect the number of unbounded and blocked metabolites to be correct."""
     consistency.find_reactions_with_unbounded_flux_default_condition(model)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
 
 # Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
@@ -16,14 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 """Install the metabolic model test suite."""
 
-from __future__ import absolute_import
 
+import versioneer
 from setuptools import setup
 
 
 # All other keys are defined in `setup.cfg` under [metadata] and [options].
-setup(
-    version="0.11.1",
-)
+setup(version=versioneer.get_version(), cmdclass=versioneer.get_cmdclass())

@@ -23,17 +23,22 @@ from sys import version_info
 
 import pytest
 
-if version_info[:2] < (3, 5):
-    pytest.skip("Thermodynamic tests require at least Python version 3.5.",
-                allow_module_level=True)
 
-import memote.support.thermodynamics as thermo  # noqa
+if version_info[:2] < (3, 5):
+    pytest.skip(
+        "Thermodynamic tests require at least Python version 3.5.",
+        allow_module_level=True,
+    )
+
 import memote.support.basic as basic  # noqa
+import memote.support.thermodynamics as thermo  # noqa
 from memote.utils import annotate, get_ids, wrapper  # noqa
 
 
-@annotate(title="Thermodynamic Reversibility of Purely Metabolic Reactions",
-          format_type="percent")
+@annotate(
+    title="Thermodynamic Reversibility of Purely Metabolic Reactions",
+    format_type="percent",
+)
 def test_find_candidate_irreversible_reactions(model):
     u"""
     Identify reversible reactions that could be irreversible.
@@ -81,15 +86,19 @@ def test_find_candidate_irreversible_reactions(model):
     threshold = 7.0
     ann = test_find_candidate_irreversible_reactions.annotation
     met_rxns = basic.find_pure_metabolic_reactions(model)
-    rev_index, incomplete, problematic, unbalanced = \
-        thermo.find_thermodynamic_reversibility_index(met_rxns)
+    (
+        rev_index,
+        incomplete,
+        problematic,
+        unbalanced,
+    ) = thermo.find_thermodynamic_reversibility_index(met_rxns)
     ann["data"] = (
         # The reversibility index can be infinite so we convert it to a JSON
         # compatible string.
         [(r.id, str(i)) for r, i in rev_index],
         get_ids(incomplete),
         get_ids(problematic),
-        get_ids(unbalanced)
+        get_ids(unbalanced),
     )
     num_irrev = sum(1 for r, i in rev_index if abs(i) >= threshold)
     ann["message"] = wrapper.fill(
@@ -98,7 +107,8 @@ def test_find_candidate_irreversible_reactions(model):
         candidates for being irreversible.
         {} reactions could not be mapped to KEGG completely, {} contained
         'problematic' metabolites, and {} are chemically or redox imbalanced.
-        """.format(len(met_rxns), num_irrev, len(incomplete), len(problematic),
-                   len(unbalanced))
+        """.format(
+            len(met_rxns), num_irrev, len(incomplete), len(problematic), len(unbalanced)
+        )
     )
     ann["metric"] = num_irrev / len(rev_index)

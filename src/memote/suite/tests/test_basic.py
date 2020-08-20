@@ -21,8 +21,7 @@ from __future__ import absolute_import, division
 
 import memote.support.basic as basic
 import memote.support.helpers as helpers
-from memote.utils import (
-    annotate, get_ids, get_ids_and_bounds, truncate, wrapper)
+from memote.utils import annotate, get_ids, get_ids_and_bounds, truncate, wrapper
 
 
 @annotate(title="Model Identifier", format_type="raw")
@@ -67,8 +66,7 @@ def test_genes_presence(model):
     ann = test_genes_presence.annotation
     assert hasattr(model, "genes")
     ann["data"] = get_ids(model.genes)
-    ann["message"] = "{:d} genes are defined in the model.".format(
-        len(ann["data"]))
+    ann["message"] = "{:d} genes are defined in the model.".format(len(ann["data"]))
     assert len(ann["data"]) >= 1, ann["message"]
 
 
@@ -89,8 +87,7 @@ def test_reactions_presence(model):
     ann = test_reactions_presence.annotation
     assert hasattr(model, "reactions")
     ann["data"] = get_ids(model.reactions)
-    ann["message"] = "{:d} reactions are defined in the model.".format(
-        len(ann["data"]))
+    ann["message"] = "{:d} reactions are defined in the model.".format(len(ann["data"]))
     assert len(ann["data"]) >= 1, ann["message"]
 
 
@@ -113,7 +110,8 @@ def test_metabolites_presence(model):
     assert hasattr(model, "metabolites")
     ann["data"] = get_ids(model.metabolites)
     ann["message"] = "{:d} metabolites are defined in the model.".format(
-        len(ann["data"]))
+        len(ann["data"])
+    )
     assert len(ann["data"]) >= 1, ann["message"]
 
 
@@ -136,13 +134,14 @@ def test_metabolites_formula_presence(model):
 
     """
     ann = test_metabolites_formula_presence.annotation
-    ann["data"] = get_ids(
-        basic.check_metabolites_formula_presence(model))
+    ann["data"] = get_ids(basic.check_metabolites_formula_presence(model))
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """There are a total of {}
         metabolites ({:.2%}) without a formula: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -165,13 +164,14 @@ def test_metabolites_charge_presence(model):
 
     """
     ann = test_metabolites_charge_presence.annotation
-    ann["data"] = get_ids(
-        basic.check_metabolites_charge_presence(model))
+    ann["data"] = get_ids(basic.check_metabolites_charge_presence(model))
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """There are a total of {}
         metabolites ({:.2%}) without a charge: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -202,12 +202,14 @@ def test_gene_protein_reaction_rule_presence(model):
     ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """There are a total of {} reactions ({:.2%}) without GPR:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Non-Growth Associated Maintenance Reaction",
-          format_type="count")
+@annotate(title="Non-Growth Associated Maintenance Reaction", format_type="count")
 def test_ngam_presence(model):
     """
     Expect a single non growth-associated maintenance reaction.
@@ -237,7 +239,10 @@ def test_ngam_presence(model):
     ann["metric"] = 1.0 - float(len(ann["data"]) == 1)
     ann["message"] = wrapper.fill(
         """A total of {} NGAM reactions could be identified:
-        {}""".format(len(ann["data"]), truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 1, ann["message"]
 
 
@@ -263,7 +268,8 @@ def test_metabolic_coverage(model):
     ann["data"] = (len(model.reactions), len(model.genes))
     ann["metric"] = basic.calculate_metabolic_coverage(model)
     ann["message"] = wrapper.fill(
-        """The degree of metabolic coverage is {:.2}.""".format(ann["metric"]))
+        """The degree of metabolic coverage is {:.2}.""".format(ann["metric"])
+    )
     assert ann["metric"] >= 1, ann["message"]
 
 
@@ -293,7 +299,9 @@ def test_compartments_presence(model):
     ann["metric"] = 1.0 - float(len(ann["data"]) >= 2)
     ann["message"] = wrapper.fill(
         """A total of {:d} compartments are defined in the model: {}""".format(
-            len(ann["data"]), truncate(ann["data"])))
+            len(ann["data"]), truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) >= 2, ann["message"]
 
 
@@ -322,7 +330,10 @@ def test_protein_complex_presence(model):
     ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {:d} reactions are catalyzed by complexes defined
-        through GPR rules in the model.""".format(len(ann["data"])))
+        through GPR rules in the model.""".format(
+            len(ann["data"])
+        )
+    )
     assert len(ann["data"]) >= 1, ann["message"]
 
 
@@ -347,18 +358,19 @@ def test_find_pure_metabolic_reactions(model):
 
     """
     ann = test_find_pure_metabolic_reactions.annotation
-    ann["data"] = get_ids(
-        basic.find_pure_metabolic_reactions(model))
+    ann["data"] = get_ids(basic.find_pure_metabolic_reactions(model))
     ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions are defined in
         the model, this excludes transporters, exchanges, or pseudo-reactions:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Purely Metabolic Reactions with Constraints",
-          format_type="count")
+@annotate(title="Purely Metabolic Reactions with Constraints", format_type="count")
 def test_find_constrained_pure_metabolic_reactions(model):
     """
     Expect zero or more purely metabolic reactions to have fixed constraints.
@@ -378,14 +390,16 @@ def test_find_constrained_pure_metabolic_reactions(model):
     ann = test_find_constrained_pure_metabolic_reactions.annotation
     pmr = basic.find_pure_metabolic_reactions(model)
     ann["data"] = get_ids_and_bounds(
-        [rxn for rxn in pmr if basic.is_constrained_reaction(
-            model, rxn)])
+        [rxn for rxn in pmr if basic.is_constrained_reaction(model, rxn)]
+    )
     ann["metric"] = len(ann["data"]) / len(pmr)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) purely metabolic reactions have fixed
         constraints in the model, this excludes transporters, exchanges, or
-        pseudo-reactions: {}""".format(len(ann["data"]), ann["metric"],
-                                       truncate(ann["data"])))
+        pseudo-reactions: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
 
 
 @annotate(title="Transport Reactions", format_type="count")
@@ -430,12 +444,13 @@ def test_find_transport_reactions(model):
         """A total of {:d} ({:.2%}) transport reactions are defined in the
         model, this excludes purely metabolic reactions, exchanges, or
         pseudo-reactions: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) >= 1, ann["message"]
 
 
-@annotate(title="Transport Reactions with Constraints",
-          format_type="count")
+@annotate(title="Transport Reactions with Constraints", format_type="count")
 def test_find_constrained_transport_reactions(model):
     """
     Expect zero or more transport reactions to have fixed constraints.
@@ -456,17 +471,18 @@ def test_find_constrained_transport_reactions(model):
     ann = test_find_constrained_transport_reactions.annotation
     transporters = helpers.find_transport_reactions(model)
     ann["data"] = get_ids_and_bounds(
-        [rxn for rxn in transporters if basic.is_constrained_reaction(
-            model, rxn)])
+        [rxn for rxn in transporters if basic.is_constrained_reaction(model, rxn)]
+    )
     ann["metric"] = len(ann["data"]) / len(transporters)
     ann["message"] = wrapper.fill(
         """A total of {:d} ({:.2%}) transport reactions have fixed
-        constraints in the model: {}""".format(len(ann["data"]), ann["metric"],
-                                               truncate(ann["data"])))
+        constraints in the model: {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
 
 
-@annotate(title="Fraction of Transport Reactions without GPR",
-          format_type="percent")
+@annotate(title="Fraction of Transport Reactions without GPR", format_type="percent")
 def test_transport_reaction_gpr_presence(model):
     """
     Expect a small fraction of transport reactions not to have a GPR rule.
@@ -486,21 +502,19 @@ def test_transport_reaction_gpr_presence(model):
     """
     # TODO: Update threshold with improved insight from meta study.
     ann = test_transport_reaction_gpr_presence.annotation
-    ann["data"] = get_ids(
-        basic.check_transport_reaction_gpr_presence(model)
-    )
-    ann["metric"] = len(ann["data"]) / len(
-        helpers.find_transport_reactions(model)
-    )
+    ann["data"] = get_ids(basic.check_transport_reaction_gpr_presence(model))
+    ann["metric"] = len(ann["data"]) / len(helpers.find_transport_reactions(model))
     ann["message"] = wrapper.fill(
         """There are a total of {} transport reactions ({:.2%} of all
         transport reactions) without GPR:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert ann["metric"] < 0.2, ann["message"]
 
 
-@annotate(title="Number of Reversible Oxygen-Containing Reactions",
-          format_type="count")
+@annotate(title="Number of Reversible Oxygen-Containing Reactions", format_type="count")
 def test_find_reversible_oxygen_reactions(model):
     """
     Expect zero or more oxygen-containing reactions to be reversible.
@@ -524,7 +538,9 @@ def test_find_reversible_oxygen_reactions(model):
     ann["message"] = wrapper.fill(
         """There are a total of {} reversible oxygen-containing reactions
         ({:.2%} of all oxygen-containing reactions): {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
 
 
 @annotate(title="Unique Metabolites", format_type="count")
@@ -551,12 +567,13 @@ def test_find_unique_metabolites(model):
     ann["message"] = wrapper.fill(
         """Not counting the same entities in other compartments, there is a
         total of {} ({:.2%}) unique metabolites in the model: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) < len(model.metabolites), ann["message"]
 
 
-@annotate(title="Duplicate Metabolites in Identical Compartments",
-          format_type="count")
+@annotate(title="Duplicate Metabolites in Identical Compartments", format_type="count")
 def test_find_duplicate_metabolites_in_compartments(model):
     """
     Expect there to be zero duplicate metabolites in the same compartments.
@@ -575,20 +592,18 @@ def test_find_duplicate_metabolites_in_compartments(model):
 
     """
     ann = test_find_duplicate_metabolites_in_compartments.annotation
-    ann["data"] = basic.find_duplicate_metabolites_in_compartments(
-        model)
+    ann["data"] = basic.find_duplicate_metabolites_in_compartments(model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """There are a total of {} metabolites in the model which
         have duplicates in the same compartment: {}""".format(
-            len(ann["data"]), truncate(ann["data"])))
+            len(ann["data"]), truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Reactions With Partially Identical Annotations",
-    format_type="percent"
-)
+@annotate(title="Reactions With Partially Identical Annotations", format_type="percent")
 def test_find_reactions_with_partially_identical_annotations(model):
     """
     Expect there to be zero duplicate reactions.
@@ -613,14 +628,16 @@ def test_find_reactions_with_partially_identical_annotations(model):
 
     """
     ann = test_find_reactions_with_partially_identical_annotations.annotation
-    duplicates, total = \
-        basic.find_reactions_with_partially_identical_annotations(model)
+    duplicates, total = basic.find_reactions_with_partially_identical_annotations(model)
     ann["data"] = duplicates
     ann["metric"] = total / len(model.reactions)
     ann["message"] = wrapper.fill(
         """Based on annotations there are {} different groups of overlapping
         annotation which corresponds to a total of {} duplicated reactions in
-        the model.""".format(len(duplicates), total))
+        the model.""".format(
+            len(duplicates), total
+        )
+    )
     assert total == 0, ann["message"]
 
 
@@ -657,7 +674,10 @@ def test_find_duplicate_reactions(model):
     ann["message"] = wrapper.fill(
         """Based on metabolites, directionality and compartment there are a
         total of {} reactions in the model which have duplicates:
-        {}""".format(num, truncate(duplicates)))
+        {}""".format(
+            num, truncate(duplicates)
+        )
+    )
     assert num == 0, ann["message"]
 
 
@@ -688,7 +708,9 @@ def test_find_reactions_with_identical_genes(model):
         """Based only on equal genes there are {} different groups of
         identical reactions which corresponds to a total of {}
         duplicated reactions in the model.""".format(
-            len(rxn_groups), num_dup))
+            len(rxn_groups), num_dup
+        )
+    )
     assert num_dup == 0, ann["message"]
 
 
@@ -714,5 +736,7 @@ def test_find_medium_metabolites(model):
     ann["message"] = wrapper.fill(
         """There are a total of {} metabolites in the currently set medium
         (out of {} defined extra-cellular metabolites)
-        in the model: {}""".format(len(ann["data"]), num_ex,
-                                   truncate(ann["data"])))
+        in the model: {}""".format(
+            len(ann["data"]), num_ex, truncate(ann["data"])
+        )
+    )

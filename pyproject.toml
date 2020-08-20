@@ -1,14 +1,14 @@
 [build-system]
 requires = [
-  "setuptools>=40.6.0",
-  "wheel"
+  'setuptools>=40.6.0',
+  'wheel'
 ]
 
 [tool.black]
-line-length = 80
+line-length = 88
 python-version = ['py36']
 exclude = '''
 (
-    __init__.py
+    _version.py
 )
 '''

@@ -19,20 +19,21 @@
 
 from __future__ import absolute_import
 
-from os.path import join, dirname
+from os.path import dirname, join
 
 import libsbml
 import pytest
 
 import memote.support.validation as val
 
+
 sbml_valid = join(dirname(__file__), "data", "validation", "tiny_FBC.xml")
 sbml_invalid = join(dirname(__file__), "data", "validation", "tiny_FBC2.xml")
 
 
-@pytest.mark.parametrize("filename, expected", [
-    (sbml_valid, [0, 0, False]),
-    (sbml_invalid, [2, 0, True])])
+@pytest.mark.parametrize(
+    "filename, expected", [(sbml_valid, [0, 0, False]), (sbml_invalid, [2, 0, True])]
+)
 def test_load_cobra_model(filename, expected):
     notifications = {"warnings": [], "errors": []}
     model, _ = val.load_cobra_model(filename, notifications)
@@ -42,9 +43,9 @@ def test_load_cobra_model(filename, expected):
     assert (model is None) == expected[2]
 
 
-@pytest.mark.parametrize("filename, expected", [
-    (sbml_valid, [0, 0]),
-    (sbml_invalid, [1, 0])])
+@pytest.mark.parametrize(
+    "filename, expected", [(sbml_valid, [0, 0]), (sbml_invalid, [1, 0])]
+)
 def test_run_libsbml_validation(filename, expected):
     notifications = {"warnings": [], "errors": []}
     document = libsbml.readSBML(filename)

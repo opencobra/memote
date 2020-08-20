@@ -23,6 +23,7 @@ import logging
 
 from memote.suite.reporting.report import Report
 
+
 LOGGER = logging.getLogger(__name__)
 
 

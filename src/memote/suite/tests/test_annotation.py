@@ -24,7 +24,7 @@ from builtins import dict
 import pytest
 
 import memote.support.annotation as annotation
-from memote.utils import annotate, truncate, get_ids, wrapper
+from memote.utils import annotate, get_ids, truncate, wrapper
 
 
 @annotate(title="Presence of Metabolite Annotation", format_type="count")
@@ -44,12 +44,16 @@ def test_metabolite_annotation_presence(model):
 
     """
     ann = test_metabolite_annotation_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_annotation(
-        model, "metabolites"))
+    ann["data"] = get_ids(
+        annotation.find_components_without_annotation(model, "metabolites")
+    )
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} metabolites ({:.2%}) lack any form of annotation:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -70,12 +74,16 @@ def test_reaction_annotation_presence(model):
 
     """
     ann = test_reaction_annotation_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_annotation(
-        model, "reactions"))
+    ann["data"] = get_ids(
+        annotation.find_components_without_annotation(model, "reactions")
+    )
     ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """A total of {} reactions ({:.2%}) lack any form of annotation:
-        {}""".format(len(ann["data"]), ann["metric"], truncate(ann["data"])))
+        {}""".format(
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -97,19 +105,25 @@ def test_gene_product_annotation_presence(model):
 
     """
     ann = test_gene_product_annotation_presence.annotation
-    ann["data"] = get_ids(annotation.find_components_without_annotation(
-        model, "genes"))
+    ann["data"] = get_ids(annotation.find_components_without_annotation(model, "genes"))
     ann["metric"] = len(ann["data"]) / len(model.genes)
     ann["message"] = wrapper.fill(
         """A total of {} genes ({:.2%}) lack any form of
         annotation: {}""".format(
-            len(ann["data"]), ann["metric"], truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
-@annotate(title="Metabolite Annotations Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Metabolite Annotations Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_metabolite_annotation_overview(model, db):
     """
     Expect all metabolites to have annotations from common databases.
@@ -143,19 +157,26 @@ def test_metabolite_annotation_overview(model, db):
     """
     ann = test_metabolite_annotation_overview.annotation
     ann["data"][db] = get_ids(
-        annotation.generate_component_annotation_overview(
-            model.metabolites, db))
+        annotation.generate_component_annotation_overview(model.metabolites, db)
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(model.metabolites)
     ann["message"][db] = wrapper.fill(
         """The following {} metabolites ({:.2%}) lack annotation for {}:
-        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
-                     truncate(ann["data"][db])))
+        {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", list(annotation.REACTION_ANNOTATIONS))
-@annotate(title="Reaction Annotations Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Reaction Annotations Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_reaction_annotation_overview(model, db):
     """
     Expect all reactions to have annotations from common databases.
@@ -189,19 +210,26 @@ def test_reaction_annotation_overview(model, db):
     """
     ann = test_reaction_annotation_overview.annotation
     ann["data"][db] = get_ids(
-        annotation.generate_component_annotation_overview(
-            model.reactions, db))
+        annotation.generate_component_annotation_overview(model.reactions, db)
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(model.reactions)
     ann["message"][db] = wrapper.fill(
         """The following {} reactions ({:.2%}) lack annotation for {}:
-        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
-                     truncate(ann["data"][db])))
+        {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", list(annotation.GENE_PRODUCT_ANNOTATIONS))
-@annotate(title="Gene Annotations Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Gene Annotations Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_gene_product_annotation_overview(model, db):
     """
     Expect all genes to have annotations from common databases.
@@ -235,19 +263,26 @@ def test_gene_product_annotation_overview(model, db):
     """
     ann = test_gene_product_annotation_overview.annotation
     ann["data"][db] = get_ids(
-        annotation.generate_component_annotation_overview(
-            model.genes, db))
+        annotation.generate_component_annotation_overview(model.genes, db)
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(model.genes)
     ann["message"][db] = wrapper.fill(
         """The following {} genes ({:.2%}) lack annotation for {}:
-        {}""".format(len(ann["data"][db]), ann["metric"][db], db,
-                     truncate(ann["data"][db])))
+        {}""".format(
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", list(annotation.METABOLITE_ANNOTATIONS))
-@annotate(title="Metabolite Annotation Conformity Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Metabolite Annotation Conformity Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_metabolite_annotation_wrong_ids(model, db):
     """
     Expect all annotations of metabolites to be in the correct format.
@@ -272,29 +307,41 @@ def test_metabolite_annotation_wrong_ids(model, db):
     ann = test_metabolite_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
         set(model.metabolites).difference(
-            annotation.generate_component_annotation_overview(
-                model.metabolites, db)))
+            annotation.generate_component_annotation_overview(model.metabolites, db)
+        )
+    )
     ann["metric"][db] = 1.0
     ann["message"][db] = wrapper.fill(
         """There are no metabolite annotations for the {} database.
-        """.format(db))
+        """.format(
+            db
+        )
+    )
     assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
         annotation.generate_component_annotation_miriam_match(
-            model.metabolites, "metabolites", db))
+            model.metabolites, "metabolites", db
+        )
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(total)
     ann["message"][db] = wrapper.fill(
         """A total of {} metabolite annotations ({:.2%}) do not match the
         regular expression patterns defined on identifiers.org for the {}
         database: {}""".format(
-            len(ann["data"][db]), ann["metric"][db], db,
-            truncate(ann["data"][db])))
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", annotation.REACTION_ANNOTATIONS)
-@annotate(title="Reaction Annotation Conformity Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Reaction Annotation Conformity Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_reaction_annotation_wrong_ids(model, db):
     """
     Expect all annotations of reactions to be in the correct format.
@@ -319,29 +366,41 @@ def test_reaction_annotation_wrong_ids(model, db):
     ann = test_reaction_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
         set(model.reactions).difference(
-            annotation.generate_component_annotation_overview(
-                model.reactions, db)))
+            annotation.generate_component_annotation_overview(model.reactions, db)
+        )
+    )
     ann["metric"][db] = 1.0
     ann["message"][db] = wrapper.fill(
         """There are no reaction annotations for the {} database.
-        """.format(db))
+        """.format(
+            db
+        )
+    )
     assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
         annotation.generate_component_annotation_miriam_match(
-            model.reactions, "reactions", db))
+            model.reactions, "reactions", db
+        )
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(model.reactions)
     ann["message"][db] = wrapper.fill(
         """A total of {} reaction annotations ({:.2%}) do not match the
         regular expression patterns defined on identifiers.org for the {}
         database: {}""".format(
-            len(ann["data"][db]), ann["metric"][db], db,
-            truncate(ann["data"][db])))
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
 @pytest.mark.parametrize("db", annotation.GENE_PRODUCT_ANNOTATIONS)
-@annotate(title="Gene Annotation Conformity Per Database",
-          format_type="percent", message=dict(), data=dict(), metric=dict())
+@annotate(
+    title="Gene Annotation Conformity Per Database",
+    format_type="percent",
+    message=dict(),
+    data=dict(),
+    metric=dict(),
+)
 def test_gene_product_annotation_wrong_ids(model, db):
     """
     Expect all annotations of genes/gene-products to be in the correct format.
@@ -366,23 +425,28 @@ def test_gene_product_annotation_wrong_ids(model, db):
     ann = test_gene_product_annotation_wrong_ids.annotation
     ann["data"][db] = total = get_ids(
         set(model.genes).difference(
-            annotation.generate_component_annotation_overview(
-                model.genes, db)))
+            annotation.generate_component_annotation_overview(model.genes, db)
+        )
+    )
     ann["metric"][db] = 1.0
     ann["message"][db] = wrapper.fill(
         """There are no gene annotations for the {} database.
-        """.format(db))
+        """.format(
+            db
+        )
+    )
     assert len(total) > 0, ann["message"][db]
     ann["data"][db] = get_ids(
-        annotation.generate_component_annotation_miriam_match(
-            model.genes, "genes", db))
+        annotation.generate_component_annotation_miriam_match(model.genes, "genes", db)
+    )
     ann["metric"][db] = len(ann["data"][db]) / len(model.genes)
     ann["message"][db] = wrapper.fill(
         """A total of {} gene annotations ({:.2%}) do not match the
         regular expression patterns defined on identifiers.org for the {}
         database: {}""".format(
-            len(ann["data"][db]), ann["metric"][db], db,
-            truncate(ann["data"][db])))
+            len(ann["data"][db]), ann["metric"][db], db, truncate(ann["data"][db])
+        )
+    )
     assert len(ann["data"][db]) == 0, ann["message"][db]
 
 
@@ -413,19 +477,23 @@ def test_metabolite_id_namespace_consistency(model):
 
     """
     ann = test_metabolite_id_namespace_consistency.annotation
-    overview = annotation.generate_component_id_namespace_overview(
-        model, "metabolites")
+    overview = annotation.generate_component_id_namespace_overview(model, "metabolites")
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
     # Assume that all identifiers match the largest namespace.
-    ann["data"] = list(set(get_ids(model.metabolites)).difference(
-        overview[overview[largest]].index.tolist()))
+    ann["data"] = list(
+        set(get_ids(model.metabolites)).difference(
+            overview[overview[largest]].index.tolist()
+        )
+    )
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """{} metabolite identifiers ({:.2%}) deviate from the largest found
         namespace ({}): {}""".format(
-            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]
 
 
@@ -456,17 +524,21 @@ def test_reaction_id_namespace_consistency(model):
 
     """
     ann = test_reaction_id_namespace_consistency.annotation
-    overview = annotation.generate_component_id_namespace_overview(
-        model, "reactions")
+    overview = annotation.generate_component_id_namespace_overview(model, "reactions")
     distribution = overview.sum()
     cols = list(distribution.index)
     largest = distribution[cols].idxmax()
     # Assume that all identifiers match the largest namespace.
-    ann["data"] = list(set(get_ids(model.reactions)).difference(
-        overview[overview[largest]].index.tolist()))
+    ann["data"] = list(
+        set(get_ids(model.reactions)).difference(
+            overview[overview[largest]].index.tolist()
+        )
+    )
     ann["metric"] = len(ann["data"]) / len(model.reactions)
     ann["message"] = wrapper.fill(
         """{} reaction identifiers ({:.2%}) deviate from the largest found
         namespace ({}): {}""".format(
-            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])))
+            len(ann["data"]), ann["metric"], largest, truncate(ann["data"])
+        )
+    )
     assert len(ann["data"]) == 0, ann["message"]

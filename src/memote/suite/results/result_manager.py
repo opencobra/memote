@@ -19,13 +19,14 @@
 
 from __future__ import absolute_import
 
-import logging
 import gzip
 import json
+import logging
 from builtins import open
 
-from memote.utils import jsonify
 from memote.suite.results.result import MemoteResult
+from memote.utils import jsonify
+
 
 __all__ = ("ResultManager",)
 
@@ -56,9 +57,7 @@ class ResultManager(object):
         LOGGER.info("Storing result in '%s'.", filename)
         if filename.endswith(".gz"):
             with gzip.open(filename, "wb") as file_handle:
-                file_handle.write(
-                    jsonify(result, pretty=pretty).encode("utf-8")
-                )
+                file_handle.write(jsonify(result, pretty=pretty).encode("utf-8"))
         else:
             with open(filename, "w", encoding="utf-8") as file_handle:
                 file_handle.write(jsonify(result, pretty=pretty))
@@ -68,9 +67,7 @@ class ResultManager(object):
         LOGGER.info("Loading result from '%s'.", filename)
         if filename.endswith(".gz"):
             with gzip.open(filename, "rb") as file_handle:
-                result = MemoteResult(
-                    json.loads(file_handle.read().decode("utf-8"))
-                )
+                result = MemoteResult(json.loads(file_handle.read().decode("utf-8")))
         else:
             with open(filename, "r", encoding="utf-8") as file_handle:
                 result = MemoteResult(json.load(file_handle))

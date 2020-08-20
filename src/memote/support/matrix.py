@@ -20,8 +20,11 @@
 from __future__ import absolute_import
 
 import logging
+
 import numpy as np
+
 import memote.support.consistency_helpers as con_helpers
+
 
 LOGGER = logging.getLogger(__name__)
 

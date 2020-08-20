@@ -19,10 +19,10 @@
 
 from __future__ import absolute_import
 
+import logging
 import shlex
 import sys
-import logging
-from subprocess import check_output, CalledProcessError
+from subprocess import CalledProcessError, check_output
 
 import click
 import git
@@ -63,8 +63,7 @@ def validate_repository(context, param, value):
     if value is not None:
         return value
     else:
-        raise click.BadParameter(
-            "No GitHub repository slug provided or configured.")
+        raise click.BadParameter("No GitHub repository slug provided or configured.")
 
 
 def validate_username(context, param, value):
@@ -72,8 +71,7 @@ def validate_username(context, param, value):
     if value is not None:
         return value
     else:
-        raise click.BadParameter(
-            "No GitHub username provided or configured.")
+        raise click.BadParameter("No GitHub username provided or configured.")
 
 
 def probe_git():
@@ -84,12 +82,14 @@ def probe_git():
         LOGGER.warning(
             "We highly recommend keeping your model in a git repository."
             " It allows you to track changes and to easily collaborate with"
-            " others via online platforms such as https://github.com.\n")
+            " others via online platforms such as https://github.com.\n"
+        )
         return
     if repo.is_dirty():
         LOGGER.critical(
             "Please git commit or git stash all changes before running"
-            " the memote suite.")
+            " the memote suite."
+        )
         sys.exit(1)
     return repo
 
@@ -104,12 +104,13 @@ def git_installed():
     """Interrupt execution of memote if `git` has not been installed."""
     LOGGER.info("Checking `git` installation.")
     try:
-        check_output(['git', '--version'])
+        check_output(["git", "--version"])
     except CalledProcessError as e:
         LOGGER.critical(
             "The execution of memote was interrupted since no installation of "
             "`git` could be detected. Please install git to use "
             "this functionality: "
-            "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git")
+            "https://git-scm.com/book/en/v2/Getting-Started-Installing-Git"
+        )
         LOGGER.debug("Underlying error:", exc_info=e)
         sys.exit(1)

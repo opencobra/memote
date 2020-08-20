@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -15,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 """
 (me)tabolic (mo)del (te)sts.
 
@@ -22,24 +21,19 @@ The memote Python package is a community-driven effort towards a standardized
 genome-scale metabolic model test suite.
 """
 
-from __future__ import absolute_import
+
+__author__ = "Moritz E. Beber"
+__email__ = "midnighter@posteo.net"
+
+
+from ._version import get_versions
+
+__version__ = get_versions()["version"]
+del get_versions
+
 
 from memote.utils import show_versions
 from memote.suite.api import *
 from memote.suite.results import *
 from memote.suite.reporting import *
 from memote.jinja2_extension import *
-
-import sys
-import warnings
-
-__author__ = "Moritz E. Beber"
-__email__ = "morbeb@biosustain.dtu.dk"
-__version__ = "0.11.1"
-
-if sys.version_info < (3,):
-    warnings.warn('You are using `Memote` with Python 2. '
-                  'Memote will soon be Python 3 only, and we have ceased to '
-                  'test against Python 2. This means that memote may no '
-                  'longer work as exprected. Please consider migrating to '
-                  'Python 3.', FutureWarning)

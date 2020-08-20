@@ -20,15 +20,19 @@
 
 def test_store(testdir):
     """Make sure that the store fixture in the collect plugin works."""
-    testdir.makeconftest("""
+    testdir.makeconftest(
+        """
            import pytest
-       """)
+       """
+    )
     # create a temporary pytest test file
     # TODO: Figure out why this doesn't work.
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
         #def test_store(store):
         #    pass
-    """)
+    """
+    )
 
     # run all tests with pytest
     result = testdir.runpytest()

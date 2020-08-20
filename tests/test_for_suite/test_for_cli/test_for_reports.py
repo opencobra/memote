@@ -19,26 +19,24 @@
 
 from __future__ import absolute_import
 
-from os.path import exists
 import os
+from os.path import exists
 
-from memote.suite.cli.reports import report
 from memote.suite.cli.config import ConfigFileProcessor
+from memote.suite.cli.reports import report
 
 
 def test_report(runner):
     """Expect a simple memote report invocation to be successful."""
     result = runner.invoke(report)
     assert result.exit_code == 0
-    assert result.output.startswith(
-        "Usage: report [OPTIONS] COMMAND [ARGS]...")
+    assert result.output.startswith("Usage: report [OPTIONS] COMMAND [ARGS]...")
 
 
 def test_snapshot(runner, model_file):
     """Expect the snapshot report to function."""
     output = model_file.split(".", 1)[0] + ".html"
-    result = runner.invoke(report, [
-        "snapshot", "--filename", output, model_file])
+    result = runner.invoke(report, ["snapshot", "--filename", output, model_file])
     assert result.exit_code == 0
     assert exists(output)
 
@@ -46,8 +44,9 @@ def test_snapshot(runner, model_file):
 def test_diff(runner, model_file):
     """Expect the diff report to function."""
     output = "diff.html"
-    result = runner.invoke(report, [
-        "diff", "--filename", output, model_file, model_file])
+    result = runner.invoke(
+        report, ["diff", "--filename", output, model_file, model_file]
+    )
     assert result.exit_code == 0
     assert exists(output)
 
@@ -62,8 +61,9 @@ def test_history(runner, mock_repo):
     context_settings = ConfigFileProcessor.read_config()
     model = context_settings["model"]
     location = context_settings["location"]
-    result = runner.invoke(report, ["history", "--model", model,
-                                    "--location", location])
+    result = runner.invoke(
+        report, ["history", "--model", model, "--location", location]
+    )
     # Teardown
     os.chdir(previous_wd)
     assert result.exit_code == 0

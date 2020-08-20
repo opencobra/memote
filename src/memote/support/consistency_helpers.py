@@ -20,23 +20,20 @@
 from __future__ import absolute_import, division
 
 import logging
+from builtins import dict, zip
 from collections import defaultdict
 
 import numpy as np
 import sympy
-
 from numpy.linalg import svd
-from six import iteritems, itervalues
-from builtins import zip, dict
-from pylru import lrudecorator
 from optlang.symbolics import add
+from pylru import lrudecorator
+from six import iteritems, itervalues
 
 from memote.support.helpers import find_biomass_reaction
 
-__all__ = (
-    "stoichiometry_matrix",
-    "nullspace"
-)
+
+__all__ = ("stoichiometry_matrix", "nullspace")
 
 LOGGER = logging.getLogger(__name__)
 
@@ -58,7 +55,8 @@ def add_reaction_constraints(model, reactions, Constraint):
     constraints = []
     for rxn in reactions:
         expression = add(
-            [c * model.variables[m.id] for m, c in rxn.metabolites.items()])
+            [c * model.variables[m.id] for m, c in rxn.metabolites.items()]
+        )
         constraints.append(Constraint(expression, lb=0, ub=0, name=rxn.id))
     model.add(constraints)
 
@@ -205,7 +203,7 @@ def get_interface(model):
         model.solver.interface.Model,
         model.solver.interface.Constraint,
         model.solver.interface.Variable,
-        model.solver.interface.Objective
+        model.solver.interface.Objective,
     )
 
 
@@ -225,13 +223,14 @@ def get_internals(model):
     """
     biomass = set(find_biomass_reaction(model))
     if len(biomass) == 0:
-        LOGGER.warning("No biomass reaction detected. Consistency test results "
-                       "are unreliable if one exists.")
+        LOGGER.warning(
+            "No biomass reaction detected. Consistency test results "
+            "are unreliable if one exists."
+        )
     return set(model.reactions) - (set(model.boundary) | biomass)
 
 
-def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
-                        Objective):
+def create_milp_problem(kernel, metabolites, Model, Variable, Constraint, Objective):
     """
     Create the MILP as defined by equation (13) in [1]_.
 
@@ -261,8 +260,9 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
            Bioinformatics 24, no. 19 (2008): 2245.
 
     """
-    assert len(metabolites) == kernel.shape[0],\
-        "metabolite vector and first nullspace dimension must be equal"
+    assert (
+        len(metabolites) == kernel.shape[0]
+    ), "metabolite vector and first nullspace dimension must be equal"
     ns_problem = Model()
     k_vars = list()
     for met in metabolites:
@@ -272,24 +272,24 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint,
         k_vars.append(k_var)
         ns_problem.add([y_var, k_var])
         # These following constraints are equivalent to 0 <= y[i] <= k[i].
-        ns_problem.add(Constraint(
-            y_var - k_var, ub=0, name="switch_{}".format(met.id)))
-        ns_problem.add(Constraint(
-            y_var, lb=0, name="switch2_{}".format(met.id)))
+        ns_problem.add(Constraint(y_var - k_var, ub=0, name="switch_{}".format(met.id)))
+        ns_problem.add(Constraint(y_var, lb=0, name="switch2_{}".format(met.id)))
     ns_problem.update()
     # add nullspace constraints
     for (j, column) in enumerate(kernel.T):
         expression = sympy.Add(
-            *[coef * ns_problem.variables[met.id]
-              for (met, coef) in zip(metabolites, column) if coef != 0.0])
-        constraint = Constraint(expression, lb=0, ub=0,
-                                name="ns_{}".format(j))
+            *[
+                coef * ns_problem.variables[met.id]
+                for (met, coef) in zip(metabolites, column)
+                if coef != 0.0
+            ]
+        )
+        constraint = Constraint(expression, lb=0, ub=0, name="ns_{}".format(j))
         ns_problem.add(constraint)
     # The objective is to minimize the binary indicators k[i], subject to
     # the above inequality constraints.
     ns_problem.objective = Objective(1)
-    ns_problem.objective.set_linear_coefficients(
-        {k_var: 1. for k_var in k_vars})
+    ns_problem.objective.set_linear_coefficients({k_var: 1.0 for k_var in k_vars})
     ns_problem.objective.direction = "min"
     return ns_problem, k_vars
 

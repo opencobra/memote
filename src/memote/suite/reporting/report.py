@@ -29,6 +29,7 @@ from six import iteritems, itervalues
 import memote.suite.templates as templates
 from memote.utils import jsonify
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -61,8 +62,7 @@ class Report(object):
         self.result = result
         self.config = configuration
         self._report_type = None
-        self._template = Template(
-            read_text(templates, "index.html", encoding="utf-8"))
+        self._template = Template(read_text(templates, "index.html", encoding="utf-8"))
 
     def render_json(self, pretty=False):
         """
@@ -80,8 +80,7 @@ class Report(object):
     def render_html(self):
         """Render an HTML report."""
         return self._template.safe_substitute(
-            report_type=self._report_type,
-            results=self.render_json()
+            report_type=self._report_type, results=self.render_json()
         )
 
     def get_configured_tests(self):
@@ -109,14 +108,14 @@ class Report(object):
         self.config["cards"].setdefault("misc", dict())
         self.config["cards"]["misc"]["title"] = "Misc. Tests"
         self.config["cards"]["misc"]["cases"] = list(
-            set(self.result.cases) - set(tests_on_cards))
+            set(self.result.cases) - set(tests_on_cards)
+        )
 
     def compute_score(self):
         """Calculate the overall test score using the configuration."""
         # LOGGER.info("Begin scoring")
         cases = self.get_configured_tests() | set(self.result.cases)
-        scores = DataFrame({"score": 0.0, "max": 1.0},
-                           index=sorted(cases))
+        scores = DataFrame({"score": 0.0, "max": 1.0}, index=sorted(cases))
         self.result.setdefault("score", dict())
         self.result["score"]["sections"] = list()
         # Calculate the scores for each test individually.
@@ -144,9 +143,7 @@ class Report(object):
         maximum = 0.0
         # Calculate the scores for each section considering the individual test
         # case scores.
-        for section_id, card in iteritems(
-            self.config['cards']['scored']['sections']
-        ):
+        for section_id, card in iteritems(self.config["cards"]["scored"]["sections"]):
             # LOGGER.info("Calculate score for section: '%s'.", section_id)
             cases = card.get("cases", None)
             if cases is None:
@@ -154,8 +151,7 @@ class Report(object):
             card_score = scores.loc[cases, "score"].sum()
             card_total = scores.loc[cases, "max"].sum()
             # Format results nicely to work immediately with Vega Bar Chart.
-            section_score = {"section": section_id,
-                             "score": card_score / card_total}
+            section_score = {"section": section_id, "score": card_score / card_total}
             self.result["score"]["sections"].append(section_score)
             # Calculate the final score for the entire model.
             weight = card.get("weight", 1.0)

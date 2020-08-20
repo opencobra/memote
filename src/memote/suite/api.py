@@ -29,11 +29,21 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from memote.suite import TEST_DIRECTORY
 from memote.suite.collect import ResultCollectionPlugin
 from memote.suite.reporting import (
-    SnapshotReport, DiffReport, HistoryReport, ReportConfiguration)
+    DiffReport,
+    HistoryReport,
+    ReportConfiguration,
+    SnapshotReport,
+)
 from memote.support import validation as val
 
-__all__ = ("validate_model", "test_model", "snapshot_report", "diff_report",
-           "history_report")
+
+__all__ = (
+    "validate_model",
+    "test_model",
+    "snapshot_report",
+    "diff_report",
+    "history_report",
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -72,7 +82,7 @@ def test_model(
     exclusive=None,
     skip=None,
     experimental=None,
-    solver_timeout=None
+    solver_timeout=None,
 ):
     """
     Test a model and optionally store results as JSON.
@@ -117,9 +127,13 @@ def test_model(
     # Load the experimental configuration using model information.
     if experimental is not None:
         experimental.load(model)
-    plugin = ResultCollectionPlugin(model, sbml_version=sbml_version,
-                                    exclusive=exclusive, skip=skip,
-                                    experimental_config=experimental)
+    plugin = ResultCollectionPlugin(
+        model,
+        sbml_version=sbml_version,
+        exclusive=exclusive,
+        skip=skip,
+        experimental_config=experimental,
+    )
     code = pytest.main(pytest_args, plugins=[plugin])
     if results:
         return code, plugin.results
@@ -209,10 +223,10 @@ def validation_report(path, notifications, filename):
 
     """
     env = Environment(
-        loader=PackageLoader('memote.suite', 'templates'),
-        autoescape=select_autoescape(['html', 'xml'])
+        loader=PackageLoader("memote.suite", "templates"),
+        autoescape=select_autoescape(["html", "xml"]),
     )
-    template = env.get_template('validation_template.html')
+    template = env.get_template("validation_template.html")
     model = os.path.basename(path)
     with open(filename, "w") as file_h:
         file_h.write(template.render(model=model, notifications=notifications))

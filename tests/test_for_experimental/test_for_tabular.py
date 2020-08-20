@@ -30,17 +30,13 @@ from memote.experimental.tabular import read_tabular
 @pytest.fixture(scope="module", params=["empty", "half"])
 def table(request):
     if request.param == "empty":
-        return DataFrame({
-            "numeric": random_sample(10),
-            "integer": range(10),
-            "comments": None
-        })
+        return DataFrame(
+            {"numeric": random_sample(10), "integer": range(10), "comments": None}
+        )
     elif request.param == "half":
-        df = DataFrame({
-            "numeric": random_sample(10),
-            "integer": range(10),
-            "comments": None
-        })
+        df = DataFrame(
+            {"numeric": random_sample(10), "integer": range(10), "comments": None}
+        )
         df.loc[range(0, 10, 2), "comments"] = "Wise comment."
         return df
 
@@ -52,8 +48,10 @@ def test_read_csv(table, tmpdir):
     assert (df["integer"] == table["integer"]).all()
     assert isclose(df["numeric"], table["numeric"]).all()
     assert (df["comments"].isnull() == table["comments"].isnull()).all()
-    assert (df.loc[df["comments"].notnull(), "comments"] ==
-            table.loc[table["comments"].notnull(), "comments"]).all()
+    assert (
+        df.loc[df["comments"].notnull(), "comments"]
+        == table.loc[table["comments"].notnull(), "comments"]
+    ).all()
 
 
 def test_read_tsv(table, tmpdir):
@@ -63,8 +61,10 @@ def test_read_tsv(table, tmpdir):
     assert (df["integer"] == table["integer"]).all()
     assert isclose(df["numeric"], table["numeric"]).all()
     assert (df["comments"].isnull() == table["comments"].isnull()).all()
-    assert (df.loc[df["comments"].notnull(), "comments"] ==
-            table.loc[table["comments"].notnull(), "comments"]).all()
+    assert (
+        df.loc[df["comments"].notnull(), "comments"]
+        == table.loc[table["comments"].notnull(), "comments"]
+    ).all()
 
 
 def test_read_xls(table, tmpdir):
@@ -74,8 +74,10 @@ def test_read_xls(table, tmpdir):
     assert (df["integer"] == table["integer"]).all()
     assert isclose(df["numeric"], table["numeric"]).all()
     assert (df["comments"].isnull() == table["comments"].isnull()).all()
-    assert (df.loc[df["comments"].notnull(), "comments"] ==
-            table.loc[table["comments"].notnull(), "comments"]).all()
+    assert (
+        df.loc[df["comments"].notnull(), "comments"]
+        == table.loc[table["comments"].notnull(), "comments"]
+    ).all()
 
 
 def test_read_xlsx(table, tmpdir):
@@ -85,5 +87,7 @@ def test_read_xlsx(table, tmpdir):
     assert (df["integer"] == table["integer"]).all()
     assert isclose(df["numeric"], table["numeric"]).all()
     assert (df["comments"].isnull() == table["comments"].isnull()).all()
-    assert (df.loc[df["comments"].notnull(), "comments"] ==
-            table.loc[table["comments"].notnull(), "comments"]).all()
+    assert (
+        df.loc[df["comments"].notnull(), "comments"]
+        == table.loc[table["comments"].notnull(), "comments"]
+    ).all()

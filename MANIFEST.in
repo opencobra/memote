@@ -2,3 +2,5 @@ include AUTHORS.rst
 include HISTORY.rst
 include LICENSE
 include README.rst
+include versioneer.py
+include src/memote/_version.py

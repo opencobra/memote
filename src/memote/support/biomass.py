@@ -23,47 +23,73 @@ import logging
 import re
 
 import numpy as np
-from six import iteritems
-from future.utils import raise_with_traceback
 from cobra.exceptions import OptimizationError
+from future.utils import raise_with_traceback
+from six import iteritems
 
 import memote.support.helpers as helpers
 
+
 __all__ = (
-    "sum_biomass_weight", "find_biomass_precursors",
-    "find_blocked_biomass_precursors")
+    "sum_biomass_weight",
+    "find_biomass_precursors",
+    "find_blocked_biomass_precursors",
+)
 
 LOGGER = logging.getLogger(__name__)
 
 # 20 Amino Acids, 4 Deoxyribonucleotides, 4 Ribonucleotides,
 # 8 Universal Cofactors, and H2O
-ESSENTIAL_PRECURSOR_IDS = \
-    ['MNXM94', 'MNXM55', 'MNXM134', 'MNXM76', 'MNXM61',
-     'MNXM97', 'MNXM53', 'MNXM114', 'MNXM42', 'MNXM142',
-     'MNXM37', 'MNXM89557', 'MNXM231', 'MNXM70', 'MNXM78',
-     'MNXM199', 'MNXM140', 'MNXM32', 'MNXM29', 'MNXM147',
-     # Deoxyribonucleotides
-     'MNXM286', 'MNXM360', 'MNXM394', 'MNXM344',
-     # Ribonucleotides
-     'MNXM3', 'MNXM51', 'MNXM63', 'MNXM121',
-     # NAD
-     'MNXM8',
-     # NADP
-     'MNXM5',
-     # S-adenosyl-L-methionine
-     'MNXM16',
-     # FAD
-     'MNXM33',
-     # Pyridoxal 5'-phosphate
-     'MNXM161',
-     # CoA
-     'MNXM12',
-     # Thiamine Diphosphate
-     'MNXM256',
-     # FMN
-     'MNXM119',
-     # H2O
-     'MNXM2']
+ESSENTIAL_PRECURSOR_IDS = [
+    "MNXM94",
+    "MNXM55",
+    "MNXM134",
+    "MNXM76",
+    "MNXM61",
+    "MNXM97",
+    "MNXM53",
+    "MNXM114",
+    "MNXM42",
+    "MNXM142",
+    "MNXM37",
+    "MNXM89557",
+    "MNXM231",
+    "MNXM70",
+    "MNXM78",
+    "MNXM199",
+    "MNXM140",
+    "MNXM32",
+    "MNXM29",
+    "MNXM147",
+    # Deoxyribonucleotides
+    "MNXM286",
+    "MNXM360",
+    "MNXM394",
+    "MNXM344",
+    # Ribonucleotides
+    "MNXM3",
+    "MNXM51",
+    "MNXM63",
+    "MNXM121",
+    # NAD
+    "MNXM8",
+    # NADP
+    "MNXM5",
+    # S-adenosyl-L-methionine
+    "MNXM16",
+    # FAD
+    "MNXM33",
+    # Pyridoxal 5'-phosphate
+    "MNXM161",
+    # CoA
+    "MNXM12",
+    # Thiamine Diphosphate
+    "MNXM256",
+    # FMN
+    "MNXM119",
+    # H2O
+    "MNXM2",
+]
 
 
 def sum_biomass_weight(reaction):
@@ -84,8 +110,13 @@ def sum_biomass_weight(reaction):
         The molecular weight of the biomass reaction in units of g/mmol.
 
     """
-    return sum(-coef * met.formula_weight
-               for (met, coef) in iteritems(reaction.metabolites)) / 1000.0
+    return (
+        sum(
+            -coef * met.formula_weight
+            for (met, coef) in iteritems(reaction.metabolites)
+        )
+        / 1000.0
+    )
 
 
 def find_biomass_precursors(model, reaction):
@@ -106,18 +137,18 @@ def find_biomass_precursors(model, reaction):
         ATP and H2O.
 
     """
-    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, "c")
     gam_reactants = set()
     try:
-        gam_reactants.update([
-            helpers.find_met_in_model(
-                model, "MNXM3", id_of_main_compartment)[0]])
+        gam_reactants.update(
+            [helpers.find_met_in_model(model, "MNXM3", id_of_main_compartment)[0]]
+        )
     except RuntimeError:
         pass
     try:
-        gam_reactants.update([
-            helpers.find_met_in_model(
-                model, "MNXM2", id_of_main_compartment)[0]])
+        gam_reactants.update(
+            [helpers.find_met_in_model(model, "MNXM2", id_of_main_compartment)[0]]
+        )
     except RuntimeError:
         pass
 
@@ -151,14 +182,10 @@ def find_blocked_biomass_precursors(reaction, model):
     for precursor in precursors:
         with model:
             dm_rxn = model.add_boundary(
-                precursor,
-                type="safe-demand",
-                reaction_id="safe_demand",
-                lb=0,
-                ub=ub
+                precursor, type="safe-demand", reaction_id="safe_demand", lb=0, ub=ub
             )
-            flux = helpers.run_fba(model, dm_rxn.id, direction='max')
-            if np.isnan(flux) or abs(flux) < 1E-08:
+            flux = helpers.run_fba(model, dm_rxn.id, direction="max")
+            if np.isnan(flux) or abs(flux) < 1e-08:
                 blocked_precursors.append(precursor)
     return blocked_precursors
 
@@ -181,32 +208,27 @@ def gam_in_biomass(model, reaction):
         Pi and H as products, False otherwise.
 
     """
-    id_of_main_compartment = helpers.find_compartment_id_in_model(model, 'c')
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, "c")
 
     try:
         left = {
-            helpers.find_met_in_model(
-                model, "MNXM3", id_of_main_compartment)[0],
-            helpers.find_met_in_model(
-                model, "MNXM2", id_of_main_compartment)[0]
+            helpers.find_met_in_model(model, "MNXM3", id_of_main_compartment)[0],
+            helpers.find_met_in_model(model, "MNXM2", id_of_main_compartment)[0],
         }
         right = {
-            helpers.find_met_in_model(
-                model, "MNXM7", id_of_main_compartment)[0],
-            helpers.find_met_in_model(
-                model, "MNXM1", id_of_main_compartment)[0],
-            helpers.find_met_in_model(
-                model, "MNXM9", id_of_main_compartment)[0]
+            helpers.find_met_in_model(model, "MNXM7", id_of_main_compartment)[0],
+            helpers.find_met_in_model(model, "MNXM1", id_of_main_compartment)[0],
+            helpers.find_met_in_model(model, "MNXM9", id_of_main_compartment)[0],
         }
     except RuntimeError:
         return False
 
-    return (
-        left.issubset(set(reaction.reactants)) and
-        right.issubset(set(reaction.products)))
+    return left.issubset(set(reaction.reactants)) and right.issubset(
+        set(reaction.products)
+    )
 
 
-def find_direct_metabolites(model, reaction, tolerance=1E-06):
+def find_direct_metabolites(model, reaction, tolerance=1e-06):
     """
     Return list of possible direct biomass precursor metabolites.
 
@@ -231,50 +253,73 @@ def find_direct_metabolites(model, reaction, tolerance=1E-06):
 
     """
     biomass_rxns = set(helpers.find_biomass_reaction(model))
-    tra_bou_bio_rxns = helpers.find_interchange_biomass_reactions(
-        model, biomass_rxns)
+    tra_bou_bio_rxns = helpers.find_interchange_biomass_reactions(model, biomass_rxns)
     try:
         precursors = find_biomass_precursors(model, reaction)
-        main_comp = helpers.find_compartment_id_in_model(model, 'c')
-        ext_space = helpers.find_compartment_id_in_model(model, 'e')
+        main_comp = helpers.find_compartment_id_in_model(model, "c")
+        ext_space = helpers.find_compartment_id_in_model(model, "e")
     except KeyError:
-        LOGGER.error("Failed to properly identify cytosolic and extracellular "
-                     "compartments.")
-        raise_with_traceback(KeyError("The cytosolic and/or extracellular "
-                                      "compartments could not be identified."))
+        LOGGER.error(
+            "Failed to properly identify cytosolic and extracellular " "compartments."
+        )
+        raise_with_traceback(
+            KeyError(
+                "The cytosolic and/or extracellular "
+                "compartments could not be identified."
+            )
+        )
     except RuntimeError:
-        LOGGER.error("Failed to properly identify cytosolic and extracellular "
-                     "compartments.")
-        raise_with_traceback(RuntimeError("The cytosolic and/or extracellular "
-                                          "compartments could not be "
-                                          "identified."))
+        LOGGER.error(
+            "Failed to properly identify cytosolic and extracellular " "compartments."
+        )
+        raise_with_traceback(
+            RuntimeError(
+                "The cytosolic and/or extracellular "
+                "compartments could not be "
+                "identified."
+            )
+        )
     else:
-        tra_bou_bio_mets = [met for met in precursors if
-                            met.reactions.issubset(tra_bou_bio_rxns)]
-        rxns_of_interest = set([rxn for met in tra_bou_bio_mets
-                                for rxn in met.reactions
-                                if rxn not in biomass_rxns])
+        tra_bou_bio_mets = [
+            met for met in precursors if met.reactions.issubset(tra_bou_bio_rxns)
+        ]
+        rxns_of_interest = set(
+            [
+                rxn
+                for met in tra_bou_bio_mets
+                for rxn in met.reactions
+                if rxn not in biomass_rxns
+            ]
+        )
 
     solution = model.optimize(raise_error=True)
     if np.isclose(solution.objective_value, 0, atol=tolerance):
-        LOGGER.error("Failed to generate a non-zero objective value with "
-                     "flux balance analysis.")
+        LOGGER.error(
+            "Failed to generate a non-zero objective value with "
+            "flux balance analysis."
+        )
         raise OptimizationError(
             "The flux balance analysis on this model returned an "
             "objective value of zero. Make sure the model can "
-            "grow! Check if the constraints are not too strict!")
+            "grow! Check if the constraints are not too strict!"
+        )
 
     tra_bou_bio_fluxes = {r: solution[r.id] for r in rxns_of_interest}
     met_flux_sum = {m: 0 for m in tra_bou_bio_mets}
 
     return detect_false_positive_direct_metabolites(
-        tra_bou_bio_mets, biomass_rxns, main_comp, ext_space,
-        tra_bou_bio_fluxes, met_flux_sum)
+        tra_bou_bio_mets,
+        biomass_rxns,
+        main_comp,
+        ext_space,
+        tra_bou_bio_fluxes,
+        met_flux_sum,
+    )
 
 
 def detect_false_positive_direct_metabolites(
-        candidates, biomass_reactions, cytosol, extra, reaction_fluxes,
-        metabolite_fluxes):
+    candidates, biomass_reactions, cytosol, extra, reaction_fluxes, metabolite_fluxes
+):
     """
     Weed out false positive direct metabolites.
 
@@ -387,16 +432,18 @@ def bundle_biomass_components(model, reaction):
     if len(reaction.metabolites) >= 16:
         return [reaction]
 
-    id_of_main_compartment = helpers.find_compartment_id_in_model(model,
-                                                                  'c')
-    gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", 'MNXM9']
+    id_of_main_compartment = helpers.find_compartment_id_in_model(model, "c")
+    gam_mets = ["MNXM3", "MNXM2", "MNXM7", "MNXM1", "MNXM9"]
     try:
-        gam = set([helpers.find_met_in_model(
-            model, met, id_of_main_compartment)[0] for met in gam_mets])
+        gam = set(
+            [
+                helpers.find_met_in_model(model, met, id_of_main_compartment)[0]
+                for met in gam_mets
+            ]
+        )
     except RuntimeError:
         gam = set()
-    regex = re.compile('^{}(_[a-zA-Z]+?)*?$'.format('biomass'),
-                       re.IGNORECASE)
+    regex = re.compile("^{}(_[a-zA-Z]+?)*?$".format("biomass"), re.IGNORECASE)
     biomass_metabolite = set(model.metabolites.query(regex))
 
     macromolecules = set(reaction.metabolites) - gam - biomass_metabolite
@@ -460,10 +507,9 @@ def essential_precursors_not_in_biomass(model, reaction):
     http://doi.org/10.1016/j.ymben.2016.12.002
 
     """
-    main_comp = helpers.find_compartment_id_in_model(model, 'c')
+    main_comp = helpers.find_compartment_id_in_model(model, "c")
     biomass_eq = bundle_biomass_components(model, reaction)
-    pooled_precursors = set(
-        [met for rxn in biomass_eq for met in rxn.metabolites])
+    pooled_precursors = set([met for rxn in biomass_eq for met in rxn.metabolites])
 
     missing_essential_precursors = []
     for mnx_id in ESSENTIAL_PRECURSOR_IDS:

@@ -31,19 +31,22 @@ def load_cobra_model(path, notifications):
     """Load a COBRA model with meta information from an SBML document."""
     doc = libsbml.readSBML(path)
     fbc = doc.getPlugin("fbc")
-    sbml_ver = doc.getLevel(), doc.getVersion(), fbc if fbc is None else \
-        fbc.getVersion()
+    sbml_ver = (
+        doc.getLevel(),
+        doc.getVersion(),
+        fbc if fbc is None else fbc.getVersion(),
+    )
     with catch_warnings(record=True) as warnings:
         simplefilter("always")
         try:
             model = read_sbml_model(path)
         except Exception as err:
-            notifications['errors'].append(str(err))
+            notifications["errors"].append(str(err))
             model = None
             validate = True
         else:
             validate = False
-        notifications['warnings'].extend([str(w.message) for w in warnings])
+        notifications["warnings"].extend([str(w.message) for w in warnings])
     if validate:
         run_sbml_validation(doc, notifications)
     return model, sbml_ver
@@ -57,7 +60,7 @@ def format_failure(failure):
         failure.getErrorId(),
         failure.getMessage(),
         failure.getCategoryAsString(),
-        failure.getSeverity()
+        failure.getSeverity(),
     )
 
 
@@ -66,10 +69,10 @@ def run_sbml_validation(document, notifications):
     validator = libsbml.SBMLValidator()
     validator.validate(document)
     for i in range(document.getNumErrors()):
-        notifications['errors'].append(format_failure(document.getError(i)))
+        notifications["errors"].append(format_failure(document.getError(i)))
     for i in range(validator.getNumFailures()):
         failure = validator.getFailure(i)
         if failure.isWarning():
-            notifications['warnings'].append(format_failure(failure))
+            notifications["warnings"].append(format_failure(failure))
         else:
-            notifications['errors'].append(format_failure(failure))
+            notifications["errors"].append(format_failure(failure))

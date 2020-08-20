@@ -62,8 +62,7 @@ class EssentialityExperiment(Experiment):
         """
         if dtype_conversion is None:
             dtype_conversion = {"essential": str}
-        super(EssentialityExperiment, self).load(
-            dtype_conversion=dtype_conversion)
+        super(EssentialityExperiment, self).load(dtype_conversion=dtype_conversion)
         self.data["essential"] = self.data["essential"].isin(self.TRUTHY)
 
     def validate(self, model, checks=[]):
@@ -72,12 +71,13 @@ class EssentialityExperiment(Experiment):
             {
                 "unknown-identifier": {
                     "column": "gene",
-                    "identifiers": {g.id for g in model.genes}
+                    "identifiers": {g.id for g in model.genes},
                 }
             }
         ]
         super(EssentialityExperiment, self).validate(
-            model=model, checks=checks + custom)
+            model=model, checks=checks + custom
+        )
 
     def evaluate(self, model):
         """Use the defined parameters to predict single gene essentiality."""
@@ -88,8 +88,10 @@ class EssentialityExperiment(Experiment):
                 model.objective = self.objective
             model.add_cons_vars(self.constraints)
             essen = single_gene_deletion(
-                model, gene_list=self.data["gene"], processes=1)
+                model, gene_list=self.data["gene"], processes=1
+            )
         essen["gene"] = [list(g)[0] for g in essen.index]
-        essen["essential"] = (essen["growth"] < self.minimal_growth_rate) \
-            | essen["growth"].isna()
+        essen["essential"] = (essen["growth"] < self.minimal_growth_rate) | essen[
+            "growth"
+        ].isna()
         return essen

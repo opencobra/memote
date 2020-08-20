@@ -26,21 +26,23 @@ import memote.support.basic as basic
 import memote.support.helpers as helpers
 from memote.utils import register_with
 
+
 MODEL_REGISTRY = dict()
 
 
 @register_with(MODEL_REGISTRY)
 def three_missing(base):
-    base.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i))
-                          for i in range(1, 4)])
+    base.add_metabolites([cobra.Metabolite(id="M{0:d}".format(i)) for i in range(1, 4)])
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def three_present(base):
     base.add_metabolites(
-        [cobra.Metabolite(id="M{0:d}".format(i), formula="CH4", charge=-1)
-         for i in range(1, 4)]
+        [
+            cobra.Metabolite(id="M{0:d}".format(i), formula="CH4", charge=-1)
+            for i in range(1, 4)
+        ]
     )
     return base
 
@@ -49,7 +51,7 @@ def three_present(base):
 def gpr_present(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'gene1 or gene2'
+    rxn_1.gene_reaction_rule = "gene1 or gene2"
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
@@ -61,12 +63,11 @@ def gpr_present(base):
 def gpr_present_complex(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'gene1 and gene2'
+    rxn_1.gene_reaction_rule = "gene1 and gene2"
     rxn_2 = cobra.Reaction("RXN2")
-    rxn_2.gene_reaction_rule = '(gene4 and gene7) or ' \
-                               '(gene9 and (gene10 or gene14))'
+    rxn_2.gene_reaction_rule = "(gene4 and gene7) or " "(gene9 and (gene10 or gene14))"
     rxn_3 = cobra.Reaction("RXN3")
-    rxn_3.gene_reaction_rule = 'gene1 and gene2'
+    rxn_3.gene_reaction_rule = "gene1 and gene2"
     base.add_reactions([rxn_1, rxn_2, rxn_3])
     return base
 
@@ -100,7 +101,7 @@ def gpr_missing_with_exchange(base):
 def gpr_present_not_lumped(base):
     """Provide a model with reactions that all have GPR"""
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'gene1'
+    rxn_1.gene_reaction_rule = "gene1"
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
@@ -246,8 +247,8 @@ def insufficient_compartments(base):
 @register_with(MODEL_REGISTRY)
 def non_metabolic_reactions(base):
     """Provide a model all kinds of reactions that are not purely metabolic"""
-    met_a = cobra.Metabolite("a_c", formula='CH4', compartment="c")
-    met_c = cobra.Metabolite("a_e", formula='CH4', compartment="e")
+    met_a = cobra.Metabolite("a_c", formula="CH4", compartment="c")
+    met_c = cobra.Metabolite("a_e", formula="CH4", compartment="e")
     rxn_a_c = cobra.Reaction("AC")
     rxn_a_c.add_metabolites({met_a: 1, met_c: -1})
     biomass = cobra.Reaction("BIOMASS")
@@ -260,12 +261,12 @@ def non_metabolic_reactions(base):
 @register_with(MODEL_REGISTRY)
 def transport_gpr(base):
     """Provide a model with a transport reaction without GPR."""
-    met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
-    met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
-    met_c = cobra.Metabolite("na_c", formula='Na', compartment="c")
-    met_d = cobra.Metabolite("na_e", formula='Na', compartment="e")
+    met_a = cobra.Metabolite("co2_c", formula="CO2", compartment="c")
+    met_b = cobra.Metabolite("co2_e", formula="CO2", compartment="e")
+    met_c = cobra.Metabolite("na_c", formula="Na", compartment="c")
+    met_d = cobra.Metabolite("na_e", formula="Na", compartment="e")
     uni = cobra.Reaction("UNI")
-    uni.gene_reaction_rule="X and Y"
+    uni.gene_reaction_rule = "X and Y"
     uni.add_metabolites({met_a: 1, met_b: -1})
     anti = cobra.Reaction("ANTI")
     anti.gene_reaction_rule = "W or V"
@@ -279,12 +280,12 @@ def transport_gpr(base):
 @register_with(MODEL_REGISTRY)
 def transport_gpr_constrained(base):
     """Provide a model with a constrained transport reaction without GPR."""
-    met_a = cobra.Metabolite("co2_c", formula='CO2', compartment="c")
-    met_b = cobra.Metabolite("co2_e", formula='CO2', compartment="e")
-    met_c = cobra.Metabolite("na_c", formula='Na', compartment="c")
-    met_d = cobra.Metabolite("na_e", formula='Na', compartment="e")
+    met_a = cobra.Metabolite("co2_c", formula="CO2", compartment="c")
+    met_b = cobra.Metabolite("co2_e", formula="CO2", compartment="e")
+    met_c = cobra.Metabolite("na_c", formula="Na", compartment="c")
+    met_d = cobra.Metabolite("na_e", formula="Na", compartment="e")
     uni = cobra.Reaction("UNI")
-    uni.gene_reaction_rule="X and Y"
+    uni.gene_reaction_rule = "X and Y"
     uni.add_metabolites({met_a: 1, met_b: -1})
     anti = cobra.Reaction("ANTI")
     anti.gene_reaction_rule = "W or V"
@@ -314,7 +315,7 @@ def non_reversible_oxygen_flow(base):
     """Provide a model with a non-reversible oxygen-containing reaction."""
     met_a = cobra.Metabolite("o2s_c", formula="O2", compartment="c")
     met_b = cobra.Metabolite("o2_c", formula="O2", compartment="c")
-    met_c = cobra.Metabolite("h2o2_c", formula='H2O2', compartment="c")
+    met_c = cobra.Metabolite("h2o2_c", formula="H2O2", compartment="c")
     met_i = cobra.Metabolite("h_c", "H", compartment="c")
     rxn = cobra.Reaction("SPODM")
     rxn.add_metabolites({met_a: -2, met_b: 1, met_c: 1, met_i: -2})
@@ -503,10 +504,8 @@ def rxns_with_two_substrates(base):
     rxn_1 = cobra.Reaction("rxn1")
     rxn_1.add_metabolites({met_a: -1, met_b: 1})
     base.add_reactions([rxn_1])
-    base.add_boundary(
-        met_c, type="custom", reaction_id="EX_c", lb=-1000, ub=1000)
-    base.add_boundary(
-        met_d, type="custom", reaction_id="EX_d", lb=-1000, ub=1000)
+    base.add_boundary(met_c, type="custom", reaction_id="EX_c", lb=-1000, ub=1000)
+    base.add_boundary(met_d, type="custom", reaction_id="EX_d", lb=-1000, ub=1000)
     return base
 
 
@@ -618,9 +617,9 @@ def dup_rxns_irrev_exchanges(base):
 def identical_genes(base):
     """Provide a model with reactions with identical genes."""
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'gene1 or gene2'
+    rxn_1.gene_reaction_rule = "gene1 or gene2"
     rxn_2 = cobra.Reaction("NXR")
-    rxn_2.gene_reaction_rule = 'gene1 or gene2'
+    rxn_2.gene_reaction_rule = "gene1 or gene2"
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
@@ -633,9 +632,9 @@ def identical_genes(base):
 def different_genes(base):
     """Provide a model with reactions with different genes."""
     rxn_1 = cobra.Reaction("RXN1")
-    rxn_1.gene_reaction_rule = 'b2912'
+    rxn_1.gene_reaction_rule = "b2912"
     rxn_2 = cobra.Reaction("NXR")
-    rxn_2.gene_reaction_rule = 'b2551'
+    rxn_2.gene_reaction_rule = "b2551"
     met_1 = cobra.Metabolite("met1")
     met_2 = cobra.Metabolite("met2")
     rxn_1.add_metabolites({met_1: 1, met_2: -1})
@@ -644,124 +643,132 @@ def different_genes(base):
     return base
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("three_missing", 3),
-    ("three_present", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("three_missing", 3), ("three_present", 0)],
+    indirect=["model"],
+)
 def test_metabolites_formula_presence(model, num):
     """Expect all metabolites to have a formula."""
     assert len(basic.check_metabolites_formula_presence(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("three_missing", 3),
-    ("three_present", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("three_missing", 3), ("three_present", 0)],
+    indirect=["model"],
+)
 def test_metabolites_charge_presence(model, num):
     """Expect all metabolites to have a charge."""
     assert len(basic.check_metabolites_charge_presence(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("gpr_present", 0),
-    ("gpr_missing", 1),
-    ("gpr_missing_with_exchange", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("empty", 0),
+        ("gpr_present", 0),
+        ("gpr_missing", 1),
+        ("gpr_missing_with_exchange", 1),
+    ],
+    indirect=["model"],
+)
 def test_gene_protein_reaction_rule_presence(model, num):
     """Expect all non-exchange reactions to have a GPR."""
-    missing_gpr_metabolic_rxns = \
-        set(
-            basic.check_gene_protein_reaction_rule_presence(
-                model
-            )
-        ).difference(set(model.boundary))
+    missing_gpr_metabolic_rxns = set(
+        basic.check_gene_protein_reaction_rule_presence(model)
+    ).difference(set(model.boundary))
     assert len(missing_gpr_metabolic_rxns) == num
 
 
-@pytest.mark.parametrize("model, coverage", [
-    pytest.param("empty", 0,
-                 marks=pytest.mark.raises(exception=ValueError)),
-    ("gpr_present", 0.5),
-    ("gpr_present_not_lumped", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, coverage",
+    [
+        pytest.param("empty", 0, marks=pytest.mark.raises(exception=ValueError)),
+        ("gpr_present", 0.5),
+        ("gpr_present_not_lumped", 1),
+    ],
+    indirect=["model"],
+)
 def test_metabolic_coverage(model, coverage):
     """Expect a model to have high metabolic coverage."""
     metabolic_coverage = basic.calculate_metabolic_coverage(model)
     assert metabolic_coverage >= coverage
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("unconstrained_rxn", 0),
-    ("nonzero_constrained_rxn", 1),
-    ("no_nonzero_constrained_rxn", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("empty", 0),
+        ("unconstrained_rxn", 0),
+        ("nonzero_constrained_rxn", 1),
+        ("no_nonzero_constrained_rxn", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_nonzero_constrained_reactions(model, num):
     """Expect amount of non-zero rxns to be identified correctly."""
     nonzero_constrained_rxns = basic.find_nonzero_constrained_reactions(model)
     assert len(nonzero_constrained_rxns) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("unconstrained_rxn", 0),
-    ("zero_constrained_rxn", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("unconstrained_rxn", 0), ("zero_constrained_rxn", 1),],
+    indirect=["model"],
+)
 def test_find_zero_constrained_reactions(model, num):
     """Expect amount of zero-constrained rxns to be identified correctly."""
     zero_constrained_rxns = basic.find_zero_constrained_reactions(model)
     assert len(zero_constrained_rxns) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("unconstrained_rxn", 0),
-    ("irreversible_rxn", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("unconstrained_rxn", 0), ("irreversible_rxn", 1),],
+    indirect=["model"],
+)
 def test_find_irreversible_reactions(model, num):
     """Expect amount of irreversible rxns to be identified correctly."""
     irreversible_rxns = basic.find_irreversible_reactions(model)
     assert len(irreversible_rxns) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("unconstrained_rxn", 1),
-    ("zero_constrained_rxn", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("unconstrained_rxn", 1), ("zero_constrained_rxn", 0),],
+    indirect=["model"],
+)
 def test_find_unconstrained_reactions(model, num):
     """Expect amount of unconstrained rxns to be identified correctly."""
     unconstrained_rxns = basic.find_unconstrained_reactions(model)
     assert len(unconstrained_rxns) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("ngam_present", 1),
-    ("ngam_and_atpsynthase", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num", [("ngam_present", 1), ("ngam_and_atpsynthase", 1)], indirect=["model"]
+)
 def test_ngam_presence(model, num):
     """Expect a single non growth-associated maintenance reaction."""
     ngam_reaction = basic.find_ngam(model)
     assert len(ngam_reaction) == num
 
 
-@pytest.mark.parametrize("model, boolean", [
-    ("sufficient_compartments", True),
-    ("insufficient_compartments", False)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, boolean",
+    [("sufficient_compartments", True), ("insufficient_compartments", False)],
+    indirect=["model"],
+)
 def test_compartments_presence(model, boolean):
     """Expect amount of compartments to be identified correctly."""
     assert (len(model.compartments) >= 3) == boolean
 
 
-@pytest.mark.parametrize("model, num", [
-    ("gpr_present", 0),
-    ("gpr_missing", 0),
-    ("gpr_present_complex", 3)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("gpr_present", 0), ("gpr_missing", 0), ("gpr_present_complex", 3)],
+    indirect=["model"],
+)
 def test_find_protein_complexes(model, num):
     """Expect the number of reactions to be identified correctly."""
     assert len(basic.find_protein_complexes(model)) == num
@@ -769,48 +776,61 @@ def test_find_protein_complexes(model, num):
 
 # TODO: ngam_and_atpsynthase is not a proper positive control test model
 # It needs to be replaced with a new test.
-@pytest.mark.parametrize("model, num", [
-    ("ngam_and_atpsynthase", 2),
-    ("gpr_missing_with_exchange", 1),
-    ("non_metabolic_reactions", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("ngam_and_atpsynthase", 2),
+        ("gpr_missing_with_exchange", 1),
+        ("non_metabolic_reactions", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_pure_metabolic_reactions(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_pure_metabolic_reactions(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("ngam_present", 1),
-    ("ngam_and_atpsynthase", 0),
-    ("non_metabolic_reactions", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("ngam_present", 1), ("ngam_and_atpsynthase", 0), ("non_metabolic_reactions", 0)],
+    indirect=["model"],
+)
 def test_find_constrained_pure_metabolic_reactions(model, num):
     """Expect num of contrained metabolic rxns to be identified correctly."""
     pmr = basic.find_pure_metabolic_reactions(model)
     contrained_pmr = set(
-        [rxn for rxn in pmr if basic.is_constrained_reaction(model, rxn)])
+        [rxn for rxn in pmr if basic.is_constrained_reaction(model, rxn)]
+    )
     assert len(contrained_pmr) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("transport_gpr_constrained", 1),
-    ("transport_gpr", 0),
-    ("ngam_and_atpsynthase", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("transport_gpr_constrained", 1),
+        ("transport_gpr", 0),
+        ("ngam_and_atpsynthase", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_constrained_transport_reactions(model, num):
     """Expect num of contrained transport rxns to be identified correctly."""
     transporters = helpers.find_transport_reactions(model)
     constrained_transporters = set(
-        [rxn for rxn in transporters if basic.is_constrained_reaction(
-            model, rxn)])
+        [rxn for rxn in transporters if basic.is_constrained_reaction(model, rxn)]
+    )
     assert len(constrained_transporters) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("reversible_oxygen_flow", 1),
-    ("non_reversible_oxygen_flow", 0),
-    ("transport_gpr", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("reversible_oxygen_flow", 1),
+        ("non_reversible_oxygen_flow", 0),
+        ("transport_gpr", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_reversible_oxygen_reactions(model, num):
     """Expect amount of reversible O2 reactions to be identified correctly."""
     o2_rxns = basic.find_oxygen_reactions(model)
@@ -818,93 +838,107 @@ def test_find_reversible_oxygen_reactions(model, num):
     assert len(rev_o2_rxns) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("sufficient_compartments", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num", [("sufficient_compartments", 1)], indirect=["model"]
+)
 def test_find_unique_metabolites(model, num):
     """Expect amount of metabolic reactions to be identified correctly."""
     assert len(basic.find_unique_metabolites(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("dup_mets_in_c", 1),
-    ("dup_mets_in_c_wrong_annotation", 0),
-    ("gpr_missing", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("dup_mets_in_c", 1), ("dup_mets_in_c_wrong_annotation", 0), ("gpr_missing", 0)],
+    indirect=["model"],
+)
 def test_find_duplicate_metabolites_in_compartments(model, num):
     """Expect amount of duplicate metabolites to be identified correctly."""
     assert len(basic.find_duplicate_metabolites_in_compartments(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("dup_rxns", 2),
-    ("dup_rxns_multiple_anns", 2),
-    ("dup_rxns_partial_matching_multiple_anns", 2),
-    ("dup_rxns_list_anns", 2),
-    ("dup_rxns_multiple_list_anns", 2),
-    ("dup_rxns_no_matching_multiple_anns", 0),
-    ("dup_rxns_multiple_list_anns_no_match", 0),
-    ("dup_rxns_compartment", 2),
-    ("dup_rxns_irrev", 2),
-    ("gpr_missing", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("empty", 0),
+        ("dup_rxns", 2),
+        ("dup_rxns_multiple_anns", 2),
+        ("dup_rxns_partial_matching_multiple_anns", 2),
+        ("dup_rxns_list_anns", 2),
+        ("dup_rxns_multiple_list_anns", 2),
+        ("dup_rxns_no_matching_multiple_anns", 0),
+        ("dup_rxns_multiple_list_anns_no_match", 0),
+        ("dup_rxns_compartment", 2),
+        ("dup_rxns_irrev", 2),
+        ("gpr_missing", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_reactions_with_partially_identical_annotations(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
     _, total = basic.find_reactions_with_partially_identical_annotations(model)
     assert total == num
 
 
-@pytest.mark.parametrize("model, expected", [
-    ("empty", 0),
-    ("dup_rxns", 2),
-    ("dup_rxns_rev", 0),
-    ("dup_rxns_irrev", 0),
-    ("dup_rxns_compartment", 0),
-    ("dup_rxns_irrev_exchanges", 2),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, expected",
+    [
+        ("empty", 0),
+        ("dup_rxns", 2),
+        ("dup_rxns_rev", 0),
+        ("dup_rxns_irrev", 0),
+        ("dup_rxns_compartment", 0),
+        ("dup_rxns_irrev_exchanges", 2),
+    ],
+    indirect=["model"],
+)
 def test_find_duplicate_reactions(model, expected):
     """Expect amount of duplicate reactions to be identified correctly."""
     _, num = basic.find_duplicate_reactions(model)
     assert num == expected
 
 
-@pytest.mark.parametrize("model, num", [
-    ("empty", 0),
-    ("identical_genes", 2),
-    ("different_genes", 0),
-    ("gpr_missing", 0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [("empty", 0), ("identical_genes", 2), ("different_genes", 0), ("gpr_missing", 0)],
+    indirect=["model"],
+)
 def test_find_reactions_with_identical_genes(model, num):
     """Expect amount of duplicate reactions to be identified correctly."""
     _, total = basic.find_reactions_with_identical_genes(model)
     assert total == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("transport_gpr", 1)
-], indirect=["model"])
+@pytest.mark.parametrize("model, num", [("transport_gpr", 1)], indirect=["model"])
 def test_check_transport_reaction_gpr_presence(model, num):
     """Expect amount of transport reactions without gpr to be identified."""
     assert len(basic.check_transport_reaction_gpr_presence(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("rxns_with_two_substrates", 2),
-    ("rxns_with_two_false_substrates", 0),
-    ("rxns_no_exchange", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("rxns_with_two_substrates", 2),
+        ("rxns_with_two_false_substrates", 0),
+        ("rxns_no_exchange", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_medium_metabolites(model, num):
     """Expect amount of medium metabolites be identified."""
     assert len(basic.find_medium_metabolites(model)) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("non_metabolic_reactions", 1),
-    ("transport_gpr", 2),
-    pytest.param("gpr_missing", 2,
-                 marks=pytest.mark.raises(exception=RuntimeError)),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("non_metabolic_reactions", 1),
+        ("transport_gpr", 2),
+        pytest.param(
+            "gpr_missing", 2, marks=pytest.mark.raises(exception=RuntimeError)
+        ),
+    ],
+    indirect=["model"],
+)
 def test_find_external_metabolites(model, num):
     """Expect a specific number of external metabolites to be found."""
     assert len(basic.find_external_metabolites(model)) == num

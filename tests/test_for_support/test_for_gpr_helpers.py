@@ -24,11 +24,10 @@ import pytest
 from memote.support.gpr_helpers import find_top_level_complex
 
 
-@pytest.mark.parametrize("gpr, expected", [
-    ("gene1 and gene2", 2),
-    ("gene1 or gene2", 0),
-    ("gene1 and (gene2 or gene3)", 3)
-])
+@pytest.mark.parametrize(
+    "gpr, expected",
+    [("gene1 and gene2", 2), ("gene1 or gene2", 0), ("gene1 and (gene2 or gene3)", 3)],
+)
 def test_find_functional_units(gpr, expected):
     """Expect the size of the unique elements in a complex to be correct."""
     assert find_top_level_complex(gpr) == expected

@@ -51,7 +51,7 @@ class Medium(ExperimentalBase):
             {
                 "unknown-identifier": {
                     "column": "exchange",
-                    "identifiers": {r.id for r in model.reactions}
+                    "identifiers": {r.id for r in model.reactions},
                 }
             }
         ]
@@ -59,5 +59,6 @@ class Medium(ExperimentalBase):
 
     def apply(self, model):
         """Set the defined medium on the given model."""
-        model.medium = {row.exchange: row.uptake
-                        for row in self.data.itertuples(index=False)}
+        model.medium = {
+            row.exchange: row.uptake for row in self.data.itertuples(index=False)
+        }

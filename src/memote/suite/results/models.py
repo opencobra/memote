@@ -25,12 +25,12 @@ from gzip import GzipFile
 from io import BytesIO
 
 from future.utils import raise_with_traceback
-from sqlalchemy import (
-    Column, DateTime, Integer, Unicode, UnicodeText, LargeBinary)
-from sqlalchemy.types import TypeDecorator
+from sqlalchemy import Column, DateTime, Integer, LargeBinary, Unicode, UnicodeText
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.types import TypeDecorator
 
-from memote.utils import log_json_incompatible_types, jsonify
+from memote.utils import jsonify, log_json_incompatible_types
+
 
 __all__ = ("Result",)
 
@@ -72,9 +72,7 @@ class BJSON(TypeDecorator):
         try:
             with BytesIO() as stream:
                 with GzipFile(fileobj=stream, mode="wb") as file_handle:
-                    file_handle.write(
-                        jsonify(value, pretty=False).encode("utf-8")
-                    )
+                    file_handle.write(jsonify(value, pretty=False).encode("utf-8"))
                 output = stream.getvalue()
             return output
         except TypeError as error:

@@ -27,7 +27,8 @@ from six import iteritems, string_types
 
 
 if version_info[:2] >= (3, 5):
-    from equilibrator_api import Reaction, CompoundMatcher
+    from equilibrator_api import CompoundMatcher, Reaction
+
     compound_matcher = CompoundMatcher()
 
 
@@ -60,8 +61,10 @@ def get_smallest_compound_id(compounds_identifiers):
         When compound_identifiers contains no KEGG compound identifiers.
 
     """
-    return min((c for c in compounds_identifiers if c.startswith("C")),
-               key=lambda c: int(c[1:]))
+    return min(
+        (c for c in compounds_identifiers if c.startswith("C")),
+        key=lambda c: int(c[1:]),
+    )
 
 
 def map_metabolite2kegg(metabolite):
@@ -108,11 +111,9 @@ def map_metabolite2kegg(metabolite):
         #         )
         #         return
         # else:
-        logger.warning("No kegg.compound annotation for metabolite %s.",
-                       metabolite.id)
+        logger.warning("No kegg.compound annotation for metabolite %s.", metabolite.id)
         return
-    if isinstance(kegg_annotation, string_types) and \
-            kegg_annotation.startswith("C"):
+    if isinstance(kegg_annotation, string_types) and kegg_annotation.startswith("C"):
         return kegg_annotation
     elif isinstance(kegg_annotation, Iterable):
         try:
@@ -120,8 +121,7 @@ def map_metabolite2kegg(metabolite):
         except ValueError:
             return
     logger.warning(
-        "No matching kegg.compound annotation for metabolite %s.",
-        metabolite.id
+        "No matching kegg.compound annotation for metabolite %s.", metabolite.id
     )
     return
 
@@ -229,6 +229,8 @@ def find_thermodynamic_reversibility_index(reactions):
             unbalanced.append(rxn)
     reversibility_indexes.sort(key=lambda p: abs(p[1]), reverse=True)
     return (
-        reversibility_indexes, incomplete_mapping, problematic_calculation,
-        unbalanced
+        reversibility_indexes,
+        incomplete_mapping,
+        problematic_calculation,
+        unbalanced,
     )

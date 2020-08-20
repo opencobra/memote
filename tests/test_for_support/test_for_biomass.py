@@ -20,14 +20,15 @@
 from __future__ import absolute_import
 
 import cobra
-import pytest
 import numpy as np
+import pytest
 from cobra.exceptions import OptimizationError
 from optlang.interface import OPTIMAL
 
-import memote.support.helpers as helpers
 import memote.support.biomass as biomass
+import memote.support.helpers as helpers
 from memote.utils import register_with
+
 
 MODEL_REGISTRY = dict()
 
@@ -47,24 +48,34 @@ def sum_within_deviation(base):
     The arbitrary molar masses for the metabolites used in this toy
     reaction will be approximated using hydrogen atoms in the formula.
     """
-    met_a = cobra.Metabolite("lipid_c", "H744", compartment='c')
-    met_b = cobra.Metabolite("protein_c", "H119", compartment='c')
-    met_c = cobra.Metabolite("rna_c", "H496", compartment='c')
-    met_d = cobra.Metabolite("dna_c", "H483", compartment='c')
-    met_e = cobra.Metabolite("ash_c", "H80", compartment='c')
-    met_f = cobra.Metabolite("cellwall_c", "H177", compartment='c')
-    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment='c')
-    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment='c')
-    met_i = cobra.Metabolite("h_c", "H", compartment='c')
-    met_j = cobra.Metabolite("h2o_c", "H2O", compartment='c')
-    met_k = cobra.Metabolite("pi_c", "HO4P", compartment='c')
+    met_a = cobra.Metabolite("lipid_c", "H744", compartment="c")
+    met_b = cobra.Metabolite("protein_c", "H119", compartment="c")
+    met_c = cobra.Metabolite("rna_c", "H496", compartment="c")
+    met_d = cobra.Metabolite("dna_c", "H483", compartment="c")
+    met_e = cobra.Metabolite("ash_c", "H80", compartment="c")
+    met_f = cobra.Metabolite("cellwall_c", "H177", compartment="c")
+    met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
+    met_h = cobra.Metabolite("adp_c", "C10H12N5O10P2", compartment="c")
+    met_i = cobra.Metabolite("h_c", "H", compartment="c")
+    met_j = cobra.Metabolite("h2o_c", "H2O", compartment="c")
+    met_k = cobra.Metabolite("pi_c", "HO4P", compartment="c")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
-    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
-                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
-                           met_g: -30.0, met_h: 30.0, met_i: 30.0,
-                           met_j: -30.0, met_k: 30.0
-                           })
+    rxn_1.add_metabolites(
+        {
+            met_a: -0.133,
+            met_b: -5.834,
+            met_c: -0.1,
+            met_d: -0.0625,
+            met_e: -0.875,
+            met_f: -0.2778,
+            met_g: -30.0,
+            met_h: 30.0,
+            met_i: 30.0,
+            met_j: -30.0,
+            met_k: 30.0,
+        }
+    )
     base.add_reactions([rxn_1])
     return base
 
@@ -87,11 +98,21 @@ def sum_outside_of_deviation(base):
     met_k = cobra.Metabolite("pi_c", "HO4P")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
-    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
-                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
-                           met_g: -30.0, met_h: 30.0, met_i: 30.0,
-                           met_j: 30.0, met_k: 30.0
-                           })
+    rxn_1.add_metabolites(
+        {
+            met_a: -0.133,
+            met_b: -5.834,
+            met_c: -0.1,
+            met_d: -0.0625,
+            met_e: -0.875,
+            met_f: -0.2778,
+            met_g: -30.0,
+            met_h: 30.0,
+            met_i: 30.0,
+            met_j: 30.0,
+            met_k: 30.0,
+        }
+    )
     base.add_reactions([rxn_1])
     return base
 
@@ -106,25 +127,21 @@ def sum_missing_formula(base):
     met_e = cobra.Metabolite("ash_c", None)
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
-    rxn_1.add_metabolites({
-        met_a: -0.2,
-        met_b: -0.2,
-        met_c: -0.2,
-        met_d: -0.2,
-        met_e: -0.2
-    })
+    rxn_1.add_metabolites(
+        {met_a: -0.2, met_b: -0.2, met_c: -0.2, met_d: -0.2, met_e: -0.2}
+    )
     base.add_reactions([rxn_1])
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def precursors_producing(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c')
-    met_b = cobra.Metabolite("protein_c", compartment='c')
-    met_c = cobra.Metabolite("rna_c", compartment='c')
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
-    met_b1 = cobra.Metabolite("protein_e", compartment='e')
-    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    met_a = cobra.Metabolite("lipid_c", compartment="c")
+    met_b = cobra.Metabolite("protein_c", compartment="c")
+    met_c = cobra.Metabolite("rna_c", compartment="c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -202,12 +219,12 @@ def precursors_uptake_limited_in_alien_species(base):
 
 @register_with(MODEL_REGISTRY)
 def precursors_blocked(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c')
-    met_b = cobra.Metabolite("protein_c", compartment='c')
-    met_c = cobra.Metabolite("rna_c", compartment='c')
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
-    met_b1 = cobra.Metabolite("protein_e", compartment='e')
-    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    met_a = cobra.Metabolite("lipid_c", compartment="c")
+    met_b = cobra.Metabolite("protein_c", compartment="c")
+    met_c = cobra.Metabolite("rna_c", compartment="c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -227,12 +244,12 @@ def precursors_blocked(base):
 
 @register_with(MODEL_REGISTRY)
 def precursors_not_in_medium(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c')
-    met_b = cobra.Metabolite("protein_c", compartment='c')
-    met_c = cobra.Metabolite("rna_c", compartment='c')
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
-    met_b1 = cobra.Metabolite("protein_e", compartment='e')
-    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    met_a = cobra.Metabolite("lipid_c", compartment="c")
+    met_b = cobra.Metabolite("protein_c", compartment="c")
+    met_c = cobra.Metabolite("rna_c", compartment="c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -261,9 +278,17 @@ def no_gam_in_biomass(base):
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="c")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
-    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
-                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
-                           met_g: -0.032})
+    rxn_1.add_metabolites(
+        {
+            met_a: -0.133,
+            met_b: -5.834,
+            met_c: -0.1,
+            met_d: -0.0625,
+            met_e: -0.875,
+            met_f: -0.2778,
+            met_g: -0.032,
+        }
+    )
     base.add_reactions([rxn_1])
     return base
 
@@ -279,24 +304,30 @@ def no_gam_in_biomass_in_alien_species(base):
     met_g = cobra.Metabolite("atp_c", "C10H12N5O13P3", compartment="alien_c")
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
-    rxn_1.add_metabolites({met_a: -0.133, met_b: -5.834, met_c: -0.1,
-                           met_d: -0.0625, met_e: -0.875, met_f: -0.2778,
-                           met_g: -0.032})
+    rxn_1.add_metabolites(
+        {
+            met_a: -0.133,
+            met_b: -5.834,
+            met_c: -0.1,
+            met_d: -0.0625,
+            met_e: -0.875,
+            met_f: -0.2778,
+            met_g: -0.032,
+        }
+    )
     base.add_reactions([rxn_1])
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def direct_met_no_growth(base):
-    base.add_metabolites(
-        [cobra.Metabolite(i, compartment='c') for i in "ABCDEFG"]
+    base.add_metabolites([cobra.Metabolite(i, compartment="c") for i in "ABCDEFG"])
+    base.add_reactions(
+        [
+            cobra.Reaction(i)
+            for i in ["EX_A", "EX_C", "EX_E", "EX_G", "A2B", "C2D", "E2F", "biomass"]
+        ]
     )
-    base.add_reactions([cobra.Reaction(i)
-                        for i in ["EX_A", "EX_C",
-                                  "EX_E", "EX_G",
-                                  "A2B", "C2D",
-                                  "E2F", "biomass"]]
-                       )
     base.reactions.EX_A.add_metabolites({"A": 1})
     base.reactions.EX_C.add_metabolites({"C": -1})
     base.reactions.EX_E.add_metabolites({"E": -1})
@@ -304,20 +335,18 @@ def direct_met_no_growth(base):
     base.reactions.A2B.add_metabolites({"A": -1, "B": 1})
     base.reactions.C2D.add_metabolites({"C": -1, "D": 1})
     base.reactions.E2F.add_metabolites({"E": -1, "F": 1})
-    base.reactions.biomass.add_metabolites(
-        {"B": -1, "D": -1, "F": -1, "G": -1}
-    )
+    base.reactions.biomass.add_metabolites({"B": -1, "D": -1, "F": -1, "G": -1})
     return base
 
 
 @register_with(MODEL_REGISTRY)
 def only_direct_mets_false_positive_candidate_EX_reactant_T_product(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
-    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
-    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
-    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
-    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    met_a = cobra.Metabolite("lipid_c", compartment="c", formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment="c", formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment="c", formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e", formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e", formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e", formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
@@ -337,12 +366,12 @@ def only_direct_mets_false_positive_candidate_EX_reactant_T_product(base):
 
 @register_with(MODEL_REGISTRY)
 def only_direct_mets_false_positive_candidate_EX_reactant_T_reactant(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
-    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
-    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
-    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
-    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    met_a = cobra.Metabolite("lipid_c", compartment="c", formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment="c", formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment="c", formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e", formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e", formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e", formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
@@ -362,12 +391,12 @@ def only_direct_mets_false_positive_candidate_EX_reactant_T_reactant(base):
 
 @register_with(MODEL_REGISTRY)
 def only_direct_mets_false_positive_candidate_EX_product_T_reactant(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
-    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
-    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
-    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
-    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    met_a = cobra.Metabolite("lipid_c", compartment="c", formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment="c", formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment="c", formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e", formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e", formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e", formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
@@ -388,12 +417,12 @@ def only_direct_mets_false_positive_candidate_EX_product_T_reactant(base):
 
 @register_with(MODEL_REGISTRY)
 def only_direct_mets_false_positive_candidate_EX_product_T_product(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
-    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
-    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
-    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
-    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    met_a = cobra.Metabolite("lipid_c", compartment="c", formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment="c", formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment="c", formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e", formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e", formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e", formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
@@ -414,12 +443,12 @@ def only_direct_mets_false_positive_candidate_EX_product_T_product(base):
 
 @register_with(MODEL_REGISTRY)
 def direct_mets_with_false_positive(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c', formula="CH2O2")
-    met_b = cobra.Metabolite("protein_c", compartment='c', formula="C2H5NO2")
-    met_c = cobra.Metabolite("rna_c", compartment='c', formula="C4H4N2O2")
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e', formula="CH2O2")
-    met_b1 = cobra.Metabolite("protein_e", compartment='e', formula="C2H5NO2")
-    met_c1 = cobra.Metabolite("rna_e", compartment='e', formula="C4H4N2O2")
+    met_a = cobra.Metabolite("lipid_c", compartment="c", formula="CH2O2")
+    met_b = cobra.Metabolite("protein_c", compartment="c", formula="C2H5NO2")
+    met_c = cobra.Metabolite("rna_c", compartment="c", formula="C4H4N2O2")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e", formula="CH2O2")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e", formula="C2H5NO2")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e", formula="C4H4N2O2")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a1: -1, met_b: -5, met_c: -2})
@@ -440,12 +469,12 @@ def direct_mets_with_false_positive(base):
 
 @register_with(MODEL_REGISTRY)
 def only_direct_mets(base):
-    met_a = cobra.Metabolite("a_c", compartment='c', formula="COOH")
-    met_b = cobra.Metabolite("b_c", compartment='c', formula="NO2")
-    met_c = cobra.Metabolite("c_c", compartment='c', formula="HCl")
-    met_a1 = cobra.Metabolite("a_e", compartment='e', formula="COOH")
-    met_b1 = cobra.Metabolite("b_e", compartment='e', formula="NO2")
-    met_c1 = cobra.Metabolite("c_e", compartment='e', formula="HCl")
+    met_a = cobra.Metabolite("a_c", compartment="c", formula="COOH")
+    met_b = cobra.Metabolite("b_c", compartment="c", formula="NO2")
+    met_c = cobra.Metabolite("c_c", compartment="c", formula="HCl")
+    met_a1 = cobra.Metabolite("a_e", compartment="e", formula="COOH")
+    met_b1 = cobra.Metabolite("b_e", compartment="e", formula="NO2")
+    met_c1 = cobra.Metabolite("c_e", compartment="e", formula="HCl")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -466,8 +495,7 @@ def only_direct_mets(base):
 @register_with(MODEL_REGISTRY)
 def large_biomass_rxn(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS
-    base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                         for i in esp_ids])
+    base.add_metabolites([cobra.Metabolite(i, compartment="c") for i in esp_ids])
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     base.add_reactions([rxn_1])
@@ -478,8 +506,7 @@ def large_biomass_rxn(base):
 @register_with(MODEL_REGISTRY)
 def essential_not_in_biomass(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS
-    base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                         for i in esp_ids])
+    base.add_metabolites([cobra.Metabolite(i, compartment="c") for i in esp_ids])
     esp_ids.pop(0)
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
@@ -491,8 +518,7 @@ def essential_not_in_biomass(base):
 @register_with(MODEL_REGISTRY)
 def essential_not_in_model(base):
     esp_ids = biomass.ESSENTIAL_PRECURSOR_IDS[1:]
-    base.add_metabolites([cobra.Metabolite(i, compartment='c')
-                         for i in esp_ids])
+    base.add_metabolites([cobra.Metabolite(i, compartment="c") for i in esp_ids])
     # Reactions
     rxn_1 = cobra.Reaction("BIOMASS_TEST")
     base.add_reactions([rxn_1])
@@ -502,12 +528,12 @@ def essential_not_in_model(base):
 
 @register_with(MODEL_REGISTRY)
 def precursor_demand_exists(base):
-    met_a = cobra.Metabolite("lipid_c", compartment='c')
-    met_b = cobra.Metabolite("protein_c", compartment='c')
-    met_c = cobra.Metabolite("rna_c", compartment='c')
-    met_a1 = cobra.Metabolite("lipid_e", compartment='e')
-    met_b1 = cobra.Metabolite("protein_e", compartment='e')
-    met_c1 = cobra.Metabolite("rna_e", compartment='e')
+    met_a = cobra.Metabolite("lipid_c", compartment="c")
+    met_b = cobra.Metabolite("protein_c", compartment="c")
+    met_c = cobra.Metabolite("rna_c", compartment="c")
+    met_a1 = cobra.Metabolite("lipid_e", compartment="e")
+    met_b1 = cobra.Metabolite("protein_e", compartment="e")
+    met_c1 = cobra.Metabolite("rna_e", compartment="e")
     # Reactions
     rxn = cobra.Reaction("BIOMASS_TEST", lower_bound=0, upper_bound=1000)
     rxn.add_metabolites({met_a: -1, met_b: -5, met_c: -2})
@@ -526,11 +552,15 @@ def precursor_demand_exists(base):
     return base
 
 
-@pytest.mark.parametrize("model, expected", [
-    ("sum_within_deviation", True),
-    ("sum_outside_of_deviation", False),
-    ("sum_missing_formula", False),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, expected",
+    [
+        ("sum_within_deviation", True),
+        ("sum_outside_of_deviation", False),
+        ("sum_missing_formula", False),
+    ],
+    indirect=["model"],
+)
 def test_biomass_weight_production(model, expected):
     """
     Expect that the sum of total mass of all biomass components equals 1.
@@ -543,10 +573,11 @@ def test_biomass_weight_production(model, expected):
         assert np.isclose(1, control_sum, atol=1e-03) == expected
 
 
-@pytest.mark.parametrize("model, expected", [
-    ("precursors_producing", 200.0),
-    ("precursors_not_in_medium", 0.0)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, expected",
+    [("precursors_producing", 200.0), ("precursors_not_in_medium", 0.0)],
+    indirect=["model"],
+)
 def test_biomass_production(model, expected):
     """
     Expect that biomass can be produced when optimizing the model.
@@ -558,12 +589,16 @@ def test_biomass_production(model, expected):
     assert solution.objective_value == expected
 
 
-@pytest.mark.parametrize("model, num", [
-    ("precursors_producing", 0),
-    ("precursors_not_in_medium", 2),
-    ("precursors_blocked", 1),
-    ("precursor_demand_exists", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("precursors_producing", 0),
+        ("precursors_not_in_medium", 2),
+        ("precursors_blocked", 1),
+        ("precursor_demand_exists", 1),
+    ],
+    indirect=["model"],
+)
 def test_production_biomass_precursors_default(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
@@ -576,11 +611,15 @@ def test_production_biomass_precursors_default(model, num):
         assert len(blocked_mets) == num
 
 
-@pytest.mark.parametrize("model, num", [
-    ("precursors_producing", 0),
-    ("precursors_not_in_medium", 0),
-    ("precursors_blocked", 1)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, num",
+    [
+        ("precursors_producing", 0),
+        ("precursors_not_in_medium", 0),
+        ("precursors_blocked", 1),
+    ],
+    indirect=["model"],
+)
 def test_production_biomass_precursors_exchange(model, num):
     """
     Expect that there are no biomass precursors that cannot be produced.
@@ -594,10 +633,11 @@ def test_production_biomass_precursors_exchange(model, num):
         assert len(blocked_mets) == num
 
 
-@pytest.mark.parametrize("model, boolean", [
-    ("sum_within_deviation", True),
-    ("no_gam_in_biomass", False)
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, boolean",
+    [("sum_within_deviation", True), ("no_gam_in_biomass", False)],
+    indirect=["model"],
+)
 def test_gam_in_biomass(model, boolean):
     """Expect the biomass reactions to contain atp and adp."""
     biomass_rxns = helpers.find_biomass_reaction(model)
@@ -605,11 +645,15 @@ def test_gam_in_biomass(model, boolean):
         assert biomass.gam_in_biomass(model, rxn) is boolean
 
 
-@pytest.mark.parametrize("model, boolean", [
-    ("precursors_producing", False),
-    ("precursors_not_in_medium", True),
-    ("precursors_uptake_limited", True),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, boolean",
+    [
+        ("precursors_producing", False),
+        ("precursors_not_in_medium", True),
+        ("precursors_uptake_limited", True),
+    ],
+    indirect=["model"],
+)
 def test_fast_growth_default(model, boolean):
     """
     Expect the predicted growth rate for each BOF to be below 10.3972.
@@ -622,15 +666,19 @@ def test_fast_growth_default(model, boolean):
     assert fast_growth == boolean
 
 
-@pytest.mark.parametrize("model, number", [
-    ("only_direct_mets", 3),
-    ("only_direct_mets_false_positive_candidate_EX_reactant_T_product", 3),
-    ("only_direct_mets_false_positive_candidate_EX_reactant_T_reactant", 3),
-    ("only_direct_mets_false_positive_candidate_EX_product_T_reactant", 3),
-    ("only_direct_mets_false_positive_candidate_EX_product_T_product", 3),
-    ("direct_mets_with_false_positive", 2),
-    ("precursors_producing", 0),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, number",
+    [
+        ("only_direct_mets", 3),
+        ("only_direct_mets_false_positive_candidate_EX_reactant_T_product", 3),
+        ("only_direct_mets_false_positive_candidate_EX_reactant_T_reactant", 3),
+        ("only_direct_mets_false_positive_candidate_EX_product_T_reactant", 3),
+        ("only_direct_mets_false_positive_candidate_EX_product_T_product", 3),
+        ("direct_mets_with_false_positive", 2),
+        ("precursors_producing", 0),
+    ],
+    indirect=["model"],
+)
 def test_find_direct_metabolites(model, number):
     """Expect the appropriate amount of direct metabolites to be found."""
     biomass_rxns = helpers.find_biomass_reaction(model)
@@ -638,14 +686,23 @@ def test_find_direct_metabolites(model, number):
         assert len(biomass.find_direct_metabolites(model, rxn)) is number
 
 
-@pytest.mark.parametrize("model", [
-    pytest.param("direct_met_no_growth",
-                 marks=pytest.mark.raises(exception=OptimizationError)),
-    pytest.param("precursors_uptake_limited",
-                 marks=pytest.mark.raises(exception=KeyError)),
-    pytest.param("precursors_uptake_limited_in_alien_species",
-                 marks=pytest.mark.raises(exception=RuntimeError)),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        pytest.param(
+            "direct_met_no_growth",
+            marks=pytest.mark.raises(exception=OptimizationError),
+        ),
+        pytest.param(
+            "precursors_uptake_limited", marks=pytest.mark.raises(exception=KeyError)
+        ),
+        pytest.param(
+            "precursors_uptake_limited_in_alien_species",
+            marks=pytest.mark.raises(exception=RuntimeError),
+        ),
+    ],
+    indirect=["model"],
+)
 def test_find_direct_metabolites_errors(model):
     """Expect the appropriate amount of direct metabolites to be found."""
     biomass_rxns = helpers.find_biomass_reaction(model)
@@ -653,11 +710,15 @@ def test_find_direct_metabolites_errors(model):
         biomass.find_direct_metabolites(model, rxn)
 
 
-@pytest.mark.parametrize("model, number", [
-    ("large_biomass_rxn", 1),
-    ("sum_within_deviation", 1),
-    ("precursors_producing", 4),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, number",
+    [
+        ("large_biomass_rxn", 1),
+        ("sum_within_deviation", 1),
+        ("precursors_producing", 4),
+    ],
+    indirect=["model"],
+)
 def test_bundle_biomass_components(model, number):
     """Expect the type of biomass reaction to be identified correctly."""
     biomass_rxns = helpers.find_biomass_reaction(model)
@@ -665,17 +726,19 @@ def test_bundle_biomass_components(model, number):
         assert len(biomass.bundle_biomass_components(model, rxn)) is number
 
 
-@pytest.mark.parametrize("model, number", [
-    ("large_biomass_rxn", 0),
-    ("essential_not_in_biomass", 1),
-    ("essential_not_in_model", 1),
-], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, number",
+    [
+        ("large_biomass_rxn", 0),
+        ("essential_not_in_biomass", 1),
+        ("essential_not_in_model", 1),
+    ],
+    indirect=["model"],
+)
 def test_essential_precursors_not_in_biomass(model, number):
     """
     Expect correct amount of missing essential precursors to be identified.
     """
     biomass_rxns = helpers.find_biomass_reaction(model)
     for rxn in biomass_rxns:
-        assert len(biomass.essential_precursors_not_in_biomass(
-            model, rxn
-        )) is number
+        assert len(biomass.essential_precursors_not_in_biomass(model, rxn)) is number
