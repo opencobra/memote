@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright 2018 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -15,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 """Provide a class for medium definitions."""
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -26,13 +24,13 @@ from goodtables import validate
 from importlib_resources import open_text
 
 import memote.experimental.schemata
-
 # The following import is necessary in order to register the custom check.
 from memote.experimental.checks import UnknownIdentifier  # noqa: F401
 from memote.experimental.tabular import read_tabular
 
 
 __all__ = ("ExperimentalBase",)
+
 
 LOGGER = logging.getLogger(__name__)
 
