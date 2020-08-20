@@ -45,8 +45,10 @@ class Medium(ExperimentalBase):
         """
         super(Medium, self).__init__(**kwargs)
 
-    def validate(self, model, checks=[]):
+    def validate(self, model, checks=None):
         """Use a defined schema to validate the medium table format."""
+        if checks is None:
+            checks = []
         custom = [
             {
                 "unknown-identifier": {

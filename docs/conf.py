@@ -48,7 +48,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'numpydoc',
 
 # Document Python Code
 autoapi_type = 'python'
-autoapi_dirs = ['../memote']
+autoapi_dirs = ['../src/memote']
 autoapi_ignore = ['.tox', '.pytest_cache', 'scripts', 'benchmarks']
 
 numpydoc_show_class_members = False

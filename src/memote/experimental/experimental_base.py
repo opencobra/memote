@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright 2018 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -15,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 """Provide a class for medium definitions."""
 
-from __future__ import absolute_import
 
 import json
 import logging
@@ -25,14 +23,14 @@ import logging
 from goodtables import validate
 from importlib_resources import open_text
 
+# Importing the checks is necessary in order to register them.
 import memote.experimental.schemata
-
-# The following import is necessary in order to register the custom check.
 from memote.experimental.checks import UnknownIdentifier  # noqa: F401
 from memote.experimental.tabular import read_tabular
 
 
 __all__ = ("ExperimentalBase",)
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -84,8 +82,10 @@ class ExperimentalBase(object):
         ) as file_handle:
             self.schema = json.load(file_handle)
 
-    def validate(self, model, checks=[]):
+    def validate(self, model, checks=None):
         """Use a defined schema to validate the given table."""
+        if checks is None:
+            checks = []
         records = self.data.to_dict("records")
         self.evaluate_report(
             validate(

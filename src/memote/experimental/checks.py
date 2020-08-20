@@ -75,6 +75,6 @@ class UnknownIdentifier:
                 cell,
                 message="Value '{value}' in column {header} on row "
                 "{row_number} is an unknown identifier.",
-                message_substitutions={"value": value,},
+                message_substitutions={"value": value},
             )
             return [error]
