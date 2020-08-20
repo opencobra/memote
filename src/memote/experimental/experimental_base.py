@@ -82,8 +82,10 @@ class ExperimentalBase(object):
         ) as file_handle:
             self.schema = json.load(file_handle)
 
-    def validate(self, model, checks=[]):
+    def validate(self, model, checks=None):
         """Use a defined schema to validate the given table."""
+        if checks is None:
+            checks = []
         records = self.data.to_dict("records")
         self.evaluate_report(
             validate(

@@ -99,13 +99,14 @@ class HistoryManager(object):
         """Iterate over all commit hashes in the repository."""
         return iterkeys(self._history["commits"])
 
-    def load_history(self, model, skip={"gh-pages"}):
+    def load_history(self, model, skip=("gh-pages",)):
         """
         Load the entire results history into memory.
 
         Could be a bad idea in a far future.
 
         """
+        skip = set(skip)
         if self._history is None:
             self.build_branch_structure(model, skip)
         self._results = dict()
@@ -117,8 +118,10 @@ class HistoryManager(object):
                 LOGGER.error("Could not load result '%s'.", commit)
                 LOGGER.debug("%s", str(err))
 
-    def get_result(self, commit, default=MemoteResult()):
+    def get_result(self, commit, default=None):
         """Return an individual result from the history if it exists."""
+        if default is None:
+            default = MemoteResult()
         assert self._results is not None, "Please call the method `load_history` first."
         return self._results.get(commit, default)
 

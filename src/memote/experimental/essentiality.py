@@ -65,8 +65,10 @@ class EssentialityExperiment(Experiment):
         super(EssentialityExperiment, self).load(dtype_conversion=dtype_conversion)
         self.data["essential"] = self.data["essential"].isin(self.TRUTHY)
 
-    def validate(self, model, checks=[]):
+    def validate(self, model, checks=None):
         """Use a defined schema to validate the medium table format."""
+        if checks is None:
+            checks = []
         custom = [
             {
                 "unknown-identifier": {
