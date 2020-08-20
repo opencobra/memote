@@ -38,6 +38,7 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install tox tox-gh-actions
     - name: Generate the MEMOTE report
+      shell: bash
       run: make reports
     - name: Test with tox
       run: tox -- --cov-report=xml
@@ -73,6 +74,7 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install twine
     - name: Generate the MEMOTE report
+      shell: bash
       run: make reports
     - name: Build package
       run: python setup.py sdist bdist_wheel
