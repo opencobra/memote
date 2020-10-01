@@ -18,6 +18,7 @@
 """Provide an interface for essentiality experiments."""
 
 from __future__ import absolute_import
+from collections import Iterable
 
 import logging
 
@@ -92,7 +93,9 @@ class EssentialityExperiment(Experiment):
             essen = single_gene_deletion(
                 model, gene_list=self.data["gene"], processes=1
             )
-        essen["gene"] = [list(g)[0] for g in essen.index]
+        essen["gene"] = [
+            list(g)[0] if isinstance(g, Iterable) else g for g in essen["ids"]
+        ]
         essen["essential"] = (essen["growth"] < self.minimal_growth_rate) | essen[
             "growth"
         ].isna()
