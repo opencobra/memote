@@ -100,6 +100,9 @@ def test_inconsistent_min_stoichiometry(model):
     """
     Report number of inconsistent min stoicihometries (if model incosistent).
 
+    Only 10 unconserved metabolites are reported and considered to
+    avoid computing for too long.
+
     Implementation:
     Algorithm described in section 3.3 of
     "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
@@ -119,7 +122,7 @@ def test_inconsistent_min_stoichiometry(model):
     ann["metric"] = len(ann["data"]["minimal_unconservable_sets"])
     ann["message"] = wrapper.fill(
         """This model contains {} minimal unconservable sets: {}""".format(
-            len(ann["data"]["minimal_unconservable_sets"]),
+            ann["metric"] if ann["metric"] > 10 else "more than 10",
             truncate(ann["data"]["minimal_unconservable_sets"]),
         )
     )

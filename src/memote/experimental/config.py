@@ -173,9 +173,10 @@ class ExperimentConfiguration(object):
                 minimal_growth_rate=minimal_growth_rate,
             )
             if growth.medium is not None:
-                assert growth.medium in self.media, (
-                    "Growth-experiment '{}' has an undefined medium '{}'."
-                    "".format(exp_id, growth.medium)
+                assert (
+                    growth.medium in self.media
+                ), "Growth-experiment '{}' has an undefined medium '{}'." "".format(
+                    exp_id, growth.medium
                 )
                 growth.medium = self.media[growth.medium]
             growth.load()
