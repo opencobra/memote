@@ -18,9 +18,9 @@
 """Provide an interface for essentiality experiments."""
 
 from __future__ import absolute_import
-from collections import Iterable
 
 import logging
+from collections import Iterable
 
 from cobra.flux_analysis import single_gene_deletion
 
