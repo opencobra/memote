@@ -27,7 +27,7 @@ import memote.support.consistency_helpers as con_helpers
 from memote.utils import annotate, get_ids, truncate, wrapper
 
 
-@annotate(title="Stoichiometric Consistency", format_type="percent")
+@annotate(title="Stoichiometric Consistency", format_type="raw")
 def test_stoichiometric_consistency(model):
     """
     Expect that the stoichiometry is consistent.
@@ -54,10 +54,61 @@ def test_stoichiometric_consistency(model):
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
+    ann["data"] = is_consistent
+    ann["metric"] = 1.0 - float(is_consistent)
+    ann["message"] = wrapper.fill(
+        """This model is stoichiomerically {}""".format(
+            "consistent" if is_consistent else "inconsistent"
+        )
+    )
+    assert is_consistent, ann["message"]
+
+
+@annotate(title="Uncoserved Metabolites", format_type="percent")
+def test_unconserved_metabolites(model):
+    """
+    Report number of unconserved metabolites (if model incosistent).
+
+    List of unconserved metabolites is computed using the algorithm described
+    in section 3.2 of
+    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+    Bioinformatics 24, no. 19 (2008): 2245.
+    doi: 10.1093/bioinformatics/btn425.
+    """
+    ann = test_stoichiometric_consistency.annotation
+    is_consistent = consistency.check_stoichiometric_consistency(model)
     ann["data"] = {
         "unconserved_metabolites": []
         if is_consistent
         else get_ids(consistency.find_unconserved_metabolites(model)),
+    }
+    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(model.metabolites)
+    ann["message"] = wrapper.fill(
+        """This model contains {} ({:.2%}) unconserved
+        metabolites: {}""".format(
+            len(ann["data"]["unconserved_metabolites"]),
+            ann["metric"],
+            truncate(ann["data"]["unconserved_metabolites"]),
+        )
+    )
+    # equivalent to is_consistent
+    assert ann["metric"] == 0, ann["message"]
+
+
+@annotate(title="Minimal Inconsistent Stoichiometries", format_type="count")
+def test_inconsistent_min_stoichiometry(model):
+    """
+    Report number of inconsistent min stoicihometries (if model incosistent).
+
+    Implementation:
+    Algorithm described in section 3.3 of
+    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+    Bioinformatics 24, no. 19 (2008): 2245.
+    doi: 10.1093/bioinformatics/btn425.
+    """
+    ann = test_stoichiometric_consistency.annotation
+    is_consistent = consistency.check_stoichiometric_consistency(model)
+    ann["data"] = {
         "minimal_unconservable_sets": []
         if is_consistent
         else [
@@ -65,18 +116,14 @@ def test_stoichiometric_consistency(model):
             for mets in consistency.find_inconsistent_min_stoichiometry(model)
         ],
     }
-    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(model.metabolites)
+    ann["metric"] = len(ann["data"]["minimal_unconservable_sets"])
     ann["message"] = wrapper.fill(
-        """This model contains {} ({:.2%}) unconserved
-        metabolites: {}; and {} minimal unconservable sets: {}""".format(
-            len(ann["data"]["unconserved_metabolites"]),
-            ann["metric"],
-            truncate(ann["data"]["unconserved_metabolites"]),
+        """This model contains {} minimal unconservable sets: {}""".format(
             len(ann["data"]["minimal_unconservable_sets"]),
             truncate(ann["data"]["minimal_unconservable_sets"]),
         )
     )
-    assert is_consistent, ann["message"]
+    assert ann["metric"] == 0, ann["message"]
 
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])

@@ -7,6 +7,8 @@ cards:
         weight: 3.0
         cases:
         - test_stoichiometric_consistency
+        - test_unconserved_metabolites
+        - test_inconsistent_min_stoichiometry
         - test_reaction_mass_balance
         - test_reaction_charge_balance
         - test_find_disconnected
