@@ -51,12 +51,24 @@ def complete_failure(base):
     return base
 
 
-@pytest.mark.parametrize("model, code", [("complete_failure", 1),], indirect=["model"])
+@pytest.mark.parametrize(
+    "model, code",
+    [
+        ("complete_failure", 1),
+    ],
+    indirect=["model"],
+)
 def test_test_model_code(model, code):
     assert api.test_model(model) == code
 
 
-@pytest.mark.parametrize("model", ["complete_failure",], indirect=["model"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        "complete_failure",
+    ],
+    indirect=["model"],
+)
 def test_test_model_result(model):
     _, result = api.test_model(model, results=True)
     # TODO: Once introduced perform schema checks here.
@@ -73,7 +85,13 @@ def test_test_model_timeout(model):
     assert model.solver.configuration.timeout == 1
 
 
-@pytest.mark.parametrize("model", ["complete_failure",], indirect=["model"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        "complete_failure",
+    ],
+    indirect=["model"],
+)
 def test_snapshot_report_file(model, tmpdir):
     filename = str(tmpdir.join("index.html"))
     _, results = api.test_model(model, results=True, pytest_args=["--tb", "no"])

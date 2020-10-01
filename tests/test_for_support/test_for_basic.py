@@ -714,7 +714,11 @@ def test_find_nonzero_constrained_reactions(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("empty", 0), ("unconstrained_rxn", 0), ("zero_constrained_rxn", 1),],
+    [
+        ("empty", 0),
+        ("unconstrained_rxn", 0),
+        ("zero_constrained_rxn", 1),
+    ],
     indirect=["model"],
 )
 def test_find_zero_constrained_reactions(model, num):
@@ -725,7 +729,11 @@ def test_find_zero_constrained_reactions(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("empty", 0), ("unconstrained_rxn", 0), ("irreversible_rxn", 1),],
+    [
+        ("empty", 0),
+        ("unconstrained_rxn", 0),
+        ("irreversible_rxn", 1),
+    ],
     indirect=["model"],
 )
 def test_find_irreversible_reactions(model, num):
@@ -736,7 +744,11 @@ def test_find_irreversible_reactions(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("empty", 0), ("unconstrained_rxn", 1), ("zero_constrained_rxn", 0),],
+    [
+        ("empty", 0),
+        ("unconstrained_rxn", 1),
+        ("zero_constrained_rxn", 0),
+    ],
     indirect=["model"],
 )
 def test_find_unconstrained_reactions(model, num):

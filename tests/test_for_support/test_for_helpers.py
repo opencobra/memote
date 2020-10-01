@@ -564,7 +564,9 @@ def test_find_converting_reactions(model, met_pair, expected):
 
 @pytest.mark.parametrize(
     "model, reaction_id, bounds",
-    [("one_exchange", "EX_abc_e", (-1000, 1000)),],
+    [
+        ("one_exchange", "EX_abc_e", (-1000, 1000)),
+    ],
     indirect=["model"],
 )
 def test_open_boundaries(model, reaction_id, bounds):

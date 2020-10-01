@@ -57,7 +57,10 @@ MOCK_CONFIG = {
         },
         "test_basic": {"cases": ["test_number"], "title": "Basic Information"},
     },
-    "weights": {"test_number": 1.0, "test_parametrized": 1.0,},
+    "weights": {
+        "test_number": 1.0,
+        "test_parametrized": 1.0,
+    },
 }
 
 
