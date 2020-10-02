@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 
 import logging
-from collections import Iterable
 
 from cobra.flux_analysis import single_gene_deletion
 
