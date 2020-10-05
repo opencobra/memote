@@ -4,6 +4,7 @@ History
 Next Release
 ------------
 * Fix bug caused from upstream changes -> cobrapy -> pandas.
+* Refactor stoichiometric consistency test into 3 separate ones.
 
 0.11.1 (2020-08-10)
 -------------------
