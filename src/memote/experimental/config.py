@@ -175,7 +175,7 @@ class ExperimentConfiguration(object):
             if growth.medium is not None:
                 assert (
                     growth.medium in self.media
-                ), "Growth-experiment '{}' has an undefined medium '{}'.".format(
+                ), "Growth-experiment '{}' has an undefined medium '{}'." "".format(
                     exp_id, growth.medium
                 )
                 growth.medium = self.media[growth.medium]
