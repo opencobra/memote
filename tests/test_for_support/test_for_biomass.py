@@ -82,7 +82,7 @@ def sum_within_deviation(base):
 
 @register_with(MODEL_REGISTRY)
 def sum_outside_of_deviation(base):
-    """ Same as above, yet here H2O is on the wrong side of the equation
+    """Same as above, yet here H2O is on the wrong side of the equation
     which will throw off the balance.
     """
     met_a = cobra.Metabolite("lipid_c", "H744")

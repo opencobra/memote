@@ -586,7 +586,16 @@ def test_find_unconserved_metabolites(model, inconsistent):
     "model, inconsistent",
     [
         ("textbook", []),
-        ("figure_1", [("A'", "B'", "C'",)]),
+        (
+            "figure_1",
+            [
+                (
+                    "A'",
+                    "B'",
+                    "C'",
+                )
+            ],
+        ),
         ("equation_8", [("A",), ("B",), ("C",)]),
         ("figure_2", [("X",)]),
     ],
@@ -670,7 +679,11 @@ def test_find_mass_unbalanced_reactions(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("loopy_toy_model", 3), ("loopless_toy_model", 0), ("infeasible_toy_model", 0),],
+    [
+        ("loopy_toy_model", 3),
+        ("loopless_toy_model", 0),
+        ("infeasible_toy_model", 0),
+    ],
     indirect=["model"],
 )
 def test_find_stoichiometrically_balanced_cycles(model, num):
@@ -702,7 +715,12 @@ def test_find_deadends(model, num):
 
 
 @pytest.mark.parametrize(
-    "model, num", [("gap_model", 1), ("gapfilled_model", 0),], indirect=["model"]
+    "model, num",
+    [
+        ("gap_model", 1),
+        ("gapfilled_model", 0),
+    ],
+    indirect=["model"],
 )
 def test_find_disconnected(model, num):
     """Expect the appropriate amount of disconnected to be found."""
@@ -712,7 +730,11 @@ def test_find_disconnected(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    [
+        ("gap_model", 4),
+        ("gap_model_2", 1),
+        ("gapfilled_model", 0),
+    ],
     indirect=["model"],
 )
 def test_find_metabolites_not_produced_with_open_bounds(model, num):
@@ -723,7 +745,11 @@ def test_find_metabolites_not_produced_with_open_bounds(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    [
+        ("gap_model", 4),
+        ("gap_model_2", 1),
+        ("gapfilled_model", 0),
+    ],
     indirect=["model"],
 )
 def test_parallel_find_metabolites_not_produced_with_open_bounds(model, num):
@@ -735,7 +761,11 @@ def test_parallel_find_metabolites_not_produced_with_open_bounds(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    [
+        ("gap_model", 4),
+        ("gap_model_2", 1),
+        ("gapfilled_model", 0),
+    ],
     indirect=["model"],
 )
 def test_find_metabolites_not_consumed_with_open_bounds(model, num):
@@ -746,7 +776,11 @@ def test_find_metabolites_not_consumed_with_open_bounds(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 4), ("gap_model_2", 1), ("gapfilled_model", 0),],
+    [
+        ("gap_model", 4),
+        ("gap_model_2", 1),
+        ("gapfilled_model", 0),
+    ],
     indirect=["model"],
 )
 def test_parallel_find_metabolites_not_consumed_with_open_bounds(model, num):
