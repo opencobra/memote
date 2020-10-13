@@ -242,7 +242,6 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13, max_mets_computed=6):
     LOGGER.debug("%s", str(problem))
     inc_minimal = set()
     cuts = list()
-    n_computed = 0
     for met in unconserved_mets:
         # always add the met as an uncoserved set if there is no left nullspace
         row = met_index[met]
@@ -251,15 +250,11 @@ def find_inconsistent_min_stoichiometry(model, atol=1e-13, max_mets_computed=6):
             # singleton set!
             inc_minimal.add((met,))
             continue
-        if n_computed >= max_mets_computed:
-            LOGGER.debug("max number of computed unconserved metabolites reached")
-            break
         # expect a positive mass for the unconserved metabolite
         problem.variables[met.id].lb = 1e-3
         status = problem.optimize()
         while status == "optimal":
             LOGGER.debug("%s: status %s", met.id, status)
-            n_computed += 1
             LOGGER.debug(
                 "sum of all primal values: %f", sum(problem.primal_values.values())
             )
