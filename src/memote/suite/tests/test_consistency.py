@@ -27,7 +27,7 @@ import memote.support.consistency_helpers as con_helpers
 from memote.utils import annotate, get_ids, truncate, wrapper
 
 
-@annotate(title="Stoichiometric Consistency", format_type="raw")
+@annotate(title="Stoichiometric Consistency", format_type="percent")
 def test_stoichiometric_consistency(model):
     """
     Expect that the stoichiometry is consistent.
@@ -41,15 +41,11 @@ def test_stoichiometric_consistency(model):
     either produce mass from nothing or consume mass from the model.
 
     Implementation:
-    This test first uses an implementation of the algorithm presented in
+    This test uses an implementation of the algorithm presented in
     section 3.1 by Gevorgyan, A., M. G Poolman, and D. A Fell.
     "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
     Bioinformatics 24, no. 19 (2008): 2245.
     doi: 10.1093/bioinformatics/btn425
-    Should the model be inconsistent, then the list of unconserved metabolites
-    is computed using the algorithm described in section 3.2 of the same
-    publication. In addition, the list of min unconservable sets is computed
-    using the algorithm described in section 3.3.
 
     """
     ann = test_stoichiometric_consistency.annotation
@@ -57,19 +53,19 @@ def test_stoichiometric_consistency(model):
     ann["data"] = is_consistent
     ann["metric"] = 1.0 - float(is_consistent)
     ann["message"] = wrapper.fill(
-        """This model is stoichiomerically {}""".format(
+        """This model's stoichiometry {}""".format(
             "consistent" if is_consistent else "inconsistent"
         )
     )
     assert is_consistent, ann["message"]
 
 
-@annotate(title="Uncoserved Metabolites", format_type="percent")
+@annotate(title="Uncoserved Metabolites", format_type="count")
 def test_unconserved_metabolites(model):
     """
-    Report number of unconserved metabolites (if model incosistent).
+    Report number all unconserved metabolites.
 
-    List of unconserved metabolites is computed using the algorithm described
+    The list of unconserved metabolites is computed using the algorithm described
     in section 3.2 of
     "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
     Bioinformatics 24, no. 19 (2008): 2245.
@@ -77,28 +73,23 @@ def test_unconserved_metabolites(model):
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
-    ann["data"] = {
-        "unconserved_metabolites": []
-        if is_consistent
-        else get_ids(consistency.find_unconserved_metabolites(model)),
-    }
-    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(model.metabolites)
+    ann["data"] = []
+    if not is_consistent:
+        ann["data"] = get_ids(consistency.find_unconserved_metabolites(model))
+    ann["metric"] = len(ann["data"])
     ann["message"] = wrapper.fill(
-        """This model contains {} ({:.2%}) unconserved
-        metabolites: {}""".format(
-            len(ann["data"]["unconserved_metabolites"]),
+        """This model contains {} unconserved metabolites: {}""".format(
             ann["metric"],
-            truncate(ann["data"]["unconserved_metabolites"]),
+            truncate(ann["data"]),
         )
     )
-    # equivalent to is_consistent
     assert ann["metric"] == 0, ann["message"]
 
 
 @annotate(title="Minimal Inconsistent Stoichiometries", format_type="count")
 def test_inconsistent_min_stoichiometry(model):
     """
-    Report number of inconsistent min stoicihometries (if model incosistent).
+    Report inconsistent min stoichiometries.
 
     Only 10 unconserved metabolites are reported and considered to
     avoid computing for too long.
@@ -111,19 +102,17 @@ def test_inconsistent_min_stoichiometry(model):
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
-    ann["data"] = {
-        "minimal_unconservable_sets": []
-        if is_consistent
-        else [
+    ann["data"] = []
+    if not is_consistent:
+        ann["data"] = [
             get_ids(mets)
             for mets in consistency.find_inconsistent_min_stoichiometry(model)
-        ],
-    }
-    ann["metric"] = len(ann["data"]["minimal_unconservable_sets"])
+        ]
+    ann["metric"] = len(ann["data"])
     ann["message"] = wrapper.fill(
         """This model contains {} minimal unconservable sets: {}""".format(
             ann["metric"] if ann["metric"] > 10 else "more than 10",
-            truncate(ann["data"]["minimal_unconservable_sets"]),
+            truncate(ann["data"]),
         )
     )
     assert ann["metric"] == 0, ann["message"]
@@ -138,7 +127,7 @@ def test_inconsistent_min_stoichiometry(model):
     metric=dict(),
 )
 def test_detect_energy_generating_cycles(model, met):
-    u"""
+    """
     Expect that no energy metabolite can be produced out of nothing.
 
     When a model is not sufficiently constrained to account for the
@@ -206,7 +195,9 @@ def test_reaction_charge_balance(model):
     """
     ann = test_reaction_charge_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(consistency.find_charge_unbalanced_reactions(internal_rxns))
+    ann["data"] = get_ids(
+        consistency.find_charge_unbalanced_reactions(internal_rxns)
+    )
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge unbalanced with at
@@ -241,7 +232,9 @@ def test_reaction_mass_balance(model):
     """
     ann = test_reaction_mass_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(consistency.find_mass_unbalanced_reactions(internal_rxns))
+    ann["data"] = get_ids(
+        consistency.find_mass_unbalanced_reactions(internal_rxns)
+    )
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are mass unbalanced with at least
@@ -389,7 +382,9 @@ def test_find_disconnected(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Production In Complete Medium", format_type="count")
+@annotate(
+    title="Metabolite Production In Complete Medium", format_type="count"
+)
 def test_find_metabolites_not_produced_with_open_bounds(model):
     """
     Expect metabolites to be producible in complete medium.
@@ -408,7 +403,9 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_produced_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(model)
+    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(
+        model
+    )
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be produced in complete
@@ -419,7 +416,9 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(title="Metabolite Consumption In Complete Medium", format_type="count")
+@annotate(
+    title="Metabolite Consumption In Complete Medium", format_type="count"
+)
 def test_find_metabolites_not_consumed_with_open_bounds(model):
     """
     Expect metabolites to be consumable in complete medium.
@@ -438,7 +437,9 @@ def test_find_metabolites_not_consumed_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(model)
+    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(
+        model
+    )
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be consumed in complete

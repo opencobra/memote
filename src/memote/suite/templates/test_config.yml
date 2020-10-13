@@ -7,8 +7,6 @@ cards:
         weight: 3.0
         cases:
         - test_stoichiometric_consistency
-        - test_unconserved_metabolites
-        - test_inconsistent_min_stoichiometry
         - test_reaction_mass_balance
         - test_reaction_charge_balance
         - test_find_disconnected
@@ -65,6 +63,8 @@ cards:
     - test_genes_presence
     - test_compartments_presence
     - test_metabolic_coverage
+    - test_unconserved_metabolites
+    - test_inconsistent_min_stoichiometry
   basic_met:
     title: "Metabolite Information"
     cases:
