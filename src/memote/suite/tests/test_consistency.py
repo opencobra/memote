@@ -195,9 +195,7 @@ def test_reaction_charge_balance(model):
     """
     ann = test_reaction_charge_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(
-        consistency.find_charge_unbalanced_reactions(internal_rxns)
-    )
+    ann["data"] = get_ids(consistency.find_charge_unbalanced_reactions(internal_rxns))
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are charge unbalanced with at
@@ -232,9 +230,7 @@ def test_reaction_mass_balance(model):
     """
     ann = test_reaction_mass_balance.annotation
     internal_rxns = con_helpers.get_internals(model)
-    ann["data"] = get_ids(
-        consistency.find_mass_unbalanced_reactions(internal_rxns)
-    )
+    ann["data"] = get_ids(consistency.find_mass_unbalanced_reactions(internal_rxns))
     ann["metric"] = len(ann["data"]) / len(internal_rxns)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) reactions are mass unbalanced with at least
@@ -382,9 +378,7 @@ def test_find_disconnected(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Metabolite Production In Complete Medium", format_type="count"
-)
+@annotate(title="Metabolite Production In Complete Medium", format_type="count")
 def test_find_metabolites_not_produced_with_open_bounds(model):
     """
     Expect metabolites to be producible in complete medium.
@@ -403,9 +397,7 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_produced_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(
-        model
-    )
+    ann["data"] = consistency.find_metabolites_not_produced_with_open_bounds(model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be produced in complete
@@ -416,9 +408,7 @@ def test_find_metabolites_not_produced_with_open_bounds(model):
     assert len(ann["data"]) == 0, ann["message"]
 
 
-@annotate(
-    title="Metabolite Consumption In Complete Medium", format_type="count"
-)
+@annotate(title="Metabolite Consumption In Complete Medium", format_type="count")
 def test_find_metabolites_not_consumed_with_open_bounds(model):
     """
     Expect metabolites to be consumable in complete medium.
@@ -437,9 +427,7 @@ def test_find_metabolites_not_consumed_with_open_bounds(model):
 
     """
     ann = test_find_metabolites_not_consumed_with_open_bounds.annotation
-    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(
-        model
-    )
+    ann["data"] = consistency.find_metabolites_not_consumed_with_open_bounds(model)
     ann["metric"] = len(ann["data"]) / len(model.metabolites)
     ann["message"] = wrapper.fill(
         """A total of {} ({:.2%}) metabolites cannot be consumed in complete
