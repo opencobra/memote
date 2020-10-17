@@ -71,7 +71,7 @@ def test_unconserved_metabolites(model):
     Bioinformatics 24, no. 19 (2008): 2245.
     doi: 10.1093/bioinformatics/btn425.
     """
-    ann = test_stoichiometric_consistency.annotation
+    ann = test_unconserved_metabolites.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
     ann["data"] = []
     if not is_consistent:
@@ -86,7 +86,7 @@ def test_unconserved_metabolites(model):
     assert ann["metric"] == 0, ann["message"]
 
 
-@annotate(title="Minimal Inconsistent Stoichiometries", format_type="count")
+@annotate(title="Minimal Inconsistent Net Stoichiometries", format_type="count")
 def test_inconsistent_min_stoichiometry(model):
     """
     Report inconsistent min stoichiometries.
@@ -100,7 +100,7 @@ def test_inconsistent_min_stoichiometry(model):
     Bioinformatics 24, no. 19 (2008): 2245.
     doi: 10.1093/bioinformatics/btn425.
     """
-    ann = test_stoichiometric_consistency.annotation
+    ann = test_inconsistent_min_stoichiometry.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
     ann["data"] = []
     if not is_consistent:
