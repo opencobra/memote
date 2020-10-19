@@ -41,42 +41,81 @@ def test_stoichiometric_consistency(model):
     either produce mass from nothing or consume mass from the model.
 
     Implementation:
-    This test first uses an implementation of the algorithm presented in
+    This test uses an implementation of the algorithm presented in
     section 3.1 by Gevorgyan, A., M. G Poolman, and D. A Fell.
     "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
     Bioinformatics 24, no. 19 (2008): 2245.
     doi: 10.1093/bioinformatics/btn425
-    Should the model be inconsistent, then the list of unconserved metabolites
-    is computed using the algorithm described in section 3.2 of the same
-    publication. In addition, the list of min unconservable sets is computed
-    using the algorithm described in section 3.3.
 
     """
     ann = test_stoichiometric_consistency.annotation
     is_consistent = consistency.check_stoichiometric_consistency(model)
-    ann["data"] = {
-        "unconserved_metabolites": []
-        if is_consistent
-        else get_ids(consistency.find_unconserved_metabolites(model)),
-        "minimal_unconservable_sets": []
-        if is_consistent
-        else [
-            get_ids(mets)
-            for mets in consistency.find_inconsistent_min_stoichiometry(model)
-        ],
-    }
-    ann["metric"] = len(ann["data"]["unconserved_metabolites"]) / len(model.metabolites)
+    ann["data"] = is_consistent
+    ann["metric"] = 1.0 - float(is_consistent)
     ann["message"] = wrapper.fill(
-        """This model contains {} ({:.2%}) unconserved
-        metabolites: {}; and {} minimal unconservable sets: {}""".format(
-            len(ann["data"]["unconserved_metabolites"]),
-            ann["metric"],
-            truncate(ann["data"]["unconserved_metabolites"]),
-            len(ann["data"]["minimal_unconservable_sets"]),
-            truncate(ann["data"]["minimal_unconservable_sets"]),
+        """This model's stoichiometry {}""".format(
+            "consistent" if is_consistent else "inconsistent"
         )
     )
     assert is_consistent, ann["message"]
+
+
+@annotate(title="Uncoserved Metabolites", format_type="count")
+def test_unconserved_metabolites(model):
+    """
+    Report number all unconserved metabolites.
+
+    The list of unconserved metabolites is computed using the algorithm described
+    in section 3.2 of
+    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+    Bioinformatics 24, no. 19 (2008): 2245.
+    doi: 10.1093/bioinformatics/btn425.
+    """
+    ann = test_unconserved_metabolites.annotation
+    is_consistent = consistency.check_stoichiometric_consistency(model)
+    ann["data"] = []
+    if not is_consistent:
+        ann["data"] = get_ids(consistency.find_unconserved_metabolites(model))
+    ann["metric"] = len(ann["data"])
+    ann["message"] = wrapper.fill(
+        """This model contains {} unconserved metabolites: {}""".format(
+            ann["metric"],
+            truncate(ann["data"]),
+        )
+    )
+    assert ann["metric"] == 0, ann["message"]
+
+
+@annotate(title="Minimal Inconsistent Net Stoichiometries", format_type="count")
+def test_inconsistent_min_stoichiometry(model):
+    """
+    Report inconsistent min stoichiometries.
+
+    Only 10 unconserved metabolites are reported and considered to
+    avoid computing for too long.
+
+    Implementation:
+    Algorithm described in section 3.3 of
+    "Detection of Stoichiometric Inconsistencies in Biomolecular Models."
+    Bioinformatics 24, no. 19 (2008): 2245.
+    doi: 10.1093/bioinformatics/btn425.
+    """
+    ann = test_inconsistent_min_stoichiometry.annotation
+    is_consistent = consistency.check_stoichiometric_consistency(model)
+    ann["data"] = []
+    if not is_consistent:
+        ann["data"] = [
+            get_ids(mets)
+            for mets in consistency.find_inconsistent_min_stoichiometry(model)
+        ]
+    ann["metric"] = len(ann["data"])
+    ann["message"] = wrapper.fill(
+        """This model contains {} minimal unconservable sets: {}""".format(
+            ann["metric"] if ann["metric"] > 10 else "more than 10",
+            truncate(ann["data"]),
+        )
+    )
+    assert ann["metric"] == 0, ann["message"]
 
 
 @pytest.mark.parametrize("met", [x for x in consistency.ENERGY_COUPLES])
@@ -88,7 +127,7 @@ def test_stoichiometric_consistency(model):
     metric=dict(),
 )
 def test_detect_energy_generating_cycles(model, met):
-    u"""
+    """
     Expect that no energy metabolite can be produced out of nothing.
 
     When a model is not sufficiently constrained to account for the

@@ -63,6 +63,8 @@ cards:
     - test_genes_presence
     - test_compartments_presence
     - test_metabolic_coverage
+    - test_unconserved_metabolites
+    - test_inconsistent_min_stoichiometry
   basic_met:
     title: "Metabolite Information"
     cases:
