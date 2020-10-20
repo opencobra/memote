@@ -147,8 +147,8 @@ def cli():
 @click.option(
     "--solver-timeout",
     type=int,
-    default=None,
-    help="Timeout in seconds to set on the mathematical " "optimization solver.",
+    default=10,
+    help="Timeout in seconds to set on the mathematical optimization solver.",
 )
 @click.option(
     "--experimental",

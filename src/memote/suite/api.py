@@ -82,7 +82,7 @@ def test_model(
     exclusive=None,
     skip=None,
     experimental=None,
-    solver_timeout=None,
+    solver_timeout=10,
 ):
     """
     Test a model and optionally store results as JSON.
@@ -103,7 +103,7 @@ def test_model(
     skip : iterable, optional
         Names of test cases or modules to skip.
     solver_timeout: int, optional
-        Timeout in seconds to set on the mathematical optimization solver.
+        Timeout in seconds to set on the mathematical optimization solver (default 10).
 
     Returns
     -------
