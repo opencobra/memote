@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import os
-from os.path import exists
+from os.path import basename
 
 from memote.suite.cli.config import ConfigFileProcessor
 from memote.suite.cli.reports import report
@@ -33,22 +33,22 @@ def test_report(runner):
     assert result.output.startswith("Usage: report [OPTIONS] COMMAND [ARGS]...")
 
 
-def test_snapshot(runner, model_file):
+def test_snapshot(tmp_path, runner, model_file):
     """Expect the snapshot report to function."""
-    output = model_file.split(".", 1)[0] + ".html"
-    result = runner.invoke(report, ["snapshot", "--filename", output, model_file])
+    output = tmp_path / (basename(model_file).split(".", 1)[0] + ".html")
+    result = runner.invoke(report, ["snapshot", "--filename", str(output), model_file])
     assert result.exit_code == 0
-    assert exists(output)
+    assert output.exists()
 
 
-def test_diff(runner, model_file):
+def test_diff(tmp_path, runner, model_file):
     """Expect the diff report to function."""
-    output = "diff.html"
+    output = tmp_path / "diff.html"
     result = runner.invoke(
-        report, ["diff", "--filename", output, model_file, model_file]
+        report, ["diff", "--filename", str(output), model_file, model_file]
     )
     assert result.exit_code == 0
-    assert exists(output)
+    assert output.exists()
 
 
 def test_history(runner, mock_repo):
