@@ -19,16 +19,14 @@
 
 from __future__ import absolute_import, division
 
-from sys import version_info
-
 import pytest
 
 
-if version_info[:2] < (3, 5):
-    pytest.skip(
-        "Thermodynamic tests require at least Python version 3.5.",
-        allow_module_level=True,
-    )
+pytest.skip(
+    "Thermodynamic tests are disabled until upgrade to new equilibrator-api version.",
+    allow_module_level=True,
+)
+
 
 import memote.support.basic as basic  # noqa
 import memote.support.thermodynamics as thermo  # noqa
