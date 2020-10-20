@@ -186,7 +186,7 @@ def find_unconserved_metabolites(model):
         )
 
 
-def find_inconsistent_min_stoichiometry(model, atol=1e-13, max_mets_computed=100):
+def find_inconsistent_min_stoichiometry(model, atol=1e-13, max_mets_computed=10):
     """
     Detect inconsistent minimal net stoichiometries.
 
