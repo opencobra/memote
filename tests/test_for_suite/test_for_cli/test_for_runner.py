@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright 2017 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
@@ -7,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +15,10 @@
 
 """Ensure the expected functioning of ``memote.suite.cli.runner``."""
 
-from __future__ import absolute_import
 
 import os
 from builtins import str
-from os.path import dirname, exists, join, pardir
+from os.path import basename, dirname, join
 
 import memote.suite.cli.runner
 from memote.suite.cli.config import ConfigFileProcessor
@@ -57,55 +54,53 @@ def test_run_with_experimental_data(runner, model_file):
     assert result.exit_code == 0
 
 
-def test_run_output(runner, model_file):
+def test_run_output(tmp_path, runner, model_file):
     """Expect a memote run to collect the results as json."""
-    output = model_file.split(".", 1)[0] + ".json"
+    output = tmp_path / (basename(model_file).split(".", 1)[0] + ".json")
     result = runner.invoke(
-        cli, ["run", "--filename", output, "--ignore-git", model_file]
+        cli, ["run", "--filename", str(output), "--ignore-git", model_file]
     )
     assert result.exit_code == 0
-    assert exists(output)
+    assert output.exists()
 
 
-def test_run_no_location(runner, mock_repo):
+def test_run_no_location(monkeypatch, runner, mock_repo):
     """
     Expect memote run to error when in repo but without specified location.
 
     """
-    previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-    repo = mock_repo[1]
-    repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
-    result = runner.invoke(cli, ["run", "--location", None, "test.xml"])
-    os.chdir(previous_wd)
+    with monkeypatch.context() as monkey:
+        monkey.chdir(mock_repo[0])
+        repo = mock_repo[1]
+        repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
+        result = runner.invoke(cli, ["run", "--location", None, "test.xml"])
     assert result.exit_code == 1
 
 
-def test_run_no_repo_ignore_git_false(runner, model_file, tmpdir):
+def test_run_no_repo_ignore_git_false(monkeypatch, tmp_path, runner, model_file):
     """
     Expect memote run to warn user if it was not invoked inside a git repo.
 
     """
-    previous_wd = tmpdir.chdir()
-    result = runner.invoke(cli, ["-v", "WARN", "run", model_file])
-    previous_wd.chdir()
+    with monkeypatch.context() as monkey:
+        monkey.chdir(tmp_path)
+        result = runner.invoke(cli, ["-v", "WARN", "run", model_file])
     assert "warning: We highly recommend" in result.output
 
 
-def test_run_dirty_repo_ignore_git_false(runner, mock_repo):
+def test_run_dirty_repo_ignore_git_false(monkeypatch, runner, mock_repo):
     """
     Expect memote run to error if it was invoked inside a dirty git repo.
 
     """
-    previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-    repo = mock_repo[1]
-    repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
-    new_file = join(mock_repo[0], "new_file.txt")
-    open(new_file, "a").close()
-    repo.git.add(new_file)
-    result = runner.invoke(cli, ["run", "test.xml"])
-    os.chdir(previous_wd)
+    with monkeypatch.context() as monkey:
+        monkey.chdir(mock_repo[0])
+        repo = mock_repo[1]
+        repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
+        new_file = join(mock_repo[0], "new_file.txt")
+        open(new_file, "a").close()
+        repo.git.add(new_file)
+        result = runner.invoke(cli, ["run", "test.xml"])
     assert result.exit_code == 1
     assert "Please git commit or git stash all changes" in result.output
 
@@ -119,53 +114,50 @@ def test_run_error_when_invalid(runner, invalid_file):
     assert result.exit_code == 1
 
 
-def test_run_skip_unchanged_false(runner, mock_repo):
+def test_run_skip_unchanged_false(monkeypatch, runner, mock_repo):
     """Expect `memote run` to run when invoked on a commit with no changes."""
-    previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-    repo = mock_repo[1]
-    repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
-    result = runner.invoke(cli, ["run", "--location", "results", "test.xml"])
-    assert result.exit_code == 0
-    repo.git.checkout("gh-pages")
-    number_of_result_files = len(os.listdir(join(mock_repo[0], "results")))
-    # Clean up the one commit made to the gh-pages branch.
-    repo.git.reset("HEAD~", hard=True)
-    os.chdir(previous_wd)
+    with monkeypatch.context() as monkey:
+        monkey.chdir(mock_repo[0])
+        repo = mock_repo[1]
+        repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
+        result = runner.invoke(cli, ["run", "--location", "results", "test.xml"])
+        assert result.exit_code == 0
+        repo.git.checkout("gh-pages")
+        number_of_result_files = len(os.listdir(join(mock_repo[0], "results")))
+        # Clean up the one commit made to the gh-pages branch.
+        repo.git.reset("HEAD~", hard=True)
     assert number_of_result_files == 4
 
 
-def test_run_skip_unchanged_true(runner, mock_repo):
+def test_run_skip_unchanged_true(monkeypatch, runner, mock_repo):
     """Expect `memote run` to skip when invoked on a commit with no changes."""
-    previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-    repo = mock_repo[1]
-    repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
-    result = runner.invoke(
-        cli, ["run", "--location", "results", "--skip-unchanged", "test.xml"]
-    )
-    assert result.exit_code == 0
-    repo.git.checkout("gh-pages")
-    number_of_result_files = len(os.listdir(join(mock_repo[0], "results")))
-    os.chdir(previous_wd)
+    with monkeypatch.context() as monkey:
+        monkey.chdir(mock_repo[0])
+        repo = mock_repo[1]
+        repo.git.checkout("eb959dd016aaa71fcef96f00b94ce045d6af8f4c")
+        result = runner.invoke(
+            cli, ["run", "--location", "results", "--skip-unchanged", "test.xml"]
+        )
+        assert result.exit_code == 0
+        repo.git.checkout("gh-pages")
+        number_of_result_files = len(os.listdir(join(mock_repo[0], "results")))
     assert number_of_result_files == 3
 
 
-def test_new(runner, tmpdir):
+def test_new(runner, tmp_path):
     """Expect memote new to create a cookiecutter repo."""
-    target_dir = str(tmpdir)
     user_responses = (
         "John\nj@d.com\nJD\nmock-repo\nmock-repo\n"
         "description\n2019-02-07\n2019\n0.1.0\n"
         "default\ndefault\ngh-pages"
     )
     result = runner.invoke(
-        cli, ["new", "--directory", target_dir], input=user_responses
+        cli, ["new", "--directory", str(tmp_path)], input=user_responses
     )
     assert result.exit_code == 0
 
 
-def test_online(runner, mock_repo, monkeypatch):
+def test_online(runner, mock_repo, monkeypatch, tmp_path):
     # Build-up
     def mock_setup_gh_repo(*args, **kwargs):
         return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
@@ -173,70 +165,63 @@ def test_online(runner, mock_repo, monkeypatch):
     def mock_setup_travis_ci(*args, **kwargs):
         return "mock_secret"
 
-    monkeypatch.setattr(memote.suite.cli.runner, "_setup_gh_repo", mock_setup_gh_repo)
-    monkeypatch.setattr(
-        memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci
-    )
-    previous_wd = os.getcwd()
-
     # Use the Repository from the mock_repo fixture as the origin to clone from
-    path2origin = mock_repo[0]
-    origin_repo = mock_repo[1]
+    path2origin, origin_repo = mock_repo
+    with monkeypatch.context() as monkey:
+        monkey.chdir(path2origin)
+        monkey.setattr(memote.suite.cli.runner, "_setup_gh_repo", mock_setup_gh_repo)
+        monkey.setattr(
+            memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci
+        )
+        # We have to allow pushing into the 'origin' repo.
+        with origin_repo.config_writer() as writer:
+            writer.set_value("receive", "denyCurrentBranch", "ignore").release()
 
-    # We have to allow pushing into the 'origin' repo.
-    os.chdir(path2origin)
-    with origin_repo.config_writer() as writer:
-        writer.set_value("receive", "denyCurrentBranch", "ignore").release()
+        # Create a directory at a temporary path to clone the mock_repo into.
+        # Cloning configures the mock_repo as the origin of the "local" repo which
+        # allows us to push from one local directory to another.
+        path2local = tmp_path / "cloned_repo"
+        path2local.mkdir()
+        local_repo = origin_repo.clone(str(path2local))
+        monkey.chdir(path2local)
 
-    # Create a directory at a temporary path to clone the mock_repo into.
-    # Cloning configures the mock_repo as the origin of the "local" repo which
-    # allows us to push from one local directory to another.
-    path2local = join(path2origin, pardir, "cloned_repo")
-    os.mkdir(path2local)
-    local_repo = origin_repo.clone(path2local)
-    os.chdir(path2local)
+        # Setting the config for the local repo.
+        with local_repo.config_writer() as writer:
+            writer.set_value("user", "name", "memote-bot").release()
+            writer.set_value("user", "email", "bot@memote.io").release()
 
-    # Setting the config for the local repo.
-    with local_repo.config_writer() as writer:
-        writer.set_value("user", "name", "memote-bot").release()
-        writer.set_value("user", "email", "bot@memote.io").release()
+        # Build context_settings
+        context_settings = ConfigFileProcessor.read_config()
+        github_repository = context_settings["github_repository"]
+        github_username = context_settings["github_username"]
 
-    # Build context_settings
-    context_settings = ConfigFileProcessor.read_config()
-    github_repository = context_settings["github_repository"]
-    github_username = context_settings["github_username"]
+        result = runner.invoke(
+            cli,
+            [
+                "online",
+                "--github_repository",
+                github_repository,
+                "--github_username",
+                github_username,
+            ],
+        )
 
-    result = runner.invoke(
-        cli,
-        [
-            "online",
-            "--github_repository",
-            github_repository,
-            "--github_username",
-            github_username,
-        ],
-    )
+        # Clean up changes to the git origin.
+        local_repo.git.reset("--hard", "HEAD~")
+        local_repo.git.push("--force", "origin", "master")
+
     assert result.exit_code == 0
 
-    # Teardown
-    local_repo.git.reset("--hard", "HEAD~")
-    local_repo.git.push("--force", "origin", "master")
-    os.chdir(previous_wd)
 
+def test_history(monkeypatch, runner, mock_repo):
+    with monkeypatch.context() as monkey:
+        monkey.chdir(mock_repo[0])
+        # Build context_settings
+        context_settings = ConfigFileProcessor.read_config()
+        model = context_settings["model"]
+        location = context_settings["location"]
 
-def test_history(runner, mock_repo):
-    # Initialize mock repo
-    previous_wd = os.getcwd()
-    os.chdir(mock_repo[0])
-
-    # Build context_settings
-    context_settings = ConfigFileProcessor.read_config()
-    model = context_settings["model"]
-    location = context_settings["location"]
-
-    result = runner.invoke(
-        cli, ["history", model, "Mock Commit Message", "--location", location]
-    )
-    # Teardown
-    os.chdir(previous_wd)
+        result = runner.invoke(
+            cli, ["history", model, "Mock Commit Message", "--location", location]
+        )
     assert result.exit_code == 0
