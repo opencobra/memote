@@ -46,7 +46,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.8]
-        node-version: [10]
 
     steps:
     - uses: actions/checkout@v2
@@ -54,10 +53,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
     - name: Get tag
       id: tag
       run: echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
@@ -65,9 +60,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install twine
-    - name: Generate the MEMOTE report
-      shell: bash
-      run: make reports
     - name: Build package
       run: python setup.py sdist bdist_wheel
     - name: Check the package
@@ -87,7 +79,7 @@ jobs:
         release_name: ${{ github.ref }}
         body: >
           Please see
-          https://github.com/${{ github.repository }}/blob/${{ steps.tag.outputs.version }}/CHANGELOG.rst
+          https://github.com/${{ github.repository }}/blob/${{ steps.tag.outputs.version }}/HISTORY.rst
           for the full release notes.
         draft: false
         prerelease: false
