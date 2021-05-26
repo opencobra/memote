@@ -69,7 +69,7 @@ def test_read_tsv(table, tmpdir):
 
 def test_read_xls(table, tmpdir):
     filename = str(tmpdir.mkdir("data").join("table.xls"))
-    table.to_excel(filename, index=False)
+    table.to_excel(filename, index=False, engine="xlwt")
     df = read_tabular(filename)
     assert (df["integer"] == table["integer"]).all()
     assert isclose(df["numeric"], table["numeric"]).all()
@@ -82,6 +82,19 @@ def test_read_xls(table, tmpdir):
 
 def test_read_xlsx(table, tmpdir):
     filename = str(tmpdir.mkdir("data").join("table.xlsx"))
+    table.to_excel(filename, index=False, engine="openpyxl")
+    df = read_tabular(filename)
+    assert (df["integer"] == table["integer"]).all()
+    assert isclose(df["numeric"], table["numeric"]).all()
+    assert (df["comments"].isnull() == table["comments"].isnull()).all()
+    assert (
+        df.loc[df["comments"].notnull(), "comments"]
+        == table.loc[table["comments"].notnull(), "comments"]
+    ).all()
+
+
+def test_read_ods(table, tmpdir):
+    filename = str(tmpdir.mkdir("data").join("table.ods"))
     table.to_excel(filename, index=False)
     df = read_tabular(filename)
     assert (df["integer"] == table["integer"]).all()

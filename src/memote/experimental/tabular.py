@@ -51,10 +51,13 @@ def read_tabular(filename, dtype_conversion=None):
     if "csv" in ext:
         df = pd.read_csv(filename, dtype=dtype_conversion, encoding="utf-8")
     elif "tsv" in ext:
-        df = pd.read_csv(filename, sep="\t", dtype=dtype_conversion, encoding="utf-8")
-    elif "xls" in ext or "xlsx" in ext:
+        df = pd.read_table(filename, sep="\t", dtype=dtype_conversion, encoding="utf-8")
+    elif "xlsx" in ext:
+        df = pd.read_excel(filename, dtype=dtype_conversion, engine="openpyxl")
+    elif "xls" in ext:
+        df = pd.read_excel(filename, dtype=dtype_conversion, engine="xlrd")
+    elif "ods" in ext:
         df = pd.read_excel(filename, dtype=dtype_conversion)
-    # TODO: Add a function to parse ODS data into a pandas data frame.
     else:
         raise ValueError("Unknown file format '{}'.".format(ext))
     return df
