@@ -444,7 +444,7 @@ def history(
     skip,
     exclusive,
     experimental=None,
-):  # noqa: D301
+):
     """
     Re-compute test results for the git branch history.
 
@@ -466,7 +466,7 @@ def history(
     2. By giving memote specific commit hashes, it will re-compute test results
        for those only. This can also be achieved by supplying a commit range.
 
-    """
+    """  # noqa: D301
     # callbacks.validate_path(model)
     callbacks.git_installed()
     if location is None:

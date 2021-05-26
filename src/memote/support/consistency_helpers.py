@@ -141,7 +141,7 @@ def rank(matrix, atol=1e-13, rtol=0):
     return int((sigma >= tol).sum())
 
 
-def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
+def nullspace(matrix, atol=1e-13, rtol=0.0):
     """
     Compute an approximate basis for the null space (kernel) of a matrix.
 
@@ -180,7 +180,7 @@ def nullspace(matrix, atol=1e-13, rtol=0.0):  # noqa: D402
     Adapted from:
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
 
-    """
+    """  # noqa: D402
     matrix = np.atleast_2d(matrix)
     _, sigma, vh = svd(matrix)
     tol = max(atol, rtol * sigma[0])
