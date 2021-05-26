@@ -184,8 +184,7 @@ def find_blocked_biomass_precursors(reaction, model):
             dm_rxn = model.add_boundary(
                 precursor, type="safe-demand", reaction_id="safe_demand", lb=0, ub=ub
             )
-            flux = helpers.run_fba(model, dm_rxn.id, direction="max")
-            if np.isnan(flux) or abs(flux) < 1e-08:
+            if helpers.get_biomass_flux(model, dm_rxn.id) <= 0.0:
                 blocked_precursors.append(precursor)
     return blocked_precursors
 

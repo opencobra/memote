@@ -151,8 +151,8 @@ def test_biomass_default_production(model, reaction_id):
 
     """
     ann = test_biomass_default_production.annotation
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
-    outcome = ann["data"][reaction_id] > 1e-07
+    ann["data"][reaction_id] = helpers.get_biomass_flux(model, reaction_id)
+    outcome = ann["data"][reaction_id] > model.tolerance
     ann["metric"][reaction_id] = 1.0 - float(outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate (1/h) that
@@ -188,8 +188,8 @@ def test_biomass_open_production(model, reaction_id):
     """
     ann = test_biomass_open_production.annotation
     helpers.open_boundaries(model)
-    ann["data"][reaction_id] = helpers.run_fba(model, reaction_id)
-    outcome = ann["data"][reaction_id] > 1e-07
+    ann["data"][reaction_id] = helpers.get_biomass_flux(model, reaction_id)
+    outcome = ann["data"][reaction_id] > model.tolerance
     ann["metric"][reaction_id] = 1.0 - float(outcome)
     ann["message"][reaction_id] = wrapper.fill(
         """Using the biomass reaction {} this is the growth rate that can be
@@ -408,7 +408,7 @@ def test_fast_growth_default(model, reaction_id):
 
     """
     ann = test_fast_growth_default.annotation
-    outcome = helpers.run_fba(model, reaction_id) > 2.81
+    outcome = helpers.get_biomass_flux(model, reaction_id) > 2.81
     ann["data"][reaction_id] = outcome
     ann["metric"][reaction_id] = 1.0 - float(outcome)
     if ann["data"][reaction_id]:

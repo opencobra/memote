@@ -24,6 +24,7 @@ import re
 from collections import defaultdict
 from operator import attrgetter, itemgetter
 
+import cobra
 import numpy as np
 import pandas as pd
 from cobra.exceptions import Infeasible
@@ -630,16 +631,24 @@ def run_fba(model, rxn_id, direction="max", single_value=True):
     model.objective = model.reactions.get_by_id(rxn_id)
     model.objective_direction = direction
     if single_value:
-        try:
-            return model.slim_optimize()
-        except Infeasible:
-            return np.nan
+        return model.slim_optimize()
     else:
         try:
             solution = model.optimize()
             return solution
         except Infeasible:
             return np.nan
+
+
+def get_biomass_flux(model: cobra.Model, rxn_id: str) -> float:
+    """"""
+    model.objective = model.reactions.get_by_id(rxn_id)
+    model.objective_direction = "max"
+    flux = model.slim_optimize(error_value=0.0)
+    if abs(flux) < model.tolerance:
+        return 0.0
+    else:
+        return flux
 
 
 def close_boundaries_sensibly(model):
