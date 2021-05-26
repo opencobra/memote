@@ -641,7 +641,23 @@ def run_fba(model, rxn_id, direction="max", single_value=True):
 
 
 def get_biomass_flux(model: cobra.Model, rxn_id: str) -> float:
-    """"""
+    """
+    Compute the maximal objective value.
+
+    Parameters
+    ----------
+    model : cobra.Model
+        The metabolic model under investigation.
+    rxn_id : string
+        A string containing the reaction ID of the desired FBA objective.
+
+    Returns
+    -------
+    float
+        The objective value which takes infeasibility and solver tolerances into
+        account.
+
+    """
     model.objective = model.reactions.get_by_id(rxn_id)
     model.objective_direction = "max"
     flux = model.slim_optimize(error_value=0.0)
