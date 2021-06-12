@@ -310,7 +310,7 @@ def test_find_orphans(model):
 
     Implementation:
     Find orphan metabolites structurally by considering only reaction
-    equations and reversibility. FBA is not carried out.
+    equations and bounds. FBA is not carried out.
 
 
     """
@@ -337,7 +337,7 @@ def test_find_deadends(model):
 
     Implementation:
     Find dead-end metabolites structurally by considering only reaction
-    equations and reversibility. FBA is not carried out.
+    equations and bounds. FBA is not carried out.
 
     """
     ann = test_find_deadends.annotation
