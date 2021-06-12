@@ -553,6 +553,28 @@ def reversible_gap(base):
     return base
 
 
+@register_with(MODEL_REGISTRY)
+def reversed_substrate(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
+    base.add_reactions([cobra.Reaction(i) for i in ["v1", "v2"]])
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"B": -1, "C": 1})
+    base.reactions.v1.bounds = -1000, 0
+    base.reactions.v2.bounds = -1000, 1000
+    return base
+
+
+@register_with(MODEL_REGISTRY)
+def reversed_product(base):
+    base.add_metabolites([cobra.Metabolite(i) for i in "ABC"])
+    base.add_reactions([cobra.Reaction(i) for i in ["v1", "v2"]])
+    base.reactions.v1.add_metabolites({"A": -1, "B": 1})
+    base.reactions.v2.add_metabolites({"A": -1, "C": 1})
+    base.reactions.v1.bounds = -1000, 0
+    base.reactions.v2.bounds = -1000, 1000
+    return base
+
+
 @pytest.mark.parametrize(
     "model, consistent",
     [
@@ -694,10 +716,16 @@ def test_find_stoichiometrically_balanced_cycles(model, num):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 1), ("gapfilled_model", 0), ("reversible_gap", 0)],
+    [
+        ("gap_model", 1),
+        ("gapfilled_model", 0),
+        ("reversible_gap", 0),
+        ("reversed_substrate", 0),
+        ("reversed_product", 1),
+    ],
     indirect=["model"],
 )
-def test_find_orphans(model, num):
+def test_find_orphans(model: cobra.Model, num: int):
     """Expect the appropriate amount of orphans to be found."""
     orphans = consistency.find_orphans(model)
     assert len(orphans) == num
