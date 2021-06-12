@@ -733,10 +733,16 @@ def test_find_orphans(model: cobra.Model, num: int):
 
 @pytest.mark.parametrize(
     "model, num",
-    [("gap_model", 2), ("gapfilled_model", 0), ("reversible_gap", 1)],
+    [
+        ("gap_model", 2),
+        ("gapfilled_model", 0),
+        ("reversible_gap", 1),
+        ("reversed_substrate", 1),
+        ("reversed_product", 0),
+    ],
     indirect=["model"],
 )
-def test_find_deadends(model, num):
+def test_find_deadends(model: cobra.Model, num: int):
     """Expect the appropriate amount of deadends to be found."""
     deadends = consistency.find_deadends(model)
     assert len(deadends) == num

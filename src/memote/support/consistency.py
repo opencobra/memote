@@ -519,15 +519,13 @@ def find_deadends(model):
         The metabolic model under investigation.
 
     """
-    exchange = frozenset(model.exchanges)
+    exchanges = frozenset(model.exchanges)
     return [
         met
         for met in model.metabolites
         if (len(met.reactions) > 0)
         and all(
-            (not rxn.reversibility)
-            and (rxn not in exchange)
-            and (rxn.metabolites[met] > 0)
+            (rxn not in exchanges) and con_helpers.is_only_product(met, rxn)
             for rxn in met.reactions
         )
     ]
