@@ -17,12 +17,11 @@
 
 """Helper functions for stoichiometric consistency checks."""
 
-from __future__ import absolute_import, division
 
 import logging
-from builtins import dict, zip
 from collections import defaultdict
 
+import cobra
 import numpy as np
 import sympy
 from numpy.linalg import svd
@@ -36,6 +35,16 @@ from memote.support.helpers import find_biomass_reaction
 __all__ = ("stoichiometry_matrix", "nullspace")
 
 LOGGER = logging.getLogger(__name__)
+
+
+def is_only_substrate(metabolite: cobra.Metabolite, reaction: cobra.Reaction) -> bool:
+    """Determine if a metabolite is only a substrate of a reaction."""
+    if reaction.reversibility:
+        return False
+    if reaction.get_coefficient(metabolite) < 0:
+        return reaction.lower_bound >= 0.0 and reaction.upper_bound > 0
+    else:
+        return reaction.lower_bound < 0.0 and reaction.upper_bound <= 0
 
 
 def add_reaction_constraints(model, reactions, Constraint):

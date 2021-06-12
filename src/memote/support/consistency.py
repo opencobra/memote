@@ -17,8 +17,6 @@
 
 """Supporting functions for stoichiometric consistency checks."""
 
-from __future__ import absolute_import, division
-
 import logging
 import multiprocessing
 from operator import attrgetter
@@ -496,15 +494,13 @@ def find_orphans(model):
         The metabolic model under investigation.
 
     """
-    exchange = frozenset(model.exchanges)
+    exchanges = frozenset(model.exchanges)
     return [
         met
         for met in model.metabolites
         if (len(met.reactions) > 0)
         and all(
-            (not rxn.reversibility)
-            and (rxn not in exchange)
-            and (rxn.metabolites[met] < 0)
+            (rxn not in exchanges) and con_helpers.is_only_substrate(met, rxn)
             for rxn in met.reactions
         )
     ]
