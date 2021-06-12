@@ -4,6 +4,12 @@ History
 Next Release
 ------------
 
+0.13.0 (2021-06-12)
+-------------------
+* Fix logic errors with orphan and dead-end metabolite detection. This problem
+  could occur with irreversible reactions whose bounds constrain flux to the
+  reverse direction.
+
 0.12.1 (2021-06-12)
 -------------------
 * Fix problems with spreadsheet parser. Now supports ``.xls``, ``.xlsx``, and ``.ods``.
