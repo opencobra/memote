@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.12.1 (2021-06-12)
+-------------------
+* Fix problems with spreadsheet parser. Now supports ``.xls``, ``.xlsx``, and ``.ods``.
+* Fix a bug with models whose biomass optimization is infeasible.
+
 0.12.0 (2020-10-20)
 -------------------
 * Fix bug caused from upstream changes -> cobrapy -> pandas.
