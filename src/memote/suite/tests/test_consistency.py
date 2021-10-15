@@ -60,7 +60,7 @@ def test_stoichiometric_consistency(model):
     assert is_consistent, ann["message"]
 
 
-@annotate(title="Uncoserved Metabolites", format_type="count")
+@annotate(title="Unconserved Metabolites", format_type="count")
 def test_unconserved_metabolites(model):
     """
     Report number all unconserved metabolites.
