@@ -587,19 +587,23 @@ def _setup_gh_repo(github_token, github_repository, github_username):
 @click.option(
     "--github-token",
     envvar="GITHUB_TOKEN",
-    help="The repository name on GitHub. Usually this is configured " "for you.",
+    help="Personal access token on GitHub.",
 )
 @click.option(
     "--github_repository",
     callback=callbacks.validate_repository,
-    help="The repository name on GitHub. Usually this is configured " "for you.",
+    help="The repository name on GitHub. Usually this is configured for you.",
 )
 @click.option(
     "--github_username",
     callback=callbacks.validate_username,
     help="The GitHub username. Usually this is configured for you.",
 )
-def online(github_token, github_repository, github_username):
+@click.option(
+    "--deployment",
+    help="Deployment branch to be pushed. Usually this is configured for you.",
+)
+def online(github_token, github_repository, github_username, deployment):
     """Upload the repository to GitHub and create a gh-pages branch."""
     # Save the encrypted token in the travis config then commit and push
     try:
@@ -615,8 +619,7 @@ def online(github_token, github_repository, github_username):
     active_branch = repo.active_branch.name
     repo.git.push("--set-upstream", "origin", active_branch)
     repo.heads["gh-pages"].checkout()
-    # TODO: the name of the deployment branch should be taken form memote.ini
-    repo.git.push("--set-upstream", "origin", "gh-pages")
+    repo.git.push("--set-upstream", "origin", deployment)
     repo.heads[active_branch].checkout()
 
 
