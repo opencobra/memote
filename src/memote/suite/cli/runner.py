@@ -578,6 +578,7 @@ def history(
 
 def _setup_gh_repo(github_token, github_repository, github_username):
     g = Github(github_token)
+    # TODO: check `get_user(github_username)`
     user = g.get_user()
     _ = user.create_repo(github_repository)
 
@@ -618,7 +619,7 @@ def online(github_token, github_repository, github_username, deployment):
     _setup_gh_repo(github_token, github_repository, github_username)
     active_branch = repo.active_branch.name
     repo.git.push("--set-upstream", "origin", active_branch)
-    repo.heads["gh-pages"].checkout()
+    repo.heads[deployment].checkout()
     repo.git.push("--set-upstream", "origin", deployment)
     repo.heads[active_branch].checkout()
 
