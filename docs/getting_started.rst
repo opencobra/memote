@@ -146,19 +146,18 @@ results and report are stored on the deployment branch (typically the
 ``gh-pages`` branch).
 
 
-In order to make your local git repository available online and enable continuous integration via Travis CI, you can run:
+In order to make your local git repository available online and enable continuous integration via Github Actions, you can run:
 
 .. code-block:: console
 
-    $ memote online
+    $ memote online --token "your-github-token"
 
-This will use require your GitHub password to create the repository, connect it
-with Travis CI, and generate a GitHub token to be used for continuous
-integration of the history report.
+This requires setting a token on Github (see `GitHub documentation`_) and providing it as 
+the ``--token`` argument. Alternatively, an environment variable ``GITHUB_TOKEN`` can be set to avoid writing the token in the command line.
 
 Now, after each edit to the model in the repository, the user can generate
 an update to the continuous model report shown at the project's gh-pages
-branch. That means each commit should be pushed to Travis individually.
+branch. That means each commit should be pushed individually.
 
 The continuous report will look like this:
 
@@ -227,6 +226,7 @@ history report in your repository, you can run ``memote report history`` from
 any branch at any time to generate it.
 
 .. _GitHub: https://github.com
+.. _GitHub documentation: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 .. _GitLab: https://gitlab.com
 
 *******************************************************************************

@@ -587,6 +587,7 @@ def _setup_gh_repo(github_token, github_repository):
 @click.option(
     "--github-token",
     envvar="GITHUB_TOKEN",
+    callback=callbacks.validate_token,
     help="Personal access token on GitHub.",
 )
 @click.option(
