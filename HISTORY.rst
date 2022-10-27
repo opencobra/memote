@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+* Fix ``memote online``, given breaking changes in Github Authentication.
+* Replace travis-CI with github actions.
+* (Cookiecutter) Add an action for comparing models in Pull
+  Requests (`#23 <https://github.com/opencobra/cookiecutter-memote/pull/23>`_).
+
 0.13.0 (2021-06-12)
 -------------------
 * Fix logic errors with orphan and dead-end metabolite detection. This problem
