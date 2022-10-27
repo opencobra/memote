@@ -187,7 +187,6 @@ def test_online(runner, mock_repo, monkeypatch, tmp_path):
         # Build context_settings
         context_settings = ConfigFileProcessor.read_config()
         github_repository = context_settings["github_repository"]
-        github_username = context_settings["github_username"]
         deployment = context_settings["deployment"]
 
         result = runner.invoke(
@@ -196,8 +195,6 @@ def test_online(runner, mock_repo, monkeypatch, tmp_path):
                 "online",
                 "--github_repository",
                 github_repository,
-                "--github_username",
-                github_username,
                 "--deployment",
                 deployment,
             ],

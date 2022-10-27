@@ -576,9 +576,8 @@ def history(
     LOGGER.info("Done.")
 
 
-def _setup_gh_repo(github_token, github_repository, github_username):
+def _setup_gh_repo(github_token, github_repository):
     g = Github(github_token)
-    # TODO: check `get_user(github_username)`
     user = g.get_user()
     _ = user.create_repo(github_repository)
 
@@ -596,15 +595,10 @@ def _setup_gh_repo(github_token, github_repository, github_username):
     help="The repository name on GitHub. Usually this is configured for you.",
 )
 @click.option(
-    "--github_username",
-    callback=callbacks.validate_username,
-    help="The GitHub username. Usually this is configured for you.",
-)
-@click.option(
     "--deployment",
     help="Deployment branch to be pushed. Usually this is configured for you.",
 )
-def online(github_token, github_repository, github_username, deployment):
+def online(github_token, github_repository, deployment):
     """Upload the repository to GitHub and create a gh-pages branch."""
     # Save the encrypted token in the travis config then commit and push
     try:
@@ -616,7 +610,7 @@ def online(github_token, github_repository, github_username, deployment):
         )
         sys.exit(1)
     LOGGER.info("Push changes to GitHub.")
-    _setup_gh_repo(github_token, github_repository, github_username)
+    _setup_gh_repo(github_token, github_repository)
     active_branch = repo.active_branch.name
     repo.git.push("--set-upstream", "origin", active_branch)
     repo.heads[deployment].checkout()
