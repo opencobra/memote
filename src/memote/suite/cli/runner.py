@@ -614,7 +614,11 @@ def online(github_token, github_repository, deployment):
     _setup_gh_repo(github_token, github_repository)
     active_branch = repo.active_branch.name
     repo.git.push("--set-upstream", "origin", active_branch)
-    repo.heads[deployment].checkout()
+    try:
+        repo.heads[deployment].checkout()
+    except IndexError:
+        # branch was not created
+        repo.heads[active_branch].checkout(b=deployment)
     repo.git.push("--set-upstream", "origin", deployment)
     repo.heads[active_branch].checkout()
 
