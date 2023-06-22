@@ -199,6 +199,8 @@ def test_online(runner: CliRunner, mock_repo, monkeypatch, tmp_path):
                 github_repository,
                 "--deployment",
                 deployment,
+                "--github-token",
+                "some_token",
             ],
         )
 
