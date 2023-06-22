@@ -20,6 +20,8 @@ import os
 from builtins import str
 from os.path import basename, dirname, join
 
+from click.testing import CliRunner
+
 import memote.suite.cli.runner
 from memote.suite.cli.config import ConfigFileProcessor
 from memote.suite.cli.runner import cli
@@ -157,7 +159,7 @@ def test_new(runner, tmp_path):
     assert result.exit_code == 0
 
 
-def test_online(runner, mock_repo, monkeypatch, tmp_path):
+def test_online(runner: CliRunner, mock_repo, monkeypatch, tmp_path):
     # Build-up
     def mock_setup_gh_repo(*args, **kwargs):
         return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
@@ -203,6 +205,11 @@ def test_online(runner, mock_repo, monkeypatch, tmp_path):
         # Clean up changes to the git origin.
         local_repo.git.reset("--hard", "HEAD~")
         local_repo.git.push("--force", "origin", "master")
+    if result.exit_code != 0:
+        print(
+            f"Output -> {result.output}\nException: {result.exception}\n"
+            f"Exec info: {result.exc_info}\nStdout: {result.stdout}\n"
+        )
 
     assert result.exit_code == 0
 
