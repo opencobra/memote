@@ -84,7 +84,7 @@ def find_unconstrained_reactions(model):
 
 
 def find_ngam(model):
-    u"""
+    """
     Return all potential non growth-associated maintenance reactions.
 
     From the list of all reactions that convert ATP to ADP select the reactions
@@ -163,7 +163,7 @@ def find_ngam(model):
 
 
 def calculate_metabolic_coverage(model):
-    u"""
+    """
     Return the ratio of reactions and genes included in the model.
 
     Determine whether the amount of reactions and genes in model not equal to

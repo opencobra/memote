@@ -606,9 +606,9 @@ def _setup_gh_repo(github_repository, github_username, note):
             sys.exit(1)
     else:
         user = response.json()
-        when = user[u"created_at"]
+        when = user["created_at"]
         LOGGER.info(
-            "Logged in to user '{}' created on '{}'.".format(user[u"login"], when)
+            "Logged in to user '{}' created on '{}'.".format(user["login"], when)
         )
 
     # Get a user's repository or create the repository if it doesn't exist on

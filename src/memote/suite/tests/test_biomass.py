@@ -310,7 +310,7 @@ def test_biomass_precursors_open_production(model, reaction_id):
     metric=dict(),
 )
 def test_gam_in_biomass(model, reaction_id):
-    u"""
+    """
     Expect the biomass reactions to contain  ATP and ADP.
 
     The growth-associated maintenance (GAM) term accounts for the energy in
@@ -388,7 +388,7 @@ def test_gam_in_biomass(model, reaction_id):
     metric=dict(),
 )
 def test_fast_growth_default(model, reaction_id):
-    u"""
+    """
     Expect the predicted growth rate for each BOF to be below 2.81.
 
     The growth rate of a metabolic model should not be faster than that of the

@@ -295,7 +295,7 @@ def create_milp_problem(kernel, metabolites, Model, Variable, Constraint, Object
         ns_problem.add(Constraint(y_var, lb=0, name="switch2_{}".format(met.id)))
     ns_problem.update()
     # add nullspace constraints
-    for (j, column) in enumerate(kernel.T):
+    for j, column in enumerate(kernel.T):
         expression = sympy.Add(
             *[
                 coef * ns_problem.variables[met.id]

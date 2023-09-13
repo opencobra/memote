@@ -159,7 +159,7 @@ def translate_reaction(reaction, metabolite_mapping):
 
 
 def find_thermodynamic_reversibility_index(reactions):
-    u"""
+    """
     Return the reversibility index of the given reactions.
 
     To determine the reversibility index, we calculate
