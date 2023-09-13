@@ -20,6 +20,7 @@
 import json
 import logging
 
+
 try:
     from importlib.resources import files
 except ImportError:

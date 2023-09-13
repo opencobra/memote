@@ -23,10 +23,12 @@ import logging
 import re
 from collections import defaultdict
 
+
 try:
     from importlib.resources import files
 except ImportError:
     from importlib_resources import files
+
 from operator import attrgetter, itemgetter
 
 import cobra

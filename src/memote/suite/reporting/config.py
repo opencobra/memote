@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import logging
 from builtins import open
 
+
 try:
     from importlib.resources import files
 except ImportError:

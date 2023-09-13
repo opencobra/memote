@@ -21,10 +21,12 @@ from __future__ import absolute_import
 
 import logging
 
+
 try:
     from importlib.resources import files
 except ImportError:
     from importlib_resources import files
+
 from string import Template
 
 from pandas import DataFrame
