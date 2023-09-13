@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.14.0 (2023-09-13)
+-------------------
+* Fix problems with the deprecated API of ``importlib_resources``. Update to either use
+  standard library or newer version of the package.
+
 0.13.0 (2021-06-12)
 -------------------
 * Fix logic errors with orphan and dead-end metabolite detection. This problem
