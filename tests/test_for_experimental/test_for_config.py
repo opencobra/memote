@@ -21,7 +21,11 @@ from __future__ import absolute_import
 
 import json
 from builtins import zip
-from importlib.resources import files
+
+try:
+    from importlib.resources import files
+except ImportError:
+    from importlib_resources import files
 from os.path import dirname, join
 
 import pytest
