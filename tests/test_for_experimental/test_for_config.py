@@ -21,10 +21,10 @@ from __future__ import absolute_import
 
 import json
 from builtins import zip
+from importlib.resources import files
 from os.path import dirname, join
 
 import pytest
-from importlib_resources import open_text
 from jsonschema import Draft4Validator, ValidationError
 from numpy import isclose
 
@@ -36,8 +36,8 @@ DATA_PATH = join(dirname(__file__), "data")
 
 def test_configuration_schema():
     """Validate the schema itself against its specification."""
-    with open_text(
-        "memote.experimental.schemata", "configuration.json", encoding="utf-8"
+    with files("memote.experimental.schemata").joinpath("configuration.json").open(
+        mode="r", encoding="utf-8"
     ) as file_handle:
         schema = json.load(file_handle)
     Draft4Validator.check_schema(schema)  # Will raise an exception if invalid.
@@ -65,7 +65,7 @@ def test_configuration(filename):
         (
             "medium_only.yml",
             "textbook",
-            [u"glucose", u"m9_fructose", u"pyruvate"],
+            ["glucose", "m9_fructose", "pyruvate"],
             [0.874, 0.416, 0.291],
         )
     ],
@@ -84,7 +84,7 @@ def test_load_medium(filename, model, media, growth):
 
 @pytest.mark.parametrize(
     "filename, model, experiment",
-    [(u"essentiality_only.yml", u"textbook", u"core_deletion")],
+    [("essentiality_only.yml", "textbook", "core_deletion")],
     indirect=["model"],
 )
 def test_load_essentiality(filename, model, experiment):
@@ -102,7 +102,7 @@ def test_load_essentiality(filename, model, experiment):
 
 @pytest.mark.parametrize(
     "filename, model, experiment",
-    [(u"growth.yml", u"textbook", u"core")],
+    [("growth.yml", "textbook", "core")],
     indirect=["model"],
 )
 def test_load_growth(filename, model, experiment):

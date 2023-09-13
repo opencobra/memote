@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import logging
 import re
 from collections import defaultdict
+from importlib.resources import files
 from operator import attrgetter, itemgetter
 
 import cobra
@@ -29,7 +30,6 @@ import numpy as np
 import pandas as pd
 from cobra.exceptions import Infeasible
 from cobra.medium.boundary_types import find_boundary_types
-from importlib_resources import open_text
 from pylru import lrudecorator
 from six import iteritems, itervalues
 
@@ -54,8 +54,8 @@ TRANSPORT_RXN_SBO_TERMS = [
 
 # Read the MetaNetX shortlist to identify specific metabolite IDs across
 # different namespaces.
-with open_text(
-    memote.support.data, "met_id_shortlist.json", encoding="utf-8"
+with files(memote.support.data).joinpath("met_id_shortlist.json").open(
+    mode="r", encoding="utf-8"
 ) as file_handle:
     METANETX_SHORTLIST = pd.read_json(file_handle)
 
@@ -467,7 +467,7 @@ def find_biomass_reaction(model):
 
 @lrudecorator(size=2)
 def find_demand_reactions(model):
-    u"""
+    """
     Return a list of demand reactions.
 
     Parameters
@@ -507,7 +507,7 @@ def find_demand_reactions(model):
 
 @lrudecorator(size=2)
 def find_sink_reactions(model):
-    u"""
+    """
     Return a list of sink reactions.
 
     Parameters
@@ -546,7 +546,7 @@ def find_sink_reactions(model):
 
 @lrudecorator(size=2)
 def find_exchange_rxns(model):
-    u"""
+    """
     Return a list of exchange reactions.
 
     Parameters

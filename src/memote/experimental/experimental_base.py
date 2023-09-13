@@ -19,9 +19,9 @@
 
 import json
 import logging
+from importlib.resources import files
 
 from goodtables import validate
-from importlib_resources import open_text
 
 # Importing the checks is necessary in order to register them.
 import memote.experimental.schemata
@@ -77,8 +77,8 @@ class ExperimentalBase(object):
 
         """
         self.data = read_tabular(self.filename, dtype_conversion)
-        with open_text(
-            memote.experimental.schemata, self.SCHEMA, encoding="utf-8"
+        with files(memote.experimental.schemata).joinpath(self.SCHEMA).open(
+            mode="r", encoding="utf-8"
         ) as file_handle:
             self.schema = json.load(file_handle)
 

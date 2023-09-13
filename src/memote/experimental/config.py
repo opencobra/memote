@@ -21,11 +21,11 @@ from __future__ import absolute_import
 
 import json
 import logging
+from importlib.resources import files
 from io import open
 from math import isnan
 from os.path import dirname, isabs, join
 
-from importlib_resources import open_text
 from jsonschema import Draft4Validator
 from ruamel.yaml import YAML
 from six import iteritems
@@ -44,8 +44,8 @@ yaml = YAML(typ="safe")
 class ExperimentConfiguration(object):
     """Represent an experimental configuration."""
 
-    with open_text(
-        "memote.experimental.schemata", "configuration.json", encoding="utf-8"
+    with files("memote.experimental.schemata").joinpath("configuration.json").open(
+        mode="r", encoding="utf-8"
     ) as file_handle:
         SCHEMA = json.load(file_handle)
 
