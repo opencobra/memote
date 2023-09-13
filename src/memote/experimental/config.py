@@ -21,7 +21,11 @@ from __future__ import absolute_import
 
 import json
 import logging
-from importlib.resources import files
+
+try:
+    from importlib.resources import files
+except ImportError:
+    from importlib_resources import files
 from io import open
 from math import isnan
 from os.path import dirname, isabs, join
