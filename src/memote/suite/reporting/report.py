@@ -20,9 +20,9 @@
 from __future__ import absolute_import
 
 import logging
+from importlib.resources import files
 from string import Template
 
-from importlib_resources import read_text
 from pandas import DataFrame
 from six import iteritems, itervalues
 
@@ -62,7 +62,9 @@ class Report(object):
         self.result = result
         self.config = configuration
         self._report_type = None
-        self._template = Template(read_text(templates, "index.html", encoding="utf-8"))
+        self._template = Template(
+            files(templates).joinpath("index.html").read_text(encoding="utf-8")
+        )
 
     def render_json(self, pretty=False):
         """
