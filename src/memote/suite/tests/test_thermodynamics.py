@@ -38,7 +38,7 @@ from memote.utils import annotate, get_ids, wrapper  # noqa
     format_type="percent",
 )
 def test_find_candidate_irreversible_reactions(model):
-    u"""
+    """
     Identify reversible reactions that could be irreversible.
 
     If a reaction is neither a transport reaction, a biomass reaction nor a

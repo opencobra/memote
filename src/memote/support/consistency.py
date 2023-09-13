@@ -313,7 +313,7 @@ def find_elementary_leakage_modes(model, atol=1e-13):
 
 
 def detect_energy_generating_cycles(model, metabolite_id):
-    u"""
+    """
     Detect erroneous energy-generating cycles for a a single metabolite.
 
     The function will first build a dissipation reaction corresponding to the
@@ -448,7 +448,7 @@ def find_charge_unbalanced_reactions(reactions):
 
 
 def find_stoichiometrically_balanced_cycles(model):
-    u"""
+    """
     Find metabolic reactions in stoichiometrically balanced cycles (SBCs).
 
     Identify forward and reverse cycles by closing all exchanges and using FVA.
