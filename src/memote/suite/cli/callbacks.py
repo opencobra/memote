@@ -72,7 +72,9 @@ def validate_token(context, param, value):
         return value
     else:
         raise click.BadParameter(
-            "No GitHub token provided. See https://memote.readthedocs.io/en/latest/getting_started.html#ci-tested-online-and-public-workflow for instructions on how to set it up."
+            "No GitHub token provided. See https://memote.readthedocs.io/en/"
+            "latest/getting_started.html#ci-tested-online-and-public-workflow"
+            " for instructions on how to set it up."
         )
 
 
