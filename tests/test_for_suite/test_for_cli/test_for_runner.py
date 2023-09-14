@@ -151,12 +151,21 @@ def test_new(runner, tmp_path):
     user_responses = (
         "John\nj@d.com\nJD\nmock-repo\nmock-repo\n"
         "description\n2019-02-07\n2019\n0.1.0\n"
-        "default\ndefault\ngh-pages"
+        "default\ndefault\ngh-pages\ndefault\n"
     )
     result = runner.invoke(
         cli, ["new", "--directory", str(tmp_path)], input=user_responses
     )
-    assert result.exit_code == 0
+    first_success = result.exit_code == 0
+    second_success = False
+    if not first_success:
+        # Assume that the cookiecutter was previously downloaded and we need to confirm
+        # that we want to re-download it.
+        result = runner.invoke(
+            cli, ["new", "--directory", str(tmp_path)], input="Y\n" + user_responses
+        )
+        second_success = result.exit_code == 0
+    assert first_success or second_success
 
 
 def test_online(runner: CliRunner, mock_repo, monkeypatch, tmp_path):

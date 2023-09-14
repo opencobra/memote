@@ -455,7 +455,7 @@ def bundle_biomass_components(model, reaction):
 
 
 def essential_precursors_not_in_biomass(model, reaction):
-    u"""
+    """
     Return a list of essential precursors missing from the biomass reaction.
 
     There are universal components of life that make up the biomass of all

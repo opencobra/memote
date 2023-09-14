@@ -22,7 +22,12 @@ from __future__ import absolute_import
 import logging
 from builtins import open
 
-from importlib_resources import open_text
+
+try:
+    from importlib.resources import files
+except ImportError:
+    from importlib_resources import files
+
 from ruamel.yaml import YAML
 
 import memote.suite.templates as templates
@@ -54,8 +59,8 @@ class ReportConfiguration(dict):
         """Load a test report configuration."""
         if filename is None:
             LOGGER.debug("Loading default configuration.")
-            with open_text(
-                templates, "test_config.yml", encoding="utf-8"
+            with files(templates).joinpath("test_config.yml").open(
+                mode="r", encoding="utf-8"
             ) as file_handle:
                 content = yaml.load(file_handle)
         else:

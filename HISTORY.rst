@@ -10,6 +10,11 @@ Next Release
   Requests (`#23 <https://github.com/opencobra/cookiecutter-memote/pull/23>`_).
 * Dropped support for python3.6 and python3.7 in favor of python3.9 and python3.10.
 
+0.14.0 (2023-09-13)
+-------------------
+* Fix problems with the deprecated API of ``importlib_resources``. Update to either use
+  standard library or newer version of the package.
+
 0.13.0 (2021-06-12)
 -------------------
 * Fix logic errors with orphan and dead-end metabolite detection. This problem
