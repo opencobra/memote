@@ -314,11 +314,10 @@ def new(directory, replay):
     if directory is None:
         directory = os.getcwd()
     cookiecutter(
-        # TODO: update cookiecutter at opencobra
-        "gh:carrascomj/cookiecutter-memote",
+        "gh:opencobra/cookiecutter-memote",
         output_dir=directory,
         replay=replay,
-        checkout="refactor-gh-actions",
+        checkout="master",
     )
 
 
