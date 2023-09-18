@@ -66,12 +66,16 @@ def validate_repository(context, param, value):
         raise click.BadParameter("No GitHub repository slug provided or configured.")
 
 
-def validate_username(context, param, value):
-    """Load username from different locations."""
+def validate_token(context, param, value):
+    """Verify that a token was provided, pointing to documentation."""
     if value is not None:
         return value
     else:
-        raise click.BadParameter("No GitHub username provided or configured.")
+        raise click.BadParameter(
+            "No GitHub token provided. See https://memote.readthedocs.io/en/"
+            "latest/getting_started.html#ci-tested-online-and-public-workflow"
+            " for instructions on how to set it up."
+        )
 
 
 def probe_git():

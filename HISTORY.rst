@@ -4,6 +4,12 @@ History
 Next Release
 ------------
 
+* Fix ``memote online``, given breaking changes in Github Authentication.
+* Replace travis-CI with github actions.
+* (Cookiecutter) Add an action for comparing models in Pull
+  Requests (`#23 <https://github.com/opencobra/cookiecutter-memote/pull/23>`_).
+* Dropped support for python3.6 and python3.7 in favor of python3.8 to python3.11.
+
 0.14.0 (2023-09-13)
 -------------------
 * Fix problems with the deprecated API of ``importlib_resources``. Update to either use

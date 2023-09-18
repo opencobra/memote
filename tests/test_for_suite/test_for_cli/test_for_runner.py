@@ -20,6 +20,8 @@ import os
 from builtins import str
 from os.path import basename, dirname, join
 
+from click.testing import CliRunner
+
 import memote.suite.cli.runner
 from memote.suite.cli.config import ConfigFileProcessor
 from memote.suite.cli.runner import cli
@@ -166,22 +168,16 @@ def test_new(runner, tmp_path):
     assert first_success or second_success
 
 
-def test_online(runner, mock_repo, monkeypatch, tmp_path):
+def test_online(runner: CliRunner, mock_repo, monkeypatch, tmp_path):
     # Build-up
     def mock_setup_gh_repo(*args, **kwargs):
         return "mock_repo_name", "mock_auth_token", "mock_repo_access_token"
-
-    def mock_setup_travis_ci(*args, **kwargs):
-        return "mock_secret"
 
     # Use the Repository from the mock_repo fixture as the origin to clone from
     path2origin, origin_repo = mock_repo
     with monkeypatch.context() as monkey:
         monkey.chdir(path2origin)
         monkey.setattr(memote.suite.cli.runner, "_setup_gh_repo", mock_setup_gh_repo)
-        monkey.setattr(
-            memote.suite.cli.runner, "_setup_travis_ci", mock_setup_travis_ci
-        )
         # We have to allow pushing into the 'origin' repo.
         with origin_repo.config_writer() as writer:
             writer.set_value("receive", "denyCurrentBranch", "ignore").release()
@@ -202,7 +198,7 @@ def test_online(runner, mock_repo, monkeypatch, tmp_path):
         # Build context_settings
         context_settings = ConfigFileProcessor.read_config()
         github_repository = context_settings["github_repository"]
-        github_username = context_settings["github_username"]
+        deployment = context_settings["deployment"]
 
         result = runner.invoke(
             cli,
@@ -210,14 +206,21 @@ def test_online(runner, mock_repo, monkeypatch, tmp_path):
                 "online",
                 "--github_repository",
                 github_repository,
-                "--github_username",
-                github_username,
+                "--deployment",
+                deployment,
+                "--github-token",
+                "some_token",
             ],
         )
 
         # Clean up changes to the git origin.
         local_repo.git.reset("--hard", "HEAD~")
         local_repo.git.push("--force", "origin", "master")
+    if result.exit_code != 0:
+        print(
+            f"Output -> {result.output}\nException: {result.exception}\n"
+            f"Exec info: {result.exc_info}\nStdout: {result.stdout}\n"
+        )
 
     assert result.exit_code == 0
 
