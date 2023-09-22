@@ -64,9 +64,9 @@ GENE_PRODUCT_ANNOTATIONS = OrderedDict(
         (
             "refseq",
             re.compile(
-                r"^((AC|AP|NC|NG|NM|NP|NR|NT|"
-                r"NW|XM|XP|XR|YP|ZP)_\d+|"
-                r"(NZ\_[A-Z]{4}\d+))(\.\d+)?$"
+                r"^(((WP|AC|AP|NC|NG|NM|NP|NR|NT|"
+                r"NW|XM|XP|XR|YP|ZP)_\d+)|"
+                r"(NZ\_[A-Z]{2,4}\d+))(\.\d+)?$"
             ),
         ),
         (
@@ -95,11 +95,11 @@ REACTION_ANNOTATIONS = OrderedDict(
         ("rhea", re.compile(r"^\d{5}$")),
         ("kegg.reaction", re.compile(r"^R\d+$")),
         ("seed.reaction", re.compile(r"^rxn\d+$")),
-        ("metanetx.reaction", re.compile(r"^MNXR\d+$")),
+        ("metanetx.reaction", re.compile(r"^(MNXR\d+|EMPTY)$")),
         ("bigg.reaction", re.compile(r"^[a-z_A-Z0-9]+$")),
         (
             "reactome",
-            re.compile(r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)"),
+            re.compile(r"(^R-[A-Z]{3}-\d+(-\d+)?(\.\d+)?$)|(^REACT_\d+(\.\d+)?$)"),
         ),
         (
             "ec-code",
@@ -112,12 +112,12 @@ REACTION_ANNOTATIONS = OrderedDict(
         (
             "brenda",
             re.compile(
-                r"^\d+\.-\.-\.-|\d+\.\d+\.-\.-|"
-                r"\d+\.\d+\.\d+\.-|"
-                r"\d+\.\d+\.\d+\.(n)?\d+$"
+                r"^((\d+\.-\.-\.-)|(\d+\.\d+\.-\.-)|"
+                r"(\d+\.\d+\.\d+\.-)"
+                r"|(\d+\.\d+\.\d+\.\d+))$"
             ),
         ),
-        ("biocyc", re.compile(r"^[A-Z-0-9]+(?<!CHEBI)" r"(\:)?[A-Za-z0-9+_.%-]+$")),
+        ("biocyc", re.compile(r"^[A-Z-0-9]+(\:)?[A-Za-z0-9+_.%-:]+$")),
     ]
 )
 
@@ -136,14 +136,14 @@ METABOLITE_ANNOTATIONS = OrderedDict(
             ),
         ),
         ("chebi", re.compile(r"^CHEBI:\d+$")),
-        ("hmdb", re.compile(r"^HMDB\d{5}$")),
+        ("hmdb", re.compile(r"^HMDB\d+$")),
         (
             "reactome",
-            re.compile(r"(^R-[A-Z]{3}-[0-9]+(-[0-9]+)?$)|(^REACT_\d+(\.\d+)?$)"),
+            re.compile(r"(^R-[A-Z]{3}-\d+(-\d+)?(\.\d+)?$)|(^REACT_\d+(\.\d+)?$)"),
         ),
-        ("metanetx.chemical", re.compile(r"^MNXM\d+$")),
+        ("metanetx.chemical", re.compile(r"^(MNXM\d+|BIOMASS|WATER)$")),
         ("bigg.metabolite", re.compile(r"^[a-z_A-Z0-9]+$")),
-        ("biocyc", re.compile(r"^[A-Z-0-9]+(?<!CHEBI)(\:)?[A-Za-z0-9+_.%-]+$")),
+        ("biocyc", re.compile(r"^[A-Z-0-9]+(\:)?[A-Za-z0-9+_.%-:]+$")),
     ]
 )
 
