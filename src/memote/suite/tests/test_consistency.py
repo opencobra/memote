@@ -24,6 +24,7 @@ from cobra.flux_analysis import find_blocked_reactions
 
 import memote.support.consistency as consistency
 import memote.support.consistency_helpers as con_helpers
+import memote.support.helpers as helpers
 from memote.utils import annotate, get_ids, truncate, wrapper
 
 
@@ -153,7 +154,8 @@ def test_detect_energy_generating_cycles(model, met):
 
     """
     ann = test_detect_energy_generating_cycles.annotation
-    if met not in model.metabolites:
+    main_comp = helpers.find_compartment_id_in_model(model, "c")
+    if helpers.find_met_in_model(model, met, main_comp)[0] is None:
         pytest.skip(
             "This test has been skipped since metabolite {} could "
             "not be found in the model.".format(met)
