@@ -24,7 +24,7 @@ import logging
 from builtins import dict, str
 from textwrap import TextWrapper
 
-from depinfo import print_dependencies
+from depinfo.application import DisplayApplication
 from future.utils import raise_with_traceback
 from numpy import isfinite
 from numpydoc.docscrape import NumpyDocString
@@ -233,7 +233,7 @@ def extended_summary(func):
 
 def show_versions():
     """Print formatted dependency information to stdout."""
-    print_dependencies("memote")
+    DisplayApplication.run("memote")
 
 
 def jsonify(obj, pretty=False):
