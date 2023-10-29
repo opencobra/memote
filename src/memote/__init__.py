@@ -37,3 +37,6 @@ from memote.suite.api import *
 from memote.suite.results import *
 from memote.suite.reporting import *
 from memote.jinja2_extension import *
+
+from . import _version
+__version__ = _version.get_versions()['version']
