@@ -158,7 +158,9 @@ def test_detect_energy_generating_cycles(model, met):
     main_comp = helpers.find_compartment_id_in_model(model, "c")
     try:
         helpers.find_met_in_model(model, met, main_comp)[0]
-    except:
+    except ValueError:
+        pytest.skip("Metabolite {} is not in the MetaNetX shortlist.".format(met))
+    except (RuntimeError, IndexError):
         pytest.skip(
             "This test has been skipped since metabolite {} could "
             "not be found in the model.".format(met)
