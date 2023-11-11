@@ -9,6 +9,8 @@ Next Release
 * (Cookiecutter) Add an action for comparing models in Pull
   Requests (`#23 <https://github.com/opencobra/cookiecutter-memote/pull/23>`_).
 * Dropped support for python3.6 and python3.7 in favor of python3.8 to python3.11.
+* Update Regex patterns for ``refseq``, ``metanetx.reaction``, ``reactome``, ``brenda``,
+  ``biocyc``, ``hmdb``, and ``metanetx.chemical`` IDs.
 
 0.14.0 (2023-09-13)
 -------------------
