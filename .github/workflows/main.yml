@@ -20,63 +20,68 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.11"]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install tox tox-gh-actions
+
     - name: Test with tox
       run: tox -- --cov-report=xml
+
     - name: Report coverage
       shell: bash
       run: bash <(curl -s https://codecov.io/bash)
 
   release:
     needs: test
-    if: startsWith(github.ref, 'refs/tags')
+    if: github.ref_type == 'tag'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.8"]
+        python-version: ["3.11"]
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Get tag
-      id: tag
-      run: echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        python -m pip install twine
+        python -m pip install build twine
+
     - name: Build package
-      run: python setup.py sdist bdist_wheel
+      run: python -m build
+
     - name: Check the package
       run: twine check dist/*
+
     - name: Publish to PyPI
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run:
         twine upload --skip-existing --non-interactive dist/*
+
     - name: Create GitHub release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
         body: >
           Please see
           https://github.com/${{ github.repository }}/blob/${{ steps.tag.outputs.version }}/HISTORY.rst
