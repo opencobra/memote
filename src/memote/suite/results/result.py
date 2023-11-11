@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import platform
 from datetime import datetime
 
-from depinfo.domain.model import DependencyReport
+from depinfo.domain import DependencyReport
 
 
 __all__ = ("MemoteResult",)
