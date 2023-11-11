@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import platform
 from datetime import datetime
 
-from depinfo import get_pkg_info
+from depinfo.domain import DependencyReport
 
 
 __all__ = ("MemoteResult",)
@@ -52,4 +52,23 @@ class MemoteResult(dict):
         meta["platform"] = platform.system()
         meta["release"] = platform.release()
         meta["python"] = platform.python_version()
-        meta["packages"] = get_pkg_info("memote")
+        report = DependencyReport.from_root(
+            root="memote",
+            build_tools=(
+                "conda",
+                "build",
+                "flit",
+                "hatch",
+                "mamba",
+                "pbr",
+                "pdm",
+                "pip",
+                "poetry",
+                "setuptools",
+                "wheel",
+            ),
+            max_depth=1,
+        )
+        meta["packages"] = dict(
+            report.iter_unique_requirements(missing_version="not installed")
+        )
