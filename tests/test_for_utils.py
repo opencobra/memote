@@ -122,15 +122,12 @@ def test_show_versions(capsys):
     utils.show_versions()
     captured = capsys.readouterr()
     lines = captured.out.split("\n")
-    assert lines[1].startswith("System Information")
-    assert lines[2].startswith("==================")
-    assert lines[3].startswith("OS")
-    assert lines[4].startswith("OS-release")
-    assert lines[5].startswith("Python")
+    assert lines[1].startswith("Package Information")
+    assert lines[2].startswith("------------------")
+    assert lines[3].startswith("memote")
 
-    assert lines[7].startswith("Package Versions")
-    assert lines[8].startswith("================")
-    assert any(l.startswith("memote") for l in lines[9:])
+    assert lines[5].startswith("Dependency Information")
+    assert lines[6].startswith("------------------")
 
 
 @pytest.fixture(scope="function")
