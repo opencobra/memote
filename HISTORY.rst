@@ -4,6 +4,10 @@ History
 Next Release
 ------------
 
+0.16.0 (2023-11-19)
+-------------------
+* Allow the hybrid interface as a solver.
+
 0.15.1 (2023-11-19)
 -------------------
 
