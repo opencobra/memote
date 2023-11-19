@@ -129,7 +129,7 @@ def cli():
 )
 @click.option(
     "--solver",
-    type=click.Choice(["cplex", "glpk", "gurobi", "glpk_exact"]),
+    type=click.Choice(callbacks.DEFAULT_SOLVERS),
     default="glpk",
     show_default=True,
     help="Set the solver to be used.",
@@ -393,7 +393,7 @@ def _test_history(
 )
 @click.option(
     "--solver",
-    type=click.Choice(["cplex", "glpk", "gurobi"]),
+    type=click.Choice(callbacks.DEFAULT_SOLVERS),
     default="glpk",
     show_default=True,
     help="Set the solver to be used.",

@@ -31,6 +31,7 @@ from memote.experimental import ExperimentConfiguration
 
 
 LOGGER = logging.getLogger(__name__)
+DEFAULT_SOLVERS = ("glpk", "cplex", "gurobi", "glpk_exact", "hybrid")
 
 
 def validate_collect(context, param, value):
