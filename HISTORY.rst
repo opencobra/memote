@@ -4,6 +4,11 @@ History
 Next Release
 ------------
 
+0.15.1 (2023-11-19)
+-------------------
+
+* Release with actual improvements to metabolite identification.
+
 0.15.0 (2023-11-11)
 -------------------
 
@@ -12,7 +17,7 @@ Next Release
 * (Cookiecutter) Add an action for comparing models in Pull
   Requests (`#23 <https://github.com/opencobra/cookiecutter-memote/pull/23>`_).
 * Dropped support for python3.6 and python3.7 in favor of python3.8 to python3.11.
-* Fix use of ``depinfo>=2.2``. 
+* Fix use of ``depinfo>=2.2``.
 * Fix identifying metabolites also by their annotation.
 
 0.14.0 (2023-09-13)
