@@ -4,6 +4,8 @@ History
 Next Release
 ------------
 
+0.16.1 (2023-11-21)
+-------------------
 * Set the solver backend earlier in the process, before a COBRApy model is created.
 
 0.16.0 (2023-11-19)
@@ -12,7 +14,6 @@ Next Release
 
 0.15.1 (2023-11-19)
 -------------------
-
 * Release with actual improvements to metabolite identification.
 
 0.15.0 (2023-11-11)
