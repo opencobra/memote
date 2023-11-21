@@ -4,6 +4,8 @@ History
 Next Release
 ------------
 
+* Set the solver backend earlier in the process, before a COBRApy model is created.
+
 0.16.0 (2023-11-19)
 -------------------
 * Allow the hybrid interface as a solver.
