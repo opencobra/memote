@@ -27,6 +27,7 @@ from functools import partial
 from multiprocessing import Pool, cpu_count
 
 import click
+import cobra
 import git
 from libsbml import SBMLError
 from sqlalchemy.exc import ArgumentError
@@ -143,6 +144,10 @@ def snapshot(
     MODEL: Path to model file. Can also be supplied via the environment variable
     MEMOTE_MODEL or configured in 'setup.cfg' or 'memote.ini'.
     """
+    # Configure the chosen solver before attempting to load the model.
+    config = cobra.Configuration()
+    config.solver = solver
+
     model_obj, sbml_ver, notifications = api.validate_model(model)
     if model_obj is None:
         LOGGER.critical(
@@ -159,7 +164,6 @@ def snapshot(
     # Update the default test configuration with custom ones (if any).
     for custom in custom_config:
         config.merge(ReportConfiguration.load(custom))
-    model_obj.solver = solver
     _, results = api.test_model(
         model_obj,
         sbml_version=sbml_ver,
@@ -363,6 +367,10 @@ def diff(
 
     MODELS: List of paths to two or more model files.
     """
+    # Configure the chosen solver before attempting to load the model.
+    config = cobra.Configuration()
+    config.solver = solver
+
     if not any(a.startswith("--tb") for a in pytest_args):
         pytest_args = ["--tb", "no"] + pytest_args
     # Add further directories to search for tests.
@@ -390,7 +398,6 @@ def diff(
                     "reported in {}.".format(model_filename, report_path)
                 )
                 continue
-            model.solver = solver
             model_and_model_ver_tuple.append((model, model_ver))
         except (IOError, SBMLError):
             LOGGER.debug(exc_info=True)

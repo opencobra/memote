@@ -31,6 +31,7 @@ from tempfile import mkdtemp
 
 import click
 import click_log
+import cobra
 import git
 from cookiecutter.main import cookiecutter, get_user_config
 from github import Github
@@ -231,6 +232,11 @@ def run(
             sys.exit(0)
     # Add further directories to search for tests.
     pytest_args.extend(custom_tests)
+
+    # Configure the chosen solver before attempting to load the model.
+    config = cobra.Configuration()
+    config.solver = solver
+
     # Check if the model can be loaded at all.
     model, sbml_ver, notifications = api.validate_model(model)
     if model is None:
@@ -239,7 +245,7 @@ def run(
         )
         stdout_notifications(notifications)
         sys.exit(1)
-    model.solver = solver
+
     code, result = api.test_model(
         model=model,
         sbml_version=sbml_ver,
@@ -339,7 +345,6 @@ def _model_from_stream(stream, filename):
 def _test_history(
     model,
     sbml_ver,
-    solver,
     solver_timeout,
     manager,
     commit,
@@ -348,7 +353,6 @@ def _test_history(
     exclusive,
     experimental,
 ):
-    model.solver = solver
     # Load the experimental configuration using model information.
     if experimental is not None:
         experimental.load(model)
@@ -480,6 +484,9 @@ def history(
         previous = repo.active_branch
         LOGGER.info("Checking out deployment branch {}.".format(deployment))
         repo.git.checkout(deployment)
+    # Configure the chosen solver before attempting to load the model.
+    config = cobra.Configuration()
+    config.solver = solver
     # Temporarily move the results to a new location so that they are
     # available while checking out the various commits.
     engine = None
@@ -545,7 +552,6 @@ def history(
             args=(
                 model_obj,
                 sbml_ver,
-                solver,
                 solver_timeout,
                 manager,
                 commit,
