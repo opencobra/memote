@@ -22,7 +22,12 @@ from __future__ import absolute_import
 import pandas as pd
 
 
-def read_tabular(filename, dtype_conversion=None):
+def read_tabular(
+    filename,
+    dtype_conversion=None,
+    truthy=("yes", "Yes", "YES"),
+    falsy=("no", "No", "NO"),
+):
     """
     Read a tabular data file which can be CSV, TSV, XLS or XLSX.
 
@@ -49,15 +54,45 @@ def read_tabular(filename, dtype_conversion=None):
     # Completely empty columns are interpreted as float by default.
     dtype_conversion["comment"] = str
     if "csv" in ext:
-        df = pd.read_csv(filename, dtype=dtype_conversion, encoding="utf-8")
+        df = pd.read_csv(
+            filename,
+            dtype=dtype_conversion,
+            true_values=list(truthy),
+            false_values=list(falsy),
+            encoding="utf-8",
+        )
     elif "tsv" in ext:
-        df = pd.read_table(filename, sep="\t", dtype=dtype_conversion, encoding="utf-8")
+        df = pd.read_table(
+            filename,
+            sep="\t",
+            dtype=dtype_conversion,
+            true_values=list(truthy),
+            false_values=list(falsy),
+            encoding="utf-8",
+        )
     elif "xlsx" in ext:
-        df = pd.read_excel(filename, dtype=dtype_conversion, engine="openpyxl")
+        df = pd.read_excel(
+            filename,
+            dtype=dtype_conversion,
+            true_values=list(truthy),
+            false_values=list(falsy),
+            engine="openpyxl",
+        )
     elif "xls" in ext:
-        df = pd.read_excel(filename, dtype=dtype_conversion, engine="xlrd")
+        df = pd.read_excel(
+            filename,
+            dtype=dtype_conversion,
+            true_values=list(truthy),
+            false_values=list(falsy),
+            engine="xlrd",
+        )
     elif "ods" in ext:
-        df = pd.read_excel(filename, dtype=dtype_conversion)
+        df = pd.read_excel(
+            filename,
+            dtype=dtype_conversion,
+            true_values=list(truthy),
+            false_values=list(falsy),
+        )
     else:
         raise ValueError("Unknown file format '{}'.".format(ext))
     return df
