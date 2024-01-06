@@ -17,20 +17,8 @@
 """Provide a class for medium definitions."""
 
 
-import json
 import logging
 
-
-try:
-    from importlib.resources import files
-except ImportError:
-    from importlib_resources import files
-
-from goodtables import validate
-
-# Importing the checks is necessary in order to register them.
-import memote.experimental.schemata
-from memote.experimental.checks import UnknownIdentifier  # noqa: F401
 from memote.experimental.tabular import read_tabular
 
 
@@ -42,9 +30,6 @@ LOGGER = logging.getLogger(__name__)
 
 class ExperimentalBase(object):
     """Represent a specific medium condition."""
-
-    SCHEMA = None
-    TRUTHY = {"true", "True", "TRUE", "1", "yes", "Yes", "YES"}
 
     def __init__(self, identifier, obj, filename, **kwargs):
         """
@@ -66,11 +51,10 @@ class ExperimentalBase(object):
             self.label = ""
         self.filename = filename
         self.data = None
-        self.schema = None
 
     def load(self, dtype_conversion=None):
         """
-        Load the data table and corresponding validation schema.
+        Load the data table.
 
         Parameters
         ----------
@@ -82,26 +66,10 @@ class ExperimentalBase(object):
 
         """
         self.data = read_tabular(self.filename, dtype_conversion)
-        with files(memote.experimental.schemata).joinpath(self.SCHEMA).open(
-            mode="r", encoding="utf-8"
-        ) as file_handle:
-            self.schema = json.load(file_handle)
 
-    def validate(self, model, checks=None):
+    def validate(self, model):
         """Use a defined schema to validate the given table."""
-        if checks is None:
-            checks = []
-        records = self.data.to_dict("records")
-        self.evaluate_report(
-            validate(
-                records,
-                headers=list(records[0]),
-                preset="table",
-                schema=self.schema,
-                order_fields=True,
-                checks=checks,
-            )
-        )
+        NotImplementedError("Base class does not implement this method.")
 
     @staticmethod
     def evaluate_report(report):

@@ -20,6 +20,10 @@
 from __future__ import absolute_import
 
 import logging
+from typing import Optional
+
+import pandera as pa
+from pandera.typing import Series
 
 from memote.experimental.experimental_base import ExperimentalBase
 
@@ -29,10 +33,33 @@ __all__ = ("Medium",)
 LOGGER = logging.getLogger(__name__)
 
 
+class MediumModel(pa.DataFrameModel):
+    exchange: Series[str] = pa.Field(
+        description="The exchange reaction identifiers must correspond to the "
+        "metabolic model identifiers.",
+        title="Exchange Reaction Identifier",
+        unique=True,
+    )
+    uptake: Series[float] = pa.Field(
+        ge=0.0,
+        le=1000.0,
+        title="Uptake Rate",
+        description="The uptake rate for the exchange reaction. For models following "
+        "common practices this modifies the lower bound.",
+    )
+    comment: Optional[Series[str]] = pa.Field(
+        nullable=True,
+        title="Comment",
+        description="Optional comment which is not processed further.",
+    )
+
+    class Config:
+        coerce = True
+        strict = "filter"
+
+
 class Medium(ExperimentalBase):
     """Represent a specific medium condition."""
-
-    SCHEMA = "medium.json"
 
     def __init__(self, **kwargs):
         """
@@ -45,19 +72,10 @@ class Medium(ExperimentalBase):
         """
         super(Medium, self).__init__(**kwargs)
 
-    def validate(self, model, checks=None):
+    def validate(self, model):
         """Use a defined schema to validate the medium table format."""
-        if checks is None:
-            checks = []
-        custom = [
-            {
-                "unknown-identifier": {
-                    "column": "exchange",
-                    "identifiers": {r.id for r in model.reactions},
-                }
-            }
-        ]
-        super(Medium, self).validate(model=model, checks=checks + custom)
+        MediumModel.validate(self.data, lazy=True)
+        assert self.data["exchange"].isin({r.id for r in model.reactions}).all()
 
     def apply(self, model):
         """Set the defined medium on the given model."""

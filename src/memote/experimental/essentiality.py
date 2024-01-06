@@ -20,8 +20,11 @@
 from __future__ import absolute_import
 
 import logging
+from typing import Optional
 
+import pandera as pa
 from cobra.flux_analysis import single_gene_deletion
+from pandera.typing import Series
 
 from memote.experimental.experiment import Experiment
 
@@ -31,10 +34,30 @@ __all__ = ("EssentialityExperiment",)
 LOGGER = logging.getLogger(__name__)
 
 
+class EssentialityExperimentModel(pa.DataFrameModel):
+    gene: Series[str] = pa.Field(
+        title="Gene Identifier",
+        description="The gene identifier must correspond to the metabolic model "
+        "identifiers.",
+        unique=True,
+    )
+    essential: Series[bool] = pa.Field(
+        title="Gene Essentiality",
+        description="Whether a gene is (conditionally) essential.",
+    )
+    comment: Optional[Series[str]] = pa.Field(
+        nullable=True,
+        title="Comment",
+        description="Optional comment which is not processed further.",
+    )
+
+    class Config:
+        coerce = True
+        strict = "filter"
+
+
 class EssentialityExperiment(Experiment):
     """Represent an essentiality experiment."""
-
-    SCHEMA = "essentiality.json"
 
     def __init__(self, **kwargs):
         """
@@ -47,39 +70,10 @@ class EssentialityExperiment(Experiment):
         """
         super(EssentialityExperiment, self).__init__(**kwargs)
 
-    def load(self, dtype_conversion=None):
-        """
-        Load the data table and corresponding validation schema.
-
-        Parameters
-        ----------
-        dtype_conversion : dict
-            Column names as keys and corresponding type for loading the data.
-            Please take a look at the `pandas documentation
-            <https://pandas.pydata.org/pandas-docs/stable/io.html#specifying-column-data-types>`__
-            for detailed explanations.
-
-        """
-        if dtype_conversion is None:
-            dtype_conversion = {"essential": str}
-        super(EssentialityExperiment, self).load(dtype_conversion=dtype_conversion)
-        self.data["essential"] = self.data["essential"].isin(self.TRUTHY)
-
     def validate(self, model, checks=None):
-        """Use a defined schema to validate the medium table format."""
-        if checks is None:
-            checks = []
-        custom = [
-            {
-                "unknown-identifier": {
-                    "column": "gene",
-                    "identifiers": {g.id for g in model.genes},
-                }
-            }
-        ]
-        super(EssentialityExperiment, self).validate(
-            model=model, checks=checks + custom
-        )
+        """Use a defined schema to validate the essentiality table format."""
+        EssentialityExperimentModel.validate(self.data, lazy=True)
+        assert self.data["gene"].isin({g.id for g in model.genes}).all()
 
     def evaluate(self, model):
         """Use the defined parameters to predict single gene essentiality."""
