@@ -25,8 +25,8 @@ import pandas as pd
 def read_tabular(
     filename,
     dtype_conversion=None,
-    truthy=("yes", "Yes", "YES"),
-    falsy=("no", "No", "NO"),
+    truthy=("yes", "Yes", "YES", "1"),
+    falsy=("no", "No", "NO", "0"),
 ):
     """
     Read a tabular data file which can be CSV, TSV, XLS or XLSX.
