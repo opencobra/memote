@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+
+0.17.0 (2024-01-08)
+-------------------
 * Replace ``goodtables`` with ``pandera`` for data validation. This change is not
   100% backwards compatible, although most data tables should be unaffected.
 
