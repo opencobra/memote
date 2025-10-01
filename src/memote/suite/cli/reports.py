@@ -63,6 +63,11 @@ def report():
     help="Path for the HTML report output.",
 )
 @click.option(
+    "--json",
+    is_flag=True,
+    help="Flag to generate a json report file with the same base filename as the html report.",
+)
+@click.option(
     "--pytest-args",
     "-a",
     callback=callbacks.validate_pytest_args,
@@ -129,6 +134,7 @@ def report():
 def snapshot(
     model,
     filename,
+    json,
     pytest_args,
     exclusive,
     skip,
@@ -177,6 +183,11 @@ def snapshot(
     with open(filename, "w", encoding="utf-8") as file_handle:
         LOGGER.info("Writing snapshot report to '%s'.", filename)
         file_handle.write(api.snapshot_report(results, config))
+    if json:
+        filename = filename[:-4] + "json"
+        with open(filename, "w", encoding="utf-8") as file_handle:
+            LOGGER.info("Writing additional snapshot report to '%s'.", filename)
+            file_handle.write(api.snapshot_report(results, config, False))
 
 
 @report.command(context_settings=CONTEXT_SETTINGS)

@@ -8,6 +8,7 @@ Next Release
 -------------------
 * Replace ``goodtables`` with ``pandera`` for data validation. This change is not
   100% backwards compatible, although most data tables should be unaffected.
+* Add option to output json report files.
 
 0.16.1 (2023-11-21)
 -------------------
