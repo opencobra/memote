@@ -3,6 +3,9 @@ History
 
 Next Release
 ------------
+* Fix the ten SBO presence tests in ``test_sbo.py`` whose final assertion was
+  inverted, so that they passed only when every component lacked the SBO term
+  and failed on annotated models (#777, #767).
 
 0.17.0 (2024-01-08)
 -------------------

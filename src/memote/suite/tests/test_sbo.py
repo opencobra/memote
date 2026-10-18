@@ -55,7 +55,7 @@ def test_metabolite_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolites."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(model.metabolites), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Reaction General SBO Presence", format_type="count")
@@ -86,7 +86,7 @@ def test_reaction_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no reactions."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(model.reactions), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Gene General SBO Presence", format_type="count")
@@ -116,7 +116,7 @@ def test_gene_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no genes."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(model.genes), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Metabolic Reaction SBO:0000176 Presence", format_type="count")
@@ -152,7 +152,7 @@ def test_metabolic_reaction_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolic reactions."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(pure), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Transport Reaction SBO:0000185 Presence", format_type="count")
@@ -195,7 +195,7 @@ def test_transport_reaction_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no transport reactions."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(transports), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Metabolite SBO:0000247 Presence", format_type="count")
@@ -228,7 +228,7 @@ def test_metabolite_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no metabolites."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(model.metabolites), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Gene SBO:0000243 Presence", format_type="count")
@@ -261,7 +261,7 @@ def test_gene_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no genes."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(model.genes), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Exchange Reaction SBO:0000627 Presence", format_type="count")
@@ -306,7 +306,7 @@ def test_exchange_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no exchange reactions."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(exchanges), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Demand Reaction SBO:0000628 Presence", format_type="count")
@@ -350,7 +350,7 @@ def test_demand_specific_sbo_presence(model):
         ann["metric"] = 1.0
         ann["message"] = "The model has no demand reactions."
         pytest.skip(ann["message"])
-    assert len(ann["data"]) == len(demands), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Sink Reactions SBO:0000632 Presence", format_type="count")
@@ -397,7 +397,7 @@ def test_sink_specific_sbo_presence(model):
             len(ann["data"]), ann["metric"], truncate(ann["data"])
         )
     )
-    assert len(ann["data"]) == len(sinks), ann["message"]
+    assert len(ann["data"]) == 0, ann["message"]
 
 
 @annotate(title="Biomass Reactions SBO:0000629 Presence", format_type="count")
