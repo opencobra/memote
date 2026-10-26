@@ -663,6 +663,59 @@ def test_detect_energy_generating_cycles_exceptions(model, metabolite_id, output
     assert set(result) == set(output)
 
 
+@pytest.mark.parametrize("bounds", [(0, 1000), (2, 1000), (5, 5), (-1000, 1000)])
+@pytest.mark.parametrize("has_cycle", [False, True])
+def test_detect_energy_generating_cycles_is_direction_invariant(
+    solver, bounds, has_cycle
+):
+    """Equivalent reaction orientations have identical ATP-cycle diagnostics."""
+    # ATP + water -> ADP + proton + phosphate is element- and charge-balanced.
+    # Allowing only hydrolysis cannot supply the additional ATP dissipation
+    # reaction. Allowing ATP charging (or both directions) can supply it.
+    species = [
+        ("MNXM3", "ATP", "C10H12N5O13P3", -4, -1),
+        ("MNXM2", "water", "H2O", 0, -1),
+        ("MNXM7", "ADP", "C10H12N5O10P2", -3, 1),
+        ("MNXM1", "proton", "H", 1, 1),
+        ("MNXM9", "phosphate", "HO4P", -2, 1),
+    ]
+    expected_cycle = has_cycle or bounds[0] < 0 < bounds[1]
+    results = []
+    for orientation in (1, -1):
+        model = cobra.Model("balanced_atp_direction")
+        model.solver = solver
+        oriented_bounds = bounds if orientation == 1 else (-bounds[1], -bounds[0])
+        reaction = cobra.Reaction(
+            "R", lower_bound=oriented_bounds[0], upper_bound=oriented_bounds[1]
+        )
+        coefficient_sign = orientation * (-1 if has_cycle else 1)
+        stoichiometry = {}
+        for mnx, name, formula, charge, coefficient in species:
+            metabolite = cobra.Metabolite(
+                mnx + "_c",
+                name=name,
+                formula=formula,
+                charge=charge,
+                compartment="c",
+            )
+            stoichiometry[metabolite] = coefficient_sign * coefficient
+        reaction.add_metabolites(stoichiometry)
+        model.add_reactions([reaction])
+        model.compartments = {"c": "cytosol"}
+        assert reaction.check_mass_balance() == {}
+        assert not model.boundary
+
+        cycle = consistency.detect_energy_generating_cycles(model, "MNXM3")
+
+        assert cycle == (["R"] if expected_cycle else [])
+        assert model.reactions.Dissipation.check_mass_balance() == {}
+        objective = model.slim_optimize(error_value=None)
+        assert objective == pytest.approx(1.0 if expected_cycle else 0.0)
+        results.append((cycle, objective))
+
+    assert results[0] == results[1]
+
+
 @pytest.mark.parametrize(
     "model, num",
     [

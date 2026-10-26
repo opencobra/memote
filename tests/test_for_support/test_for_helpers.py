@@ -576,6 +576,48 @@ def test_open_boundaries(model, reaction_id, bounds):
 
 
 @pytest.mark.parametrize(
+    "bounds, expected",
+    [
+        ((-1000, 0), (-1, 0)),
+        ((-1000, -2), (-1, 0)),
+        ((-5, -5), (-1, 0)),
+        ((-1000, 1000), (-1, 1)),
+        ((0, 1000), (0, 1)),
+        ((2, 1000), (0, 1)),
+        ((5, 5), (0, 1)),
+        ((0, 0), (0, 1)),
+    ],
+)
+def test_close_boundaries_sensibly_preserves_direction(solver, bounds, expected):
+    """Relax flux magnitudes without reversing negative-only reactions."""
+    model = cobra.Model("internal_direction")
+    model.solver = solver
+    reaction = cobra.Reaction("internal", lower_bound=bounds[0], upper_bound=bounds[1])
+    reaction.add_metabolites({cobra.Metabolite("a_c"): -1, cobra.Metabolite("b_c"): 1})
+    model.add_reactions([reaction])
+    assert not model.boundary
+
+    helpers.close_boundaries_sensibly(model)
+
+    assert reaction.bounds == expected
+
+
+@pytest.mark.parametrize("bounds", [(-1000, 0), (0, 1000), (-1000, 1000), (0, 0)])
+def test_close_boundaries_sensibly_closes_all_boundary_directions(solver, bounds):
+    """Boundary closure takes precedence over internal direction normalization."""
+    model = cobra.Model("boundary_direction")
+    model.solver = solver
+    boundary = cobra.Reaction("EX_a", lower_bound=bounds[0], upper_bound=bounds[1])
+    boundary.add_metabolites({cobra.Metabolite("a_c"): -1})
+    model.add_reactions([boundary])
+    assert boundary in model.boundary
+
+    helpers.close_boundaries_sensibly(model)
+
+    assert boundary.bounds == (0, 0)
+
+
+@pytest.mark.parametrize(
     "model, mnx_id, compartment_id, expected",
     [
         ("find_met_id", "MNXM3", "c", "atp_c"),

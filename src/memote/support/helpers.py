@@ -697,6 +697,8 @@ def close_boundaries_sensibly(model):
     for rxn in model.reactions:
         if rxn.reversibility:
             rxn.bounds = -1, 1
+        elif rxn.upper_bound <= 0 and rxn.lower_bound < 0:
+            rxn.bounds = -1, 0
         else:
             rxn.bounds = 0, 1
     for boundary in model.boundary:

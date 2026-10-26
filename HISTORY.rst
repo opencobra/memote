@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Preserve the allowed flux direction of negative-only internal reactions when
+  normalizing bounds for closed-boundary consistency tests.
 
 0.17.0 (2024-01-08)
 -------------------
