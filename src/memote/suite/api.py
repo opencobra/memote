@@ -35,6 +35,7 @@ from memote.suite.reporting import (
     SnapshotReport,
 )
 from memote.support import validation as val
+from memote.support.cache import clear_support_caches
 
 
 __all__ = (
@@ -112,7 +113,17 @@ def test_model(
     memote.Result, optional
         A nested dictionary structure that contains the complete test results.
 
+    Notes
+    -----
+    Each sequential, non-overlapping call starts with empty support caches,
+    so changes made between calls are reflected during collection and tests.
+    Cached results are shared within a run. Direct support calls after model
+    mutation need explicit ``memote.support.cache.clear_support_caches()``.
+    Within-run mutation and concurrent or nested calls are not tracked.
+
     """
+    # Reset before collection, which also uses cached biomass classification.
+    clear_support_caches()
     if pytest_args is None:
         pytest_args = ["--tb", "short", TEST_DIRECTORY]
     elif not any(a.startswith("--tb") for a in pytest_args):

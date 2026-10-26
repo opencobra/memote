@@ -3,6 +3,8 @@ History
 
 Next Release
 ------------
+* Reset model-dependent support caches before each sequential ``test_model``
+  run, including collection, while preserving reuse within a run.
 
 0.17.0 (2024-01-08)
 -------------------

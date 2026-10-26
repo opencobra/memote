@@ -129,3 +129,141 @@ def test_validate_model(model_file):
     assert model.id == "e_coli_core"
     assert len(model.metabolites) == 72
     assert len(model.reactions) == 95
+
+
+def _cache_lifecycle_model(solver):
+    model = cobra.Model("cache_lifecycle")
+    model.solver = solver
+    a = cobra.Metabolite("a_c", compartment="c")
+    b = cobra.Metabolite("b_c", compartment="c")
+    conversion = cobra.Reaction("conversion")
+    conversion.add_metabolites({a: -1, b: 1})
+    model.add_reactions([conversion])
+    branch = cobra.Reaction("branch")
+    branch.add_metabolites({a: -1, b: 2})
+    return model, branch
+
+
+def _run_cache_lifecycle(model, selection="test_stoichiometric_consistency", extra=()):
+    return api.test_model(
+        model,
+        results=True,
+        pytest_args=[
+            "-q",
+            "--tb=short",
+            "-o",
+            "addopts=",
+            "-p",
+            "no:cacheprovider",
+            "-k",
+            selection,
+        ]
+        + list(extra),
+    )
+
+
+@pytest.mark.parametrize("initial_branch", [False, True])
+def test_test_model_reaudits_added_and_removed_reaction(solver, initial_branch):
+    """A new API run must test the current reaction set in either direction."""
+    model, branch = _cache_lifecycle_model(solver)
+    if initial_branch:
+        model.add_reactions([branch])
+    _, before = _run_cache_lifecycle(model)
+    assert before.cases["test_stoichiometric_consistency"]["data"] is not initial_branch
+    if initial_branch:
+        model.remove_reactions([branch])
+    else:
+        model.add_reactions([branch])
+    code, after = _run_cache_lifecycle(model)
+    assert after.cases["test_stoichiometric_consistency"]["data"] is initial_branch
+    assert code == (0 if initial_branch else 1)
+
+
+def test_test_model_recollects_changed_biomass_annotation(solver, pytester):
+    """Biomass parameters must refresh before pytest collection."""
+    custom = pytester.makepyfile(
+        """
+        import pytest
+        @pytest.mark.biomass
+        def test_current_biomass(model, reaction_id):
+            assert reaction_id == "branch"
+        """
+    )
+    model, branch = _cache_lifecycle_model(solver)
+    model.add_reactions([branch])
+    selection = "test_stoichiometric_consistency or test_current_biomass"
+    _, before = _run_cache_lifecycle(model, selection, [str(custom)])
+    assert before.cases["test_stoichiometric_consistency"]["data"] is False
+    branch.annotation["sbo"] = "SBO:0000629"
+    code, after = _run_cache_lifecycle(model, selection, [str(custom)])
+    assert code == 0
+    assert after.cases["test_stoichiometric_consistency"]["data"] is True
+    assert after.cases["test_current_biomass"]["result"] == {"branch": "passed"}
+
+
+def test_test_model_reuses_classification_within_run(solver, pytester, monkeypatch):
+    """Two tests still share one internal-reaction classification."""
+    from memote.support import consistency_helpers
+
+    custom = pytester.makepyfile(
+        """
+        from memote.support.consistency_helpers import get_internals
+        def test_reuse_first(model):
+            assert get_internals(model) is get_internals(model)
+        def test_reuse_second(model):
+            assert get_internals(model) is get_internals(model)
+        """
+    )
+    original = consistency_helpers.find_biomass_reaction
+    computations = []
+
+    def counted(model):
+        computations.append(model)
+        return original(model)
+
+    monkeypatch.setattr(consistency_helpers, "find_biomass_reaction", counted)
+    model, _ = _cache_lifecycle_model(solver)
+    code, _ = _run_cache_lifecycle(model, "test_reuse_", [str(custom)])
+    assert code == 0
+    assert computations == [model]
+
+
+def test_test_model_retry_after_configuration_error(solver):
+    """A failed entry must not poison the next sequential run."""
+    from memote.support.consistency_helpers import get_internals
+
+    class PlannedFailure(Exception):
+        pass
+
+    class FailingConfiguration:
+        def load(self, model):
+            get_internals(model)
+            raise PlannedFailure("controlled configuration failure")
+
+    model, branch = _cache_lifecycle_model(solver)
+    with pytest.raises(PlannedFailure):
+        api.test_model(model, experimental=FailingConfiguration())
+    model.add_reactions([branch])
+    code, result = _run_cache_lifecycle(model)
+    assert code == 1
+    assert result.cases["test_stoichiometric_consistency"]["data"] is False
+
+
+def test_clear_support_caches_covers_existing_wrappers():
+    """Keep the explicit reset complete when support caches are added."""
+    from memote.support import basic, consistency_helpers, helpers
+    from memote.support.cache import clear_support_caches
+
+    wrappers = {
+        function
+        for module in (basic, consistency_helpers, helpers)
+        for function in vars(module).values()
+        if callable(function) and hasattr(function, "cache")
+    }
+    try:
+        for function in wrappers:
+            function.cache[("cache lifecycle regression",)] = object()
+        clear_support_caches()
+        assert all(len(function.cache) == 0 for function in wrappers)
+    finally:
+        clear_support_caches()
